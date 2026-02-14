@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const accountName = ref("");
+// Get query param from URL
+const route = useRoute();
+const router = useRouter();
+const initialUser = (route.query.user as string) || "";
+
+const accountName = ref(initialUser);
 const queryUser = ref("");
 
 const { data, execute, status, error } = useFetch("/api/user", {
@@ -8,9 +13,20 @@ const { data, execute, status, error } = useFetch("/api/user", {
   watch: false,
 });
 
+// Auto-fetch if URL has user param
+onMounted(() => {
+  if (initialUser) {
+    queryUser.value = initialUser;
+    execute();
+  }
+});
+
 function handleSubmit() {
   if (!accountName.value.trim()) return;
-  queryUser.value = accountName.value.trim();
+  const username = accountName.value.trim();
+  queryUser.value = username;
+  // Update URL without reload
+  router.push({ query: { user: username } });
   execute();
 }
 
@@ -28,6 +44,40 @@ const classificationLabel = computed(() => {
   if (c === "likely_bot") return "Likely Bot";
   if (c === "suspicious") return "Suspicious";
   return "Human";
+});
+
+// Dynamic OG meta tags (text only - no server cost)
+const ogTitle = computed(() => {
+  if (!data.value?.user) return "AgentScan - GitHub AI Agent Detector";
+  return `@${data.value.user.login} - ${classificationLabel.value} | AgentScan`;
+});
+
+const ogDescription = computed(() => {
+  if (!data.value?.analysis)
+    return "Detect suspicious AI agent activities on GitHub accounts";
+  const score = data.value.analysis.score;
+  const flags = data.value.analysis.flags.length;
+  return `Score: ${score}/100 | ${flags} detection flags | ${data.value.eventCount} events analyzed`;
+});
+
+// Use user's GitHub avatar as OG image (free, hosted by GitHub)
+const ogImage = computed(() => {
+  if (!data.value?.user) return "/og.png";
+  return data.value.user.avatar;
+});
+
+useHead({
+  title: ogTitle,
+  meta: [
+    { property: "og:title", content: ogTitle },
+    { property: "og:description", content: ogDescription },
+    { property: "og:image", content: ogImage },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: ogTitle },
+    { name: "twitter:description", content: ogDescription },
+    { name: "twitter:image", content: ogImage },
+  ],
 });
 </script>
 
