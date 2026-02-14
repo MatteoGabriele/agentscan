@@ -7,21 +7,29 @@ const initialUser = computed(() => (route.query.user as string) || "");
 const accountName = ref(initialUser.value);
 const queryUser = ref(initialUser.value);
 
-// SSR fetch - runs immediately on server if user param exists
-const { data, execute, status, error } = useFetch("/api/user", {
+const {
+  data,
+  execute: getUserData,
+  status,
+  error,
+} = useFetch("/api/user", {
   query: { user: queryUser },
-  immediate: !!initialUser.value, // Fetch immediately if URL has user param
+  immediate: !!initialUser.value,
   watch: false,
-  server: true, // Enable SSR for meta tags
+  server: true,
 });
 
 function handleSubmit() {
-  if (!accountName.value.trim()) return;
   const username = accountName.value.trim();
+
+  if (!username) {
+    return;
+  }
+
   queryUser.value = username;
-  // Update URL without reload
   router.push({ query: { user: username } });
-  execute();
+
+  getUserData();
 }
 
 const scoreColor = computed(() => {
