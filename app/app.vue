@@ -2,23 +2,17 @@
 // Get query param from URL
 const route = useRoute();
 const router = useRouter();
-const initialUser = (route.query.user as string) || "";
+const initialUser = computed(() => (route.query.user as string) || "");
 
-const accountName = ref(initialUser);
-const queryUser = ref("");
+const accountName = ref(initialUser.value);
+const queryUser = ref(initialUser.value);
 
+// SSR fetch - runs immediately on server if user param exists
 const { data, execute, status, error } = useFetch("/api/user", {
   query: { user: queryUser },
-  immediate: false,
+  immediate: !!initialUser.value, // Fetch immediately if URL has user param
   watch: false,
-});
-
-// Auto-fetch if URL has user param
-onMounted(() => {
-  if (initialUser) {
-    queryUser.value = initialUser;
-    execute();
-  }
+  server: true, // Enable SSR for meta tags
 });
 
 function handleSubmit() {
