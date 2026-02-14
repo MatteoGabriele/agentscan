@@ -117,7 +117,9 @@ useHead({
           <div class="stats">
             <span>{{ data.user.followers }} followers</span>
             <span>{{ data.user.repos }} repos</span>
-            <span>{{ data.analysis.profile.age }} days old</span>
+            <span
+              >Joined <NuxtTime :datetime="data.user.created" relative
+            /></span>
           </div>
         </div>
       </div>
