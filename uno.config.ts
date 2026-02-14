@@ -20,6 +20,20 @@ export default defineConfig({
         "red-bg": "#3d1515",
       },
     },
+    animation: {
+      keyframes: {
+        spin: "{ from { transform: rotate(0deg) } to { transform: rotate(360deg) } }",
+      },
+      durations: {
+        spin: "1s",
+      },
+      timingFns: {
+        spin: "linear",
+      },
+      counts: {
+        spin: "infinite",
+      },
+    },
   },
   preflights: [
     {
@@ -34,9 +48,6 @@ export default defineConfig({
           background: #0d1117;
           color: #c9d1d9;
           min-height: 100vh;
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
         }
       `,
     },
