@@ -135,18 +135,17 @@ useHead({
 
       <!-- Flags -->
       <div v-if="data.analysis.flags.length > 0" class="flags">
-        <h3>🚩 Detection Flags</h3>
+        <h3>Detection Flags</h3>
         <ul>
           <li v-for="flag in data.analysis.flags" :key="flag.label">
             <strong>{{ flag.label }}</strong>
-            <span class="points">+{{ flag.points }}</span>
             <span class="detail">{{ flag.detail }}</span>
           </li>
         </ul>
       </div>
 
       <div v-else class="no-flags">
-        <p>✅ No suspicious patterns detected</p>
+        <p>No suspicious patterns detected</p>
       </div>
     </div>
   </div>
