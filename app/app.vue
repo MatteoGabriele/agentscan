@@ -103,7 +103,7 @@ useHead({
     </div>
 
     <div v-else-if="error" class="error-box">
-      <p>❌ {{ error.data?.message || "Failed to analyze user" }}</p>
+      <p>{{ error.data?.message || "Failed to analyze user" }}</p>
     </div>
 
     <div v-else-if="data?.analysis" class="results">
