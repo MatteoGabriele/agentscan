@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Get query param from URL
 const route = useRoute();
 const router = useRouter();
 const initialUser = computed(() => (route.query.user as string) || "");
@@ -84,45 +83,63 @@ useHead({
 </script>
 
 <template>
-  <div class="container">
-    <header>
-      <h1>AgentScan</h1>
-      <p class="subtitle">Detect suspicious AI agents activities on GitHub</p>
+  <div class="max-w-150 mx-auto py-8 px-4">
+    <header class="text-center mb-8">
+      <h1 class="text-2rem text-white">AgentScan</h1>
+      <p class="text-gh-muted mt-2">
+        Detect suspicious AI agents activities on GitHub
+      </p>
     </header>
 
-    <form @submit.prevent="handleSubmit" class="search-form">
+    <form @submit.prevent="handleSubmit" class="flex gap-2 mb-8">
       <input
         v-model="accountName"
         type="text"
         placeholder="Enter GitHub username..."
         :disabled="status === 'pending'"
+        class="flex-1 py-3 px-4 border-1 border-solid border-gh-border rounded-1.5 bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
       />
       <button
         type="submit"
         :disabled="status === 'pending' || !accountName.trim()"
+        class="py-3 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {{ status === "pending" ? "Analyzing..." : "Analyze" }}
       </button>
     </form>
 
-    <div v-if="status === 'pending'" class="loading">
-      <div class="spinner"></div>
+    <div v-if="status === 'pending'" class="text-center py-12">
+      <div
+        class="w-10 h-10 border-3 border-gh-border border-t-gh-blue rounded-full mx-auto mb-4 animate-spin"
+      ></div>
       <p>Analyzing @{{ queryUser }}...</p>
     </div>
 
-    <div v-else-if="error" class="error-box">
+    <div
+      v-else-if="error"
+      class="bg-gh-red-bg border-1 border-solid border-gh-red p-4 rounded-1.5 text-center"
+    >
       <p>{{ error.data?.message || "Failed to analyze user" }}</p>
     </div>
 
-    <div v-else-if="data?.analysis" class="results">
-      <!-- User Card -->
-      <div class="user-card">
-        <img :src="data.user.avatar" :alt="data.user.login" class="avatar" />
-        <div class="user-info">
-          <h2>{{ data.user.name || data.user.login }}</h2>
-          <p class="username">@{{ data.user.login }}</p>
-          <p v-if="data.user.bio" class="bio">{{ data.user.bio }}</p>
-          <div class="stats">
+    <div v-else-if="data?.analysis" class="flex flex-col gap-6">
+      <div
+        class="flex gap-4 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
+      >
+        <img
+          :src="data.user.avatar"
+          :alt="data.user.login"
+          class="w-20 h-20 rounded-full"
+        />
+        <div>
+          <h2 class="text-white text-1.25rem">
+            {{ data.user.name || data.user.login }}
+          </h2>
+          <p class="text-gh-muted my-1">@{{ data.user.login }}</p>
+          <p v-if="data.user.bio" class="my-2 text-0.9rem">
+            {{ data.user.bio }}
+          </p>
+          <div class="flex gap-4 mt-2 text-0.85rem text-gh-muted">
             <span>{{ data.user.followers }} followers</span>
             <span>{{ data.user.repos }} repos</span>
             <span
@@ -132,263 +149,49 @@ useHead({
         </div>
       </div>
 
-      <!-- Score -->
-      <div class="score-card" :style="{ borderColor: scoreColor }">
-        <div class="score-circle" :style="{ background: scoreColor }">
+      <div
+        class="flex items-center gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid"
+        :style="{ borderColor: scoreColor }"
+      >
+        <div
+          class="w-17.5 h-17.5 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
+          :style="{ background: scoreColor }"
+        >
           {{ data.analysis.score }}
         </div>
-        <div class="score-info">
-          <h3 :style="{ color: scoreColor }">{{ classificationLabel }}</h3>
-          <p>Based on {{ data.eventCount }} recent events</p>
+        <div>
+          <h3 class="text-1.5rem" :style="{ color: scoreColor }">
+            {{ classificationLabel }}
+          </h3>
+          <p class="text-gh-muted mt-1">
+            Based on {{ data.eventCount }} recent events
+          </p>
         </div>
       </div>
 
-      <!-- Flags -->
-      <div v-if="data.analysis.flags.length > 0" class="flags">
-        <h3>Detection Flags</h3>
-        <ul>
-          <li v-for="flag in data.analysis.flags" :key="flag.label">
+      <div
+        v-if="data.analysis.flags.length > 0"
+        class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
+      >
+        <h3 class="mb-4 text-white">Detection Flags</h3>
+        <ul class="list-none">
+          <li
+            v-for="flag in data.analysis.flags"
+            :key="flag.label"
+            class="py-3 flex items-center gap-3"
+          >
             <strong>{{ flag.label }}</strong>
-            <span class="detail">{{ flag.detail }}</span>
+            <span class="text-gh-muted text-0.9rem">{{ flag.detail }}</span>
           </li>
         </ul>
       </div>
 
-      <div v-else class="no-flags">
+      <div
+        v-else
+        class="bg-gh-green-bg border-1 border-solid border-gh-green p-6 rounded-2 text-center text-gh-green-text"
+      >
         <p>No suspicious patterns detected</p>
       </div>
     </div>
   </div>
 </template>
-
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #0d1117;
-  color: #c9d1d9;
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-header h1 {
-  font-size: 2rem;
-  color: #fff;
-}
-
-.subtitle {
-  color: #8b949e;
-  margin-top: 0.5rem;
-}
-
-.search-form {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-.search-form input {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  background: #161b22;
-  color: #c9d1d9;
-  font-size: 1rem;
-}
-
-.search-form input:focus {
-  outline: none;
-  border-color: #58a6ff;
-}
-
-.search-form button {
-  padding: 0.75rem 1.5rem;
-  background: #238636;
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.search-form button:hover:not(:disabled) {
-  background: #2ea043;
-}
-
-.search-form button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.loading {
-  text-align: center;
-  padding: 3rem;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #30363d;
-  border-top-color: #58a6ff;
-  border-radius: 50%;
-  margin: 0 auto 1rem;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.error-box {
-  background: #3d1515;
-  border: 1px solid #f85149;
-  padding: 1rem;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.results {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.user-card {
-  display: flex;
-  gap: 1rem;
-  background: #161b22;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #30363d;
-}
-
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
-
-.user-info h2 {
-  color: #fff;
-  font-size: 1.25rem;
-}
-
-.username {
-  color: #8b949e;
-  margin: 0.25rem 0;
-}
-
-.bio {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.stats {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #8b949e;
-}
-
-.score-card {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  background: #161b22;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 2px solid;
-}
-
-.score-circle {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-.score-info h3 {
-  font-size: 1.5rem;
-}
-
-.score-info p {
-  color: #8b949e;
-  margin-top: 0.25rem;
-}
-
-.flags {
-  background: #161b22;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #30363d;
-}
-
-.flags h3 {
-  margin-bottom: 1rem;
-  color: #fff;
-}
-
-.flags ul {
-  list-style: none;
-}
-
-.flags li {
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #21262d;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.flags li:last-child {
-  border-bottom: none;
-}
-
-.points {
-  background: #f8514940;
-  color: #f85149;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.detail {
-  color: #8b949e;
-  font-size: 0.9rem;
-}
-
-.no-flags {
-  background: #0d2818;
-  border: 1px solid #238636;
-  padding: 1.5rem;
-  border-radius: 8px;
-  text-align: center;
-  color: #3fb950;
-}
-</style>
