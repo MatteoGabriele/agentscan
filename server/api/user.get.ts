@@ -4,11 +4,6 @@ import {
   type GitHubEvent,
 } from "../utils/botDetectionScorer";
 
-function getHeaders() {
-  const token = process.env.GITHUB_TOKEN;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const username = query.user as string;
@@ -17,16 +12,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: "Missing user parameter" });
   }
 
-  const headers = getHeaders();
-
-  // Fetch user and events only (repos removed - not useful)
+  // Fetch user and events (no auth - 60 requests/hour)
   const [user, events] = await Promise.all([
-    $fetch<GitHubUser>(`https://api.github.com/users/${username}`, {
-      headers,
-    }).catch(() => null),
+    $fetch<GitHubUser>(`https://api.github.com/users/${username}`).catch(
+      () => null,
+    ),
     $fetch<GitHubEvent[]>(
       `https://api.github.com/users/${username}/events?per_page=100`,
-      { headers },
     ).catch(() => []),
   ]);
 

@@ -155,11 +155,12 @@ export function analyzeUser(
       daysWithManyHours.sort();
       let consecutiveCount = 1;
       let maxConsecutive = 1;
-      
+
       for (let i = 1; i < daysWithManyHours.length; i++) {
         const prev = new Date(daysWithManyHours[i - 1]!);
         const curr = new Date(daysWithManyHours[i]!);
-        const diffDays = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
+        const diffDays =
+          (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
         if (diffDays === 1) {
           consecutiveCount++;
           maxConsecutive = Math.max(maxConsecutive, consecutiveCount);
@@ -247,12 +248,12 @@ export function analyzeUser(
     const now = Date.now();
     const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
     const oneDayAgo = now - 24 * 60 * 60 * 1000;
-    
-    const prsThisWeek = externalPRs.filter((e) => 
-      new Date(e.created_at).getTime() > oneWeekAgo
+
+    const prsThisWeek = externalPRs.filter(
+      (e) => new Date(e.created_at).getTime() > oneWeekAgo,
     );
-    const prsToday = externalPRs.filter((e) => 
-      new Date(e.created_at).getTime() > oneDayAgo
+    const prsToday = externalPRs.filter(
+      (e) => new Date(e.created_at).getTime() > oneDayAgo,
     );
 
     // Many PRs in a single day - only flag extreme cases
