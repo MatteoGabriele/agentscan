@@ -143,10 +143,13 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-150 mx-auto py-8 px-4 @container">
+  <main class="max-w-150 mx-auto py-8 px-4 @container">
     <header class="text-center mb-8">
       <h1 class="text-2rem text-white flex items-center justify-center gap-2">
-        <span class="i-carbon-fingerprint-recognition text-gh-blue" />
+        <span
+          class="i-carbon-fingerprint-recognition text-gh-blue"
+          aria-hidden="true"
+        />
         AgentScan
       </h1>
       <p class="text-gh-muted text-balance @md:text-wrap">
@@ -158,19 +161,22 @@ useHead({
       @submit.prevent="handleSubmit"
       class="flex flex-col @md:flex-row gap-2 mb-8"
     >
+      <label class="sr-only" for="userName">Enter GitHub username</label>
       <input
         v-model="accountName"
         type="text"
+        id="userName"
         placeholder="Enter GitHub username..."
         :disabled="status === 'pending'"
         class="flex-1 py-2 px-4 border-1 border-solid border-gh-border rounded-1.5 bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
       />
+
       <button
         type="submit"
         :disabled="status === 'pending' || accountName === ''"
         class="py-2 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed flex justify-center items-center gap-2"
       >
-        <span class="i-carbon-search" />
+        <span class="i-carbon-search" aria-hidden="true" />
         Analyze
       </button>
     </form>
@@ -187,7 +193,7 @@ useHead({
       class="bg-gh-red-bg border-1 border-solid border-gh-red p-4 rounded-1.5 text-center"
     >
       <p class="flex items-center justify-center gap-2">
-        <span class="i-carbon-error text-gh-red text-xl" />
+        <span class="i-carbon-error text-gh-red text-xl" aria-hidden="true" />
         {{ error.data?.message || "Failed to analyze user" }}
       </p>
     </div>
@@ -198,7 +204,7 @@ useHead({
       >
         <img
           :src="data.user.avatar"
-          :alt="data.user.login"
+          :alt="`Avatar of ${data.user.login}`"
           class="size-40 @lg:size-20 rounded-full"
         />
         <div
@@ -222,15 +228,24 @@ useHead({
             class="flex flex-col items-center @lg:items-start @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
           >
             <li class="flex items-center gap-1">
-              <span class="i-carbon-user-multiple hidden @lg:inline-block" />
+              <span
+                class="i-carbon-user-multiple hidden @lg:inline-block"
+                aria-hidden="true"
+              />
               {{ data.user.followers }} followers
             </li>
             <li class="flex items-center gap-1">
-              <span class="i-carbon-repo-source-code hidden @lg:inline-block" />
+              <span
+                class="i-carbon-repo-source-code hidden @lg:inline-block"
+                aria-hidden="true"
+              />
               {{ data.user.repos }} repos
             </li>
             <li class="flex items-center gap-1">
-              <span class="i-carbon-calendar hidden @lg:inline-block" />
+              <span
+                class="i-carbon-calendar hidden @lg:inline-block"
+                aria-hidden="true"
+              />
               Joined <NuxtTime :datetime="data.user.created" relative />
             </li>
           </ul>
@@ -264,7 +279,7 @@ useHead({
             "
             class="text-gh-muted text-sm mt-2 italic flex items-center gap-1"
           >
-            <span class="i-carbon-sprout text-green-500" />
+            <span class="i-carbon-sprout text-green-500" aria-hidden="true" />
             Don't forget to touch grass!
           </p>
         </div>
@@ -296,10 +311,10 @@ useHead({
         class="bg-gh-green-bg border-1 border-solid border-gh-green p-6 rounded-2 text-center text-gh-green-text"
       >
         <p class="flex items-center justify-center gap-2">
-          <span class="i-carbon-checkmark-filled text-xl" />
+          <span class="i-carbon-checkmark-filled text-xl" aria-hidden="true" />
           No suspicious patterns detected
         </p>
       </div>
     </div>
-  </div>
+  </main>
 </template>
