@@ -155,25 +155,27 @@ useHead({
 
     <div v-else-if="data?.analysis" class="flex flex-col gap-6 @container">
       <div
-        class="flex flex-col @md:flex-row justify-center items-center @md:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
+        class="flex flex-col @lg:flex-row justify-center items-center @lg:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
       >
         <img
           :src="data.user.avatar"
           :alt="data.user.login"
-          class="w-20 h-20 rounded-full"
+          class="size-40 @lg:size-20 rounded-full"
         />
         <div
-          class="w-full flex flex-col justify-center items-center @md:items-start text-center @md:text-left"
+          class="w-full flex flex-col justify-center items-center @lg:items-start text-center @lg:text-left"
         >
-          <h2 class="text-white text-xl">
+          <h2 class="text-white text-3xl @lg:text-xl">
             {{ data.user.name || data.user.login }}
           </h2>
-          <p class="text-gh-muted">@{{ data.user.login }}</p>
+          <p class="text-gh-muted text-xl @lg:text-base">
+            @{{ data.user.login }}
+          </p>
           <p v-if="data.user.bio" class="my-2">
             {{ data.user.bio }}
           </p>
           <ul
-            class="flex flex-col @md:flex-row @md:gap-4 mt-2 text-sm text-gh-muted"
+            class="flex flex-col @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
           >
             <li>{{ data.user.followers }} followers</li>
             <li>{{ data.user.repos }} repos</li>
@@ -187,7 +189,7 @@ useHead({
         :style="{ borderColor: scoreColor }"
       >
         <div
-          class="w-17.5 h-17.5 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
+          class="w-17.5 h-17.5 shrink-0 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
           :style="{ background: scoreColor }"
         >
           {{ data.analysis.score }}
@@ -211,15 +213,17 @@ useHead({
         v-if="data.analysis.flags.length > 0"
         class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
       >
-        <h3 class="mb-4 text-white">Detection Flags</h3>
+        <h3 class="mb-4 text-white text-xl text-center @md:text-left">
+          Detection Flags
+        </h3>
         <ul>
           <li
             v-for="flag in data.analysis.flags"
             :key="flag.label"
-            class="flex items-center gap-3 not-last:border-b border-gh-border-light py-2"
+            class="flex flex-col @md:flex-row @md:justify-between items-center gap-1 @md:gap-3 not-last:border-b border-gh-border-light py-4 @md:py-2"
           >
             <strong>{{ flag.label }}</strong>
-            <span class="text-gh-muted text-0.9rem">{{ flag.detail }}</span>
+            <span class="text-gh-muted">{{ flag.detail }}</span>
           </li>
         </ul>
       </div>
