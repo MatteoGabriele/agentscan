@@ -111,7 +111,7 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-150 mx-auto py-8 px-4">
+  <div class="max-w-150 mx-auto py-8 px-4 @container">
     <header class="text-center mb-8">
       <h1 class="text-2rem text-white">AgentScan</h1>
       <p class="text-gh-muted mt-2">
@@ -119,7 +119,10 @@ useHead({
       </p>
     </header>
 
-    <form @submit.prevent="handleSubmit" class="flex gap-2 mb-8">
+    <form
+      @submit.prevent="handleSubmit"
+      class="flex flex-col @md:flex-row gap-2 mb-8"
+    >
       <input
         v-model="accountName"
         type="text"
@@ -130,7 +133,7 @@ useHead({
       <button
         type="submit"
         :disabled="status === 'pending' || accountName === ''"
-        class="px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        class="py-2 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
       >
         Analyze
       </button>
@@ -150,25 +153,27 @@ useHead({
       <p>{{ error.data?.message || "Failed to analyze user" }}</p>
     </div>
 
-    <div v-else-if="data?.analysis" class="flex flex-col gap-6">
+    <div v-else-if="data?.analysis" class="flex flex-col gap-6 @container">
       <div
-        class="flex gap-4 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
+        class="flex flex-col @md:flex-row justify-center items-center @md:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
       >
         <img
           :src="data.user.avatar"
           :alt="data.user.login"
           class="w-20 h-20 rounded-full"
         />
-        <div>
-          <h2 class="text-white text-1.25rem">
+        <div
+          class="w-full flex flex-col justify-center items-center @md:items-start text-center @md:text-left"
+        >
+          <h2 class="text-white text-xl">
             {{ data.user.name || data.user.login }}
           </h2>
-          <p class="text-gh-muted my-1">@{{ data.user.login }}</p>
-          <p v-if="data.user.bio" class="my-2 text-0.9rem">
+          <p class="text-gh-muted">@{{ data.user.login }}</p>
+          <p v-if="data.user.bio" class="my-2">
             {{ data.user.bio }}
           </p>
           <ul
-            class="flex flex-col sm:flex-row sm:gap-4 mt-2 text-0.85rem text-gh-muted"
+            class="flex flex-col @md:flex-row @md:gap-4 mt-2 text-sm text-gh-muted"
           >
             <li>{{ data.user.followers }} followers</li>
             <li>{{ data.user.repos }} repos</li>
