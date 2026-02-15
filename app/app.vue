@@ -18,7 +18,6 @@ const {
   query: { user: queryUser },
   immediate: !!initialUser.value,
   watch: false,
-  server: true,
 });
 
 function handleSubmit() {
@@ -225,7 +224,7 @@ useHead({
               {{ data.user.name || data.user.login }}
             </h2>
             <NuxtLink
-              external
+              :external="true"
               target="_blank"
               :to="`https://github.com/${data.user.login}`"
               class="text-gh-muted underline text-xl @lg:text-sm"
@@ -257,7 +256,8 @@ useHead({
                   class="i-carbon-calendar hidden @lg:inline-block"
                   aria-hidden="true"
                 />
-                Joined <NuxtTime :datetime="data.user.created" relative />
+                Joined
+                <NuxtTime :datetime="data.user.created" :relative="true" />
               </li>
             </ul>
           </div>
@@ -282,16 +282,6 @@ useHead({
             </header>
             <p class="text-gh-muted mt-1">
               Based on {{ data.eventCount }} recent events
-            </p>
-            <p
-              v-if="
-                data.analysis.score >= CONFIG.THRESHOLD_HUMAN &&
-                data.analysis.score < 100
-              "
-              class="text-gh-muted text-sm mt-2 italic flex items-center gap-1"
-            >
-              <span class="i-carbon-sprout text-green-500" aria-hidden="true" />
-              Don't forget to touch grass!
             </p>
           </div>
         </div>
@@ -345,7 +335,7 @@ useHead({
         />
         by
         <NuxtLink
-          external
+          :external="true"
           target="_blank"
           to="https://github.com/MatteoGabriele"
           class="underline"
