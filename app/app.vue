@@ -316,5 +316,30 @@ useHead({
         </p>
       </div>
     </div>
+
+    <footer
+      class="mt-12 pt-6 border-t border-gh-border text-center text-gh-muted text-sm"
+    >
+      <p class="flex items-center justify-center gap-1">
+        Made with
+        <span
+          class="i-carbon-favorite-filled text-red-500"
+          aria-hidden="true"
+        />
+        by
+        <NuxtLink
+          external
+          target="_blank"
+          to="https://github.com/MatteoGabriele"
+          class="underline"
+        >
+          MatteoGabriele
+        </NuxtLink>
+      </p>
+      <p class="mt-2 text-xs text-gh-muted/70 max-w-100 mx-auto">
+        This tool uses an opinionated scoring system. Results should be taken as
+        indicators, not definitive judgments.
+      </p>
+    </footer>
   </main>
 </template>
