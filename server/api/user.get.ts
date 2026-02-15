@@ -14,14 +14,36 @@ export default defineEventHandler(async (event) => {
   }
 
   // Fetch user and events (no auth - 60 requests/hour)
-  const [user, events] = await Promise.all([
-    $fetch<GitHubUser>(`https://api.github.com/users/${username}`).catch(
-      () => null,
-    ),
-    $fetch<GitHubEvent[]>(
-      `https://api.github.com/users/${username}/events?per_page=100`,
-    ).catch(() => []),
-  ]);
+  let user: GitHubUser | null = null;
+  let events: GitHubEvent[] = [];
+
+  try {
+    const [userResponse, eventsResponse] = await Promise.all([
+      $fetch<GitHubUser>(`https://api.github.com/users/${username}`),
+      $fetch<GitHubEvent[]>(
+        `https://api.github.com/users/${username}/events?per_page=100`,
+      ).catch(() => []),
+    ]);
+    user = userResponse;
+    events = eventsResponse;
+  } catch (err: unknown) {
+    const error = err as { status?: number; statusCode?: number };
+    const status = error.status ?? error.statusCode;
+
+    if (status === 403) {
+      throw createError({
+        statusCode: 429,
+        message: "GitHub API rate limit reached. Please try again later.",
+      });
+    }
+    if (status === 404) {
+      throw createError({ statusCode: 404, message: "User not found" });
+    }
+    throw createError({
+      statusCode: 500,
+      message: "Failed to fetch user data from GitHub",
+    });
+  }
 
   if (!user) {
     throw createError({ statusCode: 404, message: "User not found" });

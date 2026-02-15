@@ -35,6 +35,10 @@ function handleSubmit() {
   getUserData();
 }
 
+const isEmptyState = computed(() => {
+  return status.value === "idle" && !data.value && !error.value;
+});
+
 const scoreClasses = computed(() => {
   if (!data.value?.analysis) {
     return {
@@ -143,182 +147,189 @@ useHead({
 </script>
 
 <template>
-  <main class="max-w-150 mx-auto py-8 px-4 @container">
-    <header class="text-center mb-8">
-      <h1 class="text-2rem text-white flex items-center justify-center gap-2">
-        <span
-          class="i-carbon-fingerprint-recognition text-gh-blue"
-          aria-hidden="true"
-        />
-        AgentScan
-      </h1>
-      <p class="text-gh-muted text-balance @md:text-wrap">
-        Detect suspicious AI agents activities on GitHub
-      </p>
-    </header>
-
-    <form
-      @submit.prevent="handleSubmit"
-      class="flex flex-col @md:flex-row gap-2 mb-8"
+  <div class="min-h-screen flex flex-col">
+    <main
+      class="max-w-150 mx-auto py-8 px-4 @container flex-1 w-full"
+      :class="{ 'flex flex-col justify-center': isEmptyState }"
     >
-      <label class="sr-only" for="userName">Enter GitHub username</label>
-      <input
-        v-model="accountName"
-        type="text"
-        id="userName"
-        placeholder="Enter GitHub username..."
-        :disabled="status === 'pending'"
-        class="flex-1 py-2 px-4 border-1 border-solid border-gh-border rounded-1.5 bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
-      />
+      <header class="text-center mb-8">
+        <h1 class="text-2rem text-white flex items-center justify-center gap-2">
+          <span
+            class="i-carbon-fingerprint-recognition text-gh-blue"
+            aria-hidden="true"
+          />
+          AgentScan
+        </h1>
+        <p class="text-gh-muted text-balance @md:text-wrap">
+          Detect suspicious AI agents activities on GitHub
+        </p>
+      </header>
 
-      <button
-        type="submit"
-        :disabled="status === 'pending' || accountName === ''"
-        class="py-2 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+      <form
+        @submit.prevent="handleSubmit"
+        class="flex flex-col @md:flex-row gap-2 mb-8"
       >
-        <span class="i-carbon-search" aria-hidden="true" />
-        Analyze
-      </button>
-    </form>
-
-    <div v-if="status === 'pending'" class="text-center py-12">
-      <div
-        class="w-10 h-10 rounded-full mx-auto mb-4 animate-spin border-3 border-solid border-gh-border border-t-gh-green"
-      />
-      <p>Analyzing @{{ queryUser }}...</p>
-    </div>
-
-    <div
-      v-else-if="error"
-      class="bg-gh-red-bg border-1 border-solid border-gh-red p-4 rounded-1.5 text-center"
-    >
-      <p class="flex items-center justify-center gap-2">
-        <span class="i-carbon-error text-gh-red text-xl" aria-hidden="true" />
-        {{ error.data?.message || "Failed to analyze user" }}
-      </p>
-    </div>
-
-    <div v-else-if="data?.analysis" class="flex flex-col gap-6 @container">
-      <div
-        class="flex flex-col @lg:flex-row justify-center items-center @lg:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
-      >
-        <img
-          :src="data.user.avatar"
-          :alt="`Avatar of ${data.user.login}`"
-          class="size-40 @lg:size-20 rounded-full"
+        <label class="sr-only" for="userName">Enter GitHub username</label>
+        <input
+          v-model="accountName"
+          type="text"
+          id="userName"
+          placeholder="Enter GitHub username..."
+          :disabled="status === 'pending'"
+          class="flex-1 py-2 px-4 border-1 border-solid border-gh-border rounded-1.5 bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
         />
-        <div
-          class="w-full flex flex-col justify-center items-center @lg:items-start text-center @lg:text-left"
+
+        <button
+          type="submit"
+          :disabled="status === 'pending' || accountName === ''"
+          class="py-2 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed flex justify-center items-center gap-2"
         >
-          <h2 class="text-white text-3xl @lg:text-xl">
-            {{ data.user.name || data.user.login }}
-          </h2>
-          <NuxtLink
-            external
-            target="_blank"
-            :to="`https://github.com/${data.user.login}`"
-            class="text-gh-muted underline text-xl @lg:text-sm"
+          <span class="i-carbon-search" aria-hidden="true" />
+          Analyze
+        </button>
+      </form>
+
+      <div v-if="status === 'pending'" class="text-center py-12">
+        <div
+          class="w-10 h-10 rounded-full mx-auto mb-4 animate-spin border-3 border-solid border-gh-border border-t-gh-green"
+        />
+        <p>Analyzing @{{ queryUser }}...</p>
+      </div>
+
+      <div
+        v-else-if="error"
+        class="bg-gh-red-bg border-1 border-solid border-gh-red p-4 rounded-1.5 text-center"
+      >
+        <p class="flex items-center justify-center gap-2">
+          {{ error.data?.message || "Failed to analyze user" }}
+        </p>
+      </div>
+
+      <div v-else-if="data?.analysis" class="flex flex-col gap-6 @container">
+        <div
+          class="flex flex-col @lg:flex-row justify-center items-center @lg:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
+        >
+          <img
+            :src="data.user.avatar"
+            :alt="`Avatar of ${data.user.login}`"
+            class="size-40 @lg:size-20 rounded-full"
+          />
+          <div
+            class="w-full flex flex-col justify-center items-center @lg:items-start text-center @lg:text-left"
           >
-            @{{ data.user.login }}
-          </NuxtLink>
-          <p v-if="data.user.bio" class="my-2">
-            {{ data.user.bio }}
-          </p>
-          <ul
-            class="flex flex-col items-center @lg:items-start @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
+            <h2 class="text-white text-3xl @lg:text-xl">
+              {{ data.user.name || data.user.login }}
+            </h2>
+            <NuxtLink
+              external
+              target="_blank"
+              :to="`https://github.com/${data.user.login}`"
+              class="text-gh-muted underline text-xl @lg:text-sm"
+            >
+              @{{ data.user.login }}
+            </NuxtLink>
+            <p v-if="data.user.bio" class="my-2">
+              {{ data.user.bio }}
+            </p>
+            <ul
+              class="flex flex-col items-center @lg:items-start @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
+            >
+              <li class="flex items-center gap-1">
+                <span
+                  class="i-carbon-user-multiple hidden @lg:inline-block"
+                  aria-hidden="true"
+                />
+                {{ data.user.followers }} followers
+              </li>
+              <li class="flex items-center gap-1">
+                <span
+                  class="i-carbon-repo-source-code hidden @lg:inline-block"
+                  aria-hidden="true"
+                />
+                {{ data.user.repos }} repos
+              </li>
+              <li class="flex items-center gap-1">
+                <span
+                  class="i-carbon-calendar hidden @lg:inline-block"
+                  aria-hidden="true"
+                />
+                Joined <NuxtTime :datetime="data.user.created" relative />
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid"
+          :class="scoreClasses.border"
+        >
+          <div
+            class="w-17.5 h-17.5 shrink-0 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
+            :class="scoreClasses.bg"
           >
-            <li class="flex items-center gap-1">
-              <span
-                class="i-carbon-user-multiple hidden @lg:inline-block"
-                aria-hidden="true"
-              />
-              {{ data.user.followers }} followers
-            </li>
-            <li class="flex items-center gap-1">
-              <span
-                class="i-carbon-repo-source-code hidden @lg:inline-block"
-                aria-hidden="true"
-              />
-              {{ data.user.repos }} repos
-            </li>
-            <li class="flex items-center gap-1">
-              <span
-                class="i-carbon-calendar hidden @lg:inline-block"
-                aria-hidden="true"
-              />
-              Joined <NuxtTime :datetime="data.user.created" relative />
+            {{ data.analysis.score }}
+          </div>
+          <div>
+            <header class="flex gap-2 items-center" :class="scoreClasses.text">
+              <span :class="classificationIcon" class="text-base" />
+              <h3 class="text-xl">
+                {{ classificationLabel }}
+              </h3>
+            </header>
+            <p class="text-gh-muted mt-1">
+              Based on {{ data.eventCount }} recent events
+            </p>
+            <p
+              v-if="
+                data.analysis.score >= CONFIG.THRESHOLD_HUMAN &&
+                data.analysis.score < 100
+              "
+              class="text-gh-muted text-sm mt-2 italic flex items-center gap-1"
+            >
+              <span class="i-carbon-sprout text-green-500" aria-hidden="true" />
+              Don't forget to touch grass!
+            </p>
+          </div>
+        </div>
+
+        <div
+          v-if="data.analysis.flags.length > 0"
+          class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
+        >
+          <h3
+            class="mb-4 text-white text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
+          >
+            Detection Flags
+          </h3>
+          <ul>
+            <li
+              v-for="flag in data.analysis.flags"
+              :key="flag.label"
+              class="flex flex-col @md:flex-row @md:justify-between items-center gap-1 @md:gap-3 not-last:border-b border-gh-border-light py-4 @md:py-2"
+            >
+              <strong>{{ flag.label }}</strong>
+              <span class="text-gh-muted">{{ flag.detail }}</span>
             </li>
           </ul>
         </div>
-      </div>
 
-      <div
-        class="flex items-center gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid"
-        :class="scoreClasses.border"
-      >
         <div
-          class="w-17.5 h-17.5 shrink-0 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
-          :class="scoreClasses.bg"
+          v-else
+          class="bg-gh-green-bg border-1 border-solid border-gh-green p-6 rounded-2 text-center text-gh-green-text"
         >
-          {{ data.analysis.score }}
-        </div>
-        <div>
-          <header class="flex gap-2 items-center" :class="scoreClasses.text">
-            <span :class="classificationIcon" class="text-base" />
-            <h3 class="text-xl">
-              {{ classificationLabel }}
-            </h3>
-          </header>
-          <p class="text-gh-muted mt-1">
-            Based on {{ data.eventCount }} recent events
-          </p>
-          <p
-            v-if="
-              data.analysis.score >= CONFIG.THRESHOLD_HUMAN &&
-              data.analysis.score < 100
-            "
-            class="text-gh-muted text-sm mt-2 italic flex items-center gap-1"
-          >
-            <span class="i-carbon-sprout text-green-500" aria-hidden="true" />
-            Don't forget to touch grass!
+          <p class="flex items-center justify-center gap-2">
+            <span
+              class="i-carbon-checkmark-filled text-xl"
+              aria-hidden="true"
+            />
+            No suspicious patterns detected
           </p>
         </div>
       </div>
-
-      <div
-        v-if="data.analysis.flags.length > 0"
-        class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
-      >
-        <h3
-          class="mb-4 text-white text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
-        >
-          Detection Flags
-        </h3>
-        <ul>
-          <li
-            v-for="flag in data.analysis.flags"
-            :key="flag.label"
-            class="flex flex-col @md:flex-row @md:justify-between items-center gap-1 @md:gap-3 not-last:border-b border-gh-border-light py-4 @md:py-2"
-          >
-            <strong>{{ flag.label }}</strong>
-            <span class="text-gh-muted">{{ flag.detail }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <div
-        v-else
-        class="bg-gh-green-bg border-1 border-solid border-gh-green p-6 rounded-2 text-center text-gh-green-text"
-      >
-        <p class="flex items-center justify-center gap-2">
-          <span class="i-carbon-checkmark-filled text-xl" aria-hidden="true" />
-          No suspicious patterns detected
-        </p>
-      </div>
-    </div>
+    </main>
 
     <footer
-      class="mt-12 pt-6 border-t border-gh-border text-center text-gh-muted text-sm"
+      class="py-6 border-t border-gh-border text-center text-gh-muted text-sm"
     >
       <p class="flex items-center justify-center gap-1">
         Made with
@@ -341,5 +352,5 @@ useHead({
         indicators, not definitive judgments.
       </p>
     </footer>
-  </main>
+  </div>
 </template>
