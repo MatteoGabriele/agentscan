@@ -139,7 +139,7 @@ useHead({
     <div v-if="status === 'pending'" class="text-center py-12">
       <div
         class="w-10 h-10 rounded-full mx-auto mb-4 animate-spin border-3 border-solid border-gh-border border-t-gh-green"
-      ></div>
+      />
       <p>Analyzing @{{ queryUser }}...</p>
     </div>
 
