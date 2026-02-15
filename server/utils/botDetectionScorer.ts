@@ -47,16 +47,16 @@ export function analyzeUser(
   if (ageDays < CONFIG.AGE_NEW_ACCOUNT) {
     score += CONFIG.POINTS_NEW_ACCOUNT;
     flags.push({
-      label: "New Account",
+      label: "Recently created",
       points: CONFIG.POINTS_NEW_ACCOUNT,
-      detail: `${ageDays} days old`,
+      detail: `Account is ${ageDays} days old`,
     });
   } else if (ageDays < CONFIG.AGE_YOUNG_ACCOUNT) {
     score += CONFIG.POINTS_YOUNG_ACCOUNT;
     flags.push({
-      label: "Young Account",
+      label: "Young account",
       points: CONFIG.POINTS_YOUNG_ACCOUNT,
-      detail: `${ageDays} days old`,
+      detail: `Account is ${ageDays} days old`,
     });
   }
 
@@ -65,9 +65,9 @@ export function analyzeUser(
   if (!hasIdentity) {
     score += CONFIG.POINTS_NO_IDENTITY;
     flags.push({
-      label: "No Identity",
+      label: "Minimal profile",
       points: CONFIG.POINTS_NO_IDENTITY,
-      detail: "Missing name and bio",
+      detail: "No name or bio provided",
     });
   }
 
@@ -78,9 +78,9 @@ export function analyzeUser(
   ) {
     score += CONFIG.POINTS_ZERO_REPOS_ACTIVE;
     flags.push({
-      label: "No Repos But Active",
+      label: "Active without repos",
       points: CONFIG.POINTS_ZERO_REPOS_ACTIVE,
-      detail: `${events.length} events but 0 personal repos`,
+      detail: `${events.length} events with no personal repositories`,
     });
   }
 
@@ -100,16 +100,16 @@ export function analyzeUser(
     if (eventsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME) {
       score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY;
       flags.push({
-        label: "Extreme Activity Density",
+        label: "Very high activity rate",
         points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
-        detail: `${eventsPerDay.toFixed(1)} events/day over ${eventSpanDays} days`,
+        detail: `${events.length} events in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"} (~${Math.round(eventsPerDay)} per day)`,
       });
     } else if (eventsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH) {
       score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY;
       flags.push({
-        label: "High Activity Density",
+        label: "High activity rate",
         points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
-        detail: `${eventsPerDay.toFixed(1)} events/day over ${eventSpanDays} days`,
+        detail: `${events.length} events in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"} (~${Math.round(eventsPerDay)} per day)`,
       });
     }
   }
@@ -121,16 +121,16 @@ export function analyzeUser(
   ) {
     score += CONFIG.POINTS_FOLLOW_RATIO;
     flags.push({
-      label: "Follow Ratio",
+      label: "Unusual follow ratio",
       points: CONFIG.POINTS_FOLLOW_RATIO,
-      detail: `${user.followers} followers, ${user.following} following`,
+      detail: `Following ${user.following} but only ${user.followers} followers`,
     });
   } else if (user.followers === 0 && user.following > 0) {
     score += CONFIG.POINTS_ZERO_FOLLOWERS;
     flags.push({
-      label: "Zero Followers",
+      label: "No followers yet",
       points: CONFIG.POINTS_ZERO_FOLLOWERS,
-      detail: "No followers yet",
+      detail: "Account has no followers",
     });
   }
 
@@ -138,38 +138,49 @@ export function analyzeUser(
     const timestamps = events.map((e) => new Date(e.created_at));
     const userLogin = user.login.toLowerCase();
 
+    // Coding events only - commits and PRs
+    // Responding to issues/comments throughout the day is normal for maintainers
+    const codingEventTypes = new Set([
+      "PushEvent",
+      "PullRequestEvent",
+      "PullRequestReviewEvent",
+      "PullRequestReviewCommentEvent",
+    ]);
+    const codingEvents = events.filter((e) => codingEventTypes.has(e.type));
+
     // Fork surge
     // AI agents fork lots of repos to contribute
     const forkEvents = events.filter((e) => e.type === "ForkEvent");
     if (forkEvents.length >= CONFIG.FORKS_EXTREME) {
       score += CONFIG.POINTS_FORK_SURGE;
       flags.push({
-        label: "Fork Surge",
+        label: "Many recent forks",
         points: CONFIG.POINTS_FORK_SURGE,
         detail: `${forkEvents.length} repos forked recently`,
       });
     } else if (forkEvents.length >= CONFIG.FORKS_HIGH) {
       score += CONFIG.POINTS_MULTIPLE_FORKS;
       flags.push({
-        label: "Multiple Forks",
+        label: "Multiple forks",
         points: CONFIG.POINTS_MULTIPLE_FORKS,
         detail: `${forkEvents.length} repos forked recently`,
       });
     }
 
-    // Inhuman daily activity
-    // many hours in a day, happening day after day
-    const eventsByDay = new Map<string, Date[]>();
-    timestamps.forEach((t) => {
+    // Inhuman daily coding activity
+    // many hours of coding in a day, happening day after day
+    const codingEventsByDay = new Map<string, Date[]>();
+    codingEvents.forEach((e) => {
+      const t = new Date(e.created_at);
       const day = t.toISOString().slice(0, 10);
-      if (!eventsByDay.has(day)) eventsByDay.set(day, []);
-      eventsByDay.get(day)!.push(t);
+      if (!codingEventsByDay.has(day)) codingEventsByDay.set(day, []);
+      codingEventsByDay.get(day)!.push(t);
     });
 
-    // For each day, count unique hours with activity (not just span)
+    // For each day, count unique hours with coding activity
     // Too many unique hours in a day = inhuman/unhealthy
     const daysWithManyHours: string[] = [];
-    eventsByDay.forEach((dayTimestamps, day) => {
+    codingEventsByDay.forEach((dayTimestamps, day) => {
       const uniqueHours = new Set(dayTimestamps.map((t) => t.getUTCHours()));
       if (uniqueHours.size >= CONFIG.HOURS_PER_DAY_INHUMAN) {
         daysWithManyHours.push(day);
@@ -199,16 +210,16 @@ export function analyzeUser(
       if (maxConsecutive >= CONFIG.CONSECUTIVE_INHUMAN_DAYS_EXTREME) {
         score += CONFIG.POINTS_NONSTOP_ACTIVITY;
         flags.push({
-          label: "Nonstop Activity",
+          label: "Extended daily coding",
           points: CONFIG.POINTS_NONSTOP_ACTIVITY,
-          detail: `${maxConsecutive} consecutive days with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of activity`,
+          detail: `${maxConsecutive} days in a row with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of coding`,
         });
       } else if (daysWithManyHours.length >= CONFIG.FREQUENT_MARATHON_DAYS) {
         score += CONFIG.POINTS_FREQUENT_MARATHON;
         flags.push({
-          label: "Frequent Marathon Days",
+          label: "Frequent long coding days",
           points: CONFIG.POINTS_FREQUENT_MARATHON,
-          detail: `${daysWithManyHours.length} days with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of activity`,
+          detail: `${daysWithManyHours.length} days with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of coding each`,
         });
       }
     }
@@ -237,9 +248,9 @@ export function analyzeUser(
     if (maxStreak >= CONFIG.CONSECUTIVE_DAYS_STREAK) {
       score += CONFIG.POINTS_CONTINUOUS_ACTIVITY;
       flags.push({
-        label: "Continuous Activity",
+        label: "Long activity streak",
         points: CONFIG.POINTS_CONTINUOUS_ACTIVITY,
-        detail: `${maxStreak} consecutive days of activity`,
+        detail: `${maxStreak} days in a row with activity`,
       });
     }
 
@@ -260,16 +271,16 @@ export function analyzeUser(
       if (externalRepos.size >= CONFIG.REPO_SPREAD_EXTREME) {
         score += CONFIG.POINTS_EXTREME_REPO_SPREAD_YOUNG;
         flags.push({
-          label: "Extreme External Repo Spread",
+          label: "Very wide contribution spread",
           points: CONFIG.POINTS_EXTREME_REPO_SPREAD_YOUNG,
-          detail: `Active in ${externalRepos.size} external repos`,
+          detail: `Active in ${externalRepos.size} repos they don't own`,
         });
       } else if (externalRepos.size >= CONFIG.REPO_SPREAD_HIGH) {
         score += CONFIG.POINTS_WIDE_REPO_SPREAD_YOUNG;
         flags.push({
-          label: "Wide External Repo Spread",
+          label: "Wide contribution spread",
           points: CONFIG.POINTS_WIDE_REPO_SPREAD_YOUNG,
-          detail: `Active in ${externalRepos.size} external repos`,
+          detail: `Active in ${externalRepos.size} repos they don't own`,
         });
       }
     }
@@ -299,17 +310,17 @@ export function analyzeUser(
     if (prsToday.length >= CONFIG.PRS_TODAY_EXTREME) {
       score += CONFIG.POINTS_PR_BURST;
       flags.push({
-        label: "PR Burst",
+        label: "High PR volume today",
         points: CONFIG.POINTS_PR_BURST,
-        detail: `${prsToday.length} external PRs in 24 hours`,
+        detail: `${prsToday.length} PRs to other repos in the last 24 hours`,
       });
     } else if (prsThisWeek.length >= CONFIG.PRS_WEEK_HIGH) {
       // Many PRs in a week
       score += CONFIG.POINTS_HIGH_PR_FREQUENCY;
       flags.push({
-        label: "High PR Frequency",
+        label: "High PR volume this week",
         points: CONFIG.POINTS_HIGH_PR_FREQUENCY,
-        detail: `${prsThisWeek.length} external PRs in 7 days`,
+        detail: `${prsThisWeek.length} PRs to other repos this week`,
       });
     }
 
@@ -320,13 +331,13 @@ export function analyzeUser(
     ) {
       score += CONFIG.POINTS_PR_ONLY_CONTRIBUTOR;
 
-      let detail = `${externalPRs.length} external PRs but only ${user.public_repos} personal repos`;
+      let detail = `${externalPRs.length} PRs to other repos, but only ${user.public_repos} of their own`;
       if (user.public_repos === 0) {
-        detail = `${externalPRs.length} external PRs and no personal repos`;
+        detail = `${externalPRs.length} PRs to other repos, none of their own`;
       }
 
       flags.push({
-        label: "PR-Only Contributor",
+        label: "Primarily external contributions",
         points: CONFIG.POINTS_PR_ONLY_CONTRIBUTOR,
         detail,
       });
@@ -345,9 +356,9 @@ export function analyzeUser(
     ) {
       score += CONFIG.POINTS_NO_PERSONAL_ACTIVITY;
       flags.push({
-        label: "No Personal Activity",
+        label: "Exclusively external activity",
         points: CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
-        detail: `100% external activity, only ${user.public_repos} personal repos`,
+        detail: `All activity on other people's repos, none on their own`,
       });
     } else if (
       foreignRatio >= CONFIG.FOREIGN_RATIO_HIGH &&
@@ -355,9 +366,9 @@ export function analyzeUser(
     ) {
       score += CONFIG.POINTS_EXTERNAL_FOCUS;
       flags.push({
-        label: "External Focus",
+        label: "Mostly external activity",
         points: CONFIG.POINTS_EXTERNAL_FOCUS,
-        detail: `${Math.round(foreignRatio * 100)}% external, ${user.public_repos} personal repos`,
+        detail: `${Math.round(foreignRatio * 100)}% of activity on other people's repos`,
       });
     }
   }

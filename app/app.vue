@@ -151,11 +151,13 @@ useHead({
 <template>
   <div class="min-h-screen flex flex-col">
     <main
-      class="max-w-150 mx-auto py-8 px-4 @container flex-1 w-full"
+      class="max-w-screen-md mx-auto py-8 px-4 @container flex-1 w-full"
       :class="{ 'flex flex-col justify-center': isEmptyState }"
     >
       <header class="text-center mb-8">
-        <h1 class="text-2rem text-white flex items-center justify-center gap-2">
+        <h1
+          class="text-3xl text-white flex items-center justify-center gap-2 mb-2"
+        >
           <span
             class="i-carbon-fingerprint-recognition text-gh-blue"
             aria-hidden="true"
@@ -301,16 +303,18 @@ useHead({
           <h3
             class="mb-4 text-white text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
           >
-            Detection Flags
+            Notable patterns
           </h3>
           <ul>
             <li
               v-for="flag in data.analysis.flags"
               :key="flag.label"
-              class="flex flex-col @md:flex-row @md:justify-between items-center gap-1 @md:gap-3 not-last:border-b border-gh-border-light py-4 @md:py-2"
+              class="flex flex-col @md:flex-row @md:justify-between items-center gap-1 @md:gap-6 not-last:border-b border-gh-border-light py-4 @md:py-2"
             >
-              <strong>{{ flag.label }}</strong>
-              <span class="text-gh-muted">{{ flag.detail }}</span>
+              <span>{{ flag.label }}</span>
+              <span class="text-gh-muted text-center @md:text-right">{{
+                flag.detail
+              }}</span>
             </li>
           </ul>
         </div>
