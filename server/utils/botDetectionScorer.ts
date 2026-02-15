@@ -1,3 +1,5 @@
+import { CONFIG } from "~~/shared/utils/score-config";
+
 export interface GitHubUser {
   login: string;
   avatar_url: string;
@@ -41,19 +43,19 @@ export function analyzeUser(
 
   // Account age
   const ageMs = Date.now() - new Date(user.created_at).getTime();
-  const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
-  if (ageDays < 30) {
-    score += 20;
+  const ageDays = Math.round(ageMs / (1000 * 60 * 60 * 24));
+  if (ageDays < CONFIG.AGE_NEW_ACCOUNT) {
+    score += CONFIG.POINTS_NEW_ACCOUNT;
     flags.push({
       label: "New Account",
-      points: 20,
+      points: CONFIG.POINTS_NEW_ACCOUNT,
       detail: `${ageDays} days old`,
     });
-  } else if (ageDays < 90) {
-    score += 10;
+  } else if (ageDays < CONFIG.AGE_YOUNG_ACCOUNT) {
+    score += CONFIG.POINTS_YOUNG_ACCOUNT;
     flags.push({
       label: "Young Account",
-      points: 10,
+      points: CONFIG.POINTS_YOUNG_ACCOUNT,
       detail: `${ageDays} days old`,
     });
   }
@@ -61,50 +63,53 @@ export function analyzeUser(
   // No identity (no name AND no bio)
   const hasIdentity = !!(user.name || user.bio);
   if (!hasIdentity) {
-    score += 15;
+    score += CONFIG.POINTS_NO_IDENTITY;
     flags.push({
       label: "No Identity",
-      points: 15,
+      points: CONFIG.POINTS_NO_IDENTITY,
       detail: "Missing name and bio",
     });
   }
 
   // Low followers relative to following (follow bots)
-  if (user.following > 50 && user.followers < 5) {
-    score += 15;
+  if (
+    user.following > CONFIG.FOLLOW_RATIO_FOLLOWING_MIN &&
+    user.followers < CONFIG.FOLLOW_RATIO_FOLLOWERS_MAX
+  ) {
+    score += CONFIG.POINTS_FOLLOW_RATIO;
     flags.push({
       label: "Follow Ratio",
-      points: 15,
+      points: CONFIG.POINTS_FOLLOW_RATIO,
       detail: `${user.followers} followers, ${user.following} following`,
     });
   } else if (user.followers === 0 && user.following > 0) {
-    score += 10;
+    score += CONFIG.POINTS_ZERO_FOLLOWERS;
     flags.push({
       label: "Zero Followers",
-      points: 10,
+      points: CONFIG.POINTS_ZERO_FOLLOWERS,
       detail: "No followers yet",
     });
   }
 
-  if (events.length >= 10) {
+  if (events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
     const timestamps = events.map((e) => new Date(e.created_at));
     const userLogin = user.login.toLowerCase();
 
     // Fork surge
     // AI agents fork lots of repos to contribute
     const forkEvents = events.filter((e) => e.type === "ForkEvent");
-    if (forkEvents.length >= 8) {
-      score += 30;
+    if (forkEvents.length >= CONFIG.FORKS_EXTREME) {
+      score += CONFIG.POINTS_FORK_SURGE;
       flags.push({
         label: "Fork Surge",
-        points: 30,
+        points: CONFIG.POINTS_FORK_SURGE,
         detail: `${forkEvents.length} repos forked recently`,
       });
-    } else if (forkEvents.length >= 5) {
-      score += 20;
+    } else if (forkEvents.length >= CONFIG.FORKS_HIGH) {
+      score += CONFIG.POINTS_MULTIPLE_FORKS;
       flags.push({
         label: "Multiple Forks",
-        points: 20,
+        points: CONFIG.POINTS_MULTIPLE_FORKS,
         detail: `${forkEvents.length} repos forked recently`,
       });
     }
@@ -119,17 +124,17 @@ export function analyzeUser(
     });
 
     // For each day, count unique hours with activity (not just span)
-    // 16+ unique hours in a day = inhuman/unhealthy (only 8 hours to sleep/eat/live)
+    // Too many unique hours in a day = inhuman/unhealthy
     const daysWithManyHours: string[] = [];
     eventsByDay.forEach((dayTimestamps, day) => {
       const uniqueHours = new Set(dayTimestamps.map((t) => t.getUTCHours()));
-      if (uniqueHours.size >= 16) {
+      if (uniqueHours.size >= CONFIG.HOURS_PER_DAY_INHUMAN) {
         daysWithManyHours.push(day);
       }
     });
 
     // Check if these inhuman days are consecutive
-    if (daysWithManyHours.length >= 3) {
+    if (daysWithManyHours.length >= CONFIG.CONSECUTIVE_INHUMAN_DAYS_EXTREME) {
       daysWithManyHours.sort();
       let consecutiveCount = 1;
       let maxConsecutive = 1;
@@ -147,20 +152,20 @@ export function analyzeUser(
         }
       }
 
-      // Consecutive 16+ hour days = definitely not human or really needs to touch grass
-      if (maxConsecutive >= 3) {
-        score += 40;
+      // Consecutive marathon days = definitely not human or really needs to touch grass
+      if (maxConsecutive >= CONFIG.CONSECUTIVE_INHUMAN_DAYS_EXTREME) {
+        score += CONFIG.POINTS_NONSTOP_ACTIVITY;
         flags.push({
           label: "Nonstop Activity",
-          points: 40,
-          detail: `${maxConsecutive} consecutive days with 16+ hours of activity`,
+          points: CONFIG.POINTS_NONSTOP_ACTIVITY,
+          detail: `${maxConsecutive} consecutive days with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of activity`,
         });
-      } else if (daysWithManyHours.length >= 5) {
-        score += 25;
+      } else if (daysWithManyHours.length >= CONFIG.FREQUENT_MARATHON_DAYS) {
+        score += CONFIG.POINTS_FREQUENT_MARATHON;
         flags.push({
           label: "Frequent Marathon Days",
-          points: 25,
-          detail: `${daysWithManyHours.length} days with 16+ hours of activity`,
+          points: CONFIG.POINTS_FREQUENT_MARATHON,
+          detail: `${daysWithManyHours.length} days with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of activity`,
         });
       }
     }
@@ -186,33 +191,32 @@ export function analyzeUser(
       }
     }
 
-    if (maxStreak >= 21) {
-      score += 25;
+    if (maxStreak >= CONFIG.CONSECUTIVE_DAYS_STREAK) {
+      score += CONFIG.POINTS_CONTINUOUS_ACTIVITY;
       flags.push({
         label: "Continuous Activity",
-        points: 25,
+        points: CONFIG.POINTS_CONTINUOUS_ACTIVITY,
         detail: `${maxStreak} consecutive days of activity`,
       });
     }
 
     // 4. Repo spread
-    // extremely wide spread is suspicious
-    // 40+ repos is extreme, 25+ is high
+    // Extremely wide spread is suspicious
     const uniqueRepos = new Set(
       events.map((e) => e.repo?.name).filter(Boolean),
     );
-    if (uniqueRepos.size >= 40) {
-      score += 25;
+    if (uniqueRepos.size >= CONFIG.REPO_SPREAD_EXTREME) {
+      score += CONFIG.POINTS_EXTREME_REPO_SPREAD;
       flags.push({
         label: "Extreme Repo Spread",
-        points: 25,
+        points: CONFIG.POINTS_EXTREME_REPO_SPREAD,
         detail: `Active in ${uniqueRepos.size} different repos`,
       });
-    } else if (uniqueRepos.size >= 25) {
-      score += 10;
+    } else if (uniqueRepos.size >= CONFIG.REPO_SPREAD_HIGH) {
+      score += CONFIG.POINTS_WIDE_REPO_SPREAD;
       flags.push({
         label: "Wide Repo Spread",
-        points: 10,
+        points: CONFIG.POINTS_WIDE_REPO_SPREAD,
         detail: `Active in ${uniqueRepos.size} different repos`,
       });
     }
@@ -239,26 +243,29 @@ export function analyzeUser(
 
     // Many PRs in a single day
     // only flag extreme cases
-    if (prsToday.length >= 15) {
-      score += 20;
+    if (prsToday.length >= CONFIG.PRS_TODAY_EXTREME) {
+      score += CONFIG.POINTS_PR_BURST;
       flags.push({
         label: "PR Burst",
-        points: 20,
+        points: CONFIG.POINTS_PR_BURST,
         detail: `${prsToday.length} external PRs in 24 hours`,
       });
-    } else if (prsThisWeek.length >= 20) {
+    } else if (prsThisWeek.length >= CONFIG.PRS_WEEK_HIGH) {
       // Many PRs in a week
-      score += 15;
+      score += CONFIG.POINTS_HIGH_PR_FREQUENCY;
       flags.push({
         label: "High PR Frequency",
-        points: 15,
+        points: CONFIG.POINTS_HIGH_PR_FREQUENCY,
         detail: `${prsThisWeek.length} external PRs in 7 days`,
       });
     }
 
     // Also flag if lots of PRs AND few personal repos (regardless of time)
-    if (externalPRs.length >= 15 && user.public_repos < 5) {
-      score += 20;
+    if (
+      externalPRs.length >= CONFIG.EXTERNAL_PRS_MIN &&
+      user.public_repos < CONFIG.PERSONAL_REPOS_LOW
+    ) {
+      score += CONFIG.POINTS_PR_ONLY_CONTRIBUTOR;
 
       let detail = `${externalPRs.length} external PRs but only ${user.public_repos} personal repos`;
       if (user.public_repos === 0) {
@@ -267,30 +274,36 @@ export function analyzeUser(
 
       flags.push({
         label: "PR-Only Contributor",
-        points: 20,
+        points: CONFIG.POINTS_PR_ONLY_CONTRIBUTOR,
         detail,
       });
     }
 
-    // 6. 100% external activity with no personal repos = almost certain bot
+    // 6. Full external activity with no personal repos = almost certain bot
     const foreignEvents = events.filter((e) => {
       const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
       return repoOwner && repoOwner !== userLogin;
     });
     const foreignRatio = foreignEvents.length / events.length;
 
-    if (foreignRatio === 1 && user.public_repos < 3) {
-      score += 30;
+    if (
+      foreignRatio === CONFIG.FOREIGN_RATIO_FULL &&
+      user.public_repos < CONFIG.PERSONAL_REPOS_NONE
+    ) {
+      score += CONFIG.POINTS_NO_PERSONAL_ACTIVITY;
       flags.push({
         label: "No Personal Activity",
-        points: 30,
+        points: CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
         detail: `100% external activity, only ${user.public_repos} personal repos`,
       });
-    } else if (foreignRatio >= 0.95 && user.public_repos < 5) {
-      score += 20;
+    } else if (
+      foreignRatio >= CONFIG.FOREIGN_RATIO_HIGH &&
+      user.public_repos < CONFIG.PERSONAL_REPOS_LOW
+    ) {
+      score += CONFIG.POINTS_EXTERNAL_FOCUS;
       flags.push({
         label: "External Focus",
-        points: 20,
+        points: CONFIG.POINTS_EXTERNAL_FOCUS,
         detail: `${Math.round(foreignRatio * 100)}% external, ${user.public_repos} personal repos`,
       });
     }
