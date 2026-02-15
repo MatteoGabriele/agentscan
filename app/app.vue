@@ -35,9 +35,6 @@ function handleSubmit() {
   getUserData();
 }
 
-const HUMAN_SCORE = 70;
-const SUSPICIOUS_SCORE = 50;
-
 const scoreClasses = computed(() => {
   if (!data.value?.analysis) {
     return {
@@ -49,7 +46,7 @@ const scoreClasses = computed(() => {
 
   const score = data.value.analysis.score;
 
-  if (score >= HUMAN_SCORE) {
+  if (score >= CONFIG.THRESHOLD_HUMAN) {
     return {
       text: "text-green-500",
       border: "border-green-500",
@@ -57,7 +54,7 @@ const scoreClasses = computed(() => {
     };
   }
 
-  if (score >= SUSPICIOUS_SCORE) {
+  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
     return {
       text: "text-amber-500",
       border: "border-amber-500",
@@ -262,7 +259,8 @@ useHead({
           </p>
           <p
             v-if="
-              data.analysis.score >= HUMAN_SCORE && data.analysis.score < 100
+              data.analysis.score >= CONFIG.THRESHOLD_HUMAN &&
+              data.analysis.score < 100
             "
             class="text-gh-muted text-sm mt-2 italic flex items-center gap-1"
           >

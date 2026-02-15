@@ -1,19 +1,3 @@
-/**
- * AI Agent Detection - Simple & Focused
- */
-
-// ============================================
-// CONFIG - Tweak these values
-// Score: 100 = definitely human, 0 = likely bot
-// ============================================
-export const CONFIG = {
-  THRESHOLD_HUMAN: 70, // >= this = "human"
-  THRESHOLD_SUSPICIOUS: 50, // >= this = "suspicious", below = "likely_bot"
-};
-
-// ============================================
-// TYPES
-// ============================================
 export interface GitHubUser {
   login: string;
   avatar_url: string;
@@ -48,17 +32,12 @@ export interface AnalysisResult {
   };
 }
 
-// ============================================
-// ANALYSIS
-// ============================================
 export function analyzeUser(
   user: GitHubUser,
   events: GitHubEvent[],
 ): AnalysisResult {
   const flags: Array<{ label: string; points: number; detail: string }> = [];
   let score = 0;
-
-  // === PROFILE SIGNALS ===
 
   // Account age
   const ageMs = Date.now() - new Date(user.created_at).getTime();
@@ -107,13 +86,12 @@ export function analyzeUser(
     });
   }
 
-  // === ACTIVITY SIGNALS ===
-
   if (events.length >= 10) {
     const timestamps = events.map((e) => new Date(e.created_at));
     const userLogin = user.login.toLowerCase();
 
-    // 1. Fork surge - AI agents fork lots of repos to contribute
+    // Fork surge
+    // AI agents fork lots of repos to contribute
     const forkEvents = events.filter((e) => e.type === "ForkEvent");
     if (forkEvents.length >= 8) {
       score += 30;
@@ -131,8 +109,8 @@ export function analyzeUser(
       });
     }
 
-    // 2. Inhuman daily activity - many hours in a day, happening day after day
-    // Group events by day
+    // Inhuman daily activity
+    // many hours in a day, happening day after day
     const eventsByDay = new Map<string, Date[]>();
     timestamps.forEach((t) => {
       const day = t.toISOString().slice(0, 10);
@@ -141,7 +119,7 @@ export function analyzeUser(
     });
 
     // For each day, count unique hours with activity (not just span)
-    // 16+ unique hours in a day = inhuman (only 8 hours to sleep/eat/live)
+    // 16+ unique hours in a day = inhuman/unhealthy (only 8 hours to sleep/eat/live)
     const daysWithManyHours: string[] = [];
     eventsByDay.forEach((dayTimestamps, day) => {
       const uniqueHours = new Set(dayTimestamps.map((t) => t.getUTCHours()));
@@ -169,7 +147,7 @@ export function analyzeUser(
         }
       }
 
-      // Consecutive 16+ hour days = definitely not human
+      // Consecutive 16+ hour days = definitely not human or really needs to touch grass
       if (maxConsecutive >= 3) {
         score += 40;
         flags.push({
@@ -187,7 +165,8 @@ export function analyzeUser(
       }
     }
 
-    // 3. Consecutive days activity - working non-stop
+    // 3. Consecutive days activity
+    // working non-stop
     const daySet = new Set<string>();
     timestamps.forEach((t) => daySet.add(t.toISOString().slice(0, 10)));
     const sortedDays = [...daySet].sort();
@@ -216,7 +195,8 @@ export function analyzeUser(
       });
     }
 
-    // 4. Repo spread - extremely wide spread is suspicious
+    // 4. Repo spread
+    // extremely wide spread is suspicious
     // 40+ repos is extreme, 25+ is high
     const uniqueRepos = new Set(
       events.map((e) => e.repo?.name).filter(Boolean),
@@ -237,7 +217,8 @@ export function analyzeUser(
       });
     }
 
-    // 5. External PRs - check frequency, not just total
+    // 5. External PRs
+    // check frequency, not just total
     const prEvents = events.filter((e) => e.type === "PullRequestEvent");
     const externalPRs = prEvents.filter((e) => {
       const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
@@ -256,7 +237,8 @@ export function analyzeUser(
       (e) => new Date(e.created_at).getTime() > oneDayAgo,
     );
 
-    // Many PRs in a single day - only flag extreme cases
+    // Many PRs in a single day
+    // only flag extreme cases
     if (prsToday.length >= 15) {
       score += 20;
       flags.push({
@@ -277,10 +259,16 @@ export function analyzeUser(
     // Also flag if lots of PRs AND few personal repos (regardless of time)
     if (externalPRs.length >= 15 && user.public_repos < 5) {
       score += 20;
+
+      let detail = `${externalPRs.length} external PRs but only ${user.public_repos} personal repos`;
+      if (user.public_repos === 0) {
+        detail = `${externalPRs.length} external PRs and no personal repos`;
+      }
+
       flags.push({
         label: "PR-Only Contributor",
         points: 20,
-        detail: `${externalPRs.length} external PRs but only ${user.public_repos} personal repos`,
+        detail,
       });
     }
 
