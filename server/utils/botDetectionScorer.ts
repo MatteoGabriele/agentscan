@@ -42,10 +42,7 @@ export function analyzeUser(
   let score = 0;
 
   // Coding event types used throughout (commits and PRs)
-  const codingEventTypes = new Set([
-    "PushEvent",
-    "PullRequestEvent",
-  ]);
+  const codingEventTypes = new Set(["PushEvent", "PullRequestEvent"]);
 
   // Account age
   const ageMs = Date.now() - new Date(user.created_at).getTime();
@@ -82,12 +79,15 @@ export function analyzeUser(
     const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
     return repoOwner && repoOwner !== user.login.toLowerCase();
   });
-  const allExternal = user.public_repos === 0 && foreignEvents.length === events.length;
+  const allExternal =
+    user.public_repos === 0 && foreignEvents.length === events.length;
   if (allExternal && events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS) {
-    score += CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY;
+    score +=
+      CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY;
     flags.push({
       label: "Only active on other people's repos",
-      points: CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
+      points:
+        CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
       detail: `No personal repos, all ${events.length} events are on repos they don't own`,
     });
   }
@@ -100,24 +100,29 @@ export function analyzeUser(
     const prEvents = events.filter((e) => e.type === "PullRequestEvent");
     // Commits
     if (commitEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-      const timestamps = commitEvents.map((e) => new Date(e.created_at).getTime());
+      const timestamps = commitEvents.map((e) =>
+        new Date(e.created_at).getTime(),
+      );
       const oldestEvent = Math.min(...timestamps);
       const newestEvent = Math.max(...timestamps);
-      const eventSpanDays = Math.max(1, Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)));
+      const eventSpanDays = Math.max(
+        1,
+        Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)),
+      );
       const commitsPerDay = commitEvents.length / eventSpanDays;
       if (commitsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME) {
         score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY;
         flags.push({
           label: "Very high commit rate",
           points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
-          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
         });
       } else if (commitsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH) {
         score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY;
         flags.push({
           label: "High commit rate",
           points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
-          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
         });
       }
     }
@@ -126,21 +131,25 @@ export function analyzeUser(
       const timestamps = prEvents.map((e) => new Date(e.created_at).getTime());
       const oldestEvent = Math.min(...timestamps);
       const newestEvent = Math.max(...timestamps);
-      const eventSpanDays = Math.max(1, Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)));
+      const eventSpanDays = Math.max(
+        1,
+        Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)),
+      );
       const prsPerDay = prEvents.length / eventSpanDays;
-      if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) { // PRs are much rarer
+      if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) {
+        // PRs are much rarer
         score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10;
         flags.push({
           label: "Extremely high PR rate",
           points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10,
-          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
         });
       } else if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH / 2) {
         score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5;
         flags.push({
           label: "High PR rate",
           points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5,
-          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
         });
       }
     }
@@ -171,10 +180,11 @@ export function analyzeUser(
     const userLogin = user.login.toLowerCase();
 
     // Reuse codingEventTypes from above, but include reviews for marathon check
-    const codingEventsWithReviews = events.filter((e) =>
-      codingEventTypes.has(e.type) ||
-      e.type === "PullRequestReviewEvent" ||
-      e.type === "PullRequestReviewCommentEvent",
+    const codingEventsWithReviews = events.filter(
+      (e) =>
+        codingEventTypes.has(e.type) ||
+        e.type === "PullRequestReviewEvent" ||
+        e.type === "PullRequestReviewCommentEvent",
     );
 
     // Fork surge
