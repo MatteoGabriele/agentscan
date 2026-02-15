@@ -49,7 +49,9 @@ export default defineCachedEventHandler(
     maxAge: 600, // 10 minutes
     getKey: (event) => {
       const query = getQuery(event);
-      return `user:${(query.user as string)?.toLowerCase() || ""}`;
+      const user = (query.user as string) ?? "";
+      // Use encodeURIComponent to preserve special characters in cache key
+      return `user:${encodeURIComponent(user.toLowerCase())}`;
     },
   },
 );
