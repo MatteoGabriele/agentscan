@@ -10,18 +10,18 @@ const queryUser = ref(initialUser.value);
 
 const {
   data,
-  execute: getUserData,
   status,
   error,
-  clear: clearUserData,
-} = useFetch("/api/user", {
-  query: { user: queryUser },
-  immediate: !!initialUser.value,
-  watch: false,
-  server: true,
-});
+  execute: getUserData,
+} = useAsyncData(
+  () => accountName.value,
+  () => $fetch("/api/user", { query: { user: queryUser.value } }),
+  {
+    immediate: !!initialUser.value,
+  },
+);
 
-function handleSubmit() {
+async function handleSubmit() {
   const username = accountName.value.trim();
 
   if (!username) {
@@ -29,9 +29,7 @@ function handleSubmit() {
   }
 
   queryUser.value = username;
-  router.push({ query: { user: username } });
-
-  clearUserData();
+  await router.push({ query: { user: username } });
   getUserData();
 }
 
@@ -201,7 +199,7 @@ useHead({
         class="bg-gh-red-bg border-1 border-solid border-gh-red p-4 rounded-1.5 text-center"
       >
         <p class="flex items-center justify-center gap-2">
-          {{ error.data?.message || "Failed to analyze user" }}
+          {{ (error.data as any)?.message || "Failed to analyze user" }}
         </p>
       </div>
 
