@@ -71,6 +71,49 @@ export function analyzeUser(
     });
   }
 
+  // Zero repos with significant activity
+  if (
+    user.public_repos === 0 &&
+    events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS
+  ) {
+    score += CONFIG.POINTS_ZERO_REPOS_ACTIVE;
+    flags.push({
+      label: "No Repos But Active",
+      points: CONFIG.POINTS_ZERO_REPOS_ACTIVE,
+      detail: `${events.length} events but 0 personal repos`,
+    });
+  }
+
+  // Activity density based on actual event time window
+  // Only flag for new/young accounts - established accounts often have burst activity
+  const isNewOrYoungAccount = ageDays < CONFIG.AGE_YOUNG_ACCOUNT;
+  if (isNewOrYoungAccount && events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+    const timestamps = events.map((e) => new Date(e.created_at).getTime());
+    const oldestEvent = Math.min(...timestamps);
+    const newestEvent = Math.max(...timestamps);
+    const eventSpanDays = Math.max(
+      1,
+      Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)),
+    );
+    const eventsPerDay = events.length / eventSpanDays;
+
+    if (eventsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME) {
+      score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY;
+      flags.push({
+        label: "Extreme Activity Density",
+        points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
+        detail: `${eventsPerDay.toFixed(1)} events/day over ${eventSpanDays} days`,
+      });
+    } else if (eventsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH) {
+      score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY;
+      flags.push({
+        label: "High Activity Density",
+        points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
+        detail: `${eventsPerDay.toFixed(1)} events/day over ${eventSpanDays} days`,
+      });
+    }
+  }
+
   // Low followers relative to following (follow bots)
   if (
     user.following > CONFIG.FOLLOW_RATIO_FOLLOWING_MIN &&
@@ -200,25 +243,35 @@ export function analyzeUser(
       });
     }
 
-    // 4. Repo spread
-    // Extremely wide spread is suspicious
-    const uniqueRepos = new Set(
-      events.map((e) => e.repo?.name).filter(Boolean),
-    );
-    if (uniqueRepos.size >= CONFIG.REPO_SPREAD_EXTREME) {
-      score += CONFIG.POINTS_EXTREME_REPO_SPREAD;
-      flags.push({
-        label: "Extreme Repo Spread",
-        points: CONFIG.POINTS_EXTREME_REPO_SPREAD,
-        detail: `Active in ${uniqueRepos.size} different repos`,
-      });
-    } else if (uniqueRepos.size >= CONFIG.REPO_SPREAD_HIGH) {
-      score += CONFIG.POINTS_WIDE_REPO_SPREAD;
-      flags.push({
-        label: "Wide Repo Spread",
-        points: CONFIG.POINTS_WIDE_REPO_SPREAD,
-        detail: `Active in ${uniqueRepos.size} different repos`,
-      });
+    // 4. External repo spread
+    // Only count repos the user doesn't own
+    // Only flag for young accounts - established OSS devs often contribute widely
+    if (isNewOrYoungAccount) {
+      const externalRepos = new Set(
+        events
+          .map((e) => e.repo?.name)
+          .filter((name): name is string => {
+            if (!name) return false;
+            const repoOwner = name.split("/")[0]?.toLowerCase();
+            return repoOwner !== userLogin;
+          }),
+      );
+
+      if (externalRepos.size >= CONFIG.REPO_SPREAD_EXTREME) {
+        score += CONFIG.POINTS_EXTREME_REPO_SPREAD_YOUNG;
+        flags.push({
+          label: "Extreme External Repo Spread",
+          points: CONFIG.POINTS_EXTREME_REPO_SPREAD_YOUNG,
+          detail: `Active in ${externalRepos.size} external repos`,
+        });
+      } else if (externalRepos.size >= CONFIG.REPO_SPREAD_HIGH) {
+        score += CONFIG.POINTS_WIDE_REPO_SPREAD_YOUNG;
+        flags.push({
+          label: "Wide External Repo Spread",
+          points: CONFIG.POINTS_WIDE_REPO_SPREAD_YOUNG,
+          detail: `Active in ${externalRepos.size} external repos`,
+        });
+      }
     }
 
     // 5. External PRs

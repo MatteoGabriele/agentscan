@@ -40,11 +40,11 @@ export const CONFIG = {
   CONSECUTIVE_DAYS_STREAK: 21, // >= this = suspicious
   POINTS_CONTINUOUS_ACTIVITY: 25,
 
-  // Repo spread thresholds
-  REPO_SPREAD_EXTREME: 40, // >= this = extreme spread
-  REPO_SPREAD_HIGH: 25, // >= this = wide spread
-  POINTS_EXTREME_REPO_SPREAD: 25,
-  POINTS_WIDE_REPO_SPREAD: 10,
+  // Repo spread thresholds (external repos only, young accounts only)
+  REPO_SPREAD_EXTREME: 30, // >= this = extreme spread
+  REPO_SPREAD_HIGH: 20, // >= this = wide spread
+  POINTS_EXTREME_REPO_SPREAD_YOUNG: 30,
+  POINTS_WIDE_REPO_SPREAD_YOUNG: 15,
 
   // External PR thresholds
   PRS_TODAY_EXTREME: 15, // >= this in 24h = PR burst
@@ -63,4 +63,14 @@ export const CONFIG = {
   PERSONAL_REPOS_NONE: 3, // < this with 100% external = suspicious
   POINTS_NO_PERSONAL_ACTIVITY: 30,
   POINTS_EXTERNAL_FOCUS: 20,
+
+  // Zero repos with activity
+  ZERO_REPOS_MIN_EVENTS: 20, // 0 repos but this many events = suspicious
+  POINTS_ZERO_REPOS_ACTIVE: 20,
+
+  // Activity density (events per day)
+  ACTIVITY_DENSITY_HIGH: 8, // >= this events/day average
+  ACTIVITY_DENSITY_EXTREME: 15, // >= this events/day average
+  POINTS_HIGH_ACTIVITY_DENSITY: 15,
+  POINTS_EXTREME_ACTIVITY_DENSITY: 25,
 } as const;
