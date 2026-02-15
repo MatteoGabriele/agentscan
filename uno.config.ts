@@ -1,7 +1,24 @@
-import { defineConfig, presetUno } from "unocss";
+import {
+  defineConfig,
+  presetIcons,
+  presetWind4,
+  transformerDirectives,
+  transformerVariantGroup,
+} from "unocss";
 
 export default defineConfig({
-  presets: [presetUno()],
+  presets: [
+    presetWind4(),
+    presetIcons({
+      extraProperties: {
+        display: "inline-block",
+        "forced-color-adjust": "preserve-parent-color",
+      },
+      warn: true,
+      scale: 1.2,
+    }),
+  ],
+  transformers: [transformerDirectives(), transformerVariantGroup()],
   theme: {
     colors: {
       gh: {

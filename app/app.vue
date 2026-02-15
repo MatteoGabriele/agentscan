@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const route = useRoute();
 const router = useRouter();
-const initialUser = computed(() => (route.query.user as string) || "");
+const initialUser = computed<string>(() => {
+  return (route.query.user as string) || "";
+});
 
 const accountName = ref(initialUser.value);
 const queryUser = ref(initialUser.value);
@@ -31,39 +33,65 @@ function handleSubmit() {
   getUserData();
 }
 
+const HUMAN_SCORE = 70;
+const SUSPICIOUS_SCORE = 50;
+
 const scoreColor = computed(() => {
-  if (!data.value?.analysis) return "gray";
+  if (!data.value?.analysis) {
+    return "gray";
+  }
+
   const score = data.value.analysis.score;
-  if (score >= 70) return "#22c55e"; // green - human
-  if (score >= 50) return "#f59e0b"; // amber - suspicious
-  return "#ef4444"; // red - likely bot
+
+  if (score >= HUMAN_SCORE) {
+    return "#22c55e";
+  }
+
+  if (score >= SUSPICIOUS_SCORE) {
+    return "#f59e0b";
+  }
+
+  return "#ef4444";
 });
 
-const classificationLabel = computed(() => {
-  if (!data.value?.analysis) return "";
-  const c = data.value.analysis.classification;
-  if (c === "likely_bot") return "Likely Bot";
-  if (c === "suspicious") return "Suspicious";
+const classificationLabel = computed<string>(() => {
+  if (!data.value?.analysis) {
+    return "";
+  }
+
+  const type = data.value.analysis.classification;
+
+  if (type === "likely_bot") {
+    return "Likely Bot";
+  }
+  if (type === "suspicious") {
+    return "Suspicious";
+  }
+
   return "Human";
 });
 
-// Dynamic OG meta tags (text only - no server cost)
 const ogTitle = computed(() => {
   if (!data.value?.user) return "AgentScan - GitHub AI Agent Detector";
   return `@${data.value.user.login} - ${classificationLabel.value} | AgentScan`;
 });
 
 const ogDescription = computed(() => {
-  if (!data.value?.analysis)
+  if (!data.value?.analysis) {
     return "Detect suspicious AI agent activities on GitHub accounts";
+  }
+
   const score = data.value.analysis.score;
   const flags = data.value.analysis.flags.length;
+
   return `Score: ${score}/100 | ${flags} detection flags | ${data.value.eventCount} events analyzed`;
 });
 
-// Use user's GitHub avatar as OG image (free, hosted by GitHub)
 const ogImage = computed(() => {
-  if (!data.value?.user) return "/og.png";
+  if (!data.value?.user) {
+    return "/og.png";
+  }
+
   return data.value.user.avatar;
 });
 
@@ -104,7 +132,7 @@ useHead({
         :disabled="status === 'pending' || accountName === ''"
         class="px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {{ status === "pending" ? "Analyzing..." : "Analyze" }}
+        Analyze
       </button>
     </form>
 
@@ -139,13 +167,13 @@ useHead({
           <p v-if="data.user.bio" class="my-2 text-0.9rem">
             {{ data.user.bio }}
           </p>
-          <div class="flex gap-4 mt-2 text-0.85rem text-gh-muted">
-            <span>{{ data.user.followers }} followers</span>
-            <span>{{ data.user.repos }} repos</span>
-            <span
-              >Joined <NuxtTime :datetime="data.user.created" relative
-            /></span>
-          </div>
+          <ul
+            class="flex flex-col sm:flex-row sm:gap-4 mt-2 text-0.85rem text-gh-muted"
+          >
+            <li>{{ data.user.followers }} followers</li>
+            <li>{{ data.user.repos }} repos</li>
+            <li>Joined <NuxtTime :datetime="data.user.created" relative /></li>
+          </ul>
         </div>
       </div>
 
@@ -160,9 +188,14 @@ useHead({
           {{ data.analysis.score }}
         </div>
         <div>
-          <h3 class="text-1.5rem" :style="{ color: scoreColor }">
-            {{ classificationLabel }}
-          </h3>
+          <header
+            class="flex gap-2 items-center"
+            :style="{ color: scoreColor }"
+          >
+            <h3 class="text-xl">
+              {{ classificationLabel }}
+            </h3>
+          </header>
           <p class="text-gh-muted mt-1">
             Based on {{ data.eventCount }} recent events
           </p>
@@ -174,11 +207,11 @@ useHead({
         class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
       >
         <h3 class="mb-4 text-white">Detection Flags</h3>
-        <ul class="space-y-4">
+        <ul>
           <li
             v-for="flag in data.analysis.flags"
             :key="flag.label"
-            class="flex items-center gap-3"
+            class="flex items-center gap-3 not-last:border-b border-gh-border-light py-2"
           >
             <strong>{{ flag.label }}</strong>
             <span class="text-gh-muted text-0.9rem">{{ flag.detail }}</span>
