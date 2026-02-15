@@ -260,6 +260,15 @@ useHead({
           <p class="text-gh-muted mt-1">
             Based on {{ data.eventCount }} recent events
           </p>
+          <p
+            v-if="
+              data.analysis.score >= HUMAN_SCORE && data.analysis.score < 100
+            "
+            class="text-gh-muted text-sm mt-2 italic flex items-center gap-1"
+          >
+            <span class="i-carbon-sprout text-green-500" />
+            Don't forget to touch grass!
+          </p>
         </div>
       </div>
 
