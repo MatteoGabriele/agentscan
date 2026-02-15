@@ -151,7 +151,7 @@ useHead({
 <template>
   <div class="min-h-screen flex flex-col">
     <main
-      class="max-w-screen-md mx-auto py-8 px-4 @container flex-1 w-full"
+      class="max-w-screen-sm mx-auto py-8 px-4 @container flex-1 w-full"
       :class="{ 'flex flex-col justify-center': isEmptyState }"
     >
       <header class="text-center mb-8">
@@ -309,12 +309,12 @@ useHead({
             <li
               v-for="flag in data.analysis.flags"
               :key="flag.label"
-              class="flex flex-col @md:flex-row @md:justify-between items-center gap-1 @md:gap-6 not-last:border-b border-gh-border-light py-4 @md:py-2"
+              class="not-last:border-b border-gh-border-light py-4 @md:py-2"
             >
-              <span>{{ flag.label }}</span>
-              <span class="text-gh-muted text-center @md:text-right">{{
-                flag.detail
-              }}</span>
+              <h4>{{ flag.label }}</h4>
+              <p class="text-gh-muted">
+                {{ flag.detail }}
+              </p>
             </li>
           </ul>
         </div>

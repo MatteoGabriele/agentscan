@@ -41,6 +41,12 @@ export function analyzeUser(
   const flags: Array<{ label: string; points: number; detail: string }> = [];
   let score = 0;
 
+  // Coding event types used throughout (commits and PRs)
+  const codingEventTypes = new Set([
+    "PushEvent",
+    "PullRequestEvent",
+  ]);
+
   // Account age
   const ageMs = Date.now() - new Date(user.created_at).getTime();
   const ageDays = Math.round(ageMs / (1000 * 60 * 60 * 24));
@@ -71,46 +77,72 @@ export function analyzeUser(
     });
   }
 
-  // Zero repos with significant activity
-  if (
-    user.public_repos === 0 &&
-    events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS
-  ) {
-    score += CONFIG.POINTS_ZERO_REPOS_ACTIVE;
+  // Zero personal repos and all activity is external
+  const foreignEvents = events.filter((e) => {
+    const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
+    return repoOwner && repoOwner !== user.login.toLowerCase();
+  });
+  const allExternal = user.public_repos === 0 && foreignEvents.length === events.length;
+  if (allExternal && events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS) {
+    score += CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY;
     flags.push({
-      label: "Active without repos",
-      points: CONFIG.POINTS_ZERO_REPOS_ACTIVE,
-      detail: `${events.length} events with no personal repositories`,
+      label: "Only active on other people's repos",
+      points: CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
+      detail: `No personal repos, all ${events.length} events are on repos they don't own`,
     });
   }
 
-  // Activity density based on actual event time window
+  // Coding activity density (split PRs and commits)
   // Only flag for new/young accounts - established accounts often have burst activity
   const isNewOrYoungAccount = ageDays < CONFIG.AGE_YOUNG_ACCOUNT;
   if (isNewOrYoungAccount && events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-    const timestamps = events.map((e) => new Date(e.created_at).getTime());
-    const oldestEvent = Math.min(...timestamps);
-    const newestEvent = Math.max(...timestamps);
-    const eventSpanDays = Math.max(
-      1,
-      Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)),
-    );
-    const eventsPerDay = events.length / eventSpanDays;
-
-    if (eventsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME) {
-      score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY;
-      flags.push({
-        label: "Very high activity rate",
-        points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
-        detail: `${events.length} events in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"} (~${Math.round(eventsPerDay)} per day)`,
-      });
-    } else if (eventsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH) {
-      score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY;
-      flags.push({
-        label: "High activity rate",
-        points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
-        detail: `${events.length} events in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"} (~${Math.round(eventsPerDay)} per day)`,
-      });
+    const commitEvents = events.filter((e) => e.type === "PushEvent");
+    const prEvents = events.filter((e) => e.type === "PullRequestEvent");
+    // Commits
+    if (commitEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+      const timestamps = commitEvents.map((e) => new Date(e.created_at).getTime());
+      const oldestEvent = Math.min(...timestamps);
+      const newestEvent = Math.max(...timestamps);
+      const eventSpanDays = Math.max(1, Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)));
+      const commitsPerDay = commitEvents.length / eventSpanDays;
+      if (commitsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME) {
+        score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY;
+        flags.push({
+          label: "Very high commit rate",
+          points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
+          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+        });
+      } else if (commitsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH) {
+        score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY;
+        flags.push({
+          label: "High commit rate",
+          points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
+          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+        });
+      }
+    }
+    // PRs (flag more aggressively)
+    if (prEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+      const timestamps = prEvents.map((e) => new Date(e.created_at).getTime());
+      const oldestEvent = Math.min(...timestamps);
+      const newestEvent = Math.max(...timestamps);
+      const eventSpanDays = Math.max(1, Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)));
+      const prsPerDay = prEvents.length / eventSpanDays;
+      if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) { // PRs are much rarer
+        score += CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10;
+        flags.push({
+          label: "Extremely high PR rate",
+          points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10,
+          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+        });
+      } else if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH / 2) {
+        score += CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5;
+        flags.push({
+          label: "High PR rate",
+          points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5,
+          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? '' : 's'}`,
+        });
+      }
     }
   }
 
@@ -138,15 +170,12 @@ export function analyzeUser(
     const timestamps = events.map((e) => new Date(e.created_at));
     const userLogin = user.login.toLowerCase();
 
-    // Coding events only - commits and PRs
-    // Responding to issues/comments throughout the day is normal for maintainers
-    const codingEventTypes = new Set([
-      "PushEvent",
-      "PullRequestEvent",
-      "PullRequestReviewEvent",
-      "PullRequestReviewCommentEvent",
-    ]);
-    const codingEvents = events.filter((e) => codingEventTypes.has(e.type));
+    // Reuse codingEventTypes from above, but include reviews for marathon check
+    const codingEventsWithReviews = events.filter((e) =>
+      codingEventTypes.has(e.type) ||
+      e.type === "PullRequestReviewEvent" ||
+      e.type === "PullRequestReviewCommentEvent",
+    );
 
     // Fork surge
     // AI agents fork lots of repos to contribute
@@ -170,7 +199,7 @@ export function analyzeUser(
     // Inhuman daily coding activity
     // many hours of coding in a day, happening day after day
     const codingEventsByDay = new Map<string, Date[]>();
-    codingEvents.forEach((e) => {
+    codingEventsWithReviews.forEach((e) => {
       const t = new Date(e.created_at);
       const day = t.toISOString().slice(0, 10);
       if (!codingEventsByDay.has(day)) codingEventsByDay.set(day, []);
@@ -343,24 +372,10 @@ export function analyzeUser(
       });
     }
 
-    // 6. Full external activity with no personal repos = almost certain bot
-    const foreignEvents = events.filter((e) => {
-      const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
-      return repoOwner && repoOwner !== userLogin;
-    });
+    // 6. Mostly external activity (not 100%)
     const foreignRatio = foreignEvents.length / events.length;
-
     if (
-      foreignRatio === CONFIG.FOREIGN_RATIO_FULL &&
-      user.public_repos < CONFIG.PERSONAL_REPOS_NONE
-    ) {
-      score += CONFIG.POINTS_NO_PERSONAL_ACTIVITY;
-      flags.push({
-        label: "Exclusively external activity",
-        points: CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
-        detail: `All activity on other people's repos, none on their own`,
-      });
-    } else if (
+      !allExternal &&
       foreignRatio >= CONFIG.FOREIGN_RATIO_HIGH &&
       user.public_repos < CONFIG.PERSONAL_REPOS_LOW
     ) {
