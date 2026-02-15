@@ -13,6 +13,7 @@ const {
   execute: getUserData,
   status,
   error,
+  clear: clearUserData,
 } = useFetch("/api/user", {
   query: { user: queryUser },
   immediate: !!initialUser.value,
@@ -30,28 +31,45 @@ function handleSubmit() {
   queryUser.value = username;
   router.push({ query: { user: username } });
 
+  clearUserData();
   getUserData();
 }
 
 const HUMAN_SCORE = 70;
 const SUSPICIOUS_SCORE = 50;
 
-const scoreColor = computed(() => {
+const scoreClasses = computed(() => {
   if (!data.value?.analysis) {
-    return "gray";
+    return {
+      text: "text-gray-500",
+      border: "border-gray-500",
+      bg: "bg-gray-500",
+    };
   }
 
   const score = data.value.analysis.score;
 
   if (score >= HUMAN_SCORE) {
-    return "#22c55e";
+    return {
+      text: "text-green-500",
+      border: "border-green-500",
+      bg: "bg-green-500",
+    };
   }
 
   if (score >= SUSPICIOUS_SCORE) {
-    return "#f59e0b";
+    return {
+      text: "text-amber-500",
+      border: "border-amber-500",
+      bg: "bg-amber-500",
+    };
   }
 
-  return "#ef4444";
+  return {
+    text: "text-red-500",
+    border: "border-red-500",
+    bg: "bg-red-500",
+  };
 });
 
 const classificationLabel = computed<string>(() => {
@@ -69,6 +87,23 @@ const classificationLabel = computed<string>(() => {
   }
 
   return "Human";
+});
+
+const classificationIcon = computed<string>(() => {
+  if (!data.value?.analysis) {
+    return "";
+  }
+
+  const type = data.value.analysis.classification;
+
+  if (type === "likely_bot") {
+    return "i-carbon-machine-learning";
+  }
+  if (type === "suspicious") {
+    return "i-carbon-warning";
+  }
+
+  return "i-carbon-face-satisfied";
 });
 
 const ogTitle = computed(() => {
@@ -113,8 +148,11 @@ useHead({
 <template>
   <div class="max-w-150 mx-auto py-8 px-4 @container">
     <header class="text-center mb-8">
-      <h1 class="text-2rem text-white">AgentScan</h1>
-      <p class="text-gh-muted mt-2">
+      <h1 class="text-2rem text-white flex items-center justify-center gap-2">
+        <span class="i-carbon-fingerprint-recognition text-gh-blue" />
+        AgentScan
+      </h1>
+      <p class="text-gh-muted text-balance @md:text-wrap">
         Detect suspicious AI agents activities on GitHub
       </p>
     </header>
@@ -133,8 +171,9 @@ useHead({
       <button
         type="submit"
         :disabled="status === 'pending' || accountName === ''"
-        class="py-2 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        class="py-2 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed flex justify-center items-center gap-2"
       >
+        <span class="i-carbon-search" />
         Analyze
       </button>
     </form>
@@ -150,7 +189,10 @@ useHead({
       v-else-if="error"
       class="bg-gh-red-bg border-1 border-solid border-gh-red p-4 rounded-1.5 text-center"
     >
-      <p>{{ error.data?.message || "Failed to analyze user" }}</p>
+      <p class="flex items-center justify-center gap-2">
+        <span class="i-carbon-error text-gh-red text-xl" />
+        {{ error.data?.message || "Failed to analyze user" }}
+      </p>
     </div>
 
     <div v-else-if="data?.analysis" class="flex flex-col gap-6 @container">
@@ -168,37 +210,49 @@ useHead({
           <h2 class="text-white text-3xl @lg:text-xl">
             {{ data.user.name || data.user.login }}
           </h2>
-          <p class="text-gh-muted text-xl @lg:text-base">
+          <NuxtLink
+            external
+            target="_blank"
+            :to="`https://github.com/${data.user.login}`"
+            class="text-gh-muted underline text-xl @lg:text-sm"
+          >
             @{{ data.user.login }}
-          </p>
+          </NuxtLink>
           <p v-if="data.user.bio" class="my-2">
             {{ data.user.bio }}
           </p>
           <ul
-            class="flex flex-col @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
+            class="flex flex-col items-center @lg:items-start @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
           >
-            <li>{{ data.user.followers }} followers</li>
-            <li>{{ data.user.repos }} repos</li>
-            <li>Joined <NuxtTime :datetime="data.user.created" relative /></li>
+            <li class="flex items-center gap-1">
+              <span class="i-carbon-user-multiple hidden @lg:inline-block" />
+              {{ data.user.followers }} followers
+            </li>
+            <li class="flex items-center gap-1">
+              <span class="i-carbon-repo-source-code hidden @lg:inline-block" />
+              {{ data.user.repos }} repos
+            </li>
+            <li class="flex items-center gap-1">
+              <span class="i-carbon-calendar hidden @lg:inline-block" />
+              Joined <NuxtTime :datetime="data.user.created" relative />
+            </li>
           </ul>
         </div>
       </div>
 
       <div
         class="flex items-center gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid"
-        :style="{ borderColor: scoreColor }"
+        :class="scoreClasses.border"
       >
         <div
           class="w-17.5 h-17.5 shrink-0 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
-          :style="{ background: scoreColor }"
+          :class="scoreClasses.bg"
         >
           {{ data.analysis.score }}
         </div>
         <div>
-          <header
-            class="flex gap-2 items-center"
-            :style="{ color: scoreColor }"
-          >
+          <header class="flex gap-2 items-center" :class="scoreClasses.text">
+            <span :class="classificationIcon" class="text-base" />
             <h3 class="text-xl">
               {{ classificationLabel }}
             </h3>
@@ -213,7 +267,9 @@ useHead({
         v-if="data.analysis.flags.length > 0"
         class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
       >
-        <h3 class="mb-4 text-white text-xl text-center @md:text-left">
+        <h3
+          class="mb-4 text-white text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
+        >
           Detection Flags
         </h3>
         <ul>
@@ -232,7 +288,10 @@ useHead({
         v-else
         class="bg-gh-green-bg border-1 border-solid border-gh-green p-6 rounded-2 text-center text-gh-green-text"
       >
-        <p>No suspicious patterns detected</p>
+        <p class="flex items-center justify-center gap-2">
+          <span class="i-carbon-checkmark-filled text-xl" />
+          No suspicious patterns detected
+        </p>
       </div>
     </div>
   </div>
