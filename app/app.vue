@@ -97,12 +97,12 @@ useHead({
         type="text"
         placeholder="Enter GitHub username..."
         :disabled="status === 'pending'"
-        class="flex-1 py-3 px-4 border-1 border-solid border-gh-border rounded-1.5 bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
+        class="flex-1 py-2 px-4 border-1 border-solid border-gh-border rounded-1.5 bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
       />
       <button
         type="submit"
-        :disabled="status === 'pending' || !accountName.trim()"
-        class="py-3 px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        :disabled="status === 'pending' || accountName === ''"
+        class="px-6 bg-gh-green border-none rounded-1.5 text-white font-600 cursor-pointer hover:bg-gh-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {{ status === "pending" ? "Analyzing..." : "Analyze" }}
       </button>
@@ -110,8 +110,7 @@ useHead({
 
     <div v-if="status === 'pending'" class="text-center py-12">
       <div
-        class="w-10 h-10 rounded-full mx-auto mb-4 animate-spin"
-        style="border: 3px solid #30363d; border-top-color: #58a6ff"
+        class="w-10 h-10 rounded-full mx-auto mb-4 animate-spin border-3 border-solid border-gh-border border-t-gh-green"
       ></div>
       <p>Analyzing @{{ queryUser }}...</p>
     </div>
@@ -175,11 +174,11 @@ useHead({
         class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
       >
         <h3 class="mb-4 text-white">Detection Flags</h3>
-        <ul class="list-none">
+        <ul class="space-y-4">
           <li
             v-for="flag in data.analysis.flags"
             :key="flag.label"
-            class="py-3 flex items-center gap-3"
+            class="flex items-center gap-3"
           >
             <strong>{{ flag.label }}</strong>
             <span class="text-gh-muted text-0.9rem">{{ flag.detail }}</span>
