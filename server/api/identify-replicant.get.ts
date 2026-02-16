@@ -1,8 +1,4 @@
-import {
-  analyzeUser,
-  type GitHubUser,
-  type GitHubEvent,
-} from "../utils/botDetectionScorer";
+import { identifyReplicant } from "~~/shared/utils/voight-kampff-machine";
 
 export default defineCachedEventHandler(
   async (event) => {
@@ -13,7 +9,6 @@ export default defineCachedEventHandler(
       throw createError({ statusCode: 400, message: "Missing user parameter" });
     }
 
-    // Fetch user and events (no auth - 60 requests/hour)
     let user: GitHubUser | null = null;
     let events: GitHubEvent[] = [];
 
@@ -36,9 +31,11 @@ export default defineCachedEventHandler(
           message: "GitHub API rate limit reached. Please try again later.",
         });
       }
+
       if (status === 404) {
         throw createError({ statusCode: 404, message: "User not found" });
       }
+
       throw createError({
         statusCode: 500,
         message: "Failed to fetch user data from GitHub",
@@ -49,7 +46,7 @@ export default defineCachedEventHandler(
       throw createError({ statusCode: 404, message: "User not found" });
     }
 
-    const analysis = analyzeUser(user, events ?? []);
+    const analysis = identifyReplicant(user, events ?? []);
 
     return {
       user: {

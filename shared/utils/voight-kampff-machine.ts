@@ -1,28 +1,7 @@
-import { CONFIG } from "~~/shared/utils/score-config";
+import type { GitHubEvent, GitHubUser } from "../types/github";
+import { CONFIG } from "./score-config";
 
-export interface GitHubUser {
-  login: string;
-  avatar_url: string;
-  name: string | null;
-  bio: string | null;
-  public_repos: number;
-  followers: number;
-  following: number;
-  created_at: string;
-}
-
-export interface GitHubEvent {
-  type: string;
-  created_at: string;
-  repo?: { name: string };
-  payload?: {
-    commits?: Array<{ message: string }>;
-    pull_request?: { title: string; body: string | null };
-    issue?: { title: string; body: string | null };
-  };
-}
-
-export interface AnalysisResult {
+export interface IdentifyReplicantResult {
   score: number;
   classification: "human" | "suspicious" | "likely_bot";
   flags: Array<{ label: string; points: number; detail: string }>;
@@ -34,10 +13,10 @@ export interface AnalysisResult {
   };
 }
 
-export function analyzeUser(
+export function identifyReplicant(
   user: GitHubUser,
   events: GitHubEvent[],
-): AnalysisResult {
+): IdentifyReplicantResult {
   const flags: Array<{ label: string; points: number; detail: string }> = [];
   let score = 0;
 

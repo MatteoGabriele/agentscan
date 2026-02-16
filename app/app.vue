@@ -14,7 +14,7 @@ const {
   status,
   error,
   clear: clearUserData,
-} = useFetch("/api/user", {
+} = useFetch("/api/identify-replicant", {
   query: { user: queryUser },
   immediate: !!initialUser.value,
   watch: false,
@@ -268,7 +268,7 @@ useHead({
           :class="scoreClasses.border"
         >
           <div
-            class="w-17.5 h-17.5 shrink-0 rounded-full flex items-center justify-center text-1.5rem font-bold text-white"
+            class="size-20 shrink-0 rounded-full flex items-center justify-center text-xl font-bold text-white"
             :class="scoreClasses.bg"
           >
             {{ data.analysis.score }}
@@ -318,7 +318,7 @@ useHead({
               class="i-carbon-checkmark-filled text-xl"
               aria-hidden="true"
             />
-            No suspicious patterns detected
+            No notable patterns detected
           </p>
         </div>
       </div>
