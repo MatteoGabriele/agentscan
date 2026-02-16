@@ -1,30 +1,39 @@
-import type { GitHubEvent, GitHubUser } from "../types/github";
-import dayjs from "dayjs";
+import type { GitHubEvent, GitHubRepo, GitHubUser } from "../types/github";
 import { CONFIG } from "./score-config";
+import dayjs from "dayjs";
 
-export interface IdentifyReplicantResult {
+export type IdentifyReplicantResult = {
   score: number;
   classification: "human" | "suspicious" | "likely_bot";
   flags: Array<{ label: string; points: number; detail: string }>;
-  profile: {
-    age: number;
-    followers: number;
-    repos: number;
-    hasIdentity: boolean;
-  };
-}
+};
 
-export function identifyReplicant(
-  user: GitHubUser,
-  events: GitHubEvent[],
-): IdentifyReplicantResult {
-  const flags: Array<{ label: string; points: number; detail: string }> = [];
+export type IdentifyReplicantOptions = {
+  user: GitHubUser;
+  events: GitHubEvent[];
+  repos: GitHubRepo[];
+};
+
+type Flag = {
+  label: string;
+  points: number;
+  detail: string;
+};
+
+export function identifyReplicant({
+  user,
+  events,
+  repos,
+}: IdentifyReplicantOptions): IdentifyReplicantResult {
+  const flags: Flag[] = [];
 
   // Coding event types used throughout (commits and PRs)
   const codingEventTypes = new Set(["PushEvent", "PullRequestEvent"]);
 
   // Account
-  const accountDaysOld = dayjs().diff(user.created_at, "days");
+  const accountDaysOld = dayjs()
+    .startOf("day")
+    .diff(dayjs(user.created_at).startOf("day"), "days");
 
   if (accountDaysOld < CONFIG.AGE_NEW_ACCOUNT) {
     flags.push({
@@ -40,29 +49,21 @@ export function identifyReplicant(
     });
   }
 
-  // No identity (no name AND no bio)
-  const hasIdentity = !!(user.name || user.bio);
-  if (!hasIdentity) {
-    flags.push({
-      label: "Minimal profile",
-      points: CONFIG.POINTS_NO_IDENTITY,
-      detail: "No name or bio provided",
-    });
-  }
-
   // Zero personal repos and all activity is external
   const foreignEvents = events.filter((e) => {
     const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
     return repoOwner && repoOwner !== user.login.toLowerCase();
   });
+
   const allExternal =
-    user.public_repos === 0 && foreignEvents.length === events.length;
+    repos.length < 2 && foreignEvents.length === events.length;
+
   if (allExternal && events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS) {
     flags.push({
       label: "Only active on other people's repos",
       points:
         CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
-      detail: `No personal repos, all ${events.length} events are on repos they don't own`,
+      detail: `${repos.length === 0 ? "No" : repos.length} personal repos, all ${events.length} events are on repos they don't own`,
     });
   }
 
@@ -325,10 +326,10 @@ export function identifyReplicant(
     // Also flag if lots of PRs AND few personal repos (regardless of time)
     if (
       externalPRs.length >= CONFIG.EXTERNAL_PRS_MIN &&
-      user.public_repos < CONFIG.PERSONAL_REPOS_LOW
+      repos.length < CONFIG.PERSONAL_REPOS_LOW
     ) {
-      let detail = `${externalPRs.length} PRs to other repos, but only ${user.public_repos} of their own`;
-      if (user.public_repos === 0) {
+      let detail = `${externalPRs.length} PRs to other repos, but only ${repos.length} of their own`;
+      if (repos.length === 0) {
         detail = `${externalPRs.length} PRs to other repos, none of their own`;
       }
 
@@ -344,7 +345,7 @@ export function identifyReplicant(
     if (
       !allExternal &&
       foreignRatio >= CONFIG.FOREIGN_RATIO_HIGH &&
-      user.public_repos < CONFIG.PERSONAL_REPOS_LOW
+      repos.length < CONFIG.PERSONAL_REPOS_LOW
     ) {
       flags.push({
         label: "Mostly external activity",
@@ -370,11 +371,5 @@ export function identifyReplicant(
     score: humanScore,
     classification,
     flags,
-    profile: {
-      age: accountDaysOld,
-      followers: user.followers,
-      repos: user.public_repos,
-      hasIdentity,
-    },
   };
 }

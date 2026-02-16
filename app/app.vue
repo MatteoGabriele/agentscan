@@ -121,7 +121,7 @@ const ogDescription = computed(() => {
   const score = data.value.analysis.score;
   const flags = data.value.analysis.flags.length;
 
-  return `Score: ${score}/100 | ${flags} notable patterns | ${data.value.eventCount} events analyzed`;
+  return `Score: ${score}/100 | ${flags} notable patterns | ${data.value.eventsCount} events analyzed`;
 });
 
 const ogImage = computed(() => {
@@ -129,7 +129,7 @@ const ogImage = computed(() => {
     return "/og.png";
   }
 
-  return data.value.user.avatar;
+  return data.value.user.avatar_url;
 });
 
 useHead({
@@ -213,7 +213,8 @@ useHead({
           class="flex flex-col @lg:flex-row justify-center items-center @lg:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
         >
           <img
-            :src="data.user.avatar"
+            v-if="data.user.avatar_url"
+            :src="data.user.avatar_url"
             :alt="`Avatar of ${data.user.login}`"
             class="size-40 @lg:size-20 rounded-full"
           />
@@ -249,7 +250,13 @@ useHead({
                   class="i-carbon-repo-source-code hidden @lg:inline-block"
                   aria-hidden="true"
                 />
-                {{ data.user.repos }} repos
+                <span v-if="data.ownedPublicReposCount === 0">No</span>
+                <span v-else
+                  >{{ data.ownedPublicReposCount }}/{{
+                    data.user.public_repos
+                  }}</span
+                >
+                repos
               </li>
               <li class="flex items-center gap-1">
                 <span
@@ -257,7 +264,7 @@ useHead({
                   aria-hidden="true"
                 />
                 Joined
-                <NuxtTime :datetime="data.user.created" :relative="true" />
+                <NuxtTime :datetime="data.user.created_at" relative />
               </li>
             </ul>
           </div>
@@ -281,7 +288,7 @@ useHead({
               </h3>
             </header>
             <p class="text-gh-muted mt-1">
-              Based on {{ data.eventCount }} recent events
+              Based on {{ data.eventsCount }} recent events
             </p>
           </div>
         </div>
@@ -335,7 +342,7 @@ useHead({
         />
         by
         <NuxtLink
-          :external="true"
+          external
           target="_blank"
           to="https://github.com/MatteoGabriele"
           class="underline"

@@ -1,4 +1,4 @@
-export interface GitHubUser {
+export type GitHubUser = {
   login: string;
   avatar_url: string;
   name: string | null;
@@ -7,9 +7,9 @@ export interface GitHubUser {
   followers: number;
   following: number;
   created_at: string;
-}
+};
 
-export interface GitHubEvent {
+export type GitHubEvent = {
   type: string;
   created_at: string;
   repo?: { name: string };
@@ -18,4 +18,8 @@ export interface GitHubEvent {
     pull_request?: { title: string; body: string | null };
     issue?: { title: string; body: string | null };
   };
-}
+};
+
+export type GitHubRepo = {
+  fork: boolean;
+};

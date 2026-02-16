@@ -11,16 +11,21 @@ export default defineCachedEventHandler(
 
     let user: GitHubUser | null = null;
     let events: GitHubEvent[] = [];
+    let repos: GitHubRepo[] = [];
 
     try {
-      const [userResponse, eventsResponse] = await Promise.all([
+      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
         $fetch<GitHubUser>(`https://api.github.com/users/${username}`),
+        $fetch<GitHubRepo[]>(
+          `https://api.github.com/users/${username}/repos?type=owner`,
+        ).catch(() => []),
         $fetch<GitHubEvent[]>(
           `https://api.github.com/users/${username}/events?per_page=100`,
         ).catch(() => []),
       ]);
       user = userResponse;
       events = eventsResponse;
+      repos = reposResponse.filter((repo) => !repo.fork);
     } catch (err: unknown) {
       const error = err as { status?: number; statusCode?: number };
       const status = error.status ?? error.statusCode;
@@ -46,21 +51,11 @@ export default defineCachedEventHandler(
       throw createError({ statusCode: 404, message: "User not found" });
     }
 
-    const analysis = identifyReplicant(user, events ?? []);
-
     return {
-      user: {
-        login: user.login,
-        avatar: user.avatar_url,
-        name: user.name,
-        bio: user.bio,
-        followers: user.followers,
-        following: user.following,
-        repos: user.public_repos,
-        created: user.created_at,
-      },
-      analysis,
-      eventCount: events?.length ?? 0,
+      user,
+      ownedPublicReposCount: repos.length,
+      analysis: identifyReplicant({ user, events, repos }),
+      eventsCount: events.length,
     };
   },
   {
