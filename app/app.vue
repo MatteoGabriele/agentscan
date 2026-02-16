@@ -121,7 +121,7 @@ const ogDescription = computed(() => {
   const score = data.value.analysis.score;
   const flags = data.value.analysis.flags.length;
 
-  return `Score: ${score}/100 | ${flags} detection flags | ${data.value.eventCount} events analyzed`;
+  return `Score: ${score}/100 | ${flags} notable patterns | ${data.value.eventCount} events analyzed`;
 });
 
 const ogImage = computed(() => {
