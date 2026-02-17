@@ -1,75 +1,15 @@
-# Nuxt Minimal Starter
+# AgentScan
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Programmatically detect humans, agents, and suspicious account on Github.
 
-## Setup
+I didn’t expect to build this website, but ended up creating in a weekend after reading [this article](https://socket.dev/blog/ai-agent-lands-prs-in-major-oss-projects-targets-maintainers-via-cold-outreach) about open source projects being targeted by AI agents.
 
-Make sure to install dependencies:
+It applies an opinionated scoring system to GitHub activity signals to classify accounts as human, bot, or potentially suspicious.
+The results are indicators, not verdicts. There’s no AI involved, just event analysis looking for patterns that feel a little off.
 
-```bash
-# npm
-npm install
+<img width="657" height="832" alt="Screenshot 2026-02-16 at 21 14 29" src="https://github.com/user-attachments/assets/8a616904-6459-4fd9-9d8f-9284bf9d1e29" />
 
-# pnpm
-pnpm install
+### Issues and features requests
 
-# yarn
-yarn install
+Please drop an issue, if you find something that doesn't work, or have an idea for something that works better.
 
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
