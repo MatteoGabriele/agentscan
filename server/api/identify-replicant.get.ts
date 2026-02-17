@@ -1,4 +1,9 @@
-import { identifyReplicant } from "~~/shared/utils/voight-kampff-machine";
+import {
+  identifyReplicant,
+  type GitHubEvent,
+  type GitHubRepo,
+  type GitHubUser,
+} from "voight-kampff-test";
 
 export default defineCachedEventHandler(
   async (event) => {
@@ -18,11 +23,12 @@ export default defineCachedEventHandler(
         $fetch<GitHubUser>(`https://api.github.com/users/${username}`),
         $fetch<GitHubRepo[]>(
           `https://api.github.com/users/${username}/repos?type=owner`,
-        ).catch(() => []),
+        ),
         $fetch<GitHubEvent[]>(
           `https://api.github.com/users/${username}/events?per_page=100`,
-        ).catch(() => []),
+        ),
       ]);
+
       user = userResponse;
       events = eventsResponse;
       repos = reposResponse.filter((repo) => !repo.fork);
@@ -54,7 +60,7 @@ export default defineCachedEventHandler(
     return {
       user,
       ownedPublicReposCount: repos.length,
-      analysis: identifyReplicant({ user, events, repos }),
+      analysis: identifyReplicant(user, events, repos),
       eventsCount: events.length,
     };
   },

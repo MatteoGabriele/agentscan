@@ -212,12 +212,15 @@ useHead({
         <div
           class="flex flex-col @lg:flex-row justify-center items-center @lg:items-start gap-6 bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
         >
-          <img
-            v-if="data.user.avatar_url"
-            :src="data.user.avatar_url"
-            :alt="`Avatar of ${data.user.login}`"
-            class="size-40 @lg:size-20 rounded-full"
-          />
+          <div class="size-40 @lg:size-20 rounded-full bg-gray-500 shrink-0">
+            <img
+              v-if="data.user.avatar_url"
+              :src="data.user.avatar_url"
+              :alt="`Avatar of ${data.user.login}`"
+              class="size-40 @lg:size-20 rounded-full bg-gh-card"
+            />
+          </div>
+
           <div
             class="w-full flex flex-col justify-center items-center @lg:items-start text-center @lg:text-left"
           >
@@ -263,8 +266,11 @@ useHead({
                   class="i-carbon-calendar hidden @lg:inline-block"
                   aria-hidden="true"
                 />
-                Joined
-                <NuxtTime :datetime="data.user.created_at" relative />
+                Member since
+                <NuxtTime
+                  :datetime="data.user.created_at"
+                  date-style="medium"
+                />
               </li>
             </ul>
           </div>
@@ -287,8 +293,27 @@ useHead({
                 {{ classificationLabel }}
               </h3>
             </header>
-            <p class="text-gh-muted mt-1">
-              Based on {{ data.eventsCount }} recent events
+            <p class="text-gh-muted mt-1" v-if="data.eventsCount > 0">
+              Based on {{ data.eventsCount }} recent
+              <NuxtLink
+                external
+                target="_blank"
+                class="underline"
+                :to="`https://api.github.com/users/${data.user.login}/events?per_page=100`"
+                >events</NuxtLink
+              >
+              on GitHub
+            </p>
+            <p v-else>
+              No recent
+              <NuxtLink
+                external
+                target="_blank"
+                class="underline"
+                :to="`https://api.github.com/users/${data.user.login}/events?per_page=100`"
+                >events</NuxtLink
+              >
+              from this account
             </p>
           </div>
         </div>
