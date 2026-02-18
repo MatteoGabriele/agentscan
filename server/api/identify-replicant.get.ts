@@ -1,7 +1,6 @@
 import {
   identifyReplicant,
   type GitHubEvent,
-  type GitHubRepo,
   type GitHubUser,
 } from "voight-kampff-test";
 
@@ -16,14 +15,10 @@ export default defineCachedEventHandler(
 
     let user: GitHubUser | null = null;
     let events: GitHubEvent[] = [];
-    let repos: GitHubRepo[] = [];
 
     try {
-      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
+      const [userResponse, eventsResponse] = await Promise.all([
         $fetch<GitHubUser>(`https://api.github.com/users/${username}`),
-        $fetch<GitHubRepo[]>(
-          `https://api.github.com/users/${username}/repos?type=owner`,
-        ),
         $fetch<GitHubEvent[]>(
           `https://api.github.com/users/${username}/events?per_page=100`,
         ),
@@ -31,7 +26,6 @@ export default defineCachedEventHandler(
 
       user = userResponse;
       events = eventsResponse;
-      repos = reposResponse.filter((repo) => !repo.fork);
     } catch (err: unknown) {
       const error = err as { status?: number; statusCode?: number };
       const status = error.status ?? error.statusCode;
@@ -59,8 +53,7 @@ export default defineCachedEventHandler(
 
     return {
       user,
-      ownedPublicReposCount: repos.length,
-      analysis: identifyReplicant(user, events, repos),
+      analysis: identifyReplicant(user, events),
       eventsCount: events.length,
     };
   },
