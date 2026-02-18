@@ -32,39 +32,7 @@ function handleSubmit() {
   router.push({ name: "user-name", params: { name } });
 }
 
-const scoreClasses = computed(() => {
-  if (!data.value?.analysis) {
-    return {
-      text: "text-gray-500",
-      border: "border-gray-500",
-      bg: "bg-gray-500",
-    };
-  }
-
-  const score = data.value.analysis.score;
-
-  if (score >= CONFIG.THRESHOLD_HUMAN) {
-    return {
-      text: "text-green-500",
-      border: "border-green-500",
-      bg: "bg-green-500",
-    };
-  }
-
-  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
-    return {
-      text: "text-amber-500",
-      border: "border-amber-500",
-      bg: "bg-amber-500",
-    };
-  }
-
-  return {
-    text: "text-red-500",
-    border: "border-red-500",
-    bg: "bg-red-500",
-  };
-});
+const { scoreClasses } = useScoreStyle(data.value?.analysis.score);
 
 const classificationLabel = computed<string>(() => {
   if (!data.value?.analysis) {
