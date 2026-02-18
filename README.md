@@ -1,8 +1,8 @@
 # AgentScan
 
-Programmatically detect humans, agents, and suspicious account on Github.
+Identifying potential automation patterns in GitHub accounts
 
-I didn’t expect to build this website, but ended up creating in a weekend after reading [this article](https://socket.dev/blog/ai-agent-lands-prs-in-major-oss-projects-targets-maintainers-via-cold-outreach) about open source projects being targeted by AI agents.
+I didn’t expect to build this website, but ended up creating it in a weekend after reading [this article](https://socket.dev/blog/ai-agent-lands-prs-in-major-oss-projects-targets-maintainers-via-cold-outreach) about open source projects being targeted by AI agents.
 
 It applies an opinionated scoring system to GitHub activity signals to classify accounts as human, bot, or potentially suspicious.
 The results are indicators, not verdicts. There’s no AI involved, just event analysis looking for patterns that feel a little off.
