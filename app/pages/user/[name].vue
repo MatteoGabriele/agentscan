@@ -32,9 +32,59 @@ function handleSubmit() {
   router.push({ name: "user-name", params: { name } });
 }
 
-const { classes: scoreClasses, label: classificationLabel } = useClassification(
-  data.value?.analysis.score,
-);
+const scoreClasses = computed(() => {
+  const score = data.value?.analysis.score ?? 0;
+
+  if (score >= CONFIG.THRESHOLD_HUMAN) {
+    return {
+      text: "text-green-500",
+      border: "border-green-500",
+      bg: "bg-green-500",
+    };
+  }
+
+  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    return {
+      text: "text-amber-500",
+      border: "border-amber-500",
+      bg: "bg-amber-500",
+    };
+  }
+
+  return {
+    text: "text-red-500",
+    border: "border-red-500",
+    bg: "bg-red-500",
+  };
+});
+
+const classificationLabel = computed<string>(() => {
+  const score = data.value?.analysis.score ?? 0;
+
+  if (score >= CONFIG.THRESHOLD_HUMAN) {
+    return "Human";
+  }
+
+  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    return "Suspiscious";
+  }
+
+  return "Likely Bot";
+});
+
+const classificationIcon = computed<string>(() => {
+  const score = data.value?.analysis.score ?? 0;
+
+  if (score >= CONFIG.THRESHOLD_HUMAN) {
+    return "i-carbon-face-satisfied";
+  }
+
+  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    return "i-carbon-warning";
+  }
+
+  return "i-carbon-machine-learning";
+});
 
 const ogTitle = computed(() => {
   if (!data.value?.user) {
@@ -164,8 +214,12 @@ useHead({
         {{ data.analysis.score }}
       </div>
       <div>
-        <ClassificationIcon :score="data.analysis.score" />
-
+        <header class="flex gap-2 items-center" :class="scoreClasses.text">
+          <span :class="classificationIcon" class="text-base" />
+          <h3 class="text-xl">
+            {{ classificationLabel }}
+          </h3>
+        </header>
         <p class="text-gh-muted mt-1" v-if="data.eventsCount > 0">
           Based on {{ data.eventsCount }} recent
           <NuxtLink
