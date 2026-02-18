@@ -32,41 +32,9 @@ function handleSubmit() {
   router.push({ name: "user-name", params: { name } });
 }
 
-const { scoreClasses } = useScoreStyle(data.value?.analysis.score);
-
-const classificationLabel = computed<string>(() => {
-  if (!data.value?.analysis) {
-    return "";
-  }
-
-  const type = data.value.analysis.classification;
-
-  if (type === "likely_bot") {
-    return "Likely Bot";
-  }
-  if (type === "suspicious") {
-    return "Suspicious";
-  }
-
-  return "Human";
-});
-
-const classificationIcon = computed<string>(() => {
-  if (!data.value?.analysis) {
-    return "";
-  }
-
-  const type = data.value.analysis.classification;
-
-  if (type === "likely_bot") {
-    return "i-carbon-machine-learning";
-  }
-  if (type === "suspicious") {
-    return "i-carbon-warning";
-  }
-
-  return "i-carbon-face-satisfied";
-});
+const { classes: scoreClasses, label: classificationLabel } = useClassification(
+  data.value?.analysis.score,
+);
 
 const ogTitle = computed(() => {
   if (!data.value?.user) {
@@ -196,12 +164,8 @@ useHead({
         {{ data.analysis.score }}
       </div>
       <div>
-        <header class="flex gap-2 items-center" :class="scoreClasses.text">
-          <span :class="classificationIcon" class="text-base" />
-          <h3 class="text-xl">
-            {{ classificationLabel }}
-          </h3>
-        </header>
+        <ClassificationIcon :score="data.analysis.score" />
+
         <p class="text-gh-muted mt-1" v-if="data.eventsCount > 0">
           Based on {{ data.eventsCount }} recent
           <NuxtLink
