@@ -9,4 +9,10 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: "en-US" },
     },
   },
+
+  routeRules: {
+    "^/\?user=([^/&?#]+)$": {
+      redirect: "/user/:user",
+    },
+  },
 });
