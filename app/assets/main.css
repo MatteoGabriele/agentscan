@@ -6,10 +6,6 @@
   padding: 0;
 }
 
-body {
-  min-height: 100vh;
-}
-
 :root[data-theme="dark"] {
   --bg: #0d1117;
   --card: #161b22;
@@ -40,4 +36,10 @@ body {
   --green-bg: #dafbe1;
   --red: #cf222e;
   --red-bg: #ffebe9;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
 }
