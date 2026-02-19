@@ -159,7 +159,7 @@ useHead({
       <div
         class="w-full flex flex-col justify-center items-center @lg:items-start text-center @lg:text-left"
       >
-        <h2 class="text-white text-3xl @lg:text-xl">
+        <h2 class="text-gh-text text-3xl @lg:text-xl">
           {{ data.user.name || data.user.login }}
         </h2>
         <NuxtLink
