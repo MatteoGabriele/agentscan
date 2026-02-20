@@ -10,6 +10,12 @@ export default defineNuxtConfig({
     dataValue: "theme",
   },
 
+  runtimeConfig: {
+    app: {
+      githubToken: process.env.GITHUB_TOKEN,
+    },
+  },
+
   css: ["~/assets/main.css"],
 
   app: {

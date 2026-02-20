@@ -9,6 +9,15 @@ export default defineCachedEventHandler(
     const query = getQuery(event);
     const username = query.user as string;
 
+    const config = useRuntimeConfig();
+    const fetchOptions = config.app.githubToken
+      ? {
+          headers: {
+            Authorization: `Bearer ${config.app.githubToken}`,
+          },
+        }
+      : {};
+
     if (!username) {
       throw createError({ statusCode: 400, message: "Missing user parameter" });
     }
@@ -18,9 +27,13 @@ export default defineCachedEventHandler(
 
     try {
       const [userResponse, eventsResponse] = await Promise.all([
-        $fetch<GitHubUser>(`https://api.github.com/users/${username}`),
+        $fetch<GitHubUser>(
+          `https://api.github.com/users/${username}`,
+          fetchOptions,
+        ),
         $fetch<GitHubEvent[]>(
           `https://api.github.com/users/${username}/events?per_page=100`,
+          fetchOptions,
         ),
       ]);
 
