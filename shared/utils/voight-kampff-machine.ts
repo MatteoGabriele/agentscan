@@ -1,160 +1,153 @@
-import type { GitHubEvent, GitHubRepo, GitHubUser } from "../types/github";
-import { CONFIG } from "./score-config";
+import { CONFIG } from "./config";
 import dayjs from "dayjs";
+import minMax from "dayjs/plugin/minMax";
+import type {
+  GitHubEvent,
+  GitHubUser,
+  IdentifyFlag,
+  IdentifyReplicantResult,
+  IdentityClassification,
+} from "../types";
 
-export type IdentifyReplicantResult = {
-  score: number;
-  classification: "human" | "suspicious" | "likely_bot";
-  flags: Array<{ label: string; points: number; detail: string }>;
-};
+dayjs.extend(minMax);
 
-export type IdentifyReplicantOptions = {
-  user: GitHubUser;
-  events: GitHubEvent[];
-  repos: GitHubRepo[];
-};
+export function identifyReplicant(
+  user: GitHubUser,
+  events: GitHubEvent[],
+): IdentifyReplicantResult {
+  const flags: IdentifyFlag[] = [];
+  const reposCount = user.public_repos;
 
-type Flag = {
-  label: string;
-  points: number;
-  detail: string;
-};
+  const accountAge = dayjs().diff(user.created_at, "days");
 
-export function identifyReplicant({
-  user,
-  events,
-  repos,
-}: IdentifyReplicantOptions): IdentifyReplicantResult {
-  const flags: Flag[] = [];
-
-  // Coding event types used throughout (commits and PRs)
-  const codingEventTypes = new Set(["PushEvent", "PullRequestEvent"]);
-
-  // Account
-  const accountDaysOld = dayjs()
-    .startOf("day")
-    .diff(dayjs(user.created_at).startOf("day"), "days");
-
-  if (accountDaysOld < CONFIG.AGE_NEW_ACCOUNT) {
+  if (accountAge < CONFIG.AGE_NEW_ACCOUNT) {
     flags.push({
       label: "Recently created",
       points: CONFIG.POINTS_NEW_ACCOUNT,
-      detail: `Account is ${accountDaysOld} days old`,
+      detail: `Account is ${accountAge} days old`,
     });
-  } else if (accountDaysOld < CONFIG.AGE_YOUNG_ACCOUNT) {
+  } else if (accountAge < CONFIG.AGE_YOUNG_ACCOUNT) {
     flags.push({
       label: "Young account",
       points: CONFIG.POINTS_YOUNG_ACCOUNT,
-      detail: `Account is ${accountDaysOld} days old`,
+      detail: `Account is ${accountAge} days old`,
     });
   }
 
-  // Zero personal repos and all activity is external
   const foreignEvents = events.filter((e) => {
     const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
     return repoOwner && repoOwner !== user.login.toLowerCase();
   });
 
-  const allExternal =
-    repos.length < 2 && foreignEvents.length === events.length;
+  const hasAllExternal =
+    reposCount === 0 && foreignEvents.length === events.length;
 
-  if (allExternal && events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS) {
+  if (hasAllExternal && events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS) {
     flags.push({
       label: "Only active on other people's repos",
       points:
         CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
-      detail: `${repos.length === 0 ? "No" : repos.length} personal repos, all ${events.length} events are on repos they don't own`,
+      detail: `No personal repos, all ${events.length} events are on repos they don't own`,
     });
   }
 
-  // Coding activity density (split PRs and commits)
-  // Only flag for new/young accounts - established accounts often have burst activity
-  const isNewOrYoungAccount = accountDaysOld < CONFIG.AGE_YOUNG_ACCOUNT;
+  const isNewOrYoungAccount = accountAge < CONFIG.AGE_YOUNG_ACCOUNT;
+
   if (isNewOrYoungAccount && events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
     const commitEvents = events.filter((e) => e.type === "PushEvent");
-    const prEvents = events.filter((e) => e.type === "PullRequestEvent");
-    // Commits
-    if (commitEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-      const timestamps = commitEvents.map((e) =>
-        new Date(e.created_at).getTime(),
-      );
-      const oldestEvent = Math.min(...timestamps);
-      const newestEvent = Math.max(...timestamps);
-      const eventSpanDays = Math.max(
-        1,
-        Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)),
-      );
-      const commitsPerDay = commitEvents.length / eventSpanDays;
-      if (commitsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME) {
-        flags.push({
-          label: "Very high commit rate",
-          points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
-          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
-        });
-      } else if (commitsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH) {
-        flags.push({
-          label: "High commit rate",
-          points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
-          detail: `${commitEvents.length} commits in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
-        });
-      }
-    }
-    // PRs (flag more aggressively)
-    if (prEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-      const timestamps = prEvents.map((e) => new Date(e.created_at).getTime());
-      const oldestEvent = Math.min(...timestamps);
-      const newestEvent = Math.max(...timestamps);
-      const eventSpanDays = Math.max(
-        1,
-        Math.round((newestEvent - oldestEvent) / (1000 * 60 * 60 * 24)),
-      );
-      const prsPerDay = prEvents.length / eventSpanDays;
-      if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) {
-        // PRs are much rarer
-        flags.push({
-          label: "Extremely high PR rate",
-          points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10,
-          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
-        });
-      } else if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH / 2) {
-        flags.push({
-          label: "High PR rate",
-          points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5,
-          detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
-        });
-      }
-    }
-  }
-
-  // Low followers relative to following (follow bots)
-  if (
-    user.following > CONFIG.FOLLOW_RATIO_FOLLOWING_MIN &&
-    user.followers < CONFIG.FOLLOW_RATIO_FOLLOWERS_MAX
-  ) {
-    flags.push({
-      label: "Unusual follow ratio",
-      points: CONFIG.POINTS_FOLLOW_RATIO,
-      detail: `Following ${user.following} but only ${user.followers} followers`,
-    });
-  } else if (user.followers === 0 && user.following > 0) {
-    flags.push({
-      label: "No followers yet",
-      points: CONFIG.POINTS_ZERO_FOLLOWERS,
-      detail: "Account has no followers",
-    });
-  }
-
-  if (events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-    const timestamps = events.map((e) => new Date(e.created_at));
     const userLogin = user.login.toLowerCase();
 
-    // Reuse codingEventTypes from above, but include reviews for marathon check
-    const codingEventsWithReviews = events.filter(
-      (e) =>
-        codingEventTypes.has(e.type) ||
-        e.type === "PullRequestReviewEvent" ||
-        e.type === "PullRequestReviewCommentEvent",
-    );
+    if (commitEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+      const timestamps = commitEvents
+        .map((e) => dayjs(e.created_at))
+        .sort((a, b) => a.valueOf() - b.valueOf());
+
+      let maxCommitsInHour = 0;
+      let windowStartIndex = 0;
+
+      for (
+        let windowEndIndex = 0;
+        windowEndIndex < timestamps.length;
+        windowEndIndex++
+      ) {
+        const windowEnd = timestamps[windowEndIndex];
+
+        // Slide window start forward until within 1 hour
+        while (
+          windowEnd &&
+          windowEnd.diff(timestamps[windowStartIndex], "hour", true) > 1
+        ) {
+          windowStartIndex++;
+        }
+
+        const commitsInWindow = windowEndIndex - windowStartIndex + 1;
+        maxCommitsInHour = Math.max(maxCommitsInHour, commitsInWindow);
+      }
+
+      if (maxCommitsInHour >= CONFIG.HOURLY_ACTIVITY_EXTREME) {
+        flags.push({
+          label: "Extreme commit burst",
+          points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
+          detail: `${maxCommitsInHour} commits within 1 hour`,
+        });
+      } else if (maxCommitsInHour >= CONFIG.HOURLY_ACTIVITY_HIGH) {
+        flags.push({
+          label: "High commit burst",
+          points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
+          detail: `${maxCommitsInHour} commits within 1 hour`,
+        });
+      }
+
+      // Detect ultra-tight bursts (e.g., 3+ commits within 10 seconds)
+      let tightBurstCount = 0;
+
+      for (let i = 1; i < timestamps.length; i++) {
+        if (timestamps[i] !== undefined && timestamps[i - 1] !== undefined) {
+          const diffSeconds = timestamps[i]!.diff(timestamps[i - 1]!, "second");
+
+          if (diffSeconds <= CONFIG.TIGHT_COMMIT_SECONDS) {
+            tightBurstCount++;
+          }
+        }
+      }
+
+      if (tightBurstCount >= CONFIG.TIGHT_COMMIT_THRESHOLD) {
+        flags.push({
+          label: "Commits too tightly spaced",
+          points: CONFIG.POINTS_TIGHT_BURST,
+          detail: `${tightBurstCount + 1} commits within very short intervals`,
+        });
+      }
+    }
+
+    // PRs (flag more aggressively)
+    const prEvents = events.filter((e) => e.type === "PullRequestEvent");
+
+    if (prEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+      const timestamps = prEvents.map((e) => dayjs(e.created_at));
+      const oldestEvent = dayjs.min(timestamps);
+      const newestEvent = dayjs.max(timestamps);
+
+      if (newestEvent) {
+        const eventSpanDays = Math.max(1, newestEvent.diff(oldestEvent, "day"));
+        const prsPerDay = prEvents.length / eventSpanDays;
+
+        if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) {
+          // PRs are much rarer
+          flags.push({
+            label: "Extremely high PR rate",
+            points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10,
+            detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
+          });
+        } else if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH / 2) {
+          flags.push({
+            label: "High PR rate",
+            points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5,
+            detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
+          });
+        }
+      }
+    }
 
     // Fork surge
     // AI agents fork lots of repos to contribute
@@ -173,10 +166,22 @@ export function identifyReplicant({
       });
     }
 
+    const codingEventTypes = new Set(["PushEvent", "PullRequestEvent"]);
+    const codingEventsWithReviews = events.filter(
+      (e) =>
+        (e.type && codingEventTypes.has(e.type)) ||
+        e.type === "PullRequestReviewEvent" ||
+        e.type === "PullRequestReviewCommentEvent",
+    );
+
     // Inhuman daily coding activity
     // many hours of coding in a day, happening day after day
     const codingEventsByDay = new Map<string, Date[]>();
     codingEventsWithReviews.forEach((e) => {
+      if (!e.created_at) {
+        return;
+      }
+
       const t = new Date(e.created_at);
       const day = t.toISOString().slice(0, 10);
       if (!codingEventsByDay.has(day)) codingEventsByDay.set(day, []);
@@ -198,12 +203,11 @@ export function identifyReplicant({
       daysWithManyHours.sort();
       let consecutiveCount = 1;
       let maxConsecutive = 1;
-
       for (let i = 1; i < daysWithManyHours.length; i++) {
-        const prev = new Date(daysWithManyHours[i - 1]!);
-        const curr = new Date(daysWithManyHours[i]!);
-        const diffDays =
-          (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
+        const prev = dayjs(daysWithManyHours[i - 1]);
+        const curr = dayjs(daysWithManyHours[i]);
+        const diffDays = curr.diff(prev, "day");
+
         if (diffDays === 1) {
           consecutiveCount++;
           maxConsecutive = Math.max(maxConsecutive, consecutiveCount);
@@ -231,17 +235,22 @@ export function identifyReplicant({
     // Consecutive days activity
     // working non-stop
     const daySet = new Set<string>();
-    timestamps.forEach((t) => daySet.add(t.toISOString().slice(0, 10)));
-    const sortedDays = [...daySet].sort();
+    events.forEach((e) => {
+      daySet.add(dayjs(e.created_at).format("YYYY-MM-DD"));
+    });
+
+    const sortedDays = Array.from(daySet)
+      .map((d) => dayjs(d, "YYYY-MM-DD"))
+      .sort((a, b) => a.valueOf() - b.valueOf());
 
     let maxStreak = 1;
     let currentStreak = 1;
+
     for (let i = 1; i < sortedDays.length; i++) {
-      const prev = new Date(sortedDays[i - 1]!);
-      const curr = new Date(sortedDays[i]!);
-      const diffDays =
-        (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
-      if (diffDays === 1) {
+      const prev = sortedDays[i - 1];
+      const curr = sortedDays[i];
+
+      if (curr && prev && curr.diff(prev, "day") === 1) {
         currentStreak++;
         maxStreak = Math.max(maxStreak, currentStreak);
       } else {
@@ -288,36 +297,35 @@ export function identifyReplicant({
 
     // External PRs
     // check frequency, not just total
-    const prEvents = events.filter((e) => e.type === "PullRequestEvent");
     const externalPRs = prEvents.filter((e) => {
       const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
       return repoOwner && repoOwner !== userLogin;
     });
 
     // Group PRs by day and week
-    const now = Date.now();
-    const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
-    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    const now = dayjs();
+    const oneWeekAgo = now.subtract(1, "week");
+    const oneDayAgo = now.subtract(1, "day");
 
-    const prsThisWeek = externalPRs.filter(
-      (e) => new Date(e.created_at).getTime() > oneWeekAgo,
+    const prsThisWeek = externalPRs.filter((e) =>
+      dayjs(e.created_at).isAfter(oneWeekAgo),
     );
-    const prsToday = externalPRs.filter(
-      (e) => new Date(e.created_at).getTime() > oneDayAgo,
+    const prsToday = externalPRs.filter((e) =>
+      dayjs(e.created_at).isAfter(oneDayAgo),
     );
 
     // Many PRs in a single day
     // only flag extreme cases
     if (prsToday.length >= CONFIG.PRS_TODAY_EXTREME) {
       flags.push({
-        label: "High PR volume today",
+        label: "High PR volume in the past 24 hours",
         points: CONFIG.POINTS_PR_BURST,
         detail: `${prsToday.length} PRs to other repos in the last 24 hours`,
       });
     } else if (prsThisWeek.length >= CONFIG.PRS_WEEK_HIGH) {
       // Many PRs in a week
       flags.push({
-        label: "High PR volume this week",
+        label: "High PR volume during last week",
         points: CONFIG.POINTS_HIGH_PR_FREQUENCY,
         detail: `${prsThisWeek.length} PRs to other repos this week`,
       });
@@ -326,10 +334,10 @@ export function identifyReplicant({
     // Also flag if lots of PRs AND few personal repos (regardless of time)
     if (
       externalPRs.length >= CONFIG.EXTERNAL_PRS_MIN &&
-      repos.length < CONFIG.PERSONAL_REPOS_LOW
+      reposCount < CONFIG.PERSONAL_REPOS_LOW
     ) {
-      let detail = `${externalPRs.length} PRs to other repos, but only ${repos.length} of their own`;
-      if (repos.length === 0) {
+      let detail = `${externalPRs.length} PRs to other repos, but only ${reposCount} of their own`;
+      if (reposCount === 0) {
         detail = `${externalPRs.length} PRs to other repos, none of their own`;
       }
 
@@ -343,9 +351,9 @@ export function identifyReplicant({
     // Mostly external activity (not 100%)
     const foreignRatio = foreignEvents.length / events.length;
     if (
-      !allExternal &&
+      !hasAllExternal &&
       foreignRatio >= CONFIG.FOREIGN_RATIO_HIGH &&
-      repos.length < CONFIG.PERSONAL_REPOS_LOW
+      reposCount < CONFIG.PERSONAL_REPOS_LOW
     ) {
       flags.push({
         label: "Mostly external activity",
@@ -356,11 +364,11 @@ export function identifyReplicant({
   }
 
   // Invert score: 100 = human, 0 = bot
-  const score = flags.reduce((total, flag) => total + flag.points, 0);
+  const score = flags.reduce((total, flag) => (total += flag.points), 0);
   const humanScore = Math.max(0, 100 - score);
 
   // Classification based on inverted score
-  let classification: "human" | "suspicious" | "likely_bot" = "likely_bot";
+  let classification: IdentityClassification = "likely_bot";
   if (humanScore >= CONFIG.THRESHOLD_HUMAN) {
     classification = "human";
   } else if (humanScore >= CONFIG.THRESHOLD_SUSPICIOUS) {
@@ -371,5 +379,10 @@ export function identifyReplicant({
     score: humanScore,
     classification,
     flags,
+    profile: {
+      age: accountAge,
+      followers: user.followers,
+      repos: reposCount,
+    },
   };
 }

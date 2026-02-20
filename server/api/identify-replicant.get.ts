@@ -1,36 +1,37 @@
-import { identifyReplicant, GitHubUser, GitHubEvent } from "voight-kampff-test";
+import { identifyReplicant } from "~~/shared/utils/voight-kampff-machine";
+import type { GitHubUser, GitHubEvent } from "~~/shared/types/identity";
 import { Octokit } from "octokit";
 
 export default defineCachedEventHandler(
   async (event) => {
+    const config = useRuntimeConfig();
     const query = getQuery(event);
     const username = query.user as string;
-
-    const config = useRuntimeConfig();
 
     if (!username) {
       throw createError({ statusCode: 400, message: "Missing user parameter" });
     }
-
-    let user: GitHubUser | null = null;
-    let events: GitHubEvent[] = [];
 
     const oktokit = new Octokit({
       auth: config.githubToken,
     });
 
     try {
-      const userResponse = await oktokit.rest.users.getByUsername({ username });
-      const eventResponse = await oktokit.rest.activity.listPublicEventsForUser(
-        {
+      const { data: user } = await oktokit.rest.users.getByUsername({
+        username,
+      });
+      const { data: events } =
+        await oktokit.rest.activity.listPublicEventsForUser({
           username,
           per_page: 100,
           page: 1,
-        },
-      );
+        });
 
-      user = userResponse.data;
-      events = eventResponse.data;
+      return {
+        user,
+        analysis: identifyReplicant(user, events),
+        eventsCount: events.length,
+      };
     } catch (err: unknown) {
       const error = err as { status?: number; statusCode?: number };
       const status = error.status ?? error.statusCode;
@@ -51,16 +52,6 @@ export default defineCachedEventHandler(
         message: "Failed to fetch user data from GitHub",
       });
     }
-
-    if (!user) {
-      throw createError({ statusCode: 404, message: "User not found" });
-    }
-
-    return {
-      user,
-      analysis: identifyReplicant(user, events),
-      eventsCount: events.length,
-    };
   },
   {
     maxAge: 600, // 10 minutes
