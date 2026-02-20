@@ -11,9 +11,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    app: {
-      githubToken: process.env.GITHUB_TOKEN,
-    },
+    githubToken: "",
   },
 
   css: ["~/assets/main.css"],

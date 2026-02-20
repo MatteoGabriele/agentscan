@@ -10,10 +10,10 @@ export default defineCachedEventHandler(
     const username = query.user as string;
 
     const config = useRuntimeConfig();
-    const fetchOptions = config.app.githubToken
+    const fetchOptions = config.githubToken
       ? {
           headers: {
-            Authorization: `Bearer ${config.app.githubToken}`,
+            Authorization: `Bearer ${config.githubToken}`,
           },
         }
       : {};
