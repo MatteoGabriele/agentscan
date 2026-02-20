@@ -1,8 +1,5 @@
-import {
-  identifyReplicant,
-  type GitHubEvent,
-  type GitHubUser,
-} from "voight-kampff-test";
+import { identifyReplicant, GitHubUser, GitHubEvent } from "voight-kampff-test";
+import { Octokit } from "octokit";
 
 export default defineCachedEventHandler(
   async (event) => {
@@ -10,13 +7,6 @@ export default defineCachedEventHandler(
     const username = query.user as string;
 
     const config = useRuntimeConfig();
-    const fetchOptions = config.githubToken
-      ? {
-          headers: {
-            Authorization: `Bearer ${config.githubToken}`,
-          },
-        }
-      : {};
 
     if (!username) {
       throw createError({ statusCode: 400, message: "Missing user parameter" });
@@ -25,20 +15,22 @@ export default defineCachedEventHandler(
     let user: GitHubUser | null = null;
     let events: GitHubEvent[] = [];
 
-    try {
-      const [userResponse, eventsResponse] = await Promise.all([
-        $fetch<GitHubUser>(
-          `https://api.github.com/users/${username}`,
-          fetchOptions,
-        ),
-        $fetch<GitHubEvent[]>(
-          `https://api.github.com/users/${username}/events?per_page=100`,
-          fetchOptions,
-        ),
-      ]);
+    const oktokit = new Octokit({
+      auth: config.githubToken,
+    });
 
-      user = userResponse;
-      events = eventsResponse;
+    try {
+      const userResponse = await oktokit.rest.users.getByUsername({ username });
+      const eventResponse = await oktokit.rest.activity.listPublicEventsForUser(
+        {
+          username,
+          per_page: 100,
+          page: 1,
+        },
+      );
+
+      user = userResponse.data;
+      events = eventResponse.data;
     } catch (err: unknown) {
       const error = err as { status?: number; statusCode?: number };
       const status = error.status ?? error.statusCode;
