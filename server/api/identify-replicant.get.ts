@@ -1,5 +1,4 @@
-import { identifyReplicant } from "~~/shared/utils/voight-kampff-machine";
-import type { GitHubUser, GitHubEvent } from "~~/shared/types/identity";
+import { identifyReplicant } from "~~/shared/utils/voight-kampff-test/identify-replicant";
 import { Octokit } from "octokit";
 
 export default defineCachedEventHandler(
@@ -12,9 +11,7 @@ export default defineCachedEventHandler(
       throw createError({ statusCode: 400, message: "Missing user parameter" });
     }
 
-    const oktokit = new Octokit({
-      auth: config.githubToken,
-    });
+    const oktokit = new Octokit({ auth: config.githubToken });
 
     try {
       const { data: user } = await oktokit.rest.users.getByUsername({

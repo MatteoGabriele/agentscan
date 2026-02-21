@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "app.netlify.agentscan.reaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["subject", "reaction", "createdAt"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the page"
+          },
+          "reaction": {
+            "type": "string",
+            "knownValues": ["like", "insightful", "question"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

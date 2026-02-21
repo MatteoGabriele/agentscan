@@ -24,6 +24,15 @@ export type IdentifyReplicantResult = {
   };
 };
 
+export type Reaction = {
+  did: string;
+  handle: string;
+  displayName: string | undefined;
+  avatar: string | undefined;
+  reaction: string;
+  createdAt: string;
+};
+
 export type FlagReturn = {
   flags: IdentifyFlag[];
 };

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
+
 const route = useRoute();
 const router = useRouter();
 
@@ -16,11 +18,42 @@ const initialUser = computed<string>(() => {
 
 const accountName = ref(initialUser.value);
 
-const { data, status, error } = await useFetch("/api/identify-replicant", {
-  query: { user: accountName },
-  key: accountName,
-  watch: false,
+const { data, status, error } = await useFetch(
+  () => "/api/identify-replicant",
+  {
+    query: { user: accountName },
+    key: accountName,
+    watch: false,
+  },
+);
+
+const { data: reactions, refresh: refreshReactions } = await useFetch(
+  () => `/api/reactions/${accountName.value}`,
+  {
+    key: `reactions:${accountName.value}`,
+  },
+);
+
+const { data: me } = await useFetch("/api/auth/me");
+const isFlagged = computed<boolean>(() => {
+  return reactions.value?.some((r: any) => r.did === me.value?.user?.did);
 });
+
+async function flagAccount() {
+  await $fetch("/api/reactions/create", {
+    method: "POST",
+    body: { githubUsername: accountName.value, reaction: "like" },
+  });
+  await refreshReactions();
+}
+
+async function unflagAccount() {
+  await $fetch("/api/reactions/delete", {
+    method: "POST",
+    body: { githubUsername: accountName.value },
+  });
+  await refreshReactions();
+}
 
 function handleSubmit() {
   const name = accountName.value.trim();
@@ -213,12 +246,17 @@ useHead({
       >
         {{ data.analysis.score }}
       </div>
-      <div>
-        <header class="flex gap-2 items-center" :class="scoreClasses.text">
-          <span :class="classificationIcon" class="text-base" />
-          <h3 class="text-xl">
-            {{ classificationLabel }}
-          </h3>
+      <div class="w-full">
+        <header class="flex items-center justify-between">
+          <div class="flex gap-2 items-center" :class="scoreClasses.text">
+            <span :class="classificationIcon" class="text-base" />
+            <h3 class="text-xl">
+              {{ classificationLabel }}
+            </h3>
+          </div>
+
+          <button @click="unflagAccount" v-if="isFlagged">Unflag</button>
+          <button @click="flagAccount" v-else>Flag</button>
         </header>
         <p class="text-gh-muted mt-1" v-if="data.eventsCount > 0">
           Based on {{ data.eventsCount }} recent
@@ -244,6 +282,28 @@ useHead({
           </NuxtLink>
           from this account
         </p>
+
+        <div v-if="reactions.length" class="mt-4">
+          <h3 class="text-sm">
+            Flagged by {{ reactions.length }}
+            {{ reactions.length === 1 ? "user" : "users" }}
+          </h3>
+          <ul class="mt-2 flex items-center">
+            <li v-for="reaction in reactions" :key="reaction.did">
+              <NuxtLink
+                external
+                :to="`https://bsky.app/profile/${reaction.handle}`"
+                class="flex"
+                target="_blank"
+              >
+                <div class="size-8 overflow-hidden rounded-full">
+                  <img :src="reaction.avatar" aria-hidden="true" />
+                </div>
+                <span class="sr-only">{{ reaction.displayName }}</span>
+              </NuxtLink>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 

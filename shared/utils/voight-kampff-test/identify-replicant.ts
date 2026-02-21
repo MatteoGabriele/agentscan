@@ -7,7 +7,7 @@ import type {
   IdentifyFlag,
   IdentifyReplicantResult,
   IdentityClassification,
-} from "../types";
+} from "~~/shared/types/identity";
 
 dayjs.extend(minMax);
 

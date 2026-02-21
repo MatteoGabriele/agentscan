@@ -11,7 +11,14 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    githubToken: "",
+    githubToken: process.env.NUXT_GITHUB_TOKEN || "",
+    upstash: {
+      redisRestUrl: process.env.NUXT_UPSTASH_REDIS_REST_URL || "",
+      redisRestToken: process.env.NUXT_UPSTASH_REDIS_REST_TOKEN || "",
+    },
+    public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "",
+    },
   },
 
   css: ["~/assets/main.css"],
@@ -19,6 +26,12 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: "en-US" },
+    },
+  },
+
+  vite: {
+    server: {
+      allowedHosts: ["fever-beverages-burns-radical.trycloudflare.com"],
     },
   },
 });

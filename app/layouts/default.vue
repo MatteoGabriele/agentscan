@@ -11,6 +11,9 @@ const colorScheme = computed(() => {
   }[colorMode.preference];
 });
 
+const { data } = await useFetch("/api/auth/me");
+const user = computed(() => data.value?.user);
+
 useHead({
   title: "AgentScan - GitHub AI Agent Detector",
   meta: [
@@ -28,7 +31,7 @@ useHead({
 <template>
   <NuxtLoadingIndicator />
   <div class="min-h-screen flex flex-col">
-    <header class="p-4 flex items-center justify-end">
+    <header class="p-4 flex gap-2 items-center justify-between">
       <NuxtLink
         aria-label="Link to Github repository"
         external
@@ -37,6 +40,12 @@ useHead({
       >
         <span class="i-carbon:logo-github text-lg flex" aria-hidden="true" />
       </NuxtLink>
+      <div v-if="user" class="flex items-center gap-2">
+        <div class="size-6 rounded-full overflow-hidden">
+          <img :src="user.avatar" alt="user avatar" />
+        </div>
+        <span class="text-sm">{{ user.displayName }}</span>
+      </div>
     </header>
     <main
       class="max-w-screen-sm mx-auto py-8 px-4 @container flex-1 w-full flex flex-col justify-center"
