@@ -16,7 +16,7 @@ const initialUser = computed<string>(() => {
   return route.params.name[0] ?? "";
 });
 
-const accountName = ref(initialUser.value);
+const accountName = ref(initialUser.value.toLowerCase());
 
 const { data, status, error } = await useFetch(
   () => "/api/identify-replicant",
@@ -27,24 +27,29 @@ const { data, status, error } = await useFetch(
   },
 );
 
-const { data: reactions, refresh: refreshReactions } = await useFetch(
-  () => `/api/reactions/${accountName.value}`,
-  {
-    key: `reactions:${accountName.value}`,
-  },
-);
+const { data: reactions, refresh: refreshReactions } = await useFetch<
+  Reaction[]
+>(() => `/api/reactions/${accountName.value}`, {
+  key: `reactions:${accountName.value}`,
+});
 
 const { data: me } = await useFetch("/api/auth/me");
 const isFlagged = computed<boolean>(() => {
+  if (!reactions.value?.length) {
+    return false;
+  }
+
   return reactions.value?.some((r: any) => r.did === me.value?.user?.did);
 });
+
+const isLoginModalOpen = ref<boolean>(false);
+const isFlaggingPending = ref<boolean>(false);
 
 async function flagAccount() {
   await $fetch("/api/reactions/create", {
     method: "POST",
-    body: { githubUsername: accountName.value, reaction: "like" },
+    body: { githubUsername: accountName.value, reaction: "signal" },
   });
-  await refreshReactions();
 }
 
 async function unflagAccount() {
@@ -52,12 +57,27 @@ async function unflagAccount() {
     method: "POST",
     body: { githubUsername: accountName.value },
   });
-  await refreshReactions();
 }
 
-function handleSubmit() {
-  const name = accountName.value.trim();
+async function handleFlagging() {
+  if (!me.value?.user) {
+    isLoginModalOpen.value = true;
+    return;
+  }
 
+  isFlaggingPending.value = true;
+
+  if (isFlagged.value) {
+    await unflagAccount();
+  } else {
+    await flagAccount();
+  }
+
+  await refreshReactions();
+  isFlaggingPending.value = false;
+}
+
+function handleSubmit(name: string) {
   if (!name) {
     return;
   }
@@ -95,28 +115,28 @@ const classificationLabel = computed<string>(() => {
   const score = data.value?.analysis.score ?? 0;
 
   if (score >= CONFIG.THRESHOLD_HUMAN) {
-    return "Human";
+    return "Organic activity detected";
   }
 
   if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
-    return "Suspiscious";
+    return "Mixed signals";
   }
 
-  return "Likely Bot";
+  return "Unusual activity patterns";
 });
 
 const classificationIcon = computed<string>(() => {
   const score = data.value?.analysis.score ?? 0;
 
   if (score >= CONFIG.THRESHOLD_HUMAN) {
-    return "i-carbon-face-satisfied";
+    return "i-carbon:growth";
   }
 
   if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
-    return "i-carbon-warning";
+    return "i-carbon:unknown";
   }
 
-  return "i-carbon-machine-learning";
+  return "i-carbon:meter-alt";
 });
 
 const ogTitle = computed(() => {
@@ -132,10 +152,21 @@ const ogDescription = computed(() => {
     return;
   }
 
-  const score = data.value.analysis.score;
-  const flags = data.value.analysis.flags.length;
+  const label = classificationLabel.value;
+  const flagsCounter = data.value.analysis.flags.length;
+  const reactionsCounter = reactions.value?.length ?? 0;
 
-  return `Score: ${score}/100 | ${flags} notable patterns | ${data.value.eventsCount} events analyzed`;
+  let description = label;
+
+  if (reactionsCounter > 0) {
+    description += ` | ${reactionsCounter} community signals`;
+  }
+
+  if (flagsCounter > 0) {
+    description += ` | ${flagsCounter} flags`;
+  }
+
+  return description;
 });
 
 const ogImage = computed(() => {
@@ -158,11 +189,14 @@ useHead({
 </script>
 
 <template>
+  <LoginModal v-if="isLoginModalOpen" />
+
   <AnalyzeForm v-model="accountName" @submit="handleSubmit" />
 
   <div v-if="status === 'pending'" class="text-center py-12">
-    <div
-      class="w-10 h-10 rounded-full mx-auto mb-4 animate-spin border-3 border-solid border-gh-border border-t-gh-green"
+    <span
+      class="i-carbon-circle-dash animate-spin text-4xl text-gh-green mx-auto mb-4 block"
+      aria-label="Loading"
     />
     <p>Analyzing @{{ accountName }}...</p>
   </div>
@@ -207,18 +241,18 @@ useHead({
           {{ data.user.bio }}
         </p>
         <ul
-          class="flex flex-col items-center @lg:items-start @lg:flex-row @lg:gap-4 mt-4 @lg:mt-2 text-base @lg:text-sm text-gh-muted"
+          class="flex flex-col items-center @md:items-start @md:flex-row @md:gap-4 mt-4 @md:mt-2 text-base @md:text-sm text-gh-muted"
         >
           <li class="flex items-center gap-1">
             <span
-              class="i-carbon-user-multiple hidden @lg:inline-block"
+              class="i-carbon-user-multiple hidden @md:inline-block"
               aria-hidden="true"
             />
             {{ data.user.followers }} followers
           </li>
           <li class="flex items-center gap-1">
             <span
-              class="i-carbon-repo-source-code hidden @lg:inline-block"
+              class="i-carbon-repo-source-code hidden @md:inline-block"
               aria-hidden="true"
             />
             <span v-if="data.user.public_repos === 0">No repos</span>
@@ -226,7 +260,7 @@ useHead({
           </li>
           <li class="flex items-center gap-1">
             <span
-              class="i-carbon-calendar hidden @lg:inline-block"
+              class="i-carbon-calendar hidden @md:inline-block"
               aria-hidden="true"
             />
             Member since
@@ -237,15 +271,9 @@ useHead({
     </div>
 
     <div
-      class="flex items-center gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid"
+      class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
       :class="scoreClasses.border"
     >
-      <div
-        class="size-20 shrink-0 rounded-full flex items-center justify-center text-xl font-bold text-white"
-        :class="scoreClasses.bg"
-      >
-        {{ data.analysis.score }}
-      </div>
       <div class="w-full">
         <header class="flex items-center justify-between">
           <div class="flex gap-2 items-center" :class="scoreClasses.text">
@@ -255,8 +283,22 @@ useHead({
             </h3>
           </div>
 
-          <button @click="unflagAccount" v-if="isFlagged">Unflag</button>
-          <button @click="flagAccount" v-else>Flag</button>
+          <button
+            @click="handleFlagging"
+            class="text-red flex hover:bg-gh-red-hover hover:text-gh-bg transition-colors size-8 text-sm rounded-full items-center justify-center"
+          >
+            <span
+              v-if="isFlaggingPending"
+              class="i-carbon-circle-dash animate-spin text-lg"
+              aria-label="Flagging..."
+            />
+            <span
+              v-else-if="isFlagged"
+              class="i-carbon-flag-filled"
+              aria-label="Flagged"
+            />
+            <span v-else class="i-carbon-flag" aria-label="Flag" />
+          </button>
         </header>
         <p class="text-gh-muted mt-1" v-if="data.eventsCount > 0">
           Based on {{ data.eventsCount }} recent
@@ -283,27 +325,39 @@ useHead({
           from this account
         </p>
 
-        <div v-if="reactions.length" class="mt-4">
-          <h3 class="text-sm">
-            Flagged by {{ reactions.length }}
-            {{ reactions.length === 1 ? "user" : "users" }}
-          </h3>
-          <ul class="mt-2 flex items-center">
-            <li v-for="reaction in reactions" :key="reaction.did">
-              <NuxtLink
-                external
-                :to="`https://bsky.app/profile/${reaction.handle}`"
-                class="flex"
-                target="_blank"
+        <Transition name="fade">
+          <div v-if="reactions?.length" class="mt-4">
+            <h3 class="text-sm">
+              Signaled by {{ reactions.length }}
+              {{ reactions.length === 1 ? "user" : "users" }}
+            </h3>
+            <TransitionGroup
+              name="avatar"
+              tag="ul"
+              class="mt-2 flex w-full flex-wrap items-center"
+            >
+              <li
+                v-for="reaction in reactions"
+                :key="reaction.did"
+                class="-mr-2"
               >
-                <div class="size-8 overflow-hidden rounded-full">
-                  <img :src="reaction.avatar" aria-hidden="true" />
-                </div>
-                <span class="sr-only">{{ reaction.displayName }}</span>
-              </NuxtLink>
-            </li>
-          </ul>
-        </div>
+                <NuxtLink
+                  external
+                  :to="`https://bsky.app/profile/${reaction.handle}`"
+                  class="flex"
+                  target="_blank"
+                >
+                  <div
+                    class="size-8 overflow-hidden rounded-full border-2 border-gh-border"
+                  >
+                    <img :src="reaction.avatar" aria-hidden="true" />
+                  </div>
+                  <span class="sr-only">{{ reaction.displayName }}</span>
+                </NuxtLink>
+              </li>
+            </TransitionGroup>
+          </div>
+        </Transition>
       </div>
     </div>
 
@@ -312,9 +366,9 @@ useHead({
       class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
     >
       <h3
-        class="mb-4 text-white text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
+        class="mb-4 text-gh-text text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
       >
-        Notable patterns
+        Activity Signals
       </h3>
       <ul>
         <li
@@ -336,8 +390,38 @@ useHead({
     >
       <p class="flex items-center justify-center gap-2">
         <span class="i-carbon-checkmark-filled text-xl" aria-hidden="true" />
-        No notable patterns detected
+        No unusual activity found
       </p>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* whole block fades in */
+.fade-enter-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+}
+
+/* individual avatars pop in/out */
+.avatar-enter-active {
+  transition: all 0.3s ease;
+}
+.avatar-leave-active {
+  transition: all 0.2s ease;
+  position: absolute;
+}
+.avatar-enter-from {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.avatar-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.avatar-move {
+  transition: transform 0.3s ease;
+}
+</style>

@@ -34,6 +34,7 @@ export default defineConfig({
         "green-text": "var(--text-green)",
         "green-bg": "var(--green-bg)",
         red: "var(--red)",
+        "red-hover": "var(--red-hover)",
         "red-bg": "var(--red-bg)",
       },
     },

@@ -11,12 +11,11 @@
         "properties": {
           "subject": {
             "type": "string",
-            "format": "uri",
-            "description": "URL of the page"
+            "description": "GitHub username being flagged"
           },
           "reaction": {
             "type": "string",
-            "knownValues": ["like", "insightful", "question"]
+            "knownValues": ["signal"]
           },
           "createdAt": {
             "type": "string",

@@ -31,7 +31,7 @@ export default defineNuxtConfig({
 
   vite: {
     server: {
-      allowedHosts: ["fever-beverages-burns-radical.trycloudflare.com"],
+      allowedHosts: ["stanford-compile-fishing-being.trycloudflare.com"],
     },
   },
 });
