@@ -1,4 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL ?? "";
+const tunnelHostname = siteUrl
+  ? siteUrl.replace("https://", "").replace("http://", "")
+  : "";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
@@ -31,7 +37,7 @@ export default defineNuxtConfig({
 
   vite: {
     server: {
-      allowedHosts: ["shell-jonathan-curve-interior.trycloudflare.com"],
+      allowedHosts: tunnelHostname ? [tunnelHostname] : [],
     },
   },
 });
