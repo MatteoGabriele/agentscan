@@ -1,9 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-const siteUrl = process.env.NUXT_PUBLIC_SITE_URL ?? "";
-const tunnelHostname = siteUrl
-  ? siteUrl.replace("https://", "").replace("http://", "")
-  : "";
+// const siteUrl = process.env.NUXT_PUBLIC_SITE_URL ?? "";
+// const tunnelHostname = siteUrl
+//   ? siteUrl.replace("https://", "").replace("http://", "")
+//   : "";
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
@@ -18,13 +18,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     githubToken: "",
-    upstash: {
-      redisRestUrl: "",
-      redisRestToken: "",
-    },
-    public: {
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "",
-    },
+    // upstash: {
+    //   redisRestUrl: "",
+    //   redisRestToken: "",
+    // },
+    // public: {
+    //   siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "",
+    // },
   },
 
   css: ["~/assets/main.css"],
@@ -35,10 +35,10 @@ export default defineNuxtConfig({
     },
   },
 
-  vite: {
-    server: {
-      // Allow tunnel when working locally at atproto stuff
-      allowedHosts: tunnelHostname ? [tunnelHostname] : [],
-    },
-  },
+  // vite: {
+  //   server: {
+  //     // Allow tunnel when working locally at atproto stuff
+  //     allowedHosts: tunnelHostname ? [tunnelHostname] : [],
+  //   },
+  // },
 });
