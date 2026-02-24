@@ -2,9 +2,7 @@
 const accountName = ref("");
 
 const router = useRouter();
-function handleSubmit() {
-  const name = accountName.value.trim();
-
+function handleSubmit(name: string) {
   if (!name) {
     return;
   }

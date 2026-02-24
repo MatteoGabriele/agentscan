@@ -19,6 +19,7 @@
   --text-green: #3fb950;
   --green-bg: #0d2818;
   --red: #f85149;
+  --red-hover: #ff6a6a;
   --red-bg: #3d1515;
 }
 
@@ -35,6 +36,7 @@
   --text-green: #116329;
   --green-bg: #dafbe1;
   --red: #cf222e;
+  --red-hover: #f85149;
   --red-bg: #ffebe9;
 }
 
