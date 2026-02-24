@@ -14,7 +14,7 @@
     </div>
 
     <p class="text-gh-muted text-balance @md:text-wrap">
-      Identifying potential automation patterns in GitHub accounts
+      An open experiment in detecting automation patterns on GitHub
     </p>
   </div>
 </template>

@@ -17,7 +17,7 @@ useHead({
     { property: "og:title", content: "AgentScan - GitHub AI Agent Detector" },
     {
       property: "og:description",
-      content: "Identifying potential automation patterns in GitHub accounts",
+      content: "An open experiment in detecting automation patterns on GitHub",
     },
     { property: "og:type", content: "website" },
     { name: "color-scheme", content: colorScheme },

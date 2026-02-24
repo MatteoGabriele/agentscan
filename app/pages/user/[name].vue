@@ -81,10 +81,12 @@ function handleSubmit(name: string) {
   router.push({ name: "user-name", params: { name } });
 }
 
-const scoreClasses = computed(() => {
-  const score = data.value?.analysis.score ?? 0;
+const score = computed<number>(() => {
+  return data.value?.analysis.score ?? 0;
+});
 
-  if (score >= CONFIG.THRESHOLD_HUMAN) {
+const scoreClasses = computed(() => {
+  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
     return {
       text: "text-green-500",
       border: "border-green-500",
@@ -92,7 +94,7 @@ const scoreClasses = computed(() => {
     };
   }
 
-  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
+  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
     return {
       text: "text-amber-500",
       border: "border-amber-500",
@@ -101,35 +103,41 @@ const scoreClasses = computed(() => {
   }
 
   return {
-    text: "text-red-500",
-    border: "border-red-500",
-    bg: "bg-red-500",
+    text: "text-orange-500",
+    border: "border-orange-500",
+    bg: "bg-orange-500",
   };
 });
 
-const classificationLabel = computed<string>(() => {
-  const score = data.value?.analysis.score ?? 0;
-
-  if (score >= CONFIG.THRESHOLD_HUMAN) {
-    return "Organic activity";
+const classificationDetails = computed(() => {
+  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
+    return {
+      label: "Organic activity",
+      description: "No automation signals detected in the analyzed events.",
+    };
   }
 
-  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
-    return "Mixed signals";
+  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    return {
+      label: "Mixed activity",
+      description:
+        "Activity patterns show a mix of organic and automated signals.",
+    };
   }
 
-  return "Unusual activity";
+  return {
+    label: "Automation signals",
+    description: "Activity patterns show signs of automation.",
+  };
 });
 
 const classificationIcon = computed<string>(() => {
-  const score = data.value?.analysis.score ?? 0;
-
-  if (score >= CONFIG.THRESHOLD_HUMAN) {
+  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
     return "i-carbon:growth";
   }
 
-  if (score >= CONFIG.THRESHOLD_SUSPICIOUS) {
-    return "i-carbon:unknown";
+  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    return "i-carbon:activity";
   }
 
   return "i-carbon:meter-alt";
@@ -140,7 +148,7 @@ const ogTitle = computed(() => {
     return;
   }
 
-  return `@${data.value.user.login} - ${classificationLabel.value} | AgentScan`;
+  return `@${data.value.user.login} - ${classificationDetails.value.label} | AgentScan`;
 });
 
 const ogDescription = computed(() => {
@@ -148,7 +156,7 @@ const ogDescription = computed(() => {
     return;
   }
 
-  const label = classificationLabel.value;
+  const label = classificationDetails.value.label;
   const flagsCounter = data.value.analysis.flags.length;
   // const signalsCounter = signals.value?.length ?? 0;
 
@@ -278,12 +286,20 @@ useHead({
       :class="scoreClasses.border"
     >
       <div class="w-full">
-        <header class="flex items-center justify-between">
-          <div class="flex gap-2 items-center" :class="scoreClasses.text">
-            <span :class="classificationIcon" class="text-base" />
-            <h3 class="text-xl">
-              {{ classificationLabel }}
-            </h3>
+        <header class="flex items-center justify-between mb-2">
+          <div>
+            <span
+              class="flex gap-2 items-center mb-2"
+              :class="scoreClasses.text"
+            >
+              <span :class="classificationIcon" class="text-base" />
+              <h3 class="text-xl">
+                {{ classificationDetails.label }}
+              </h3>
+            </span>
+            <p class="mt-1 text-gh-text">
+              {{ classificationDetails.description }}
+            </p>
           </div>
 
           <!-- <button
@@ -296,31 +312,31 @@ useHead({
             />
           </button> -->
         </header>
-        <p class="text-gh-muted mt-1" v-if="data.eventsCount > 0">
-          Based on {{ data.eventsCount }} recent
-          <NuxtLink
-            external
-            target="_blank"
-            class="underline"
-            :to="`https://api.github.com/users/${data.user.login}/events?per_page=100`"
-          >
-            events
-          </NuxtLink>
-          on GitHub
-        </p>
-        <p v-else>
-          No recent
-          <NuxtLink
-            external
-            target="_blank"
-            class="underline"
-            :to="`https://api.github.com/users/${data.user.login}/events?per_page=100`"
-          >
-            events
-          </NuxtLink>
-          from this account
-        </p>
-
+        <div class="text-sm text-gh-muted">
+          <p v-if="data.eventsCount > 0">
+            Analyzed from the last {{ data.eventsCount }} public GitHub
+            <NuxtLink
+              external
+              target="_blank"
+              class="underline"
+              :to="`https://api.github.com/users/${data.user.login}/events?per_page=100`"
+            >
+              events
+            </NuxtLink>
+          </p>
+          <p v-else>
+            No recent
+            <NuxtLink
+              external
+              target="_blank"
+              class="underline"
+              :to="`https://api.github.com/users/${data.user.login}/events?per_page=100`"
+            >
+              events
+            </NuxtLink>
+            from this account
+          </p>
+        </div>
         <!-- <Transition name="fade">
           <div v-if="signals?.length" class="mt-4">
             <h3 class="text-sm">

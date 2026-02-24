@@ -113,7 +113,7 @@ export function identifyReplicant(
 
       if (tightBurstCount >= CONFIG.TIGHT_COMMIT_THRESHOLD) {
         flags.push({
-          label: "Commits too tightly spaced",
+          label: "High commit frequency",
           points: CONFIG.POINTS_TIGHT_BURST,
           detail: `${tightBurstCount + 1} commits within very short intervals`,
         });
@@ -135,13 +135,13 @@ export function identifyReplicant(
         if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) {
           // PRs are much rarer
           flags.push({
-            label: "Extremely high PR rate",
+            label: "Very high PR volume",
             points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10,
             detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
           });
         } else if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH / 2) {
           flags.push({
-            label: "High PR rate",
+            label: "High PR volume",
             points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5,
             detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`,
           });
@@ -282,15 +282,15 @@ export function identifyReplicant(
 
       if (externalRepos.size >= CONFIG.REPO_SPREAD_EXTREME) {
         flags.push({
-          label: "Very wide contribution spread",
+          label: "Highly distributed activity",
           points: CONFIG.POINTS_EXTREME_REPO_SPREAD_YOUNG,
-          detail: `Active in ${externalRepos.size} repos they don't own`,
+          detail: `Activity spread across ${externalRepos.size} external repositories`,
         });
       } else if (externalRepos.size >= CONFIG.REPO_SPREAD_HIGH) {
         flags.push({
-          label: "Wide contribution spread",
+          label: "Distributed activity",
           points: CONFIG.POINTS_WIDE_REPO_SPREAD_YOUNG,
-          detail: `Active in ${externalRepos.size} repos they don't own`,
+          detail: `Activity spread across ${externalRepos.size} external repositories`,
         });
       }
     }
