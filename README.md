@@ -8,9 +8,9 @@ I didn’t expect to build this website, but ended up creating it in a weekend a
 **This is an ongoing experiment**. It uses an opinionated scoring system to analyze public GitHub events and classify accounts as human, suspicious, or likely bot.
 The results are indicators, not verdicts. There’s no AI involved, just event analysis looking for patterns that feel a little off.
 
+<img width="988" height="1362" alt="Screenshot 2026-02-25 at 15 49 50" src="https://github.com/user-attachments/assets/5ea74aca-593b-4b81-b920-de9ced0e8f1f" />
 
-<img width="691" height="1010" alt="Screenshot 2026-02-25 at 12 07 56" src="https://github.com/user-attachments/assets/fe6ba77d-02bd-433d-9c17-7cb4642a4514" />
-
+ 
 
 ### Contribute
 Feel free to contribute and help out with to the project.
