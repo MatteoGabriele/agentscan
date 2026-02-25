@@ -13,9 +13,13 @@ The results are indicators, not verdicts. There’s no AI involved, just event a
 
 
 ### Contribute
-Feel free to contribute to the project!
+Feel free to contribute and help out with to the project.
 
-The stack is a straightforward Nuxt app with a single API endpoint that fetches public data from the GitHub API.
+The stack 
+- Nuxt
+- Unocss
+- Netlify
+- Love
 
 ### Issues and features requests
 
