@@ -54,7 +54,7 @@
                 to="https://github.com/matteogabriele/agentscan"
                 class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
               >
-                → GitHub Repository
+                GitHub Repository
               </NuxtLink>
               <NuxtLink
                 external
@@ -62,7 +62,7 @@
                 to="https://github.com/matteogabriele/agentscan/issues"
                 class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
               >
-                → Report Issues
+                Report Issues
               </NuxtLink>
               <NuxtLink
                 external
@@ -70,7 +70,7 @@
                 to="https://github.com/matteogabriele/agentscan/blob/main/README.md"
                 class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
               >
-                → Documentation
+                Documentation
               </NuxtLink>
             </div>
           </div>

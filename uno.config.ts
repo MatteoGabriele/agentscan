@@ -20,6 +20,10 @@ export default defineConfig({
   ],
   transformers: [transformerDirectives(), transformerVariantGroup()],
   theme: {
+    font: {
+      mono: "'Roboto', monospace",
+      sans: "'Open Sans', system-ui, -apple-system, sans-serif",
+    },
     colors: {
       gh: {
         bg: "var(--bg)",

@@ -10,7 +10,7 @@
         />
       </NuxtLink>
 
-      <h1 class="text-3xl text-gh-text">AgentScan</h1>
+      <h1 class="text-3xl text-gh-text font-mono">AgentScan</h1>
     </div>
 
     <p class="text-gh-muted text-balance @md:text-wrap">

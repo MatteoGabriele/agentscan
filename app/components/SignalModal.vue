@@ -40,7 +40,7 @@ async function toggleSignal() {
 <template>
   <Modal @close="closeModal">
     <div class="my-6 text-center">
-      <h2 class="text-xl text-gh-text mb-1">
+      <h2 class="text-xl text-gh-text mb-1 font-mono">
         <template v-if="isFlagged"> Remove automated signal? </template>
         <template v-else> Signal as automated? </template>
       </h2>
@@ -58,7 +58,7 @@ async function toggleSignal() {
     </div>
     <button
       @click="toggleSignal"
-      class="w-full py-2 px-6 bg-gh-red rounded-md text-white hover:bg-gh-red-hover flex justify-center items-center gap-2 transition-colors"
+      class="w-full py-2 px-6 bg-gh-red rounded-md text-white hover:bg-gh-red-hover flex justify-center items-center gap-2 transition-colors font-mono"
     >
       <span
         v-if="isPending"

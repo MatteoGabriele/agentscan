@@ -44,7 +44,7 @@ function clear() {
 
     <button
       type="submit"
-      class="py-2 px-6 bg-gh-green rounded-md text-white hover:bg-gh-green-hover flex justify-center items-center gap-2"
+      class="py-2 px-6 bg-gh-green rounded-md text-white hover:bg-gh-green-hover flex justify-center items-center gap-2 font-mono"
     >
       <span class="i-carbon-search" aria-hidden="true" />
       Analyze

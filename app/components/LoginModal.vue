@@ -22,7 +22,7 @@ function closeModal() {
 <template>
   <Modal @close="closeModal">
     <div class="my-6 text-center">
-      <h2 class="text-2xl font-semibold text-gh-text mb-1">
+      <h2 class="text-2xl font-semibold text-gh-text mb-1 font-mono">
         Sign in to AgentScan
       </h2>
       <p class="text-gh-muted text-sm">
@@ -36,7 +36,7 @@ function closeModal() {
     <form @submit.prevent="handleSubmit" class="flex flex-col gap-4">
       <button
         type="submit"
-        class="py-2 px-6 bg-gh-green rounded-md text-white hover:bg-gh-green-hover flex justify-center items-center gap-2 transition-colors"
+        class="py-2 px-6 bg-gh-green rounded-md text-white hover:bg-gh-green-hover flex justify-center items-center gap-2 transition-colors font-mono"
       >
         <span
           v-if="isPending"

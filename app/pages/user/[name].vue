@@ -237,7 +237,7 @@ useHead({
       <div
         class="w-full flex flex-col justify-center items-center @lg:items-start text-center @lg:text-left"
       >
-        <h2 class="text-gh-text text-3xl @lg:text-xl">
+        <h2 class="text-gh-text text-3xl @lg:text-xl font-mono">
           {{ data.user.name || data.user.login }}
         </h2>
         <NuxtLink
@@ -293,7 +293,7 @@ useHead({
               :class="scoreClasses.text"
             >
               <span :class="classificationIcon" class="text-base" />
-              <h3 class="text-xl">
+              <h3 class="text-xl font-mono">
                 {{ classificationDetails.label }}
               </h3>
             </span>
@@ -374,7 +374,7 @@ useHead({
       class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
     >
       <h3
-        class="mb-4 text-gh-text text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2"
+        class="mb-4 text-gh-text text-xl text-center @md:text-left flex items-center justify-center @md:justify-start gap-2 font-mono"
       >
         Activity Signals
       </h3>
@@ -384,7 +384,7 @@ useHead({
           :key="flag.label"
           class="not-last:border-b border-gh-border-light py-4 @md:py-2"
         >
-          <h4>{{ flag.label }}</h4>
+          <h4 class="font-mono">{{ flag.label }}</h4>
           <p class="text-gh-muted">
             {{ flag.detail }}
           </p>
