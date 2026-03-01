@@ -80,4 +80,20 @@ export const CONFIG = {
   TIGHT_COMMIT_SECONDS: 60 * 10,
   TIGHT_COMMIT_THRESHOLD: 3,
   POINTS_TIGHT_BURST: 25,
+
+  // Rapid repo creation (bot-like behavior)
+  CREATE_EVENTS_MIN: 5, // need at least this many repo creations to analyze
+  CREATE_BURST_EXTREME: 25, // >= 25 repos created in 24 hours = extreme automation
+  CREATE_BURST_HIGH: 15, // >= 15 repos created in 24 hours = suspicious
+  POINTS_CREATE_BURST_EXTREME: 35,
+  POINTS_CREATE_BURST_HIGH: 25,
+
+  // 24/7 activity pattern (no sleep)
+  HOURS_ACTIVE_EXTREME: 15, // activity across 15+ hours = suspicious (no natural sleep)
+  EVENTS_PER_HOUR_MIN: 1, // minimum events per active hour for 24/7 pattern
+  POINTS_24_7_ACTIVITY: 30,
+
+  // Event type diversity (bots have narrow activity)
+  EVENT_TYPE_DIVERSITY_MIN: 2, // <= 2 event types = very limited diversity
+  POINTS_LOW_DIVERSITY: 20,
 } as const;

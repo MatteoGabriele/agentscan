@@ -7,6 +7,8 @@ export default defineCachedEventHandler(
     const query = getQuery(event);
     const username = query.user as string;
 
+    console.log(process.env.NODE_ENV);
+
     if (!username) {
       throw createError({ statusCode: 400, message: "Missing user parameter" });
     }
@@ -56,7 +58,7 @@ export default defineCachedEventHandler(
     }
   },
   {
-    maxAge: 600, // 10 minutes
+    maxAge: process.env.NODE_ENV === "development" ? 0 : 600, // 0 = no cache, 600 = 10 minutes
     getKey: (event) => {
       const query = getQuery(event);
       const user = (query.user as string) ?? "";

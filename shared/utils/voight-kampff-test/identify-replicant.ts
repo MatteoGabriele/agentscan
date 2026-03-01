@@ -53,9 +53,108 @@ export function identifyReplicant(
 
   const isNewOrYoungAccount = accountAge < CONFIG.AGE_YOUNG_ACCOUNT;
 
+  // Behavioral pattern checks (apply to all accounts regardless of age)
+  if (events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+    const createEvents = events.filter((e) => e.type === "CreateEvent");
+
+    // Rapid repo creation burst (CreateEvent clustering)
+    let hasRapidCreationBurst = false;
+    if (createEvents.length >= CONFIG.CREATE_EVENTS_MIN) {
+      const createTimestamps = createEvents
+        .map((e) => dayjs(e.created_at))
+        .sort((a, b) => a.valueOf() - b.valueOf());
+
+      // Check for repo creation clustering (multiple repos in short time window)
+      let maxCreatesInWindow = 0;
+      let windowStartIdx = 0;
+
+      for (let endIdx = 0; endIdx < createTimestamps.length; endIdx++) {
+        const windowEnd = createTimestamps[endIdx];
+
+        // Slide window to include only events within 24 hours
+        while (
+          windowEnd &&
+          windowEnd.diff(createTimestamps[windowStartIdx], "hour", true) > 24
+        ) {
+          windowStartIdx++;
+        }
+
+        const createsInWindow = endIdx - windowStartIdx + 1;
+        maxCreatesInWindow = Math.max(maxCreatesInWindow, createsInWindow);
+      }
+
+      if (maxCreatesInWindow >= CONFIG.CREATE_BURST_EXTREME) {
+        flags.push({
+          label: "Concentrated repository creation activity",
+          points: CONFIG.POINTS_CREATE_BURST_EXTREME,
+          detail: `${maxCreatesInWindow} repositories created in a short timeframe (within 24 hours)`,
+        });
+        hasRapidCreationBurst = true;
+      } else if (maxCreatesInWindow >= CONFIG.CREATE_BURST_HIGH) {
+        flags.push({
+          label: "Frequent repository creation",
+          points: CONFIG.POINTS_CREATE_BURST_HIGH,
+          detail: `${maxCreatesInWindow} repositories created in a short timeframe (within 24 hours)`,
+        });
+        hasRapidCreationBurst = true;
+      }
+    }
+
+    // 24/7 activity pattern (no sleep, bot-like consistency)
+    // Check if user has activity spread across all 24 hours
+    const activityByHour = new Map<number, number>();
+    events.forEach((e) => {
+      const hour = dayjs(e.created_at).hour();
+      activityByHour.set(hour, (activityByHour.get(hour) || 0) + 1);
+    });
+
+    const activeHours = activityByHour.size;
+    let hasExtendedActivityPattern = false;
+    if (activeHours >= CONFIG.HOURS_ACTIVE_EXTREME) {
+      // Also check if activity is distributed evenly (not just a few events per hour)
+      const avgEventsPerHour = events.length / activeHours;
+      const minEventsPerActiveHour = Math.min(...activityByHour.values());
+
+      if (
+        avgEventsPerHour >= CONFIG.EVENTS_PER_HOUR_MIN &&
+        minEventsPerActiveHour >= 1
+      ) {
+        flags.push({
+          label: "Extended activity hours distribution",
+          points: CONFIG.POINTS_24_7_ACTIVITY,
+          detail: `Active during ${activeHours} hours with minimal rest window`,
+        });
+        hasExtendedActivityPattern = true;
+      }
+    }
+
+    // Event type diversity check (bots often have limited activity types)
+    const eventTypes = new Set(events.map((e) => e.type));
+    const hasInteraction =
+      eventTypes.has("IssueCommentEvent") ||
+      eventTypes.has("PullRequestReviewEvent") ||
+      eventTypes.has("PullRequestReviewCommentEvent");
+    const hasWatches = eventTypes.has("WatchEvent");
+
+    // Pure automation indicator: only create/push events, no human interaction
+    if (
+      eventTypes.size <= CONFIG.EVENT_TYPE_DIVERSITY_MIN &&
+      !hasInteraction &&
+      !hasWatches
+    ) {
+      flags.push({
+        label: "Narrow activity focus",
+        points: CONFIG.POINTS_LOW_DIVERSITY,
+        detail: `Activity concentrated on ${eventTypes.size} specific event types without interpersonal interactions`,
+      });
+    }
+  }
+
+  // Additional checks for young accounts (more strict thresholds)
   if (isNewOrYoungAccount && events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-    const commitEvents = events.filter((e) => e.type === "PushEvent");
     const userLogin = user.login.toLowerCase();
+
+    const commitEvents = events.filter((e) => e.type === "PushEvent");
 
     if (commitEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
       const timestamps = commitEvents
