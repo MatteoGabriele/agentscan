@@ -7,23 +7,18 @@ export default defineCachedEventHandler(
     const query = getQuery(event);
     const username = query.user as string;
 
-    console.log(process.env.NODE_ENV);
-
     if (!username) {
       throw createError({ statusCode: 400, message: "Missing user parameter" });
     }
 
-    console.log("token exists:", !!config.githubToken);
-    console.log("token length:", config.githubToken?.length);
-
-    const oktokit = new Octokit({ auth: config.githubToken });
+    const octokit = new Octokit({ auth: config.githubToken });
 
     try {
-      const { data: user } = await oktokit.rest.users.getByUsername({
+      const { data: user } = await octokit.rest.users.getByUsername({
         username,
       });
       const { data: events } =
-        await oktokit.rest.activity.listPublicEventsForUser({
+        await octokit.rest.activity.listPublicEventsForUser({
           username,
           per_page: 100,
           page: 1,

@@ -27,51 +27,19 @@ const { data, status, error } = await useFetch(
   },
 );
 
-// const { data: signals, refresh: refreshSignals } = await useFetch<Reaction[]>(
-//   () => `/api/signals/${accountName.value}`,
-//   {
-//     key: `signals:${accountName.value}`,
-//   },
-// );
+const { data: verifiedList, status: verifiedListStatus } = await useFetch(
+  () => "/api/verified-automations",
+  {
+    key: "verified-list",
+    default: () => [],
+  },
+);
 
-// const { data: me } = await useFetch("/api/auth/me");
-// const hasAnySignal = computed<boolean>(() => {
-//   if (!signals.value?.length) {
-//     return false;
-//   }
-
-//   return signals.value?.some((r: any) => r.did === me.value?.user?.did);
-// });
-
-// const isLoginModalOpen = ref<boolean>(false);
-// function openLoginModal() {
-//   isLoginModalOpen.value = true;
-// }
-// function closeLoginModal() {
-//   isLoginModalOpen.value = false;
-// }
-
-// const isSignalModal = ref<boolean>(false);
-// function openSignalModal() {
-//   isSignalModal.value = true;
-// }
-// function closeSignalModal() {
-//   isSignalModal.value = false;
-// }
-
-// async function handleFlagging() {
-//   if (!me.value?.user) {
-//     openLoginModal();
-//     return;
-//   }
-
-//   openSignalModal();
-// }
-
-// async function onSignalSubmit() {
-//   await refreshSignals();
-//   closeSignalModal();
-// }
+const isAccountFlagged = computed<boolean>(() => {
+  return verifiedList.value.some(
+    (account) => account.username === accountName.value,
+  );
+});
 
 function handleSubmit(name: string) {
   if (!name) {
@@ -86,6 +54,14 @@ const score = computed<number>(() => {
 });
 
 const scoreClasses = computed(() => {
+  if (isAccountFlagged.value) {
+    return {
+      text: "text-gh-danger",
+      border: "border-gh-danger",
+      bg: "bg-gh-danger",
+    };
+  }
+
   if (score.value >= CONFIG.THRESHOLD_HUMAN) {
     return {
       text: "text-green-500",
@@ -148,7 +124,7 @@ const ogTitle = computed(() => {
     return;
   }
 
-  return `@${data.value.user.login} - ${classificationDetails.value.label} | AgentScan`;
+  return `${data.value.user.login} | AgentScan`;
 });
 
 const ogDescription = computed(() => {
@@ -158,13 +134,12 @@ const ogDescription = computed(() => {
 
   const label = classificationDetails.value.label;
   const flagsCounter = data.value.analysis.flags.length;
-  // const signalsCounter = signals.value?.length ?? 0;
 
   let description = label;
 
-  // if (signalsCounter > 0) {
-  //   description += ` | ${signalsCounter} community signals`;
-  // }
+  if (isAccountFlagged.value) {
+    description += ` | flagged by the community`;
+  }
 
   if (flagsCounter > 0) {
     description += ` | ${flagsCounter} flags`;
@@ -193,15 +168,6 @@ useHead({
 </script>
 
 <template>
-  <!-- <LoginModal v-if="isLoginModalOpen" @close="closeLoginModal" />
-  <SignalModal
-    :account-name="accountName"
-    :is-flagged="hasAnySignal"
-    v-if="isSignalModal"
-    @close="closeSignalModal"
-    @submit="onSignalSubmit"
-  /> -->
-
   <AnalyzeForm v-model="accountName" @submit="handleSubmit" />
 
   <div v-if="status === 'pending'" class="text-center py-12">
@@ -301,16 +267,6 @@ useHead({
               {{ classificationDetails.description }}
             </p>
           </div>
-
-          <!-- <button
-            @click="handleFlagging"
-            class="text-red flex hover:bg-gh-red-hover hover:text-gh-bg transition-colors size-8 text-sm rounded-full items-center justify-center"
-          >
-            <span
-              class="i-carbon:connection-signal"
-              :aria-label="hasAnySignal ? 'Account is flagged' : 'Flag account'"
-            />
-          </button> -->
         </header>
         <div class="text-sm text-gh-muted">
           <p v-if="data.eventsCount > 0">
@@ -337,35 +293,6 @@ useHead({
             from this account
           </p>
         </div>
-        <!-- <Transition name="fade">
-          <div v-if="signals?.length" class="mt-4">
-            <h3 class="text-sm">
-              Signaled by {{ signals.length }}
-              {{ signals.length === 1 ? "user" : "users" }}
-            </h3>
-            <TransitionGroup
-              name="avatar"
-              tag="ul"
-              class="mt-2 flex w-full flex-wrap items-center"
-            >
-              <li v-for="reaction in signals" :key="reaction.did" class="-mr-2">
-                <NuxtLink
-                  external
-                  :to="`https://bsky.app/profile/${reaction.handle}`"
-                  class="flex"
-                  target="_blank"
-                >
-                  <div
-                    class="size-8 overflow-hidden rounded-full border-2 border-gh-border"
-                  >
-                    <img :src="reaction.avatar" aria-hidden="true" />
-                  </div>
-                  <span class="sr-only">{{ reaction.displayName }}</span>
-                </NuxtLink>
-              </li>
-            </TransitionGroup>
-          </div>
-        </Transition> -->
       </div>
     </div>
 
@@ -403,33 +330,3 @@ useHead({
     </div>
   </div>
 </template>
-
-<style scoped>
-/* whole block fades in */
-.fade-enter-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from {
-  opacity: 0;
-}
-
-/* individual avatars pop in/out */
-.avatar-enter-active {
-  transition: all 0.3s ease;
-}
-.avatar-leave-active {
-  transition: all 0.2s ease;
-  position: absolute;
-}
-.avatar-enter-from {
-  opacity: 0;
-  transform: scale(0.5);
-}
-.avatar-leave-to {
-  opacity: 0;
-  transform: scale(0.5);
-}
-.avatar-move {
-  transition: transform 0.3s ease;
-}
-</style>

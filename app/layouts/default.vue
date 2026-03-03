@@ -43,8 +43,6 @@ useHead({
   <NuxtLoadingIndicator />
 
   <div class="flex flex-col">
-    <MainHeader />
-
     <main
       class="max-w-screen-sm mx-auto py-8 px-4 @container w-full min-h-screen flex flex-col justify-center"
     >

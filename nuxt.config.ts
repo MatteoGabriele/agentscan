@@ -12,7 +12,7 @@ export default defineNuxtConfig({
         global: true,
       },
       {
-        name: "Open sans",
+        name: "Open Sans",
         weights: ["400", "500"],
         preload: true,
         global: true,
