@@ -28,16 +28,10 @@ const { data, status, error } = await useFetch(
   },
 );
 
-const { data: verifiedList, status: verifiedListStatus } = await useFetch(
-  () => "/api/verified-automations",
-  {
-    key: "verified-list",
-    default: () => [],
-  },
-);
+const { latestFlaggedAgents } = await useFlaggedAgents();
 
 const flaggedItem = computed(() => {
-  return verifiedList.value.find(
+  return latestFlaggedAgents.value.find(
     (account) => account.username === accountName.value,
   );
 });

@@ -1,6 +1,6 @@
 import { Octokit } from "octokit";
 
-type VerifiedAutomation = {
+export type VerifiedAutomation = {
   username: string;
   reason: string;
   issueUrl: string;
