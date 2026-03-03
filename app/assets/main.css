@@ -18,9 +18,9 @@
   --green-hover: #2ea043;
   --text-green: #3fb950;
   --green-bg: #0d2818;
-  --danger: #f85149;
-  --danger-hover: #ff6a6a;
-  --danger-bg: #3d1515;
+  --danger: #ea580c;
+  --danger-hover: #f97316;
+  --danger-bg: #5a1f04;
 }
 
 :root[data-theme="light"] {
@@ -35,9 +35,9 @@
   --green-hover: #2ea043;
   --text-green: #116329;
   --green-bg: #dafbe1;
-  --danger: #cf222e;
-  --danger-hover: #f85149;
-  --danger-bg: #ffebe9;
+  --danger: #ea580c;
+  --danger-hover: #c2410c;
+  --danger-bg: #fef3c7;
 }
 
 body {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import dayjs from "dayjs";
 import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
 
 const route = useRoute();
@@ -35,10 +36,20 @@ const { data: verifiedList, status: verifiedListStatus } = await useFetch(
   },
 );
 
-const isAccountFlagged = computed<boolean>(() => {
-  return verifiedList.value.some(
+const flaggedItem = computed(() => {
+  return verifiedList.value.find(
     (account) => account.username === accountName.value,
   );
+});
+
+const isFlagged = computed<boolean>(() => !!flaggedItem.value);
+
+const flagCreatedAt = computed<string | undefined>(() => {
+  if (!flaggedItem.value) {
+    return;
+  }
+
+  return dayjs(flaggedItem.value.createdAt).format("MMM D, YYYY");
 });
 
 function handleSubmit(name: string) {
@@ -54,7 +65,7 @@ const score = computed<number>(() => {
 });
 
 const scoreClasses = computed(() => {
-  if (isAccountFlagged.value) {
+  if (isFlagged.value) {
     return {
       text: "text-gh-danger",
       border: "border-gh-danger",
@@ -137,7 +148,7 @@ const ogDescription = computed(() => {
 
   let description = label;
 
-  if (isAccountFlagged.value) {
+  if (isFlagged.value) {
     description += ` | flagged by the community`;
   }
 
@@ -293,6 +304,31 @@ useHead({
             from this account
           </p>
         </div>
+
+        <section
+          v-if="flaggedItem"
+          class="mt-4 pt-4 border-t border-gh-border-light"
+        >
+          <p
+            class="flex gap-2 items-center mb-2 text-gh-red font-mono text-base"
+          >
+            Community flagged
+          </p>
+          <p class="text-gh-text text-sm mb-2">
+            {{ flaggedItem.reason }}
+          </p>
+          <footer class="flex items-baseline justify-between">
+            <p class="text-gh-muted text-xs">Flagged {{ flagCreatedAt }}</p>
+            <NuxtLink
+              :to="flaggedItem.issueUrl"
+              target="_blank"
+              external
+              class="text-gh-danger underline inline text-xs"
+            >
+              View issue
+            </NuxtLink>
+          </footer>
+        </section>
       </div>
     </div>
 
