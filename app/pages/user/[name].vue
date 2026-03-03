@@ -304,7 +304,7 @@ useHead({
           class="mt-4 pt-4 border-t border-gh-border-light"
         >
           <p
-            class="flex gap-2 items-center mb-2 text-gh-red font-mono text-base"
+            class="flex gap-2 items-center mb-2 text-gh-danger font-mono text-base"
           >
             Community flagged
           </p>
