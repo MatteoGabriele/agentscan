@@ -28,6 +28,7 @@ function clear() {
       <input
         v-model="accountName"
         ref="inputRef"
+        autocomplete="off"
         id="userName"
         placeholder="Enter GitHub username..."
         class="flex-1 w-full py-2 px-4 pr-8 border-1 border-solid border-gh-border rounded-md bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
