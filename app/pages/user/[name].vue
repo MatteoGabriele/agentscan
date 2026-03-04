@@ -32,7 +32,7 @@ const { latestFlaggedAgents } = await useFlaggedAgents();
 
 const flaggedItem = computed(() => {
   return latestFlaggedAgents.value.find(
-    (account) => account.username === accountName.value,
+    (account) => account.username === initialUser.value,
   );
 });
 
