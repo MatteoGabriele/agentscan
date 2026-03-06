@@ -5,14 +5,17 @@ export default defineEventHandler(async (event) => {
   const username = getRouterParam(event, "username");
 
   if (!username) {
-    throw createError({ statusCode: 400, message: "Missing user parameter" });
+    throw createError({
+      statusCode: 400,
+      message: "Missing username parameter",
+    });
   }
 
   const octokit = new Octokit({ auth: config.githubToken });
 
   try {
     const { data } = await octokit.rest.users.getByUsername({
-      username,
+      username: username.toLowerCase(),
     });
 
     return data;

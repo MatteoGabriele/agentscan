@@ -17,9 +17,7 @@ const accountName = computed(() => {
   return route.params.name[0] ?? "";
 });
 
-const formInput = ref(accountName.value);
-
-const { data: user, error } = await useFetch(
+const { data: user, error: userError } = await useFetch(
   () => `/api/account/${accountName.value}`,
   {
     key: `account:${accountName.value}`,
@@ -27,18 +25,23 @@ const { data: user, error } = await useFetch(
   },
 );
 
-const { data: analysis, status: analysisStatus } = useFetch(
-  () => `/api/identify-replicant/${accountName.value}`,
-  {
-    query: {
-      created_at: user.value?.created_at,
-      repos_count: user.value?.public_repos,
-    },
-    key: `analysis:${accountName.value}`,
-    watch: [accountName, user],
-    lazy: true,
+const {
+  data: analysis,
+  status: analysisStatus,
+  error: analysisError,
+} = useFetch(() => `/api/identify-replicant/${accountName.value}`, {
+  query: {
+    created_at: user.value?.created_at,
+    repos_count: user.value?.public_repos,
   },
-);
+  key: `analysis:${accountName.value}`,
+  watch: [accountName, user],
+  lazy: true,
+});
+
+const error = computed(() => {
+  return userError.value || analysisError.value;
+});
 
 async function handleSubmit(name: string) {
   await router.push({ name: "user-name", params: { name } });
@@ -182,7 +185,7 @@ useHead({
 </script>
 
 <template>
-  <AnalyzeForm v-model="formInput" @submit="handleSubmit" />
+  <AnalyzeForm :model-value="accountName" @submit="handleSubmit" />
 
   <div class="flex flex-col gap-6 @container">
     <!-- User Card -->

@@ -7,7 +7,7 @@ const { data, pending } = useVerifiedAutomations();
 const recentAutomations = computed<VerifiedAutomation[]>(() => {
   const items = data.value ?? [];
   return items
-    .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
+    .toSorted((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
     .slice(0, 3);
 });
 </script>

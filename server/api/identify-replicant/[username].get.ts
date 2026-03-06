@@ -3,8 +3,18 @@ import { Octokit } from "octokit";
 import * as v from "valibot";
 
 const QuerySchema = v.object({
-  created_at: v.string("created_at is required"),
-  repos_count: v.number("repos_count must be a number"),
+  created_at: v.pipe(
+    v.string("created_at is required"),
+    v.check(
+      (value) => value.trim().length > 0 && !Number.isNaN(Date.parse(value)),
+      "created_at must be a valid ISO 8601 date string",
+    ),
+  ),
+  repos_count: v.pipe(
+    v.number("repos_count must be a number"),
+    v.integer("repos_count must be an integer"),
+    v.minValue(0, "repos_count must be a non-negative integer"),
+  ),
 });
 
 export default defineEventHandler(async (event) => {
@@ -38,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
     const { data: events } =
       await octokit.rest.activity.listPublicEventsForUser({
-        username,
+        username: username.toLowerCase(),
         per_page: 100,
         page: 1,
       });
