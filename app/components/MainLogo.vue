@@ -11,9 +11,9 @@ const { headingLevel = "h1" } = defineProps<{
         <span class="i-carbon-scan relative top-1 text-gh-text text-2xl" />
       </NuxtLink>
 
-      <component :as="headingLevel" class="text-3xl text-gh-text font-mono">
+      <Component :is="headingLevel" class="text-3xl text-gh-text font-mono">
         AgentScan
-      </component>
+      </Component>
     </div>
 
     <p class="text-gh-muted text-balance @md:text-wrap">
