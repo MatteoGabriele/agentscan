@@ -41,5 +41,18 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { prerender: true },
     "/privacy-policy": { prerender: true },
+
+    "/api/account/**": {
+      cache: {
+        maxAge: 60 * 5,
+      },
+    },
+    "/api/identify-replicant/**": {
+      isr: {
+        expiration: 60 * 10,
+        passQuery: true,
+      },
+      cache: { maxAge: 600 },
+    },
   },
 });

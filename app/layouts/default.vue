@@ -37,6 +37,9 @@ useHead({
     },
   ],
 });
+
+const route = useRoute();
+const isHomePage = computed<boolean>(() => route.name === "index");
 </script>
 
 <template>
@@ -44,7 +47,8 @@ useHead({
 
   <div class="flex flex-col">
     <main
-      class="max-w-screen-sm mx-auto py-20 px-4 @container w-full min-h-screen flex flex-col justify-center"
+      class="max-w-screen-sm mx-auto px-4 py-20 @container w-full min-h-screen flex flex-col"
+      :class="{ 'justify-center': isHomePage }"
     >
       <MainLogo />
 

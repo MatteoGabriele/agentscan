@@ -2,23 +2,23 @@ import { CONFIG } from "./config";
 import dayjs from "dayjs";
 import minMax from "dayjs/plugin/minMax.js";
 import type {
-  GitHubEvent,
-  GitHubUser,
   IdentifyFlag,
+  IdentifyReplicantOptions,
   IdentifyReplicantResult,
   IdentityClassification,
 } from "~~/shared/types/identity";
 
 dayjs.extend(minMax);
 
-export function identifyReplicant(
-  user: GitHubUser,
-  events: GitHubEvent[],
-): IdentifyReplicantResult {
+export function identifyReplicant({
+  createdAt,
+  reposCount,
+  accountName,
+  events,
+}: IdentifyReplicantOptions): IdentifyReplicantResult {
   const flags: IdentifyFlag[] = [];
-  const reposCount = user.public_repos;
 
-  const accountAge = dayjs().diff(user.created_at, "days");
+  const accountAge = dayjs().diff(createdAt, "days");
 
   if (accountAge < CONFIG.AGE_NEW_ACCOUNT) {
     flags.push({
@@ -36,7 +36,7 @@ export function identifyReplicant(
 
   const foreignEvents = events.filter((e) => {
     const repoOwner = e.repo?.name.split("/")[0]?.toLowerCase();
-    return repoOwner && repoOwner !== user.login.toLowerCase();
+    return repoOwner && repoOwner !== accountName.toLowerCase();
   });
 
   const hasAllExternal =
@@ -183,7 +183,7 @@ export function identifyReplicant(
 
   // Additional checks for young accounts (more strict thresholds)
   if (isNewOrYoungAccount && events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
-    const userLogin = user.login.toLowerCase();
+    const userLogin = accountName.toLowerCase();
 
     const commitEvents = events.filter((e) => e.type === "PushEvent");
 
@@ -511,7 +511,6 @@ export function identifyReplicant(
     flags,
     profile: {
       age: accountAge,
-      followers: user.followers,
       repos: reposCount,
     },
   };

@@ -8,6 +8,10 @@ const accountName = defineModel<string>({
 });
 
 function handleSubmit() {
+  if (!accountName.value) {
+    return;
+  }
+
   emit("submit", accountName.value.toLowerCase());
 }
 
