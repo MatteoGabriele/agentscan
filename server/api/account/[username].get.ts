@@ -1,4 +1,5 @@
 import { Octokit } from "octokit";
+import { formatUsername } from "~~/server/utils/format-username";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -14,8 +15,9 @@ export default defineEventHandler(async (event) => {
   const octokit = new Octokit({ auth: config.githubToken });
 
   try {
+    const formattedUsername = formatUsername(username);
     const { data } = await octokit.rest.users.getByUsername({
-      username: username.toLowerCase(),
+      username: formattedUsername,
     });
 
     return data;

@@ -1,6 +1,7 @@
 import { identifyReplicant } from "~~/shared/utils/voight-kampff-test/identify-replicant";
 import { Octokit } from "octokit";
 import * as v from "valibot";
+import { formatUsername } from "~~/server/utils/format-username";
 
 const QuerySchema = v.object({
   created_at: v.pipe(
@@ -45,10 +46,11 @@ export default defineEventHandler(async (event) => {
 
   try {
     const octokit = new Octokit({ auth: config.githubToken });
+    const formattedUsername = formatUsername(username);
 
     const { data: events } =
       await octokit.rest.activity.listPublicEventsForUser({
-        username: username.toLowerCase(),
+        username: formattedUsername,
         per_page: 100,
         page: 1,
       });
@@ -56,7 +58,7 @@ export default defineEventHandler(async (event) => {
     try {
       return {
         analysis: identifyReplicant({
-          accountName: username,
+          accountName: formattedUsername,
           reposCount: parsedQuery.output.repos_count,
           createdAt: parsedQuery.output.created_at,
           events,
