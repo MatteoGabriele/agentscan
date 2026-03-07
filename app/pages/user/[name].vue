@@ -325,6 +325,7 @@ useHead({
               </p>
             </div>
           </header>
+
           <div class="text-sm text-gh-muted">
             <p v-if="analysis.eventsCount > 0">
               Analyzed from the last {{ analysis.eventsCount }} public GitHub
@@ -400,8 +401,6 @@ useHead({
           </li>
         </ul>
       </div>
-
-      <NoActivityState v-else :is-flagged="hasCommunityFlag" />
     </template>
   </div>
 </template>
