@@ -26,30 +26,7 @@ async function handleSubmit(name: string) {
   await router.push({ name: "user-name", params: { name } });
 }
 
-const ogTitle = computed(() => {
-  if (!username.value) {
-    return;
-  }
-
-  return `${username.value} | AgentScan`;
-});
-
-const ogImage = computed(() => {
-  if (!user.value) {
-    return "/og.png";
-  }
-
-  return user.value.avatar_url;
-});
-
-useHead({
-  title: ogTitle,
-  meta: [
-    { property: "og:title", content: ogTitle },
-    { property: "og:image", content: ogImage },
-    { property: "og:type", content: "website" },
-  ],
-});
+useSeoUser(user);
 </script>
 
 <template>

@@ -86,29 +86,12 @@ const classificationIcon = computed<string>(() => {
   return "i-carbon:meter-alt";
 });
 
-const ogDescription = computed(() => {
-  if (!analysis.value) {
-    return;
-  }
-
-  const flagsCounter = analysis.value.analysis.flags.length;
-  let descriptions = [];
-
-  if (hasCommunityFlag.value) {
-    descriptions.push(`Flagged by the community`);
-  }
-
-  if (flagsCounter > 0) {
-    descriptions.push(
-      `Has ${flagsCounter} flag${flagsCounter === 1 ? "" : "s"}`,
-    );
-  }
-
-  return descriptions.join(" | ");
+const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
+  return analysis.value?.analysis;
 });
 
-useHead({
-  meta: () => [{ property: "og:description", content: ogDescription.value }],
+useSeoAnalysis(identifyAnalysis, {
+  hasCommunityFlag,
 });
 </script>
 
