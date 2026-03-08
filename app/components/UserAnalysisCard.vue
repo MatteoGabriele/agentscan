@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login);
 
-const { data: analysis, status: analysisStatus } = useFetch(
+const { data, status, error } = useFetch(
   () => `/api/identify-replicant/${username.value}`,
   {
     query: {
@@ -39,7 +39,7 @@ const flagCreatedAt = computed<string | undefined>(() => {
   return dayjs(verifiedAutomation.value.createdAt).format("MMM D, YYYY");
 });
 
-const score = computed<number>(() => analysis.value?.analysis.score ?? 0);
+const score = computed<number>(() => data.value?.analysis.score ?? 0);
 const { classificationDetails } = useClassificationDetails(score);
 
 const scoreClasses = computed(() => {
@@ -87,7 +87,7 @@ const classificationIcon = computed<string>(() => {
 });
 
 const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
-  return analysis.value?.analysis;
+  return data.value?.analysis;
 });
 
 useSeoAnalysis(identifyAnalysis, {
@@ -96,8 +96,9 @@ useSeoAnalysis(identifyAnalysis, {
 </script>
 
 <template>
-  <UserAnalysisCardSkeleton v-if="analysisStatus === 'pending'" />
-  <template v-else-if="analysis">
+  <UserAnalysisCardSkeleton v-if="status === 'pending'" />
+  <UserGenericError :error v-else-if="error" />
+  <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
       :class="scoreClasses.border"
@@ -121,8 +122,8 @@ useSeoAnalysis(identifyAnalysis, {
         </header>
 
         <div class="text-sm text-gh-muted">
-          <p v-if="analysis.eventsCount > 0">
-            Analyzed from the last {{ analysis.eventsCount }} public GitHub
+          <p v-if="data.eventsCount > 0">
+            Analyzed from the last {{ data.eventsCount }} public GitHub
             <NuxtLink
               external
               target="_blank"
@@ -174,13 +175,13 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
 
     <div
-      v-if="analysis.analysis.flags.length > 0"
+      v-if="data.analysis.flags.length > 0"
       class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
     >
       <h3 class="mb-4 text-gh-text text-xl font-mono">Activity Signals</h3>
       <ul>
         <li
-          v-for="flag in analysis.analysis.flags"
+          v-for="flag in data.analysis.flags"
           :key="flag.label"
           class="not-last:border-b border-gh-border-light py-4 @md:py-2"
         >

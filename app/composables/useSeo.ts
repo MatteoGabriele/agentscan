@@ -1,23 +1,40 @@
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
-  const ogTitle = computed(() => {
+  const ogTitle = computed<string | undefined>(() => {
     const userValue = toValue(user);
-    const name = userValue?.name || userValue?.login;
+
+    if (!userValue) {
+      return;
+    }
+
+    const name = userValue.name || userValue.login;
 
     return `${name} | AgentScan`;
   });
 
-  const ogImage = computed(() => {
+  const ogImage = computed<string | undefined>(() => {
     const userValue = toValue(user);
-    return userValue?.avatar_url;
+    if (!userValue) {
+      return;
+    }
+
+    return userValue.avatar_url;
   });
 
   useHead({
     title: ogTitle,
-    meta: () => [
-      { property: "og:title", content: ogTitle },
-      { property: "og:image", content: ogImage },
-      { property: "og:type", content: "website" },
-    ],
+    meta: () => {
+      const metas = [{ property: "og:type", content: "website" }];
+
+      if (ogImage.value) {
+        metas.push({ property: "og:image", content: ogImage.value });
+      }
+
+      if (ogTitle.value) {
+        metas.push({ property: "og:title", content: ogTitle.value });
+      }
+
+      return metas;
+    },
   });
 }
 
@@ -49,10 +66,18 @@ export function useSeoAnalysis(
       );
     }
 
+    if (descriptions.length === 0) {
+      return;
+    }
+
     return descriptions.join(" | ");
   });
 
   useHead({
-    meta: () => [{ property: "og:description", content: ogDescription.value }],
+    meta: () => {
+      return ogDescription.value
+        ? [{ property: "og:description", content: ogDescription.value }]
+        : [];
+    },
   });
 }
