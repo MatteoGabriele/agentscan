@@ -8,6 +8,6 @@ function handleSubmit(name: string) {
 </script>
 
 <template>
-  <AnalyzeForm v-model="accountName" @submit="handleSubmit" />
+  <AnalysisForm v-model="accountName" @submit="handleSubmit" />
   <VerifiedAutomationList class="mt-2" />
 </template>

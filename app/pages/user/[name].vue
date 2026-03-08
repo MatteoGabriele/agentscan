@@ -32,11 +32,11 @@ useSeoUser(user);
 <template>
   <h1 class="sr-only">{{ username }} analysis page</h1>
 
-  <AnalyzeForm :model-value="username" @submit="handleSubmit" />
+  <AnalysisForm :model-value="username" @submit="handleSubmit" />
 
   <div class="flex flex-col gap-6 @container">
     <UserCard v-if="user" :user />
     <UserError v-else-if="error" :error />
-    <UserAnalysisCard v-if="user" :user />
+    <AnalysisCard v-if="user" :user />
   </div>
 </template>

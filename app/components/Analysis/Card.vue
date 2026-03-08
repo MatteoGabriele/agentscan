@@ -96,8 +96,8 @@ useSeoAnalysis(identifyAnalysis, {
 </script>
 
 <template>
-  <UserAnalysisCardSkeleton v-if="status === 'pending'" />
-  <UserGenericError :error v-else-if="error" />
+  <AnalysisCardSkeleton v-if="status === 'pending'" />
+  <GenericError :error v-else-if="error" />
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"

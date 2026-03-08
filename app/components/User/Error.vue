@@ -16,5 +16,5 @@ defineProps<{
     <h3 class="text-xl font-mono text-gh-text mb-1">User not found</h3>
     <p class="text-gh-muted text-sm">Double-check the username and try again</p>
   </div>
-  <UserGenericError :error v-else />
+  <GenericError :error v-else />
 </template>
