@@ -60,6 +60,6 @@ useHead({
   <div class="flex flex-col gap-6 @container">
     <UserCard v-if="user" :user />
     <UserError v-else-if="error" :error />
-    <UserAnalysisCard :user />
+    <UserAnalysisCard v-if="user" :user />
   </div>
 </template>

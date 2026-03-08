@@ -3,17 +3,17 @@ import dayjs from "dayjs";
 import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
 
 const props = defineProps<{
-  user?: GitHubUser;
+  user: GitHubUser;
 }>();
 
-const username = computed<string | undefined | null>(() => props.user?.login);
+const username = computed<string | undefined | null>(() => props.user.login);
 
 const { data: analysis, status: analysisStatus } = useFetch(
   () => `/api/identify-replicant/${username.value}`,
   {
     query: {
-      created_at: props.user?.created_at,
-      repos_count: props.user?.public_repos,
+      created_at: props.user.created_at,
+      repos_count: props.user.public_repos,
     },
     key: `analysis:${username.value}`,
     watch: [username],
