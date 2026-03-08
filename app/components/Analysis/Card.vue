@@ -8,6 +8,7 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login);
 
+const analysisKey = computed<string>(() => `analysis:${username.value}`);
 const { data, status, error } = useFetch(
   () => `/api/identify-replicant/${username.value}`,
   {
@@ -15,7 +16,7 @@ const { data, status, error } = useFetch(
       created_at: props.user.created_at,
       repos_count: props.user.public_repos,
     },
-    key: `analysis:${username.value}`,
+    key: analysisKey,
     watch: [username],
     lazy: true,
   },

@@ -14,10 +14,11 @@ const username = computed(() => {
   return route.params.name[0] ?? "";
 });
 
+const accountKey = computed<string>(() => `account:${username.value}`);
 const { data: user, error } = await useFetch(
   () => `/api/account/${username.value}`,
   {
-    key: `account:${username.value}`,
+    key: accountKey,
     watch: [username],
   },
 );
