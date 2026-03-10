@@ -1,17 +1,29 @@
-import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
+type ClassificationDetails = {
+  label: string;
+  description: string;
+};
 
-export function useClassificationDetails(score: MaybeRefOrGetter<number>) {
-  const classificationDetails = computed(() => {
-    const scoreValue = toValue(score);
+export function useClassificationDetails(
+  classification: MaybeRefOrGetter<IdentityClassification | undefined>,
+) {
+  const classificationDetails = computed<ClassificationDetails>(() => {
+    const classificationValue = toValue(classification);
 
-    if (scoreValue >= CONFIG.THRESHOLD_HUMAN) {
+    if (!classificationValue) {
+      return {
+        label: "Analysis unavailable",
+        description: "Classification is not available for this account.",
+      };
+    }
+
+    if (classificationValue === "organic") {
       return {
         label: "Organic activity",
         description: "No automation signals detected in the analyzed events.",
       };
     }
 
-    if (scoreValue >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    if (classificationValue === "mixed") {
       return {
         label: "Mixed activity",
         description:

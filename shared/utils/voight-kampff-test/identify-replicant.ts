@@ -498,11 +498,11 @@ export function identifyReplicant({
   const humanScore = Math.max(0, 100 - score);
 
   // Classification based on inverted score
-  let classification: IdentityClassification = "likely_bot";
+  let classification: IdentityClassification = "automation";
   if (humanScore >= CONFIG.THRESHOLD_HUMAN) {
-    classification = "human";
+    classification = "organic";
   } else if (humanScore >= CONFIG.THRESHOLD_SUSPICIOUS) {
-    classification = "suspicious";
+    classification = "mixed";
   }
 
   return {

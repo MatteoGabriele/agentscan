@@ -2,7 +2,7 @@
 
 exports[`idendity-replicant (automation) > analysis 'automation 1' 1`] = `
 {
-  "classification": "likely_bot",
+  "classification": "automation",
   "flags": [
     {
       "detail": "Account is 36 days old",
@@ -45,7 +45,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 1' 1`] = `
 
 exports[`idendity-replicant (automation) > analysis 'automation 2' 1`] = `
 {
-  "classification": "likely_bot",
+  "classification": "automation",
   "flags": [
     {
       "detail": "Account is 33 days old",
@@ -78,7 +78,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 2' 1`] = `
 
 exports[`idendity-replicant (automation) > analysis 'automation 3' 1`] = `
 {
-  "classification": "likely_bot",
+  "classification": "automation",
   "flags": [
     {
       "detail": "Account is 37 days old",
@@ -106,7 +106,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 3' 1`] = `
 
 exports[`idendity-replicant (automation) > analysis 'automation 4' 1`] = `
 {
-  "classification": "human",
+  "classification": "organic",
   "flags": [],
   "profile": {
     "age": 791,
@@ -118,7 +118,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 4' 1`] = `
 
 exports[`idendity-replicant (organic) > analysis 'automation 1' 1`] = `
 {
-  "classification": "human",
+  "classification": "organic",
   "flags": [],
   "profile": {
     "age": 4575,
@@ -130,7 +130,7 @@ exports[`idendity-replicant (organic) > analysis 'automation 1' 1`] = `
 
 exports[`idendity-replicant (organic) > analysis 'automation 2' 1`] = `
 {
-  "classification": "human",
+  "classification": "organic",
   "flags": [],
   "profile": {
     "age": 3220,

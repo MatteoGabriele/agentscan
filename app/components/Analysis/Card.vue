@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
 
 const props = defineProps<{
   user: GitHubUser;
@@ -40,47 +39,58 @@ const flagCreatedAt = computed<string | undefined>(() => {
   return dayjs(verifiedAutomation.value.createdAt).format("MMM D, YYYY");
 });
 
-const score = computed<number>(() => data.value?.analysis.score ?? 0);
-const { classificationDetails } = useClassificationDetails(score);
+const classification = computed<IdentityClassification | undefined>(() => {
+  return data.value?.analysis.classification;
+});
 
-const scoreClasses = computed(() => {
+const { classificationDetails } = useClassificationDetails(classification);
+
+type ScoreStyle = {
+  text: string;
+  border: string;
+};
+
+const scoreStyle = computed<ScoreStyle>(() => {
   if (hasCommunityFlag.value) {
     return {
       text: "text-gh-danger",
       border: "border-gh-danger",
-      bg: "bg-gh-danger",
     };
   }
 
-  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
+  if (!classification.value) {
+    return {
+      text: "text-gray-500",
+      border: "border-gray-500",
+    };
+  }
+
+  if (classification.value === "organic") {
     return {
       text: "text-green-500",
       border: "border-green-500",
-      bg: "bg-green-500",
     };
   }
 
-  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
+  if (classification.value === "mixed") {
     return {
       text: "text-amber-500",
       border: "border-amber-500",
-      bg: "bg-amber-500",
     };
   }
 
   return {
     text: "text-orange-500",
     border: "border-orange-500",
-    bg: "bg-orange-500",
   };
 });
 
 const classificationIcon = computed<string>(() => {
-  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
+  if (classification.value === "organic") {
     return "i-carbon:growth";
   }
 
-  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
+  if (classification.value === "mixed") {
     return "i-carbon:activity";
   }
 
@@ -102,15 +112,12 @@ useSeoAnalysis(identifyAnalysis, {
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
-      :class="scoreClasses.border"
+      :class="scoreStyle.border"
     >
       <div class="w-full">
         <header class="flex items-center justify-between mb-2">
           <div>
-            <span
-              class="flex gap-2 items-center mb-2"
-              :class="scoreClasses.text"
-            >
+            <span class="flex gap-2 items-center mb-2" :class="scoreStyle.text">
               <span :class="classificationIcon" class="text-base" />
               <h3 class="text-xl font-mono">
                 {{ classificationDetails.label }}
