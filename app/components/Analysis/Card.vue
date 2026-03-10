@@ -45,22 +45,30 @@ const classification = computed<IdentityClassification | undefined>(() => {
 
 const { classificationDetails } = useClassificationDetails(classification);
 
-const scoreClasses = computed(() => {
+type ScoreStyle = {
+  text: string;
+  border: string;
+};
+
+const scoreStyle = computed<ScoreStyle>(() => {
   if (hasCommunityFlag.value) {
     return {
       text: "text-gh-danger",
       border: "border-gh-danger",
-      bg: "bg-gh-danger",
     };
   }
 
-  console.log(classification.value);
+  if (!classification.value) {
+    return {
+      text: "text-gray-500",
+      border: "border-gray-500",
+    };
+  }
 
   if (classification.value === "organic") {
     return {
       text: "text-green-500",
       border: "border-green-500",
-      bg: "bg-green-500",
     };
   }
 
@@ -68,14 +76,12 @@ const scoreClasses = computed(() => {
     return {
       text: "text-amber-500",
       border: "border-amber-500",
-      bg: "bg-amber-500",
     };
   }
 
   return {
     text: "text-orange-500",
     border: "border-orange-500",
-    bg: "bg-orange-500",
   };
 });
 
@@ -106,15 +112,12 @@ useSeoAnalysis(identifyAnalysis, {
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
-      :class="scoreClasses.border"
+      :class="scoreStyle.border"
     >
       <div class="w-full">
         <header class="flex items-center justify-between mb-2">
           <div>
-            <span
-              class="flex gap-2 items-center mb-2"
-              :class="scoreClasses.text"
-            >
+            <span class="flex gap-2 items-center mb-2" :class="scoreStyle.text">
               <span :class="classificationIcon" class="text-base" />
               <h3 class="text-xl font-mono">
                 {{ classificationDetails.label }}

@@ -1,8 +1,20 @@
+type ClassificationDetails = {
+  label: string;
+  description: string;
+};
+
 export function useClassificationDetails(
   classification: MaybeRefOrGetter<IdentityClassification | undefined>,
 ) {
-  const classificationDetails = computed(() => {
+  const classificationDetails = computed<ClassificationDetails>(() => {
     const classificationValue = toValue(classification);
+
+    if (!classificationValue) {
+      return {
+        label: "Analysis unavailable",
+        description: "Classification is not available for this account.",
+      };
+    }
 
     if (classificationValue === "organic") {
       return {
