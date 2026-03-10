@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
 
 const props = defineProps<{
   user: GitHubUser;
