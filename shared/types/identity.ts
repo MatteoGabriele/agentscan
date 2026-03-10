@@ -18,7 +18,7 @@ export type IdentifyReplicantOptions = {
   events: GitHubEvent[];
 };
 
-export type IdentityClassification = "human" | "suspicious" | "likely_bot";
+export type IdentityClassification = "organic" | "mixed" | "automation";
 
 export type IdentifyReplicantResult = {
   score: number;

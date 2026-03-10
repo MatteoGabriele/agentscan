@@ -1,17 +1,17 @@
-import { CONFIG } from "~~/shared/utils/voight-kampff-test/config";
-
-export function useClassificationDetails(score: MaybeRefOrGetter<number>) {
+export function useClassificationDetails(
+  classification: MaybeRefOrGetter<IdentityClassification | undefined>,
+) {
   const classificationDetails = computed(() => {
-    const scoreValue = toValue(score);
+    const classificationValue = toValue(classification);
 
-    if (scoreValue >= CONFIG.THRESHOLD_HUMAN) {
+    if (classificationValue === "organic") {
       return {
         label: "Organic activity",
         description: "No automation signals detected in the analyzed events.",
       };
     }
 
-    if (scoreValue >= CONFIG.THRESHOLD_SUSPICIOUS) {
+    if (classificationValue === "mixed") {
       return {
         label: "Mixed activity",
         description:

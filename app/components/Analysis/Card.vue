@@ -40,8 +40,11 @@ const flagCreatedAt = computed<string | undefined>(() => {
   return dayjs(verifiedAutomation.value.createdAt).format("MMM D, YYYY");
 });
 
-const score = computed<number>(() => data.value?.analysis.score ?? 0);
-const { classificationDetails } = useClassificationDetails(score);
+const classification = computed<IdentityClassification | undefined>(() => {
+  return data.value?.analysis.classification;
+});
+
+const { classificationDetails } = useClassificationDetails(classification);
 
 const scoreClasses = computed(() => {
   if (hasCommunityFlag.value) {
@@ -52,7 +55,9 @@ const scoreClasses = computed(() => {
     };
   }
 
-  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
+  console.log(classification.value);
+
+  if (classification.value === "organic") {
     return {
       text: "text-green-500",
       border: "border-green-500",
@@ -60,7 +65,7 @@ const scoreClasses = computed(() => {
     };
   }
 
-  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
+  if (classification.value === "mixed") {
     return {
       text: "text-amber-500",
       border: "border-amber-500",
@@ -76,11 +81,11 @@ const scoreClasses = computed(() => {
 });
 
 const classificationIcon = computed<string>(() => {
-  if (score.value >= CONFIG.THRESHOLD_HUMAN) {
+  if (classification.value === "organic") {
     return "i-carbon:growth";
   }
 
-  if (score.value >= CONFIG.THRESHOLD_SUSPICIOUS) {
+  if (classification.value === "mixed") {
     return "i-carbon:activity";
   }
 
