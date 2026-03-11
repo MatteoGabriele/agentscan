@@ -8,6 +8,11 @@ async function run() {
 
     const context = github.context;
     const username = context.actor;
+    const prNumber = context.payload.pull_request?.number;
+
+    if (!prNumber) {
+      throw new Error("No PR number found");
+    }
 
     const { data: user } = await octokit.rest.users.getByUsername({
       username: username,
@@ -20,8 +25,17 @@ async function run() {
         page: 1,
       });
 
-    core.info(`PR opened by: ${user.name}`);
-    core.info(`Events count: ${events.length}`);
+    await octokit.rest.issues.createComment({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      issue_number: prNumber,
+      body: [
+        `Hello @${username}! Your PR has been received. 👋`,
+        `Events count: ${events.length}`,
+      ].join(""),
+    });
+
+    core.info(`Comment posted on PR #${prNumber}`);
   } catch (error: unknown) {
     if (error instanceof Error) {
       core.setFailed(error.message);
