@@ -19763,17 +19763,23 @@ async function run() {
 			per_page: 100,
 			page: 1
 		});
-		const details = getClassificationDetails(identifyReplicant({
+		const analysis = identifyReplicant({
 			accountName: username,
 			reposCount: user.public_repos,
 			createdAt: user.created_at,
 			events
-		}).classification);
+		});
+		const emoji = {
+			organic: "🌱",
+			mixed: "⚠️",
+			automation: "🤖"
+		}[analysis.classification];
+		const details = getClassificationDetails(analysis.classification);
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
 			issue_number: prNumber,
-			body: `### ${details.label}
+			body: `### ${emoji} ${details.label}
 
 ${details.description}
 
