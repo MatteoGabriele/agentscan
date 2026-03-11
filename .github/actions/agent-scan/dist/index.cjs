@@ -59256,34 +59256,39 @@ async function run() {
 			label: "Flagged by community",
 			description: "This account has been flagged as potentially automated by the community."
 		} : getClassificationDetails(analysis.classification);
-		await octokit.rest.issues.createComment({
-			owner: context.repo.owner,
-			repo: context.repo.repo,
-			issue_number: prNumber,
-			body: `### ${indicator} ${details.label}
+		try {
+			await octokit.rest.issues.createComment({
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				issue_number: prNumber,
+				body: `### ${indicator} ${details.label}
 
 ${details.description}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 
 <sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`
-		});
-		const labelsToAdd = [];
-		if (hasCommunityFlag) labelsToAdd.push("agentscan:community-flagged");
-		else if (analysis.classification !== "organic") {
-			const label = {
-				mixed: "agentscan:mixed-signals",
-				automation: "agentscan:automated-account"
-			}[analysis.classification];
-			if (label) labelsToAdd.push(label);
+			});
+			const labelsToAdd = [];
+			if (hasCommunityFlag) labelsToAdd.push("agentscan:community-flagged");
+			else if (analysis.classification !== "organic") {
+				const label = {
+					mixed: "agentscan:mixed-signals",
+					automation: "agentscan:automated-account"
+				}[analysis.classification];
+				if (label) labelsToAdd.push(label);
+			}
+			if (labelsToAdd.length > 0) await octokit.rest.issues.addLabels({
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				issue_number: prNumber,
+				labels: labelsToAdd
+			});
+			info(`Comment posted on PR #${prNumber}`);
+		} catch (commentError) {
+			if (commentError instanceof Error) if (commentError.message.includes("Resource not accessible")) warning("Could not post comment on this PR. Analysis completed but comment/labels skipped.");
+			else throw commentError;
 		}
-		if (labelsToAdd.length > 0) await octokit.rest.issues.addLabels({
-			owner: context.repo.owner,
-			repo: context.repo.repo,
-			issue_number: prNumber,
-			labels: labelsToAdd
-		});
-		info(`Comment posted on PR #${prNumber}`);
 	} catch (error) {
 		if (error instanceof Error) setFailed(error.message);
 	}

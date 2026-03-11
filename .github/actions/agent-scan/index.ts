@@ -105,48 +105,60 @@ async function run() {
         }
       : getClassificationDetails(analysis.classification);
 
-    await octokit.rest.issues.createComment({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      issue_number: prNumber,
-      body: `### ${indicator} ${details.label}
+    try {
+      await octokit.rest.issues.createComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: prNumber,
+        body: `### ${indicator} ${details.label}
 
 ${details.description}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 
 <sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`,
-    });
+      });
 
-    // Add labels based on classification or community flag
-    const labelsToAdd: string[] = [];
+      const labelsToAdd: string[] = [];
 
-    if (hasCommunityFlag) {
-      labelsToAdd.push("agentscan:community-flagged");
-    } else if (analysis.classification !== "organic") {
-      const labelMap: Record<
-        Exclude<IdentityClassification, "organic">,
-        string
-      > = {
-        mixed: "agentscan:mixed-signals",
-        automation: "agentscan:automated-account",
-      };
+      if (hasCommunityFlag) {
+        labelsToAdd.push("agentscan:community-flagged");
+      } else if (analysis.classification !== "organic") {
+        const labelMap: Record<
+          Exclude<IdentityClassification, "organic">,
+          string
+        > = {
+          mixed: "agentscan:mixed-signals",
+          automation: "agentscan:automated-account",
+        };
 
-      const label = labelMap[analysis.classification];
-      if (label) {
-        labelsToAdd.push(label);
+        const label = labelMap[analysis.classification];
+        if (label) {
+          labelsToAdd.push(label);
+        }
+      }
+
+      if (labelsToAdd.length > 0) {
+        await octokit.rest.issues.addLabels({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          issue_number: prNumber,
+          labels: labelsToAdd,
+        });
+      }
+
+      core.info(`Comment posted on PR #${prNumber}`);
+    } catch (commentError: unknown) {
+      if (commentError instanceof Error) {
+        if (commentError.message.includes("Resource not accessible")) {
+          core.warning(
+            "Could not post comment on this PR. Analysis completed but comment/labels skipped.",
+          );
+        } else {
+          throw commentError;
+        }
       }
     }
-
-    if (labelsToAdd.length > 0) {
-      await octokit.rest.issues.addLabels({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: prNumber,
-        labels: labelsToAdd,
-      });
-    }
-    core.info(`Comment posted on PR #${prNumber}`);
   } catch (error: unknown) {
     if (error instanceof Error) {
       core.setFailed(error.message);
