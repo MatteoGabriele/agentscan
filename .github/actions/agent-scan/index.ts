@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { identifyReplicant } from "../../../shared/utils/voight-kampff-test/identify-replicant";
+import { getClassificationDetails } from "../../../shared/utils/voight-kampff-test/classification-details";
 
 async function run() {
   try {
@@ -33,31 +34,15 @@ async function run() {
       events,
     });
 
-    const status =
-      analysis.classification === "organic"
-        ? "✅ Organic activity"
-        : "⚠️ Automation signals detected";
+    const details = getClassificationDetails(analysis.classification);
 
     await octokit.rest.issues.createComment({
       owner: context.repo.owner,
       repo: context.repo.repo,
       issue_number: prNumber,
-      body: `## AgentScan Analysis
+      body: `### ${details.label}
 
-**User**: @${username}
-**Profile**: ${user.name || "N/A"}
-**Account created**: ${new Date(user.created_at).toLocaleDateString()}
-**Public repos**: ${user.public_repos}
-
----
-
-### ${status}
-
-${
-  analysis.classification === "organic"
-    ? `No automation signals detected in the analyzed events.`
-    : `**Potential automation signals:**\n${analysis.signals.map((s: string) => `- ${s}`).join("\n")}`
-}
+${details.description}
 
 *Analyzed from the last ${events.length} public GitHub events*
 

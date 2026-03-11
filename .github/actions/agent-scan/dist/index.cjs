@@ -19729,6 +19729,26 @@ function identifyReplicant({ createdAt, reposCount, accountName, events }) {
 	};
 }
 //#endregion
+//#region ../../../shared/utils/voight-kampff-test/classification-details.ts
+function getClassificationDetails(classification) {
+	if (!classification) return {
+		label: "Analysis unavailable",
+		description: "Classification is not available for this account."
+	};
+	if (classification === "organic") return {
+		label: "Organic activity",
+		description: "No automation signals detected in the analyzed events."
+	};
+	if (classification === "mixed") return {
+		label: "Mixed activity",
+		description: "Activity patterns show a mix of organic and automated signals."
+	};
+	return {
+		label: "Automation signals",
+		description: "Activity patterns show signs of automation."
+	};
+}
+//#endregion
 //#region index.ts
 async function run() {
 	try {
@@ -19743,29 +19763,19 @@ async function run() {
 			per_page: 100,
 			page: 1
 		});
-		const analysis = identifyReplicant({
+		const details = getClassificationDetails(identifyReplicant({
 			accountName: username,
 			reposCount: user.public_repos,
 			createdAt: user.created_at,
 			events
-		});
-		const status = analysis.classification === "organic" ? "✅ Organic activity" : "⚠️ Automation signals detected";
+		}).classification);
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
 			issue_number: prNumber,
-			body: `## AgentScan Analysis
+			body: `### ${details.label}
 
-**User**: @${username}
-**Profile**: ${user.name || "N/A"}
-**Account created**: ${new Date(user.created_at).toLocaleDateString()}
-**Public repos**: ${user.public_repos}
-
----
-
-### ${status}
-
-${analysis.classification === "organic" ? `No automation signals detected in the analyzed events.` : `**Potential automation signals:**\n${analysis.signals.map((s) => `- ${s}`).join("\n")}`}
+${details.description}
 
 *Analyzed from the last ${events.length} public GitHub events*
 
