@@ -12,6 +12,8 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@actions/core": "^3.0.0",
+    "@actions/github": "^9.0.0",
     "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@unocss/preset-icons": "^66.6.0",
@@ -24,8 +26,6 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@actions/core": "^3.0.0",
-    "@actions/github": "^9.0.0",
     "@iconify-json/carbon": "^1.2.18",
     "@octokit/types": "^16.0.0",
     "@unocss/nuxt": "^66.6.0",
