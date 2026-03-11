@@ -19769,13 +19769,11 @@ async function run() {
 			createdAt: user.created_at,
 			events
 		});
-		const indicator = `
-      <span style="display: inline-block; width: 12px; height: 12px; background-color: ${{
-			organic: "#10b981",
-			mixed: "#f59e0b",
-			automation: "#ef4444"
-		}[analysis.classification]}; border-radius: 50%; margin-right: 8px;" />
-    `;
+		const indicator = {
+			organic: "✅",
+			mixed: "⚠️",
+			automation: "❌"
+		}[analysis.classification];
 		const details = getClassificationDetails(analysis.classification);
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,

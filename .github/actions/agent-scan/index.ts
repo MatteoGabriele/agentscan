@@ -38,24 +38,13 @@ async function run() {
       events,
     });
 
-    // const status: Record<IdentityClassification, string> = {
-    //   organic:
-    //     '<span style="display: inline-block; width: 12px; height: 12px; background-color: #10b981; border-radius: 50%; margin-right: 8px;"></span>',
-    //   mixed:
-    //     '<span style="display: inline-block; width: 12px; height: 12px; background-color: #f59e0b; border-radius: 50%; margin-right: 8px;"></span>',
-    //   automation:
-    //     '<span style="display: inline-block; width: 12px; height: 12px; background-color: #ef4444; border-radius: 50%; margin-right: 8px;"></span>',
-    // };
-
-    const statusColorMap: Record<IdentityClassification, string> = {
-      organic: "#10b981",
-      mixed: "#f59e0b",
-      automation: "#ef4444",
+    const statusIndicators: Record<IdentityClassification, string> = {
+      organic: "✅",
+      mixed: "⚠️",
+      automation: "❌",
     };
-    const statusColor = statusColorMap[analysis.classification];
-    const indicator = `
-      <span style="display: inline-block; width: 12px; height: 12px; background-color: ${statusColor}; border-radius: 50%; margin-right: 8px;" />
-    `;
+
+    const indicator = statusIndicators[analysis.classification];
     const details = getClassificationDetails(analysis.classification);
 
     await octokit.rest.issues.createComment({
