@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`idendity-replicant (automation) > analysis 'automation 1' 1`] = `
+exports[`identity-replicant (automation) > analysis 'automation 1' 1`] = `
 {
   "classification": "automation",
   "flags": [
@@ -43,7 +43,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 1' 1`] = `
 }
 `;
 
-exports[`idendity-replicant (automation) > analysis 'automation 2' 1`] = `
+exports[`identity-replicant (automation) > analysis 'automation 2' 1`] = `
 {
   "classification": "automation",
   "flags": [
@@ -76,7 +76,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 2' 1`] = `
 }
 `;
 
-exports[`idendity-replicant (automation) > analysis 'automation 3' 1`] = `
+exports[`identity-replicant (automation) > analysis 'automation 3' 1`] = `
 {
   "classification": "automation",
   "flags": [
@@ -104,7 +104,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 3' 1`] = `
 }
 `;
 
-exports[`idendity-replicant (automation) > analysis 'automation 4' 1`] = `
+exports[`identity-replicant (automation) > analysis 'automation 4' 1`] = `
 {
   "classification": "organic",
   "flags": [],
@@ -116,7 +116,7 @@ exports[`idendity-replicant (automation) > analysis 'automation 4' 1`] = `
 }
 `;
 
-exports[`idendity-replicant (organic) > analysis 'automation 1' 1`] = `
+exports[`identity-replicant (organic) > analysis 'automation 1' 1`] = `
 {
   "classification": "organic",
   "flags": [],
@@ -128,7 +128,7 @@ exports[`idendity-replicant (organic) > analysis 'automation 1' 1`] = `
 }
 `;
 
-exports[`idendity-replicant (organic) > analysis 'automation 2' 1`] = `
+exports[`identity-replicant (organic) > analysis 'automation 2' 1`] = `
 {
   "classification": "organic",
   "flags": [],
