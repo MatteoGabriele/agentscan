@@ -19786,7 +19786,10 @@ async function run() {
 			automation: "❌"
 		};
 		const indicator = hasCommunityFlag ? statusIndicators["automation"] : statusIndicators[analysis.classification];
-		const details = getClassificationDetails(analysis.classification);
+		const details = hasCommunityFlag ? {
+			label: "Flagged by community",
+			description: "This account has been flagged as potentially automated by the community."
+		} : getClassificationDetails(analysis.classification);
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
