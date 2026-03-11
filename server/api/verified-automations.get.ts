@@ -1,7 +1,7 @@
 import { Octokit } from "octokit";
 import type { VerifiedAutomation } from "~~/shared/types/automation";
 
-type VerifiedAutomationsList = VerifiedAutomation[];
+export type VerifiedAutomationsList = VerifiedAutomation[];
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig();

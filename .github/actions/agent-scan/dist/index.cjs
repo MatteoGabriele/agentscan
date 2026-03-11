@@ -19754,7 +19754,7 @@ async function run() {
 	try {
 		const octokit = getOctokit(getInput("github-token", { required: true }));
 		const context$2 = context;
-		const username = "kaigritun";
+		const username = "niveshdandyan";
 		const prNumber = context$2.payload.pull_request?.number;
 		if (!prNumber) throw new Error("No PR number found");
 		const { data: user } = await octokit.rest.users.getByUsername({ username });
@@ -19763,6 +19763,17 @@ async function run() {
 			per_page: 100,
 			page: 1
 		});
+		const { data: verifiedList } = await octokit.rest.repos.getContent({
+			owner: "matteogabriele",
+			repo: "agentscan",
+			path: "data/verified-automations-list.json"
+		});
+		const verified = [];
+		if ("content" in verifiedList) {
+			const content = Buffer.from(verifiedList.content, "base64").toString("utf-8");
+			verified.concat(JSON.parse(content));
+		}
+		const hasCommunityFlag = !!verified.find((account) => account.username === username);
 		const analysis = identifyReplicant({
 			accountName: username,
 			reposCount: user.public_repos,
@@ -19782,6 +19793,8 @@ async function run() {
 			body: `### ${indicator} ${details.label}
 
 ${details.description}
+
+${hasCommunityFlag ? "This account has been flagged by the community" : ""}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 

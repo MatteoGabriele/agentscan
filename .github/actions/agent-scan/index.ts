@@ -6,6 +6,7 @@ import type {
   IdentityClassification,
 } from "../../../shared/types/identity";
 import { getClassificationDetails } from "../../../shared/utils/voight-kampff-test/classification-details";
+import type { VerifiedAutomation } from "../../..//shared/types/automation";
 
 async function run() {
   try {
@@ -13,7 +14,7 @@ async function run() {
     const octokit = github.getOctokit(token);
 
     const context = github.context;
-    const username = "kaigritun"; //context.actor;
+    const username = "niveshdandyan"; //context.actor;
     const prNumber = context.payload.pull_request?.number;
 
     if (!prNumber) {
@@ -30,6 +31,28 @@ async function run() {
         per_page: 100,
         page: 1,
       });
+
+    const { data: verifiedList } = await octokit.rest.repos.getContent({
+      owner: "matteogabriele",
+      repo: "agentscan",
+      path: "data/verified-automations-list.json",
+    });
+
+    const verified: VerifiedAutomation[] = [];
+
+    if ("content" in verifiedList) {
+      const content = Buffer.from(verifiedList.content, "base64").toString(
+        "utf-8",
+      );
+
+      verified.concat(JSON.parse(content));
+    }
+
+    const verifiedAutomation: VerifiedAutomation | undefined = verified.find(
+      (account) => account.username === username,
+    );
+
+    const hasCommunityFlag: boolean = !!verifiedAutomation;
 
     const analysis: IdentifyReplicantResult = identifyReplicant({
       accountName: username,
@@ -54,6 +77,8 @@ async function run() {
       body: `### ${indicator} ${details.label}
 
 ${details.description}
+
+${hasCommunityFlag ? "This account has been flagged by the community" : ""}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 
