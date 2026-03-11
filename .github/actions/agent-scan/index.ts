@@ -68,7 +68,7 @@ async function run() {
     };
 
     const indicator = hasCommunityFlag
-      ? statusIndicators["automation"]
+      ? "🚩"
       : statusIndicators[analysis.classification];
     const details = hasCommunityFlag
       ? {

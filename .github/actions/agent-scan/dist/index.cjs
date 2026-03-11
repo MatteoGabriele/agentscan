@@ -19780,12 +19780,11 @@ async function run() {
 			createdAt: user.created_at,
 			events
 		});
-		const statusIndicators = {
+		const indicator = hasCommunityFlag ? "🚩" : {
 			organic: "✅",
 			mixed: "⚠️",
 			automation: "❌"
-		};
-		const indicator = hasCommunityFlag ? statusIndicators["automation"] : statusIndicators[analysis.classification];
+		}[analysis.classification];
 		const details = hasCommunityFlag ? {
 			label: "Flagged by community",
 			description: "This account has been flagged as potentially automated by the community."
