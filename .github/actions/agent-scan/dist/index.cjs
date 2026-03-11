@@ -19769,23 +19769,23 @@ async function run() {
 			createdAt: user.created_at,
 			events
 		});
-		const emoji = {
-			organic: "🌱",
-			mixed: "⚠️",
-			automation: "🤖"
-		}[analysis.classification];
+		const indicator = `
+      <span style="display: inline-block; width: 12px; height: 12px; background-color: ${{
+			organic: "#10b981",
+			mixed: "#f59e0b",
+			automation: "#ef4444"
+		}[analysis.classification]}; border-radius: 50%; margin-right: 8px;" />
+    `;
 		const details = getClassificationDetails(analysis.classification);
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
 			issue_number: prNumber,
-			body: `### ${emoji} ${details.label}
+			body: `### ${indicator}${details.label}
 
 ${details.description}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
-
----
 
 <sub>Powered by [AgentScan](https://agentscan.netlify.app)</sub>`
 		});
