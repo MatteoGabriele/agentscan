@@ -1,6 +1,8 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as cache from "@actions/cache";
+import fs from "fs";
+
 import { identifyReplicant } from "../../../shared/utils/voight-kampff-test/identify-replicant";
 import type {
   IdentifyReplicantResult,
@@ -32,7 +34,6 @@ async function run() {
 
     if (restored) {
       core.info(`Cache hit for ${username}`);
-      const fs = await import("fs");
       const cachedData = JSON.parse(fs.readFileSync(cachePath, "utf-8"));
       user = cachedData.user;
       events = cachedData.events;
@@ -51,7 +52,6 @@ async function run() {
         });
       events = eventsData;
 
-      const fs = await import("fs");
       fs.writeFileSync(cachePath, JSON.stringify({ user, events }, null, 2));
       await cache.saveCache([cachePath], cacheKey);
     }

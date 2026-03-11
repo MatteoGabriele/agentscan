@@ -59207,8 +59207,7 @@ async function run() {
 		let events;
 		if (await restoreCache([cachePath], cacheKey)) {
 			info(`Cache hit for ${username}`);
-			const fs$2 = await import("fs");
-			const cachedData = JSON.parse(fs$2.readFileSync(cachePath, "utf-8"));
+			const cachedData = JSON.parse(fs.default.readFileSync(cachePath, "utf-8"));
 			user = cachedData.user;
 			events = cachedData.events;
 		} else {
@@ -59221,7 +59220,7 @@ async function run() {
 				page: 1
 			});
 			events = eventsData;
-			(await import("fs")).writeFileSync(cachePath, JSON.stringify({
+			fs.default.writeFileSync(cachePath, JSON.stringify({
 				user,
 				events
 			}, null, 2));
