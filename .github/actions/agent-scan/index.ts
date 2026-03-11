@@ -1,6 +1,10 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { identifyReplicant } from "../../../shared/utils/voight-kampff-test/identify-replicant";
+import type {
+  IdentifyReplicantResult,
+  IdentityClassification,
+} from "../../../shared/types/identity";
 import { getClassificationDetails } from "../../../shared/utils/voight-kampff-test/classification-details";
 
 async function run() {
@@ -27,20 +31,27 @@ async function run() {
         page: 1,
       });
 
-    const analysis = identifyReplicant({
+    const analysis: IdentifyReplicantResult = identifyReplicant({
       accountName: username,
       reposCount: user.public_repos,
       createdAt: user.created_at,
       events,
     });
 
+    const statusEmojis: Record<IdentityClassification, string> = {
+      organic: "🌱",
+      mixed: "⚠️",
+      automation: "🤖",
+    };
+
+    const emoji = statusEmojis[analysis.classification];
     const details = getClassificationDetails(analysis.classification);
 
     await octokit.rest.issues.createComment({
       owner: context.repo.owner,
       repo: context.repo.repo,
       issue_number: prNumber,
-      body: `### ${details.label}
+      body: `### ${emoji} ${details.label}
 
 ${details.description}
 
