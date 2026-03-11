@@ -7,7 +7,7 @@ import type {
   IdentityClassification,
 } from "../../../shared/types/identity";
 import { getClassificationDetails } from "../../../shared/utils/voight-kampff-test/classification-details";
-import type { VerifiedAutomation } from "../../..//shared/types/automation";
+import type { VerifiedAutomation } from "../../../shared/types/automation";
 
 async function run() {
   try {
