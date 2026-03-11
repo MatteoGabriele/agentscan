@@ -149,8 +149,7 @@ useSeoAnalysis(identifyAnalysis, {
               class="underline"
               :to="`https://api.github.com/users/${username}/events?per_page=100`"
             >
-              events
-            </NuxtLink>
+              events</NuxtLink>
             from this account
           </p>
         </div>
