@@ -19060,6 +19060,675 @@ function getOctokit(token, options, ...additionalPlugins) {
 	return new (GitHub.plugin(...additionalPlugins))(getOctokitOptions(token, options));
 }
 //#endregion
+//#region ../../../shared/utils/voight-kampff-test/config.ts
+const CONFIG = {
+	THRESHOLD_HUMAN: 70,
+	THRESHOLD_SUSPICIOUS: 50,
+	AGE_NEW_ACCOUNT: 30,
+	AGE_YOUNG_ACCOUNT: 90,
+	POINTS_NEW_ACCOUNT: 20,
+	POINTS_YOUNG_ACCOUNT: 10,
+	POINTS_NO_IDENTITY: 15,
+	FOLLOW_RATIO_FOLLOWING_MIN: 50,
+	FOLLOW_RATIO_FOLLOWERS_MAX: 5,
+	POINTS_FOLLOW_RATIO: 15,
+	POINTS_ZERO_FOLLOWERS: 10,
+	MIN_EVENTS_FOR_ANALYSIS: 10,
+	FORKS_EXTREME: 8,
+	FORKS_HIGH: 5,
+	POINTS_FORK_SURGE: 30,
+	POINTS_MULTIPLE_FORKS: 20,
+	HOURS_PER_DAY_INHUMAN: 16,
+	CONSECUTIVE_INHUMAN_DAYS_EXTREME: 3,
+	FREQUENT_MARATHON_DAYS: 5,
+	POINTS_NONSTOP_ACTIVITY: 40,
+	POINTS_FREQUENT_MARATHON: 25,
+	CONSECUTIVE_DAYS_STREAK: 21,
+	POINTS_CONTINUOUS_ACTIVITY: 25,
+	REPO_SPREAD_EXTREME: 30,
+	REPO_SPREAD_HIGH: 20,
+	POINTS_EXTREME_REPO_SPREAD_YOUNG: 30,
+	POINTS_WIDE_REPO_SPREAD_YOUNG: 15,
+	PRS_TODAY_EXTREME: 15,
+	PRS_WEEK_HIGH: 20,
+	POINTS_PR_BURST: 20,
+	POINTS_HIGH_PR_FREQUENCY: 15,
+	EXTERNAL_PRS_MIN: 15,
+	PERSONAL_REPOS_LOW: 5,
+	POINTS_PR_ONLY_CONTRIBUTOR: 20,
+	FOREIGN_RATIO_FULL: 1,
+	FOREIGN_RATIO_HIGH: .95,
+	PERSONAL_REPOS_NONE: 3,
+	POINTS_NO_PERSONAL_ACTIVITY: 30,
+	POINTS_EXTERNAL_FOCUS: 20,
+	ZERO_REPOS_MIN_EVENTS: 20,
+	POINTS_ZERO_REPOS_ACTIVE: 20,
+	ACTIVITY_DENSITY_HIGH: 8,
+	ACTIVITY_DENSITY_EXTREME: 15,
+	POINTS_HIGH_ACTIVITY_DENSITY: 15,
+	POINTS_EXTREME_ACTIVITY_DENSITY: 25,
+	HOURLY_ACTIVITY_HIGH: 50,
+	HOURLY_ACTIVITY_EXTREME: 100,
+	TIGHT_COMMIT_SECONDS: 600,
+	TIGHT_COMMIT_THRESHOLD: 3,
+	POINTS_TIGHT_BURST: 25,
+	CREATE_EVENTS_MIN: 5,
+	CREATE_BURST_EXTREME: 25,
+	CREATE_BURST_HIGH: 15,
+	POINTS_CREATE_BURST_EXTREME: 35,
+	POINTS_CREATE_BURST_HIGH: 25,
+	HOURS_ACTIVE_EXTREME: 18,
+	EVENTS_PER_HOUR_MIN: 1.5,
+	POINTS_24_7_ACTIVITY: 30,
+	EVENT_TYPE_DIVERSITY_MIN: 2,
+	POINTS_LOW_DIVERSITY: 20
+};
+//#endregion
+//#region ../../../node_modules/dayjs/dayjs.min.js
+var require_dayjs_min = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function(t, e) {
+		"object" == typeof exports && "undefined" != typeof module ? module.exports = e() : "function" == typeof define && define.amd ? define(e) : (t = "undefined" != typeof globalThis ? globalThis : t || self).dayjs = e();
+	})(exports, (function() {
+		"use strict";
+		var t = 1e3, e = 6e4, n = 36e5, r = "millisecond", i = "second", s = "minute", u = "hour", a = "day", o = "week", c = "month", f = "quarter", h = "year", d = "date", l = "Invalid Date", $ = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/, y = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g, M = {
+			name: "en",
+			weekdays: "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),
+			months: "January_February_March_April_May_June_July_August_September_October_November_December".split("_"),
+			ordinal: function(t) {
+				var e = [
+					"th",
+					"st",
+					"nd",
+					"rd"
+				], n = t % 100;
+				return "[" + t + (e[(n - 20) % 10] || e[n] || e[0]) + "]";
+			}
+		}, m = function(t, e, n) {
+			var r = String(t);
+			return !r || r.length >= e ? t : "" + Array(e + 1 - r.length).join(n) + t;
+		}, v = {
+			s: m,
+			z: function(t) {
+				var e = -t.utcOffset(), n = Math.abs(e), r = Math.floor(n / 60), i = n % 60;
+				return (e <= 0 ? "+" : "-") + m(r, 2, "0") + ":" + m(i, 2, "0");
+			},
+			m: function t(e, n) {
+				if (e.date() < n.date()) return -t(n, e);
+				var r = 12 * (n.year() - e.year()) + (n.month() - e.month()), i = e.clone().add(r, c), s = n - i < 0, u = e.clone().add(r + (s ? -1 : 1), c);
+				return +(-(r + (n - i) / (s ? i - u : u - i)) || 0);
+			},
+			a: function(t) {
+				return t < 0 ? Math.ceil(t) || 0 : Math.floor(t);
+			},
+			p: function(t) {
+				return {
+					M: c,
+					y: h,
+					w: o,
+					d: a,
+					D: d,
+					h: u,
+					m: s,
+					s: i,
+					ms: r,
+					Q: f
+				}[t] || String(t || "").toLowerCase().replace(/s$/, "");
+			},
+			u: function(t) {
+				return void 0 === t;
+			}
+		}, g = "en", D = {};
+		D[g] = M;
+		var p = "$isDayjsObject", S = function(t) {
+			return t instanceof _ || !(!t || !t[p]);
+		}, w = function t(e, n, r) {
+			var i;
+			if (!e) return g;
+			if ("string" == typeof e) {
+				var s = e.toLowerCase();
+				D[s] && (i = s), n && (D[s] = n, i = s);
+				var u = e.split("-");
+				if (!i && u.length > 1) return t(u[0]);
+			} else {
+				var a = e.name;
+				D[a] = e, i = a;
+			}
+			return !r && i && (g = i), i || !r && g;
+		}, O = function(t, e) {
+			if (S(t)) return t.clone();
+			var n = "object" == typeof e ? e : {};
+			return n.date = t, n.args = arguments, new _(n);
+		}, b = v;
+		b.l = w, b.i = S, b.w = function(t, e) {
+			return O(t, {
+				locale: e.$L,
+				utc: e.$u,
+				x: e.$x,
+				$offset: e.$offset
+			});
+		};
+		var _ = function() {
+			function M(t) {
+				this.$L = w(t.locale, null, !0), this.parse(t), this.$x = this.$x || t.x || {}, this[p] = !0;
+			}
+			var m = M.prototype;
+			return m.parse = function(t) {
+				this.$d = function(t) {
+					var e = t.date, n = t.utc;
+					if (null === e) return /* @__PURE__ */ new Date(NaN);
+					if (b.u(e)) return /* @__PURE__ */ new Date();
+					if (e instanceof Date) return new Date(e);
+					if ("string" == typeof e && !/Z$/i.test(e)) {
+						var r = e.match($);
+						if (r) {
+							var i = r[2] - 1 || 0, s = (r[7] || "0").substring(0, 3);
+							return n ? new Date(Date.UTC(r[1], i, r[3] || 1, r[4] || 0, r[5] || 0, r[6] || 0, s)) : new Date(r[1], i, r[3] || 1, r[4] || 0, r[5] || 0, r[6] || 0, s);
+						}
+					}
+					return new Date(e);
+				}(t), this.init();
+			}, m.init = function() {
+				var t = this.$d;
+				this.$y = t.getFullYear(), this.$M = t.getMonth(), this.$D = t.getDate(), this.$W = t.getDay(), this.$H = t.getHours(), this.$m = t.getMinutes(), this.$s = t.getSeconds(), this.$ms = t.getMilliseconds();
+			}, m.$utils = function() {
+				return b;
+			}, m.isValid = function() {
+				return !(this.$d.toString() === l);
+			}, m.isSame = function(t, e) {
+				var n = O(t);
+				return this.startOf(e) <= n && n <= this.endOf(e);
+			}, m.isAfter = function(t, e) {
+				return O(t) < this.startOf(e);
+			}, m.isBefore = function(t, e) {
+				return this.endOf(e) < O(t);
+			}, m.$g = function(t, e, n) {
+				return b.u(t) ? this[e] : this.set(n, t);
+			}, m.unix = function() {
+				return Math.floor(this.valueOf() / 1e3);
+			}, m.valueOf = function() {
+				return this.$d.getTime();
+			}, m.startOf = function(t, e) {
+				var n = this, r = !!b.u(e) || e, f = b.p(t), l = function(t, e) {
+					var i = b.w(n.$u ? Date.UTC(n.$y, e, t) : new Date(n.$y, e, t), n);
+					return r ? i : i.endOf(a);
+				}, $ = function(t, e) {
+					return b.w(n.toDate()[t].apply(n.toDate("s"), (r ? [
+						0,
+						0,
+						0,
+						0
+					] : [
+						23,
+						59,
+						59,
+						999
+					]).slice(e)), n);
+				}, y = this.$W, M = this.$M, m = this.$D, v = "set" + (this.$u ? "UTC" : "");
+				switch (f) {
+					case h: return r ? l(1, 0) : l(31, 11);
+					case c: return r ? l(1, M) : l(0, M + 1);
+					case o:
+						var g = this.$locale().weekStart || 0, D = (y < g ? y + 7 : y) - g;
+						return l(r ? m - D : m + (6 - D), M);
+					case a:
+					case d: return $(v + "Hours", 0);
+					case u: return $(v + "Minutes", 1);
+					case s: return $(v + "Seconds", 2);
+					case i: return $(v + "Milliseconds", 3);
+					default: return this.clone();
+				}
+			}, m.endOf = function(t) {
+				return this.startOf(t, !1);
+			}, m.$set = function(t, e) {
+				var n, o = b.p(t), f = "set" + (this.$u ? "UTC" : ""), l = (n = {}, n[a] = f + "Date", n[d] = f + "Date", n[c] = f + "Month", n[h] = f + "FullYear", n[u] = f + "Hours", n[s] = f + "Minutes", n[i] = f + "Seconds", n[r] = f + "Milliseconds", n)[o], $ = o === a ? this.$D + (e - this.$W) : e;
+				if (o === c || o === h) {
+					var y = this.clone().set(d, 1);
+					y.$d[l]($), y.init(), this.$d = y.set(d, Math.min(this.$D, y.daysInMonth())).$d;
+				} else l && this.$d[l]($);
+				return this.init(), this;
+			}, m.set = function(t, e) {
+				return this.clone().$set(t, e);
+			}, m.get = function(t) {
+				return this[b.p(t)]();
+			}, m.add = function(r, f) {
+				var d, l = this;
+				r = Number(r);
+				var $ = b.p(f), y = function(t) {
+					var e = O(l);
+					return b.w(e.date(e.date() + Math.round(t * r)), l);
+				};
+				if ($ === c) return this.set(c, this.$M + r);
+				if ($ === h) return this.set(h, this.$y + r);
+				if ($ === a) return y(1);
+				if ($ === o) return y(7);
+				var M = (d = {}, d[s] = e, d[u] = n, d[i] = t, d)[$] || 1, m = this.$d.getTime() + r * M;
+				return b.w(m, this);
+			}, m.subtract = function(t, e) {
+				return this.add(-1 * t, e);
+			}, m.format = function(t) {
+				var e = this, n = this.$locale();
+				if (!this.isValid()) return n.invalidDate || l;
+				var r = t || "YYYY-MM-DDTHH:mm:ssZ", i = b.z(this), s = this.$H, u = this.$m, a = this.$M, o = n.weekdays, c = n.months, f = n.meridiem, h = function(t, n, i, s) {
+					return t && (t[n] || t(e, r)) || i[n].slice(0, s);
+				}, d = function(t) {
+					return b.s(s % 12 || 12, t, "0");
+				}, $ = f || function(t, e, n) {
+					var r = t < 12 ? "AM" : "PM";
+					return n ? r.toLowerCase() : r;
+				};
+				return r.replace(y, (function(t, r) {
+					return r || function(t) {
+						switch (t) {
+							case "YY": return String(e.$y).slice(-2);
+							case "YYYY": return b.s(e.$y, 4, "0");
+							case "M": return a + 1;
+							case "MM": return b.s(a + 1, 2, "0");
+							case "MMM": return h(n.monthsShort, a, c, 3);
+							case "MMMM": return h(c, a);
+							case "D": return e.$D;
+							case "DD": return b.s(e.$D, 2, "0");
+							case "d": return String(e.$W);
+							case "dd": return h(n.weekdaysMin, e.$W, o, 2);
+							case "ddd": return h(n.weekdaysShort, e.$W, o, 3);
+							case "dddd": return o[e.$W];
+							case "H": return String(s);
+							case "HH": return b.s(s, 2, "0");
+							case "h": return d(1);
+							case "hh": return d(2);
+							case "a": return $(s, u, !0);
+							case "A": return $(s, u, !1);
+							case "m": return String(u);
+							case "mm": return b.s(u, 2, "0");
+							case "s": return String(e.$s);
+							case "ss": return b.s(e.$s, 2, "0");
+							case "SSS": return b.s(e.$ms, 3, "0");
+							case "Z": return i;
+						}
+						return null;
+					}(t) || i.replace(":", "");
+				}));
+			}, m.utcOffset = function() {
+				return 15 * -Math.round(this.$d.getTimezoneOffset() / 15);
+			}, m.diff = function(r, d, l) {
+				var $, y = this, M = b.p(d), m = O(r), v = (m.utcOffset() - this.utcOffset()) * e, g = this - m, D = function() {
+					return b.m(y, m);
+				};
+				switch (M) {
+					case h:
+						$ = D() / 12;
+						break;
+					case c:
+						$ = D();
+						break;
+					case f:
+						$ = D() / 3;
+						break;
+					case o:
+						$ = (g - v) / 6048e5;
+						break;
+					case a:
+						$ = (g - v) / 864e5;
+						break;
+					case u:
+						$ = g / n;
+						break;
+					case s:
+						$ = g / e;
+						break;
+					case i:
+						$ = g / t;
+						break;
+					default: $ = g;
+				}
+				return l ? $ : b.a($);
+			}, m.daysInMonth = function() {
+				return this.endOf(c).$D;
+			}, m.$locale = function() {
+				return D[this.$L];
+			}, m.locale = function(t, e) {
+				if (!t) return this.$L;
+				var n = this.clone(), r = w(t, e, !0);
+				return r && (n.$L = r), n;
+			}, m.clone = function() {
+				return b.w(this.$d, this);
+			}, m.toDate = function() {
+				return new Date(this.valueOf());
+			}, m.toJSON = function() {
+				return this.isValid() ? this.toISOString() : null;
+			}, m.toISOString = function() {
+				return this.$d.toISOString();
+			}, m.toString = function() {
+				return this.$d.toUTCString();
+			}, M;
+		}(), k = _.prototype;
+		return O.prototype = k, [
+			["$ms", r],
+			["$s", i],
+			["$m", s],
+			["$H", u],
+			["$W", a],
+			["$M", c],
+			["$y", h],
+			["$D", d]
+		].forEach((function(t) {
+			k[t[1]] = function(e) {
+				return this.$g(e, t[0], t[1]);
+			};
+		})), O.extend = function(t, e) {
+			return t.$i || (t(e, _, O), t.$i = !0), O;
+		}, O.locale = w, O.isDayjs = S, O.unix = function(t) {
+			return O(1e3 * t);
+		}, O.en = D[g], O.Ls = D, O.p = {}, O;
+	}));
+}));
+//#endregion
+//#region ../../../node_modules/dayjs/plugin/minMax.js
+var require_minMax = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function(e, n) {
+		"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define(n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).dayjs_plugin_minMax = n();
+	})(exports, (function() {
+		"use strict";
+		return function(e, n, t) {
+			var i = function(e, n) {
+				if (!n || !n.length || 1 === n.length && !n[0] || 1 === n.length && Array.isArray(n[0]) && !n[0].length) return null;
+				var t;
+				1 === n.length && n[0].length > 0 && (n = n[0]);
+				t = (n = n.filter((function(e) {
+					return e;
+				})))[0];
+				for (var i = 1; i < n.length; i += 1) n[i].isValid() && !n[i][e](t) || (t = n[i]);
+				return t;
+			};
+			t.max = function() {
+				return i("isAfter", [].slice.call(arguments, 0));
+			}, t.min = function() {
+				return i("isBefore", [].slice.call(arguments, 0));
+			};
+		};
+	}));
+}));
+//#endregion
+//#region ../../../shared/utils/voight-kampff-test/identify-replicant.ts
+var import_dayjs_min = /* @__PURE__ */ __toESM(require_dayjs_min(), 1);
+var import_minMax = /* @__PURE__ */ __toESM(require_minMax(), 1);
+import_dayjs_min.default.extend(import_minMax.default);
+function identifyReplicant({ createdAt, reposCount, accountName, events }) {
+	const flags = [];
+	const accountAge = (0, import_dayjs_min.default)().diff(createdAt, "days");
+	if (accountAge < CONFIG.AGE_NEW_ACCOUNT) flags.push({
+		label: "Recently created",
+		points: CONFIG.POINTS_NEW_ACCOUNT,
+		detail: `Account is ${accountAge} days old`
+	});
+	else if (accountAge < CONFIG.AGE_YOUNG_ACCOUNT) flags.push({
+		label: "Young account",
+		points: CONFIG.POINTS_YOUNG_ACCOUNT,
+		detail: `Account is ${accountAge} days old`
+	});
+	const foreignEvents = events.filter((e) => {
+		const repoOwner = e.repo?.name?.split("/")[0]?.toLowerCase();
+		return repoOwner && repoOwner !== accountName.toLowerCase();
+	});
+	const hasAllExternal = reposCount === 0 && foreignEvents.length === events.length;
+	if (hasAllExternal && events.length >= CONFIG.ZERO_REPOS_MIN_EVENTS) flags.push({
+		label: "Only active on other people's repos",
+		points: CONFIG.POINTS_ZERO_REPOS_ACTIVE + CONFIG.POINTS_NO_PERSONAL_ACTIVITY,
+		detail: `No personal repos, all ${events.length} events are on repos they don't own`
+	});
+	const isNewOrYoungAccount = accountAge < CONFIG.AGE_YOUNG_ACCOUNT;
+	if (events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+		const createEvents = events.filter((e) => e.type === "CreateEvent");
+		if (createEvents.length >= CONFIG.CREATE_EVENTS_MIN) {
+			const createTimestamps = createEvents.map((e) => (0, import_dayjs_min.default)(e.created_at)).sort((a, b) => a.valueOf() - b.valueOf());
+			let maxCreatesInWindow = 0;
+			let windowStartIdx = 0;
+			for (let endIdx = 0; endIdx < createTimestamps.length; endIdx++) {
+				const windowEnd = createTimestamps[endIdx];
+				while (windowEnd && windowEnd.diff(createTimestamps[windowStartIdx], "hour", true) > 24) windowStartIdx++;
+				const createsInWindow = endIdx - windowStartIdx + 1;
+				maxCreatesInWindow = Math.max(maxCreatesInWindow, createsInWindow);
+			}
+			if (maxCreatesInWindow >= CONFIG.CREATE_BURST_EXTREME) flags.push({
+				label: "Concentrated repository creation",
+				points: CONFIG.POINTS_CREATE_BURST_EXTREME,
+				detail: `${maxCreatesInWindow} repositories created in a short timeframe (within 24 hours)`
+			});
+			else if (maxCreatesInWindow >= CONFIG.CREATE_BURST_HIGH) flags.push({
+				label: "Frequent repository creation",
+				points: CONFIG.POINTS_CREATE_BURST_HIGH,
+				detail: `${maxCreatesInWindow} repositories created in a short timeframe (within 24 hours)`
+			});
+		}
+		const activityByHour = /* @__PURE__ */ new Map();
+		events.forEach((e) => {
+			const hour = (0, import_dayjs_min.default)(e.created_at).hour();
+			activityByHour.set(hour, (activityByHour.get(hour) || 0) + 1);
+		});
+		if (events.length > 0 && activityByHour.size > 0) {
+			const activeHours = activityByHour.size;
+			const eventCounts = Array.from(activityByHour.values());
+			const avgEventsPerHour = events.length / activeHours;
+			const mean = avgEventsPerHour;
+			const variance = eventCounts.reduce((sum, count) => sum + Math.pow(count - mean, 2), 0) / eventCounts.length;
+			const coefficientOfVariation = Math.sqrt(variance) / mean;
+			const sortedHours = Array.from(activityByHour.keys()).sort((a, b) => a - b);
+			const firstHour = sortedHours[0];
+			const lastHour = sortedHours[sortedHours.length - 1];
+			let maxRestGap = firstHour !== void 0 && lastHour !== void 0 ? 24 - lastHour + firstHour : 0;
+			for (let i = 0; i < sortedHours.length - 1; i++) {
+				const currentHour = sortedHours[i];
+				const nextHour = sortedHours[i + 1];
+				if (currentHour !== void 0 && nextHour !== void 0) maxRestGap = Math.max(maxRestGap, nextHour - currentHour - 1);
+			}
+			const isSuspiciouslyUniform = coefficientOfVariation < .3;
+			const hasMinimalRest = maxRestGap < 3;
+			const meetsEventThreshold = avgEventsPerHour >= CONFIG.EVENTS_PER_HOUR_MIN;
+			if (activeHours >= CONFIG.HOURS_ACTIVE_EXTREME && meetsEventThreshold && (isSuspiciouslyUniform || hasMinimalRest)) {
+				let points = CONFIG.POINTS_24_7_ACTIVITY;
+				if (isSuspiciouslyUniform && hasMinimalRest) points = Math.round(points * 1.5);
+				flags.push({
+					label: "24/7 activity pattern",
+					points,
+					detail: `Active ${activeHours}/24 hours, ${maxRestGap}h max rest, ${avgEventsPerHour.toFixed(1)} events/hour`
+				});
+			}
+		}
+		const eventTypes = new Set(events.map((e) => e.type));
+		const hasInteraction = eventTypes.has("IssueCommentEvent") || eventTypes.has("PullRequestReviewEvent") || eventTypes.has("PullRequestReviewCommentEvent");
+		const hasWatches = eventTypes.has("WatchEvent");
+		if (eventTypes.size <= CONFIG.EVENT_TYPE_DIVERSITY_MIN && !hasInteraction && !hasWatches) flags.push({
+			label: "Narrow activity focus",
+			points: CONFIG.POINTS_LOW_DIVERSITY,
+			detail: `Activity concentrated on ${eventTypes.size} specific event types without interpersonal interactions`
+		});
+	}
+	if (isNewOrYoungAccount && events.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+		const userLogin = accountName.toLowerCase();
+		const commitEvents = events.filter((e) => e.type === "PushEvent");
+		if (commitEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+			const timestamps = commitEvents.map((e) => (0, import_dayjs_min.default)(e.created_at)).sort((a, b) => a.valueOf() - b.valueOf());
+			let maxCommitsInHour = 0;
+			let windowStartIndex = 0;
+			for (let windowEndIndex = 0; windowEndIndex < timestamps.length; windowEndIndex++) {
+				const windowEnd = timestamps[windowEndIndex];
+				while (windowEnd && windowEnd.diff(timestamps[windowStartIndex], "hour", true) > 1) windowStartIndex++;
+				const commitsInWindow = windowEndIndex - windowStartIndex + 1;
+				maxCommitsInHour = Math.max(maxCommitsInHour, commitsInWindow);
+			}
+			if (maxCommitsInHour >= CONFIG.HOURLY_ACTIVITY_EXTREME) flags.push({
+				label: "Extreme commit burst",
+				points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY,
+				detail: `${maxCommitsInHour} commits within 1 hour`
+			});
+			else if (maxCommitsInHour >= CONFIG.HOURLY_ACTIVITY_HIGH) flags.push({
+				label: "High commit burst",
+				points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY,
+				detail: `${maxCommitsInHour} commits within 1 hour`
+			});
+			let tightBurstCount = 0;
+			for (let i = 1; i < timestamps.length; i++) if (timestamps[i] !== void 0 && timestamps[i - 1] !== void 0) {
+				if (timestamps[i].diff(timestamps[i - 1], "second") <= CONFIG.TIGHT_COMMIT_SECONDS) tightBurstCount++;
+			}
+			if (tightBurstCount >= CONFIG.TIGHT_COMMIT_THRESHOLD) flags.push({
+				label: "High commit frequency",
+				points: CONFIG.POINTS_TIGHT_BURST,
+				detail: `${tightBurstCount + 1} commits within very short intervals`
+			});
+		}
+		const prEvents = events.filter((e) => e.type === "PullRequestEvent");
+		if (prEvents.length >= CONFIG.MIN_EVENTS_FOR_ANALYSIS) {
+			const timestamps = prEvents.map((e) => (0, import_dayjs_min.default)(e.created_at));
+			const oldestEvent = import_dayjs_min.default.min(timestamps);
+			const newestEvent = import_dayjs_min.default.max(timestamps);
+			if (newestEvent) {
+				const eventSpanDays = Math.max(1, newestEvent.diff(oldestEvent, "day"));
+				const prsPerDay = prEvents.length / eventSpanDays;
+				if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_EXTREME / 2) flags.push({
+					label: "Very high PR volume",
+					points: CONFIG.POINTS_EXTREME_ACTIVITY_DENSITY + 10,
+					detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`
+				});
+				else if (prsPerDay >= CONFIG.ACTIVITY_DENSITY_HIGH / 2) flags.push({
+					label: "High PR volume",
+					points: CONFIG.POINTS_HIGH_ACTIVITY_DENSITY + 5,
+					detail: `${prEvents.length} PRs in ${eventSpanDays} day${eventSpanDays === 1 ? "" : "s"}`
+				});
+			}
+		}
+		const forkEvents = events.filter((e) => e.type === "ForkEvent");
+		if (forkEvents.length >= CONFIG.FORKS_EXTREME) flags.push({
+			label: "Many recent forks",
+			points: CONFIG.POINTS_FORK_SURGE,
+			detail: `${forkEvents.length} repos forked recently`
+		});
+		else if (forkEvents.length >= CONFIG.FORKS_HIGH) flags.push({
+			label: "Multiple forks",
+			points: CONFIG.POINTS_MULTIPLE_FORKS,
+			detail: `${forkEvents.length} repos forked recently`
+		});
+		const codingEventTypes = new Set(["PushEvent", "PullRequestEvent"]);
+		const codingEventsWithReviews = events.filter((e) => e.type && codingEventTypes.has(e.type) || e.type === "PullRequestReviewEvent" || e.type === "PullRequestReviewCommentEvent");
+		const codingEventsByDay = /* @__PURE__ */ new Map();
+		codingEventsWithReviews.forEach((e) => {
+			if (!e.created_at) return;
+			const t = new Date(e.created_at);
+			const day = t.toISOString().slice(0, 10);
+			if (!codingEventsByDay.has(day)) codingEventsByDay.set(day, []);
+			codingEventsByDay.get(day).push(t);
+		});
+		const daysWithManyHours = [];
+		codingEventsByDay.forEach((dayTimestamps, day) => {
+			if (new Set(dayTimestamps.map((t) => t.getUTCHours())).size >= CONFIG.HOURS_PER_DAY_INHUMAN) daysWithManyHours.push(day);
+		});
+		if (daysWithManyHours.length >= CONFIG.CONSECUTIVE_INHUMAN_DAYS_EXTREME) {
+			daysWithManyHours.sort();
+			let consecutiveCount = 1;
+			let maxConsecutive = 1;
+			for (let i = 1; i < daysWithManyHours.length; i++) {
+				const prev = (0, import_dayjs_min.default)(daysWithManyHours[i - 1]);
+				if ((0, import_dayjs_min.default)(daysWithManyHours[i]).diff(prev, "day") === 1) {
+					consecutiveCount++;
+					maxConsecutive = Math.max(maxConsecutive, consecutiveCount);
+				} else consecutiveCount = 1;
+			}
+			if (maxConsecutive >= CONFIG.CONSECUTIVE_INHUMAN_DAYS_EXTREME) flags.push({
+				label: "Extended daily coding",
+				points: CONFIG.POINTS_NONSTOP_ACTIVITY,
+				detail: `${maxConsecutive} days in a row with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of coding`
+			});
+			else if (daysWithManyHours.length >= CONFIG.FREQUENT_MARATHON_DAYS) flags.push({
+				label: "Frequent long coding days",
+				points: CONFIG.POINTS_FREQUENT_MARATHON,
+				detail: `${daysWithManyHours.length} days with ${CONFIG.HOURS_PER_DAY_INHUMAN}+ hours of coding each`
+			});
+		}
+		const daySet = /* @__PURE__ */ new Set();
+		events.forEach((e) => {
+			daySet.add((0, import_dayjs_min.default)(e.created_at).format("YYYY-MM-DD"));
+		});
+		const sortedDays = Array.from(daySet).map((d) => (0, import_dayjs_min.default)(d, "YYYY-MM-DD")).sort((a, b) => a.valueOf() - b.valueOf());
+		let maxStreak = 1;
+		let currentStreak = 1;
+		for (let i = 1; i < sortedDays.length; i++) {
+			const prev = sortedDays[i - 1];
+			const curr = sortedDays[i];
+			if (curr && prev && curr.diff(prev, "day") === 1) {
+				currentStreak++;
+				maxStreak = Math.max(maxStreak, currentStreak);
+			} else currentStreak = 1;
+		}
+		if (maxStreak >= CONFIG.CONSECUTIVE_DAYS_STREAK) flags.push({
+			label: "Long activity streak",
+			points: CONFIG.POINTS_CONTINUOUS_ACTIVITY,
+			detail: `${maxStreak} days in a row with activity`
+		});
+		if (isNewOrYoungAccount) {
+			const externalRepos = new Set(events.map((e) => e.repo?.name).filter((name) => {
+				if (!name) return false;
+				return name.split("/")[0]?.toLowerCase() !== userLogin;
+			}));
+			if (externalRepos.size >= CONFIG.REPO_SPREAD_EXTREME) flags.push({
+				label: "Highly distributed activity",
+				points: CONFIG.POINTS_EXTREME_REPO_SPREAD_YOUNG,
+				detail: `Activity spread across ${externalRepos.size} external repositories`
+			});
+			else if (externalRepos.size >= CONFIG.REPO_SPREAD_HIGH) flags.push({
+				label: "Distributed activity",
+				points: CONFIG.POINTS_WIDE_REPO_SPREAD_YOUNG,
+				detail: `Activity spread across ${externalRepos.size} external repositories`
+			});
+		}
+		const externalPRs = prEvents.filter((e) => {
+			const repoOwner = e.repo?.name?.split("/")[0]?.toLowerCase();
+			return repoOwner && repoOwner !== userLogin;
+		});
+		const now = (0, import_dayjs_min.default)();
+		const oneWeekAgo = now.subtract(1, "week");
+		const oneDayAgo = now.subtract(1, "day");
+		const prsThisWeek = externalPRs.filter((e) => (0, import_dayjs_min.default)(e.created_at).isAfter(oneWeekAgo));
+		const prsToday = externalPRs.filter((e) => (0, import_dayjs_min.default)(e.created_at).isAfter(oneDayAgo));
+		if (prsToday.length >= CONFIG.PRS_TODAY_EXTREME) flags.push({
+			label: "High PR volume in the past 24 hours",
+			points: CONFIG.POINTS_PR_BURST,
+			detail: `${prsToday.length} PRs to other repos in the last 24 hours`
+		});
+		else if (prsThisWeek.length >= CONFIG.PRS_WEEK_HIGH) flags.push({
+			label: "High PR volume during last week",
+			points: CONFIG.POINTS_HIGH_PR_FREQUENCY,
+			detail: `${prsThisWeek.length} PRs to other repos this week`
+		});
+		if (externalPRs.length >= CONFIG.EXTERNAL_PRS_MIN && reposCount < CONFIG.PERSONAL_REPOS_LOW) {
+			let detail = `${externalPRs.length} PRs to other repos, but only ${reposCount} of their own`;
+			if (reposCount === 0) detail = `${externalPRs.length} PRs to other repos, none of their own`;
+			flags.push({
+				label: "Primarily external contributions",
+				points: CONFIG.POINTS_PR_ONLY_CONTRIBUTOR,
+				detail
+			});
+		}
+		const foreignRatio = foreignEvents.length / events.length;
+		if (!hasAllExternal && foreignRatio >= CONFIG.FOREIGN_RATIO_HIGH && reposCount < CONFIG.PERSONAL_REPOS_LOW) flags.push({
+			label: "Mostly external activity",
+			points: CONFIG.POINTS_EXTERNAL_FOCUS,
+			detail: `${Math.round(foreignRatio * 100)}% of activity on other people's repos`
+		});
+	}
+	const score = flags.reduce((total, flag) => total += flag.points, 0);
+	const humanScore = Math.max(0, 100 - score);
+	let classification = "automation";
+	if (humanScore >= CONFIG.THRESHOLD_HUMAN) classification = "organic";
+	else if (humanScore >= CONFIG.THRESHOLD_SUSPICIOUS) classification = "mixed";
+	return {
+		score: humanScore,
+		classification,
+		flags,
+		profile: {
+			age: accountAge,
+			repos: reposCount
+		}
+	};
+}
+//#endregion
 //#region index.ts
 async function run() {
 	try {
@@ -19074,11 +19743,23 @@ async function run() {
 			per_page: 100,
 			page: 1
 		});
+		const analysis = identifyReplicant({
+			accountName: username,
+			reposCount: user.public_repos,
+			createdAt: user.created_at,
+			events
+		});
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
 			issue_number: prNumber,
-			body: [`Hello @${username}! Your PR has been received. 👋`, `Events count: ${events.length}`].join("")
+			body: [
+				`Hello @${username}! Your PR has been received. 👋`,
+				"",
+				`Events count: ${events.length}`,
+				"",
+				`Analysis result: ${analysis.classification}`
+			].join("")
 		});
 		info(`Comment posted on PR #${prNumber}`);
 	} catch (error) {

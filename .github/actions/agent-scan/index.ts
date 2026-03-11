@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { identifyReplicant } from "../../../shared/utils/voight-kampff-test/identify-replicant";
 
 async function run() {
   try {
@@ -25,13 +26,23 @@ async function run() {
         page: 1,
       });
 
+    const analysis = identifyReplicant({
+      accountName: username,
+      reposCount: user.public_repos,
+      createdAt: user.created_at,
+      events,
+    });
+
     await octokit.rest.issues.createComment({
       owner: context.repo.owner,
       repo: context.repo.repo,
       issue_number: prNumber,
       body: [
         `Hello @${username}! Your PR has been received. 👋`,
+        "",
         `Events count: ${events.length}`,
+        "",
+        `Analysis result: ${analysis.classification}`,
       ].join(""),
     });
 
