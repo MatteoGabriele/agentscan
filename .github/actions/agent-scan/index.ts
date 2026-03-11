@@ -13,7 +13,7 @@ async function run() {
     const octokit = github.getOctokit(token);
 
     const context = github.context;
-    const username = context.actor;
+    const username = "kaigritun"; //context.actor;
     const prNumber = context.payload.pull_request?.number;
 
     if (!prNumber) {
@@ -60,6 +60,26 @@ ${details.description}
 <sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`,
     });
 
+    // Add labels based on classification
+    if (analysis.classification !== "organic") {
+      const labelMap: Record<
+        Exclude<IdentityClassification, "organic">,
+        string
+      > = {
+        mixed: "agentscan:mixed-signals",
+        automation: "agentscan:automation-signals",
+      };
+
+      const label = labelMap[analysis.classification];
+      if (label) {
+        await octokit.rest.issues.addLabels({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          issue_number: prNumber,
+          labels: [label],
+        });
+      }
+    }
     core.info(`Comment posted on PR #${prNumber}`);
   } catch (error: unknown) {
     if (error instanceof Error) {

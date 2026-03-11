@@ -19754,7 +19754,7 @@ async function run() {
 	try {
 		const octokit = getOctokit(getInput("github-token", { required: true }));
 		const context$2 = context;
-		const username = context$2.actor;
+		const username = "kaigritun";
 		const prNumber = context$2.payload.pull_request?.number;
 		if (!prNumber) throw new Error("No PR number found");
 		const { data: user } = await octokit.rest.users.getByUsername({ username });
@@ -19787,6 +19787,18 @@ ${details.description}
 
 <sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`
 		});
+		if (analysis.classification !== "organic") {
+			const label = {
+				mixed: "agentscan:mixed-signals",
+				automation: "agentscan:automation-signals"
+			}[analysis.classification];
+			if (label) await octokit.rest.issues.addLabels({
+				owner: context$2.repo.owner,
+				repo: context$2.repo.repo,
+				issue_number: prNumber,
+				labels: [label]
+			});
+		}
 		info(`Comment posted on PR #${prNumber}`);
 	} catch (error) {
 		if (error instanceof Error) setFailed(error.message);
