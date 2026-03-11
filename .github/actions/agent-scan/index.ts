@@ -55,11 +55,11 @@ async function run() {
 
 ${details.description}
 
-*Analyzed from the last ${events.length} public GitHub events*
+[View full analysis →](https://agentscan.netlify.app/user/${username})
 
 ---
 
-<sub>This is an automated analysis by AgentScan</sub>`,
+<sub>Powered by [AgentScan](https://agentscan.netlify.app)</sub>`,
     });
 
     core.info(`Comment posted on PR #${prNumber}`);
