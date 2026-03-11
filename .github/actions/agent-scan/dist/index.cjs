@@ -19064,15 +19064,23 @@ function getOctokit(token, options, ...additionalPlugins) {
 async function run() {
 	try {
 		const octokit = getOctokit(getInput("github-token", { required: true }));
-		const username = context.actor;
+		const context$2 = context;
+		const username = context$2.actor;
+		const prNumber = context$2.payload.pull_request?.number;
+		if (!prNumber) throw new Error("No PR number found");
 		const { data: user } = await octokit.rest.users.getByUsername({ username });
 		const { data: events } = await octokit.rest.activity.listPublicEventsForUser({
 			username,
 			per_page: 100,
 			page: 1
 		});
-		info(`PR opened by: ${user.name}`);
-		info(`Events count: ${events.length}`);
+		await octokit.rest.issues.createComment({
+			owner: context$2.repo.owner,
+			repo: context$2.repo.repo,
+			issue_number: prNumber,
+			body: [`Hello @${username}! Your PR has been received. 👋`, `Events count: ${events.length}`].join("")
+		});
+		info(`Comment posted on PR #${prNumber}`);
 	} catch (error) {
 		if (error instanceof Error) setFailed(error.message);
 	}
