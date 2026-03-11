@@ -8,6 +8,6 @@ export default defineConfig({
   platform: "node",
   target: "node24",
   deps: {
-    alwaysBundle: ["@actions/core", "@actions/github"],
+    alwaysBundle: ["@actions/core", "@actions/github", "@actions/cache"],
   },
 });
