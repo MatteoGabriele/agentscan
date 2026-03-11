@@ -59261,7 +59261,7 @@ async function run() {
 			owner: context.repo.owner,
 			repo: context.repo.repo,
 			issue_number: prNumber,
-			body: `### ${indicator} ${hasCommunityFlag ? "Flagged by community" : details.label}
+			body: `### ${indicator} ${details.label}
 
 ${details.description}
 
