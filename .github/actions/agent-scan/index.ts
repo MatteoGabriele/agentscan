@@ -22,8 +22,10 @@ async function run() {
 
     core.info(`PR opened by: ${user.name}`);
     core.info(`Events count: ${events.length}`);
-  } catch (error) {
-    core.setFailed(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
   }
 }
 

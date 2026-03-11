@@ -12,4 +12,4 @@ outputs:
     description: "PR title"
 runs:
   using: "node24"
-  main: "index.js"
+  main: "dist/index.js"
