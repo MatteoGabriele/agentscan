@@ -33,17 +33,37 @@ async function run() {
       events,
     });
 
+    const status =
+      analysis.classification === "organic"
+        ? "✅ Organic activity"
+        : "⚠️ Automation signals detected";
+
     await octokit.rest.issues.createComment({
       owner: context.repo.owner,
       repo: context.repo.repo,
       issue_number: prNumber,
-      body: [
-        `Hello @${username}! Your PR has been received. 👋`,
-        "",
-        `Events count: ${events.length}`,
-        "",
-        `Analysis result: ${analysis.classification}`,
-      ].join(""),
+      body: `## AgentScan Analysis
+
+**User**: @${username}
+**Profile**: ${user.name || "N/A"}
+**Account created**: ${new Date(user.created_at).toLocaleDateString()}
+**Public repos**: ${user.public_repos}
+
+---
+
+### ${status}
+
+${
+  analysis.classification === "organic"
+    ? `No automation signals detected in the analyzed events.`
+    : `**Potential automation signals:**\n${analysis.signals.map((s: string) => `- ${s}`).join("\n")}`
+}
+
+*Analyzed from the last ${events.length} public GitHub events*
+
+---
+
+<sub>This is an automated analysis by AgentScan</sub>`,
     });
 
     core.info(`Comment posted on PR #${prNumber}`);
