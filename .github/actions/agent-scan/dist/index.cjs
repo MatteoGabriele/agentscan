@@ -19779,13 +19779,13 @@ async function run() {
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
 			issue_number: prNumber,
-			body: `### ${indicator}${details.label}
+			body: `### ${indicator} ${details.label}
 
 ${details.description}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 
-<sub>Powered by [AgentScan](https://agentscan.netlify.app)</sub>`
+<sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`
 		});
 		info(`Comment posted on PR #${prNumber}`);
 	} catch (error) {
