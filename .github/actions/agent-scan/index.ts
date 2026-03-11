@@ -45,7 +45,7 @@ async function run() {
         "utf-8",
       );
 
-      verified.concat(JSON.parse(content));
+      verified.push(...JSON.parse(content));
     }
 
     const verifiedAutomation: VerifiedAutomation | undefined = verified.find(
@@ -67,43 +67,51 @@ async function run() {
       automation: "❌",
     };
 
-    const indicator = statusIndicators[analysis.classification];
+    const indicator = hasCommunityFlag
+      ? statusIndicators["automation"]
+      : statusIndicators[analysis.classification];
     const details = getClassificationDetails(analysis.classification);
 
     await octokit.rest.issues.createComment({
       owner: context.repo.owner,
       repo: context.repo.repo,
       issue_number: prNumber,
-      body: `### ${indicator} ${details.label}
+      body: `### ${indicator} ${hasCommunityFlag ? "Flagged by community" : details.label}
 
 ${details.description}
-
-${hasCommunityFlag ? "This account has been flagged by the community" : ""}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 
 <sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`,
     });
 
-    // Add labels based on classification
-    if (analysis.classification !== "organic") {
+    // Add labels based on classification or community flag
+    const labelsToAdd: string[] = [];
+
+    if (hasCommunityFlag) {
+      labelsToAdd.push("agentscan:community-flagged");
+    } else if (analysis.classification !== "organic") {
       const labelMap: Record<
         Exclude<IdentityClassification, "organic">,
         string
       > = {
         mixed: "agentscan:mixed-signals",
-        automation: "agentscan:automation-signals",
+        automation: "agentscan:automated-account",
       };
 
       const label = labelMap[analysis.classification];
       if (label) {
-        await octokit.rest.issues.addLabels({
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          issue_number: prNumber,
-          labels: [label],
-        });
+        labelsToAdd.push(label);
       }
+    }
+
+    if (labelsToAdd.length > 0) {
+      await octokit.rest.issues.addLabels({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: prNumber,
+        labels: labelsToAdd,
+      });
     }
     core.info(`Comment posted on PR #${prNumber}`);
   } catch (error: unknown) {

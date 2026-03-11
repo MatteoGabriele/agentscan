@@ -19771,7 +19771,7 @@ async function run() {
 		const verified = [];
 		if ("content" in verifiedList) {
 			const content = Buffer.from(verifiedList.content, "base64").toString("utf-8");
-			verified.concat(JSON.parse(content));
+			verified.push(...JSON.parse(content));
 		}
 		const hasCommunityFlag = !!verified.find((account) => account.username === username);
 		const analysis = identifyReplicant({
@@ -19780,38 +19780,40 @@ async function run() {
 			createdAt: user.created_at,
 			events
 		});
-		const indicator = {
+		const statusIndicators = {
 			organic: "✅",
 			mixed: "⚠️",
 			automation: "❌"
-		}[analysis.classification];
+		};
+		const indicator = hasCommunityFlag ? statusIndicators["automation"] : statusIndicators[analysis.classification];
 		const details = getClassificationDetails(analysis.classification);
 		await octokit.rest.issues.createComment({
 			owner: context$2.repo.owner,
 			repo: context$2.repo.repo,
 			issue_number: prNumber,
-			body: `### ${indicator} ${details.label}
+			body: `### ${indicator} ${hasCommunityFlag ? "Flagged by community" : details.label}
 
 ${details.description}
-
-${hasCommunityFlag ? "This account has been flagged by the community" : ""}
 
 [View full analysis →](https://agentscan.netlify.app/user/${username})
 
 <sub>This is an automated analysis by [AgentScan](https://agentscan.netlify.app)</sub>`
 		});
-		if (analysis.classification !== "organic") {
+		const labelsToAdd = [];
+		if (hasCommunityFlag) labelsToAdd.push("agentscan:community-flagged");
+		else if (analysis.classification !== "organic") {
 			const label = {
 				mixed: "agentscan:mixed-signals",
-				automation: "agentscan:automation-signals"
+				automation: "agentscan:automated-account"
 			}[analysis.classification];
-			if (label) await octokit.rest.issues.addLabels({
-				owner: context$2.repo.owner,
-				repo: context$2.repo.repo,
-				issue_number: prNumber,
-				labels: [label]
-			});
+			if (label) labelsToAdd.push(label);
 		}
+		if (labelsToAdd.length > 0) await octokit.rest.issues.addLabels({
+			owner: context$2.repo.owner,
+			repo: context$2.repo.repo,
+			issue_number: prNumber,
+			labels: labelsToAdd
+		});
 		info(`Comment posted on PR #${prNumber}`);
 	} catch (error) {
 		if (error instanceof Error) setFailed(error.message);
