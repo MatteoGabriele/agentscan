@@ -18,7 +18,7 @@ function getFolder(folderName: "automation" | "organic") {
 }
 
 const automationFixtures = getFolder("automation");
-describe("idendity-replicant (automation)", () => {
+describe("identity-replicant (automation)", () => {
   it.each(automationFixtures)("analysis $1", (fixture) => {
     const identity = identifyReplicant({
       createdAt: fixture.user.created_at,
@@ -31,7 +31,7 @@ describe("idendity-replicant (automation)", () => {
 });
 
 const organicFixtures = getFolder("organic");
-describe("idendity-replicant (organic)", () => {
+describe("identity-replicant (organic)", () => {
   it.each(organicFixtures)("analysis $1", (fixture) => {
     const identity = identifyReplicant({
       createdAt: fixture.user.created_at,
