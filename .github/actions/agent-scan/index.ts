@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import * as cache from "@actions/cache";
 import { identifyReplicant } from "../../../shared/utils/voight-kampff-test/identify-replicant";
 import type {
   IdentifyReplicantResult,
@@ -14,41 +15,67 @@ async function run() {
     const octokit = github.getOctokit(token);
 
     const context = github.context;
-    const username = "niveshdandyan"; //context.actor;
+    const username = context.actor;
     const prNumber = context.payload.pull_request?.number;
 
     if (!prNumber) {
       throw new Error("No PR number found");
     }
 
-    const { data: user } = await octokit.rest.users.getByUsername({
-      username: username,
-    });
+    const today = new Date().toISOString().split("T")[0];
+    const cacheKey = `agentscan-${username}-v1-${today}`;
+    const cachePath = `/tmp/agentscan-cache-${username}.json`;
 
-    const { data: events } =
-      await octokit.rest.activity.listPublicEventsForUser({
-        username,
-        per_page: 100,
-        page: 1,
+    let user: any;
+    let events: any;
+    const restored = await cache.restoreCache([cachePath], cacheKey);
+
+    if (restored) {
+      core.info(`Cache hit for ${username}`);
+      const fs = await import("fs");
+      const cachedData = JSON.parse(fs.readFileSync(cachePath, "utf-8"));
+      user = cachedData.user;
+      events = cachedData.events;
+    } else {
+      core.info(`Cache miss for ${username}, fetching from GitHub API`);
+      const { data: userData } = await octokit.rest.users.getByUsername({
+        username: username,
       });
+      user = userData;
 
-    const { data: verifiedList } = await octokit.rest.repos.getContent({
-      owner: "matteogabriele",
-      repo: "agentscan",
-      path: "data/verified-automations-list.json",
-    });
+      const { data: eventsData } =
+        await octokit.rest.activity.listPublicEventsForUser({
+          username,
+          per_page: 100,
+          page: 1,
+        });
+      events = eventsData;
 
-    const verified: VerifiedAutomation[] = [];
-
-    if ("content" in verifiedList) {
-      const content = Buffer.from(verifiedList.content, "base64").toString(
-        "utf-8",
-      );
-
-      verified.push(...JSON.parse(content));
+      const fs = await import("fs");
+      fs.writeFileSync(cachePath, JSON.stringify({ user, events }, null, 2));
+      await cache.saveCache([cachePath], cacheKey);
     }
 
-    const verifiedAutomation: VerifiedAutomation | undefined = verified.find(
+    let verified: VerifiedAutomation[] = [];
+
+    try {
+      const { data: verifiedList } = await octokit.rest.repos.getContent({
+        owner: "matteogabriele",
+        repo: "agentscan",
+        path: "data/verified-automations-list.json",
+      });
+
+      if ("content" in verifiedList) {
+        const content = Buffer.from(verifiedList.content, "base64").toString(
+          "utf-8",
+        );
+        verified = JSON.parse(content);
+      }
+    } catch (error) {
+      core.warning("Could not fetch verified automations list");
+    }
+
+    const verifiedAutomation = verified.find(
       (account) => account.username === username,
     );
 

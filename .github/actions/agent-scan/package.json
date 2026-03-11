@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
+    "@actions/cache": "^6.0.0",
     "@actions/core": "^3.0.0",
     "@actions/github": "^9.0.0"
   },

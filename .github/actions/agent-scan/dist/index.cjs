@@ -25,6 +25,8 @@ let os = require("os");
 os = __toESM(os);
 let fs = require("fs");
 fs = __toESM(fs);
+let _actions_cache = require("@actions/cache");
+_actions_cache = __toESM(_actions_cache);
 //#region node_modules/@actions/core/lib/utils.js
 /**
 * Sanitizes an input into a string so it can be passed into issueCommand safely
@@ -15906,6 +15908,14 @@ function error(message, properties = {}) {
 	issueCommand("error", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 /**
+* Adds a warning issue
+* @param message warning issue message. Errors will be converted to string via toString()
+* @param properties optional properties to add to the annotation.
+*/
+function warning(message, properties = {}) {
+	issueCommand("warning", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+/**
 * Writes info to log with console.log.
 * @param message info message
 */
@@ -19754,24 +19764,48 @@ async function run() {
 	try {
 		const octokit = getOctokit(getInput("github-token", { required: true }));
 		const context$2 = context;
-		const username = "niveshdandyan";
+		const username = context$2.actor;
 		const prNumber = context$2.payload.pull_request?.number;
 		if (!prNumber) throw new Error("No PR number found");
-		const { data: user } = await octokit.rest.users.getByUsername({ username });
-		const { data: events } = await octokit.rest.activity.listPublicEventsForUser({
-			username,
-			per_page: 100,
-			page: 1
-		});
-		const { data: verifiedList } = await octokit.rest.repos.getContent({
-			owner: "matteogabriele",
-			repo: "agentscan",
-			path: "data/verified-automations-list.json"
-		});
-		const verified = [];
-		if ("content" in verifiedList) {
-			const content = Buffer.from(verifiedList.content, "base64").toString("utf-8");
-			verified.push(...JSON.parse(content));
+		const cacheKey = `agentscan-${username}-v1-${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}`;
+		const cachePath = `/tmp/agentscan-cache-${username}.json`;
+		let user;
+		let events;
+		if (await _actions_cache.restoreCache([cachePath], cacheKey)) {
+			info(`Cache hit for ${username}`);
+			const fs$1 = await import("fs");
+			const cachedData = JSON.parse(fs$1.readFileSync(cachePath, "utf-8"));
+			user = cachedData.user;
+			events = cachedData.events;
+		} else {
+			info(`Cache miss for ${username}, fetching from GitHub API`);
+			const { data: userData } = await octokit.rest.users.getByUsername({ username });
+			user = userData;
+			const { data: eventsData } = await octokit.rest.activity.listPublicEventsForUser({
+				username,
+				per_page: 100,
+				page: 1
+			});
+			events = eventsData;
+			(await import("fs")).writeFileSync(cachePath, JSON.stringify({
+				user,
+				events
+			}, null, 2));
+			await _actions_cache.saveCache([cachePath], cacheKey);
+		}
+		let verified = [];
+		try {
+			const { data: verifiedList } = await octokit.rest.repos.getContent({
+				owner: "matteogabriele",
+				repo: "agentscan",
+				path: "data/verified-automations-list.json"
+			});
+			if ("content" in verifiedList) {
+				const content = Buffer.from(verifiedList.content, "base64").toString("utf-8");
+				verified = JSON.parse(content);
+			}
+		} catch (error) {
+			warning("Could not fetch verified automations list");
 		}
 		const hasCommunityFlag = !!verified.find((account) => account.username === username);
 		const analysis = identifyReplicant({
