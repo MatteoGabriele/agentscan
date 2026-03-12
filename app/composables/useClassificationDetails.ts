@@ -1,9 +1,6 @@
 import { getClassificationDetails } from "voight-kampff-test";
 
-type ClassificationDetails = {
-  label: string;
-  description: string;
-};
+type ClassificationDetails = ReturnType<typeof getClassificationDetails>;
 
 export function useClassificationDetails(
   classification: MaybeRefOrGetter<IdentityClassification | undefined>,
