@@ -1,4 +1,4 @@
-import { identifyReplicant } from "~~/shared/utils/voight-kampff-test/identify-replicant";
+import { identifyReplicant } from "voight-kampff-test";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { formatUsername } from "~~/server/utils/format-username";

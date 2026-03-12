@@ -1,4 +1,4 @@
-import { getClassificationDetails } from "~~/shared/utils/voight-kampff-test/classification-details";
+import { getClassificationDetails } from "voight-kampff-test";
 
 type ClassificationDetails = {
   label: string;

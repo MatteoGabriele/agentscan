@@ -1,4 +1,4 @@
-import type { VerifiedAutomation } from "~~/server/api/verified-automations.get";
+import type { VerifiedAutomation } from "~~/shared/types/automation";
 
 export function useVerifiedAutomations() {
   return useLazyAsyncData("verified-list", async () => {

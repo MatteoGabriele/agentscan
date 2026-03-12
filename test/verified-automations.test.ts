@@ -1,5 +1,6 @@
 import { expect, describe, it, beforeEach, afterEach, vi } from "vitest";
-import { identifyReplicant } from "../shared/utils/voight-kampff-test/identify-replicant";
+import { identifyReplicant } from "voight-kampff-test";
+
 import fs from "fs";
 import path from "path";
 
