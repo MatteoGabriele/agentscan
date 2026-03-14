@@ -22,5 +22,11 @@
     "reason": "Confirmed AI agent based on comment patterns and communication style consistent with LLM-generated responses",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/13",
     "createdAt": "2026-03-04"
+  },
+  {
+    "username": "aniruddhaadak80",
+    "reason": "Heavy automation usage creating spam PRs across multiple repositories within a short timeframe, following a long period of inactivity",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/25",
+    "createdAt": "2026-03-14"
   }
 ]
