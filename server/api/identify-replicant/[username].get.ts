@@ -48,12 +48,21 @@ export default defineEventHandler(async (event) => {
     const octokit = new Octokit({ auth: config.githubToken });
     const formattedUsername = formatUsername(username);
 
-    const { data: events } =
-      await octokit.rest.activity.listPublicEventsForUser({
-        username: formattedUsername,
-        per_page: 100,
-        page: 1,
-      });
+    const pages = [];
+    const PER_PAGE = 100;
+
+    for (let index = 0; index < 2; index++) {
+      pages.push(
+        octokit.rest.activity.listPublicEventsForUser({
+          username: formattedUsername,
+          per_page: PER_PAGE,
+          page: index + 1,
+        }),
+      );
+    }
+
+    const pagesData = await Promise.all(pages);
+    const events = pagesData.flatMap((pageData) => pageData.data);
 
     return {
       analysis: identifyReplicant({
