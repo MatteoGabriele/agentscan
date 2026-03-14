@@ -1,0 +1,10 @@
+[[plugins]]
+  package = "@netlify/plugin-rate-limit"
+
+  [plugins.inputs]
+    # Rate limit for API endpoints
+    [[plugins.inputs.rateLimits]]
+      windowSize = 60  # seconds
+      windowLimit = 20  # requests per window
+      aggregateBy = "ip"
+      paths = ["/api/*"]
