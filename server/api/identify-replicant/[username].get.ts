@@ -2,7 +2,9 @@ import { GitHubEvent, identifyReplicant } from "voight-kampff-test";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { formatUsername } from "~~/server/utils/format-username";
-import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
+
+const MIN_PAGES = 1;
+const MAX_PAGES = 2;
 
 const QuerySchema = v.object({
   created_at: v.pipe(
@@ -20,7 +22,8 @@ const QuerySchema = v.object({
   pages: v.pipe(
     v.number("pages must be a number"),
     v.integer("pages must be an integer"),
-    v.minValue(0, "pages must be a non-negative integer"),
+    v.minValue(MIN_PAGES, "pages must be at least 1"),
+    v.maxValue(MAX_PAGES, `pages must be equal or less than ${MAX_PAGES}`),
   ),
 });
 
@@ -55,16 +58,14 @@ export default defineEventHandler(async (event) => {
     const octokit = new Octokit({ auth: config.githubToken });
     const formattedUsername = formatUsername(username);
 
-    const pageRequests = Array.from(
-      { length: parsedQuery.output.pages },
-      (_, index) => {
-        return octokit.rest.activity.listPublicEventsForUser({
-          username: formattedUsername,
-          per_page: 100,
-          page: index + 1,
-        });
-      },
-    );
+    const validatedPages = Math.min(parsedQuery.output.pages, MAX_PAGES);
+    const pageRequests = Array.from({ length: validatedPages }, (_, index) => {
+      return octokit.rest.activity.listPublicEventsForUser({
+        username: formattedUsername,
+        per_page: 100,
+        page: index + 1,
+      });
+    });
 
     const responses = await Promise.all(pageRequests);
     const events = responses.flatMap((response) => response.data);
