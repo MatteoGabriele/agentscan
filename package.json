@@ -28,7 +28,6 @@
     "@iconify-json/carbon": "^1.2.18",
     "@octokit/types": "^16.0.0",
     "@unocss/nuxt": "^66.6.0",
-    "unocss": "^66.6.0",
-    "vitest": "^4.0.18"
+    "unocss": "^66.6.0"
   }
 }

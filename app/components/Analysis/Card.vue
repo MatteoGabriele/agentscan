@@ -14,6 +14,7 @@ const { data, status, error } = useFetch(
     query: {
       created_at: props.user.created_at,
       repos_count: props.user.public_repos,
+      pages: 2,
     },
     key: analysisKey,
     watch: [username],
@@ -149,7 +150,8 @@ useSeoAnalysis(identifyAnalysis, {
               class="underline"
               :to="`https://api.github.com/users/${username}/events?per_page=100`"
             >
-              events</NuxtLink>
+              events</NuxtLink
+            >
             from this account
           </p>
         </div>
