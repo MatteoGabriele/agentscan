@@ -98,6 +98,15 @@ const classificationIcon = computed<string>(() => {
   return "i-carbon:meter-alt";
 });
 
+const flagAccountUrl = computed<string>(() => {
+  const baseUrl = "https://github.com/MatteoGabriele/agentscan/issues/new";
+  const params = new URLSearchParams({
+    template: "report-automated-account.md",
+    title: `add verified automated account - ${username.value}`,
+  });
+  return `${baseUrl}?${params.toString()}`;
+});
+
 const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
   return data.value?.analysis;
 });
@@ -179,6 +188,20 @@ useSeoAnalysis(identifyAnalysis, {
               View issue
             </NuxtLink>
           </footer>
+        </section>
+
+        <section v-else class="mt-4 pt-4 border-t border-gh-border-light">
+          <p class="text-gh-muted text-sm">
+            Have thoughts about this account? Let the community know.
+          </p>
+          <NuxtLink
+            :to="flagAccountUrl"
+            target="_blank"
+            external
+            class="underline inline text-xs"
+          >
+            Share your thoughts
+          </NuxtLink>
         </section>
       </div>
     </div>
