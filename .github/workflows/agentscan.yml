@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: AgentScan
         uses: MatteoGabriele/agentscan-action@v1.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
