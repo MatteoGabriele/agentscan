@@ -1,6 +1,6 @@
 # AgentScan
 
-An open experiment in detecting automation patterns on GitHub
+An open experiment in detecting automation patterns on GitHub.
 
 ## Why this?
 
