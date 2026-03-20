@@ -2,7 +2,11 @@ name: AgentScan
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
 
 jobs:
   agentscan:
