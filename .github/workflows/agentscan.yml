@@ -1,0 +1,13 @@
+name: AgentScan
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  agentscan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: AgentScan
+        uses: MatteoGabriele/agentscan-action@v1.0.1
