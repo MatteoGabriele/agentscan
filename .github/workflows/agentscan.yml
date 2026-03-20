@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, reopened]
 
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   agentscan:
     runs-on: ubuntu-latest
@@ -11,3 +15,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: AgentScan
         uses: MatteoGabriele/agentscan-action@v1.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
