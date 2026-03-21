@@ -14,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: AgentScan
-        uses: MatteoGabriele/agentscan-action@v1.0.1
+        uses: MatteoGabriele/agentscan-action@v1.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-members: "matteogabriele"
