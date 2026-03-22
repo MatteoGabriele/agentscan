@@ -1,7 +1,7 @@
 name: AgentScan
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
 
 permissions:
@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: AgentScan
-        uses: MatteoGabriele/agentscan-action@v1.0.1
+        uses: MatteoGabriele/agentscan-action@v1.3.0-beta.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-members: "matteogabriele"
+          cache: true
