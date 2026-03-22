@@ -13,9 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Cache AgentScan analysis
+        uses: actions/cache@v4
+        with:
+          path: .agentscan-cache
+          key: agentscan-cache-${{ github.actor }}
+          restore-keys: agentscan-cache-
       - name: AgentScan
-        uses: MatteoGabriele/agentscan-action@v1.3.0-beta.1
+        uses: MatteoGabriele/agentscan-action@v1.3.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-members: "matteogabriele"
-          cache: true
+          cache-path: ".agentscan-cache"
