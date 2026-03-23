@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import packageJson from "voight-kampff-test/package.json";
+
+const voightKampffVersion = packageJson.version;
+</script>
 
 <template>
   <footer
@@ -97,8 +101,21 @@
       </div>
 
       <div
-        class="border-t border-gh-border/50 mt-6 pt-6 mt-6 flex items-center justify-center"
+        class="border-t border-gh-border/50 mt-6 pt-6 flex flex-col md:items-center md:justify-center gap-4"
       >
+        <div class="flex gap-2">
+          <span class="text-xs text-gh-muted/60">Detection using</span>
+          <NuxtLink
+            external
+            target="_blank"
+            to="https://github.com/MatteoGabriele/voight-kampff-test"
+            class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+            :title="`voight-kampff-test v${voightKampffVersion}`"
+          >
+            voight-kampff-test v{{ voightKampffVersion }}
+          </NuxtLink>
+        </div>
+
         <NuxtLink
           to="/privacy-policy"
           class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
