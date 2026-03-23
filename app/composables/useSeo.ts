@@ -1,3 +1,5 @@
+import { getClassificationDetails } from "voight-kampff-test";
+
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
   const ogTitle = computed<string | undefined>(() => {
     const userValue = toValue(user);
@@ -58,12 +60,13 @@ export function useSeoAnalysis(
 
     if (toValue(options?.hasCommunityFlag)) {
       descriptions.push(`Flagged by the community`);
+    } else {
+      const details = getClassificationDetails(analysisValue.classification);
+      descriptions.push(details.label);
     }
 
     if (flagsCounter > 0) {
-      descriptions.push(
-        `Has ${flagsCounter} flag${flagsCounter === 1 ? "" : "s"}`,
-      );
+      descriptions.push(`${flagsCounter} flag${flagsCounter === 1 ? "" : "s"}`);
     }
 
     if (descriptions.length === 0) {
