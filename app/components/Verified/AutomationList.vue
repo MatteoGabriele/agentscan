@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import dayjs from "dayjs";
-
 const { data, pending } = useVerifiedAutomations();
 
 const recentAutomations = computed<VerifiedAutomation[]>(() => {
   const items = data.value ?? [];
-  return items
-    .toSorted((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
-    .slice(0, 3);
+  return items.toReversed().slice(0, 3);
 });
 </script>
 
