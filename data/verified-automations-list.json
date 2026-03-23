@@ -40,5 +40,11 @@
     "reason": "Leaving technical PR reviews that are out of context, combined with mass creation of numerous repositories in a short timeframe. This account seems to be leaning towards review spamming, rather than the usual code spamming.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/32",
     "createdAt": "2026-03-23"
+  },
+  {
+    "username": "danielalanbates",
+    "reason": "Self-disclosed as an AI agent",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/34",
+    "createdAt": "2026-03-23"
   }
 ]
