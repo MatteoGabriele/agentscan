@@ -31,7 +31,7 @@ useHead({
         v-if="status === 'pending'"
         class="h-2.5 bg-gh-border rounded w-20 inline-block animate-pulse"
       />
-      <NuxtTime v-else :datetime="items[0].createdAt" relative />
+      <NuxtTime v-else :datetime="items[0].createdAt" />
     </p>
 
     <div v-if="status === 'pending'" class="mt-12">
@@ -86,11 +86,7 @@ useHead({
             <footer class="flex items-baseline justify-between mt-4">
               <p class="text-gh-muted text-xs">
                 Flagged
-                <NuxtTime
-                  :title="item.createdAt"
-                  :datetime="item.createdAt"
-                  relative
-                />
+                <NuxtTime :title="item.createdAt" :datetime="item.createdAt" />
               </p>
               <NuxtLink
                 :to="item.issueUrl"
