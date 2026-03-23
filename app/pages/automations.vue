@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import dayjs from "dayjs";
-
 const { data, status, error } = useVerifiedAutomations();
 
 const items = computed(() => {
-  const items = data.value ?? [];
-  return items.toSorted((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)));
+  return data.value?.toReversed() ?? [];
 });
 
 useHead({
