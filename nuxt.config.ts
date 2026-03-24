@@ -61,7 +61,6 @@ export default defineNuxtConfig({
     },
 
     "/privacy-policy": { prerender: true },
-    "/automations": { prerender: true },
 
     "/api/account/**": {
       cache: {
