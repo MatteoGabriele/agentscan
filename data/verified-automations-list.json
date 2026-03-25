@@ -46,5 +46,17 @@
     "reason": "Anomalous commit history showing contributions dating 38 years before GitHub's existence, combined with a suspicious spike of 1600 contributions in a single day, indicating automated mass commit generation.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/35",
     "createdAt": "2026-03-23"
+  },
+  {
+    "username": "ashelythompson72-cloud",
+    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/37",
+    "createdAt": "2026-03-25"
+  },
+  {
+    "username": "rayb64680-ui",
+    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/38",
+    "createdAt": "2026-03-25"
   }
 ]
