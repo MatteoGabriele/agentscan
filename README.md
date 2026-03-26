@@ -16,6 +16,10 @@ The scoring is not bulletproof. Sophisticated automated accounts can pass undete
 
 **This is an ongoing experiment.** Scores may be inaccurate. Use them as a starting point, not a conclusion.
 
+## GitHub Action
+
+AgentScan is also available as a [GitHub Action](https://github.com/MatteoGabriele/agentscan-action) that you can integrate directly into your workflows. The action analyzes pull request authors' activity patterns and automatically detects automation signals within your GitHub environment. It can post comments on PRs, assign labels, and provide analysis data.
+
 ## Reporting an automated account
 
 If you've found a GitHub account you believe is automated, you can submit it for review.

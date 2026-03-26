@@ -58,23 +58,15 @@ const voightKampffVersion = packageJson.version;
                 to="https://github.com/matteogabriele/agentscan"
                 class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
               >
-                GitHub Repository
+                AgentScan
               </NuxtLink>
               <NuxtLink
                 external
                 target="_blank"
-                to="https://github.com/matteogabriele/agentscan/issues"
+                to="https://github.com/matteogabriele/agentscan-action"
                 class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
               >
-                Report Issues
-              </NuxtLink>
-              <NuxtLink
-                external
-                target="_blank"
-                to="https://github.com/matteogabriele/agentscan/blob/main/README.md"
-                class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
-              >
-                Documentation
+                AgentScan GitHub Action
               </NuxtLink>
             </div>
           </div>
