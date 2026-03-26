@@ -2,7 +2,7 @@
 name: Share Community Feedback
 about: Help the community evaluate if an account is automated
 title: "Community discussion: "
-labels: automated-account
+labels: automation
 ---
 
 **GitHub username:**
