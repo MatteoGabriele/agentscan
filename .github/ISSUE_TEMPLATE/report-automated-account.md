@@ -5,18 +5,10 @@ title: "Community discussion: "
 labels: automated-account
 ---
 
-## GitHub Username
+**GitHub username:**
 
-<!-- Replace this with the suspected automated account username (without the @) -->
+**What are your thoughts about this account:**
 
-## Reason
+**Supporting evidence (links, screenshots):**
 
-<!-- Provide a clear, concise explanation of why you believe this is an automated account -->
-
-## Evidence
-
-<!-- Add links, screenshots, or other supporting evidence -->
-
-## Additional Context (Optional)
-
-<!-- Any other relevant information -->
+**Any additional context:**
