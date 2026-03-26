@@ -161,7 +161,7 @@ jobs:
       - name: Find or create pull request
         id: pr
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH_NAME="${{ steps.check_branch.outputs.branch_name }}"
           USERNAME="${{ steps.parse_issue.outputs.username }}"
@@ -202,7 +202,7 @@ jobs:
 
       - name: Comment on issue with PR link
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
