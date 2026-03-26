@@ -24,11 +24,17 @@ jobs:
           ISSUE_BODY="${{ github.event.issue.body }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
 
-          # Extract GitHub username (content between "## GitHub Username" and next section)
-          USERNAME=$(echo "$ISSUE_BODY" | sed -n '/^## GitHub Username/,/^##/p' | sed '1d;$d' | xargs)
+          # Extract GitHub username
+          USERNAME=$(echo "$ISSUE_BODY" | grep -A1 "^**GitHub username:**" | tail -1 | xargs)
 
-          # Extract reason (content between "## Reason" and next section)
-          REASON=$(echo "$ISSUE_BODY" | sed -n '/^## Reason/,/^##/p' | sed '1d;$d' | xargs)
+          # Extract reason (handle multi-line)
+          REASON=$(echo "$ISSUE_BODY" | sed -n '/^**What are your thoughts about this account:/,/^**/p' | sed '1d;$d' | xargs)
+
+          # Create the issue URL
+          ISSUE_URL="https://github.com/${{ github.repository }}/issues/$ISSUE_NUMBER"
+
+          # Create today's date in YYYY-MM-DD format
+          CREATED_AT=$(date -u +%Y-%m-%d)
 
           # Validate that we have required fields
           if [ -z "$USERNAME" ] || [ -z "$REASON" ]; then
