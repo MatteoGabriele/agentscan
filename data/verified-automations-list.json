@@ -1,62 +1,68 @@
 [
   {
-    "username": "kaigritun",
-    "reason": "Self-disclosed as an AI agent",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/10",
-    "createdAt": "2026-03-03"
-  },
-  {
-    "username": "crabby-rathbun",
-    "reason": "Published a disparaging article targeting an open-source maintainer after a rejected PR; the agent was later terminated by its owner.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/11",
-    "createdAt": "2026-03-03"
-  },
-  {
-    "username": "echo931",
-    "reason": "Account publicly describes itself as an AI agent in Bluesky message.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/12",
-    "createdAt": "2026-03-03"
-  },
-  {
-    "username": "niveshdandyan",
-    "reason": "Confirmed AI agent based on comment patterns and communication style consistent with LLM-generated responses",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/13",
-    "createdAt": "2026-03-04"
-  },
-  {
-    "username": "aniruddhaadak80",
-    "reason": "Heavy automation usage creating spam PRs across multiple repositories within a short timeframe, following a long period of inactivity",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/25",
-    "createdAt": "2026-03-14"
-  },
-  {
-    "username": "jozrftamson",
-    "reason": "Suspected bot with sudden mass forking of repos. Submits PRs without descriptions, no responses to comments or community engagement",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/30",
-    "createdAt": "2026-03-22"
-  },
-  {
-    "username": "danielalanbates",
-    "reason": "Self-disclosed as an AI agent",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/34",
-    "createdAt": "2026-03-23"
-  },
-  {
-    "username": "buley",
-    "reason": "Anomalous commit history showing contributions dating 38 years before GitHub's existence, combined with a suspicious spike of 1600 contributions in a single day, indicating automated mass commit generation.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/35",
-    "createdAt": "2026-03-23"
-  },
-  {
-    "username": "ashelythompson72-cloud",
-    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/37",
-    "createdAt": "2026-03-25"
-  },
-  {
-    "username": "rayb64680-ui",
-    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "createdAt": "2026-03-25",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/38",
-    "createdAt": "2026-03-25"
+    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "username": "rayb64680-ui"
+  },
+  {
+    "createdAt": "2026-03-25",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/37",
+    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "username": "ashelythompson72-cloud"
+  },
+  {
+    "createdAt": "2026-03-23",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/35",
+    "reason": "Anomalous commit history showing contributions dating 38 years before GitHub's existence, combined with a suspicious spike of 1600 contributions in a single day, indicating automated mass commit generation.",
+    "username": "buley"
+  },
+  {
+    "createdAt": "2026-03-23",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/34",
+    "reason": "Self-disclosed as an AI agent",
+    "username": "danielalanbates"
+  },
+  {
+    "createdAt": "2026-03-22",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/30",
+    "reason": "Suspected bot with sudden mass forking of repos. Submits PRs without descriptions, no responses to comments or community engagement",
+    "username": "jozrftamson"
+  },
+  {
+    "createdAt": "2026-03-14",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/25",
+    "reason": "Heavy automation usage creating spam PRs across multiple repositories within a short timeframe, following a long period of inactivity",
+    "username": "aniruddhaadak80"
+  },
+  {
+    "createdAt": "2026-03-04",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/13",
+    "reason": "Confirmed AI agent based on comment patterns and communication style consistent with LLM-generated responses",
+    "username": "niveshdandyan"
+  },
+  {
+    "createdAt": "2026-03-03",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/12",
+    "reason": "Account publicly describes itself as an AI agent in Bluesky message.",
+    "username": "echo931"
+  },
+  {
+    "createdAt": "2026-03-03",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/11",
+    "reason": "Published a disparaging article targeting an open-source maintainer after a rejected PR; the agent was later terminated by its owner.",
+    "username": "crabby-rathbun"
+  },
+  {
+    "createdAt": "2026-03-03",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/10",
+    "reason": "Self-disclosed as an AI agent",
+    "username": "kaigritun"
+  },
+  {
+    "createdAt": "",
+    "issueUrl": "",
+    "reason": "test 123",
+    "username": "test-bot-2"
   }
 ]
