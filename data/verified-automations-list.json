@@ -1,27 +1,27 @@
 [
   {
     "createdAt": "2026-03-25",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/38",
-    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
-    "username": "rayb64680-ui"
-  },
-  {
-    "createdAt": "2026-03-25",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/37",
     "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
     "username": "ashelythompson72-cloud"
   },
   {
-    "createdAt": "2026-03-23",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/35",
-    "reason": "Anomalous commit history showing contributions dating 38 years before GitHub's existence, combined with a suspicious spike of 1600 contributions in a single day, indicating automated mass commit generation.",
-    "username": "buley"
+    "createdAt": "2026-03-25",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/38",
+    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "username": "rayb64680-ui"
   },
   {
     "createdAt": "2026-03-23",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/34",
     "reason": "Self-disclosed as an AI agent",
     "username": "danielalanbates"
+  },
+  {
+    "createdAt": "2026-03-23",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/35",
+    "reason": "Anomalous commit history showing contributions dating 38 years before GitHub's existence, combined with a suspicious spike of 1600 contributions in a single day, indicating automated mass commit generation.",
+    "username": "buley"
   },
   {
     "createdAt": "2026-03-22",
@@ -43,9 +43,9 @@
   },
   {
     "createdAt": "2026-03-03",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/12",
-    "reason": "Account publicly describes itself as an AI agent in Bluesky message.",
-    "username": "echo931"
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/10",
+    "reason": "Self-disclosed as an AI agent",
+    "username": "kaigritun"
   },
   {
     "createdAt": "2026-03-03",
@@ -55,9 +55,9 @@
   },
   {
     "createdAt": "2026-03-03",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/10",
-    "reason": "Self-disclosed as an AI agent",
-    "username": "kaigritun"
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/12",
+    "reason": "Account publicly describes itself as an AI agent in Bluesky message.",
+    "username": "echo931"
   },
   {
     "createdAt": "",
