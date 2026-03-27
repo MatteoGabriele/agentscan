@@ -70,5 +70,11 @@
     "reason": "Submits numerous PRs with auto-generated code and descriptions without engaging with maintainers or responding to feedback.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/40",
     "createdAt": "2026-03-26"
+  },
+  {
+    "username": "sudabg",
+    "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/44",
+    "createdAt": "2026-03-27"
   }
 ]
