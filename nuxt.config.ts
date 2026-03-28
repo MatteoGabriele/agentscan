@@ -40,6 +40,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     githubToken: "",
+    geminiApiKey: "",
   },
 
   css: ["~/assets/main.css"],
