@@ -23,5 +23,5 @@ jobs:
         uses: MatteoGabriele/agentscan-action@v1.3.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          skip-members: "matteogabriele"
+          skip-members: "MatteoGabriele"
           cache-path: ".agentscan-cache"
