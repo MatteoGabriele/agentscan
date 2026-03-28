@@ -184,7 +184,7 @@ export default defineEventHandler(async (event) => {
         ## Return JSON Format (MUST be valid JSON only)
         \`\`\`json
         {
-          "score": number (0-100, overall humanness assessment),
+          "score": number (0-100),
           "classification": "organic" | "mixed" | "automation",
           "flags": [
             {
@@ -206,6 +206,7 @@ export default defineEventHandler(async (event) => {
         - Provide specific evidence in details (actual counts, timeframes, observed behaviors)
         - Return ONLY valid JSON - no markdown, no extra text
         - Include at least one flag per classification (if suspicious/mixed/automation)
+        - If an unexpected pattern emerges requiring a new label, use human-readable format (e.g., "Unusual coordination pattern") instead of snake_case (e.g., "unusual_coordination_pattern")
 
         Be precise. Focus on evidence-based assessment, not fixed rubrics.`;
       const userPrompt = `Here is the data to analyze: ${compactedData}`;
