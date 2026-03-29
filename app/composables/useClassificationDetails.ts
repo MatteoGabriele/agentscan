@@ -1,4 +1,4 @@
-import { getClassificationDetails } from "voight-kampff-test";
+import { getClassificationDetails } from "@unveil/identity";
 
 type ClassificationDetails = ReturnType<typeof getClassificationDetails>;
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import packageJson from "voight-kampff-test/package.json";
+import packageJson from "@unveil/identity/package.json";
 
-const voightKampffVersion = packageJson.version;
+const unveilIdentityVersion = packageJson.version;
 </script>
 
 <template>
@@ -100,11 +100,11 @@ const voightKampffVersion = packageJson.version;
           <NuxtLink
             external
             target="_blank"
-            to="https://github.com/MatteoGabriele/voight-kampff-test"
+            to="https://github.com/unveil-project/identity"
             class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
-            :title="`voight-kampff-test v${voightKampffVersion}`"
+            :title="`@unveil/identity v${unveilIdentityVersion}`"
           >
-            voight-kampff-test v{{ voightKampffVersion }}
+            @unveil/identity v{{ unveilIdentityVersion }}
           </NuxtLink>
         </div>
 

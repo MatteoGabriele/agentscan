@@ -16,12 +16,13 @@
     "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@unocss/preset-icons": "^66.6.0",
+    "@unveil/compactor": "^1.0.0",
+    "@unveil/identity": "^1.0.0",
     "@vueuse/core": "^14.2.1",
     "dayjs": "^1.11.19",
     "nuxt": "^4.3.1",
     "octokit": "^5.0.5",
     "valibot": "^1.2.0",
-    "voight-kampff-test": "^2.5.0",
     "vue": "^3.5.28",
     "vue-router": "^4.6.4"
   },
@@ -29,7 +30,6 @@
     "@iconify-json/carbon": "^1.2.18",
     "@octokit/types": "^16.0.0",
     "@unocss/nuxt": "^66.6.0",
-    "unocss": "^66.6.0",
-    "voight-kampff-compactor": "^1.0.0"
+    "unocss": "^66.6.0"
   }
 }

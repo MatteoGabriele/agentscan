@@ -1,9 +1,9 @@
-import { identifyReplicant, IdentifyReplicantResult } from "voight-kampff-test";
+import { identify, IdentifyResult } from "@unveil/identity";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { formatUsername } from "~~/server/utils/format-username";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { compactor } from "voight-kampff-compactor";
+import { compactor } from "@unveil/compactor";
 
 const MIN_PAGES = 1;
 const MAX_PAGES = 1;
@@ -251,7 +251,7 @@ export default defineEventHandler(async (event) => {
         const textContent = result.response.text();
 
         return {
-          analysis: JSON.parse(textContent) as IdentifyReplicantResult,
+          analysis: JSON.parse(textContent) as IdentifyResult,
           eventsCount: events.length,
         };
       } catch (aiError: unknown) {
@@ -261,7 +261,7 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      analysis: identifyReplicant({
+      analysis: identify({
         accountName: formattedUsername,
         reposCount: parsedQuery.output.repos_count,
         createdAt: parsedQuery.output.created_at,
