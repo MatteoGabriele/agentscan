@@ -7,6 +7,7 @@ import { compactor } from "voight-kampff-compactor";
 
 const MIN_PAGES = 1;
 const MAX_PAGES = 1;
+const ITEMS_PER_PAGE = 100;
 
 const QuerySchema = v.object({
   ai: v.optional(v.boolean(), false),
@@ -66,7 +67,7 @@ export default defineEventHandler(async (event) => {
     const pageRequests = Array.from({ length: validatedPages }, (_, index) => {
       return octokit.rest.activity.listPublicEventsForUser({
         username: formattedUsername,
-        per_page: 100,
+        per_page: ITEMS_PER_PAGE,
         page: index + 1,
       });
     });
@@ -231,6 +232,7 @@ export default defineEventHandler(async (event) => {
         - Return ONLY valid JSON - no markdown, no extra text
         - Include at least one flag per classification (if suspicious/mixed/automation)
         - If an unexpected pattern emerges requiring a new label, use human-readable format (e.g., "Unusual coordination pattern") instead of snake_case (e.g., "unusual_coordination_pattern")
+        - NOTE: Events are limited to the most recent ${ITEMS_PER_PAGE * MAX_PAGES} public events from the GitHub API. This is NOT the user's complete activity history — draw conclusions accordingly and avoid absolute statements about total activity.
 
         Be precise, realistic, and evidence-based. Short bursts = automation. Do not be lenient.`;
       const userPrompt = `Here is the data to analyze: ${compactedData}`;
