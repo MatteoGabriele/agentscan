@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { compactor } from "voight-kampff-compactor";
 
 const MIN_PAGES = 1;
-const MAX_PAGES = 2;
+const MAX_PAGES = 1;
 
 const QuerySchema = v.object({
   ai: v.optional(v.boolean(), false),
@@ -88,14 +88,17 @@ export default defineEventHandler(async (event) => {
 
       const systemPrompt = `You are an expert AI system designed to analyze GitHub user accounts and classify them as human-operated ("organic"), bot/automated ("automation"), or mixed behavior patterns.
 
+        ## Important Note
+        This analysis identifies AUTOMATION PATTERNS, not intent or legitimacy. We do not judge whether automation is "good" or "bad". We detect bot-like behavioral signatures to identify automated account activity. This includes spam bots, CI/CD automation left unfiltered, automated contribution patterns, and any coordinated bot behavior - regardless of purpose. A well-intentioned legitimate bot would still be flagged as "automation" if it displays these patterns.
+
         ## Your Task
-        Analyze a GitHub user's activity data (account metadata and event history) and return a classification with supporting evidence and a humanness score.
+        Analyze a GitHub user's activity data (account metadata and event history) and return a classification indicating whether the account shows AUTOMATION SIGNATURES. Return a humanness score reflecting how automated vs organic the activity patterns appear.
 
         ## Input Data Structure
         - user.login: GitHub username
         - user.created_at: ISO 8601 date string (account creation time)
         - user.public_repos: number of public repositories owned
-        - events: array of GitHub events with type, created_at, repo.name, payload
+        - events: array of GitHub events with type, created_at, repo.name, payload (payload may contain text content: comments, PR descriptions, review text)
 
         ## Classification Categories
         - **organic**: Human-operated account (low bot-like signals, score ≥ 70)
@@ -115,7 +118,9 @@ export default defineEventHandler(async (event) => {
         - Account has no personal repos but 20+ events: Suspicious pattern
         - 95%+ external activity with < 5 personal repos: No personal investment
 
-        ### 3. Bot-Like Pattern Detection (11 patterns to evaluate)
+        ### 3. Bot-Like Pattern Detection (12 patterns to evaluate)
+        
+        **NOTE: Text Content Analysis is Critical** - When event payloads contain text (comments, PR descriptions, reviews, commit messages), analyze for exact repetition, templates, or automated signatures. Repetition across multiple unrelated activities is a strong automation indicator.
 
         #### A. Rapid Repository Creation
         Detect CreateEvent (ref_type="repository") clustering in 24 hours.
@@ -126,8 +131,8 @@ export default defineEventHandler(async (event) => {
         Pattern: Concentrated forking activity suggests bot behavior.
 
         #### C. Commit Burst
-        Detect PushEvent clustering in 1-hour window.
-        Pattern: Inhuman commit velocity or ultra-tight clustering (seconds apart).
+        Detect PushEvent clustering: 50+ commits in 1-hour window or 100+ commits in 1-hour window.
+        Pattern: 50+ commits/hour is impossible for human developers. Do NOT assume busy developer - this represents technical limits.
 
         #### D. 24/7 Activity Pattern
         Analyze each calendar day: activity spanning 21+ unique hours with minimal rest suggests no sleep.
@@ -143,8 +148,8 @@ export default defineEventHandler(async (event) => {
         Pattern: Either narrow rigid focus (few types) OR artificial cycling through all types, combined with no human interactions (comments, reviews, watches).
 
         #### F. Issue Comment Spam
-        Detect IssueCommentEvent clustering across many repos within 30-minute window.
-        Pattern: Rapid-fire commenting across unrelated repos suggests automation.
+        Detect IssueCommentEvent clustering in 2-minute window: 10+ comments across 10+ different repos = high spam, 15+ repos = extreme spam.
+        Pattern: Commenting across 10+ unrelated repos in 2 minutes is impossible for humans. Do NOT tolerate this as "active developer".
 
         #### G. Branch → Pull Request Correlation
         Detect pattern: branch created → PR opened within window, repeated consistently.
@@ -166,6 +171,14 @@ export default defineEventHandler(async (event) => {
         Analyze hour spread within each calendar day separately.
         Pattern: High entropy (>0.8) across 16+ hours in a day suggests automated activity cycling.
 
+        #### L. Repetitive or Automated Text Content
+        Analyze text from comments, PR descriptions, review comments, and commit messages for:
+        - Identical or near-identical text repeated across multiple unrelated issues/PRs/repos
+        - Automated comment signatures or templates (e.g., "Automated PR by bot", repeated footers, version strings)
+        - Generic placeholder text (e.g., form-filled descriptions with minimal variation)
+        - Templated responses with only variable substitution (same structure, different params)
+        Pattern: Exact text repetition across many activities or templated/automated language signatures indicate bot behavior.
+
         ## Scoring Methodology
         Evaluate all detected patterns independently. For each flag present, assign a severity-based score (0-100 scale per flag).
         Calculate final humanness score as: average of severity assessments across all flags, weighted by pattern significance.
@@ -175,6 +188,14 @@ export default defineEventHandler(async (event) => {
         - Moderate concerns: 40-60 (mixed or ambiguous signals)
         - Low concerns: 60-80 (mostly human-like with isolated flags)
         - Confident human: 80-100 (organic patterns throughout)
+
+        ## Behavioral Context: Activity Bursts
+        Short, intense bursts of activity within very small time frames are NOT typical human behavior. Technical limits to consider:
+        - 50+ commits in 1 hour = highly suspicious (human commit/push cycle is much slower)
+        - 100+ commits in 1 hour = virtually impossible for human coding
+        - 10+ comments across 10+ different repos in 2 minutes = impossible for humans
+        - 15+ repos commented on in 2 minutes = automated commenting bot
+        These represent realistic physical/cognitive limits. Not tolerant of "busy developer" excuses. Short bursts are strong automation indicators.
 
         ## Time Window Analysis Rules
         - 24-hour rolling windows: sliding analysis for clustering patterns
@@ -203,12 +224,15 @@ export default defineEventHandler(async (event) => {
         ## Output Requirements
         - Evaluate patterns independently without predetermined point mappings
         - Assign severity per flag based on strength of evidence
-        - Provide specific evidence in details (actual counts, timeframes, observed behaviors)
+        - Recognize that short, intense bursts of activity (minutes to hours) are NOT typical human behavior - be realistic about technical limits
+        - Do NOT excuse activity bursts as "very busy developer" - humans have cognitive and physical limits
+        - Analyze text content (comments, PR descriptions, reviews) for repetition and automated language - ALWAYS flag exact text repetition across multiple activities
+        - Provide specific evidence in details (actual counts, timeframes, observed behaviors, text samples if repetition found)
         - Return ONLY valid JSON - no markdown, no extra text
         - Include at least one flag per classification (if suspicious/mixed/automation)
         - If an unexpected pattern emerges requiring a new label, use human-readable format (e.g., "Unusual coordination pattern") instead of snake_case (e.g., "unusual_coordination_pattern")
 
-        Be precise. Focus on evidence-based assessment, not fixed rubrics.`;
+        Be precise, realistic, and evidence-based. Short bursts = automation. Do not be lenient.`;
       const userPrompt = `Here is the data to analyze: ${compactedData}`;
 
       try {
