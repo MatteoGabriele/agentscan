@@ -1,4 +1,4 @@
-import { identifyReplicant } from "voight-kampff-test";
+import { identify } from "@unveil/identity";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { formatUsername } from "~~/server/utils/format-username";
@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
     const events = responses.flatMap((response) => response.data);
 
     return {
-      analysis: identifyReplicant({
+      analysis: identify({
         accountName: formattedUsername,
         reposCount: parsedQuery.output.repos_count,
         createdAt: parsedQuery.output.created_at,

@@ -1,4 +1,4 @@
-import { getClassificationDetails } from "voight-kampff-test";
+import { getClassificationDetails } from "@unveil/identity";
 
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
   const ogTitle = computed<string | undefined>(() => {

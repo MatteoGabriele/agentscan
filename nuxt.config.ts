@@ -9,7 +9,7 @@ export default defineNuxtConfig({
         "@vue/devtools-core",
         "@vue/devtools-kit",
         "dayjs", // CJS
-        "voight-kampff-test",
+        "@unveil/identity",
         "@vueuse/core",
       ],
     },
