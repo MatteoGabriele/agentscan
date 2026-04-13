@@ -88,5 +88,17 @@
     "reason": "Suspected Open Claw bot: 45 PRs submitted to Biome's repository within 24 hours.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/47",
     "createdAt": "2026-03-29"
+  },
+  {
+    "username": "faithmckinely-alt",
+    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/48",
+    "createdAt": "2026-04-13"
+  },
+  {
+    "username": "slegarraga",
+    "reason": "Suspected bot with no human involvement creating PRs in projects like Nuxt and PrivateBin",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/49",
+    "createdAt": "2026-04-13"
   }
 ]
