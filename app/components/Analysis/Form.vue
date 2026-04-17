@@ -7,12 +7,16 @@ const accountName = defineModel<string>({
   default: "",
 });
 
-function handleSubmit() {
-  if (!accountName.value) {
+function submit(value: string) {
+  if (!value) {
     return;
   }
 
-  emit("submit", accountName.value.toLowerCase());
+  emit("submit", value.toLowerCase());
+}
+
+function handleSubmit() {
+  submit(accountName.value);
 }
 
 const inputRef = useTemplateRef("inputRef");
@@ -20,6 +24,10 @@ function clear() {
   accountName.value = "";
   inputRef.value?.focus();
 }
+
+usePaste(inputRef, (pasted) => {
+  submit(pasted);
+});
 </script>
 
 <template>
