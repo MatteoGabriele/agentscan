@@ -36,8 +36,11 @@ useSeoUser(user);
   <AnalysisForm :model-value="username" @submit="handleSubmit" />
 
   <div class="flex flex-col gap-6 @container">
-    <UserCard v-if="user" :user />
-    <UserCardError v-else-if="error" :error />
-    <AnalysisCard v-if="user" :user />
+    <template v-if="user">
+      <UserCard :user />
+      <AnalysisCard :user />
+    </template>
+
+    <UserCardError v-else-if="error" :error :username />
   </div>
 </template>
