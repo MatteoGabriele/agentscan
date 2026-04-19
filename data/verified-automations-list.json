@@ -100,5 +100,11 @@
     "reason": "Suspected bot with no human involvement creating PRs in projects like Nuxt and PrivateBin",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/49",
     "createdAt": "2026-04-13"
+  },
+  {
+    "username": "avasis-ai",
+    "reason": "Shows obvious indicators of an automated account. The profile also links to a service that deploys automated agents via repository submission.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/51",
+    "createdAt": "2026-04-19"
   }
 ]
