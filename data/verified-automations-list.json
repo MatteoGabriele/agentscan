@@ -106,5 +106,11 @@
     "reason": "Shows obvious indicators of an automated account. The profile also links to a service that deploys automated agents via repository submission.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/51",
     "createdAt": "2026-04-19"
+  },
+  {
+    "username": "hammadxcm",
+    "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/52",
+    "createdAt": "2026-04-19"
   }
 ]
