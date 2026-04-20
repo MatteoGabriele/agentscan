@@ -97,7 +97,7 @@
   },
   {
     "username": "slegarraga",
-    "reason": "Suspected bot with no human involvement creating PRs in projects like Nuxt and PrivateBin",
+    "reason": "Suspected bot with no human involvement creating PRs in projects like Nuxt and PrivateBin.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/49",
     "createdAt": "2026-04-13"
   },
@@ -109,8 +109,26 @@
   },
   {
     "username": "hammadxcm",
-    "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository",
+    "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/52",
     "createdAt": "2026-04-19"
+  },
+  {
+    "username": "nova-openclawagent",
+    "reason": "Confirmed AI agent based on its name, comment patterns and communication style consistent with LLM-generated responses.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/55",
+    "createdAt": "2026-04-21"
+  },
+  {
+    "username": "MukundaKatta",
+    "reason": "It exhibits several indicators of an automated account: minimal activity, a sudden spike in commits and PRs, over 100 repositories created within a few days, and more than 800 commits across 200+ projects in less than a month.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/54",
+    "createdAt": "2026-04-21"
+  },
+  {
+    "username": "lawrence3699",
+    "reason": "It shows many signs of an automated account. Almost no activity, a sudden surge of commits and PRs, and over 100 repositories created in 2 days.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/53",
+    "createdAt": "2026-04-21"
   }
 ]
