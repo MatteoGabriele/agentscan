@@ -78,7 +78,7 @@
     "createdAt": "2026-03-27"
   },
   {
-    "username": "SuperNovaRobot",
+    "username": "supernovarobot",
     "reason": "Self-disclosed as an AI agent.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/45",
     "createdAt": "2026-03-28"
@@ -120,7 +120,7 @@
     "createdAt": "2026-04-21"
   },
   {
-    "username": "MukundaKatta",
+    "username": "mukundakatta",
     "reason": "It exhibits several indicators of an automated account: minimal activity, a sudden spike in commits and PRs, over 100 repositories created within a few days, and more than 800 commits across 200+ projects in less than a month.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/54",
     "createdAt": "2026-04-21"
