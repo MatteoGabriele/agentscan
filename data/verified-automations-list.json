@@ -156,5 +156,12 @@
     "reason": "It follows the classic pattern of a dormant account suddenly showing a surge in commits, pull requests, and newly created external repositories.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/59",
     "createdAt": "2026-04-21"
+  },
+  {
+    "username": "georgephillips",
+    "id": 435107,
+    "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/57",
+    "createdAt": "2026-04-21"
   }
 ]
