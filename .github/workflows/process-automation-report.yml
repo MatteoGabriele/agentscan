@@ -9,7 +9,7 @@ jobs:
     if: contains(github.event.issue.labels.*.name, 'automation')
     runs-on: ubuntu-latest
     permissions:
-      issues: read
+      issues: write
       pull-requests: write
       contents: write
 

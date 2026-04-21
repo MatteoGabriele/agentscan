@@ -19,18 +19,18 @@ function parseIssueBody(body: string): Partial<AutomationEntry> {
   // Form fields are presented as "### Field Name\n\nValue"
 
   // Extract GitHub Username
-  const usernameMatch = body.match(/### GitHub Username\s*\n\n(.+?)(?:\n|$)/);
+  const usernameMatch = body.match(/### GitHub Username\s*\n+\s*(.+?)(?:\n|$)/);
   const username = usernameMatch?.[1]?.trim();
 
   // Extract GitHub User ID
-  const idMatch = body.match(/### GitHub User ID\s*\n\n(\d+)/);
+  const idMatch = body.match(/### GitHub User ID\s*\n+\s*(\d+)/);
   const id = idMatch ? parseInt(idMatch[1], 10) : undefined;
 
-  // Extract Reason
+  // Extract Reason - stop at the next ### or end of string
   const reasonMatch = body.match(
-    /### Why do you believe this is an automated account\?\s*\n\n([\s\S]*?)(?:\n### |\n\*\*|$)/,
+    /### Why do you believe this is an automated account\?\s*\n+\s*([\s\S]*?)(?:\n+### |\n+_No|$)/,
   );
-  const reason = reasonMatch?.[1]?.trim();
+  const reason = reasonMatch?.[1]?.trim().split("\n\n")[0];
 
   return {
     username,
@@ -122,6 +122,14 @@ async function main() {
   console.log("🔍 Parsing automation report...\n");
 
   const parsed = parseIssueBody(issueBody);
+
+  // Debug output
+  console.log("DEBUG - Parsed values:");
+  console.log(`  username: "${parsed.username}"`);
+  console.log(`  id: ${parsed.id}`);
+  console.log(`  reason: "${parsed.reason?.substring(0, 60)}..."`);
+  console.log("");
+
   const entry = generateEntry(parsed, issueUrl || "", createdAt);
 
   if (!validateEntry(entry)) {
