@@ -33,16 +33,21 @@ jobs:
             '$(date -u +%Y-%m-%d)' \
           || (echo "Parse failed" && exit 1)
 
+      - name: Configure git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
       - name: Create Pull Request
         if: success()
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore: add verified automation entry"
-          title: "Add verified automation: ${{ github.event.issue.title }}"
-          body: |
-            Automated submission from ${{ github.event.issue.html_url }}
-
-            This PR adds a new entry to the verified automations list based on the submitted issue.
-          branch: automation/add-${{ github.event.issue.number }}
-          delete-branch: true
-          labels: automation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout -b automation/add-${{ github.event.issue.number }}
+          git add data/verified-automations-list.json
+          git commit -m "chore: add verified automation entry"
+          git push origin automation/add-${{ github.event.issue.number }}
+          gh pr create \
+            --title "Add verified automation: ${{ github.event.issue.title }}" \
+            --body "Automated submission from ${{ github.event.issue.html_url }}" \
+            --label automation
