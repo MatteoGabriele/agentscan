@@ -149,5 +149,12 @@
     "reason": "It shows many signs of an automated account. Almost no activity, a sudden surge of commits and PRs, and over 100 repositories created in 2 days.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/53",
     "createdAt": "2026-04-21"
+  },
+  {
+    "username": "barry3406",
+    "id": 100205797,
+    "reason": "It follows the classic pattern of a dormant account suddenly showing a surge in commits, pull requests, and newly created external repositories.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/59",
+    "createdAt": "2026-04-21"
   }
 ]
