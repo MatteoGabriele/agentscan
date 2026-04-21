@@ -163,5 +163,12 @@
     "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/57",
     "createdAt": "2026-04-21"
+  },
+  {
+    "username": "mixelburg",
+    "id": 52622705,
+    "reason": "Clear use of automations, exhibiting the classic dormant pattern: a sudden burst of activity followed by PR spam. It has been seen once, even opening a PR with 1M lines of added lines.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/62",
+    "createdAt": "2026-04-21"
   }
 ]
