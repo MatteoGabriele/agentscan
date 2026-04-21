@@ -50,13 +50,10 @@ jobs:
 
           git checkout -b "$BRANCH_NAME"
           git add data/verified-automations-list.json
-          git commit -m "chore: add verified automation entry
-
-Closes #${{ github.event.issue.number }}"
+          git commit -m "chore: add verified automation entry" -m "Closes #${{ github.event.issue.number }}"
           git push origin "$BRANCH_NAME"
           gh pr create \
             --title "Add verified automation: ${{ github.event.issue.title }}" \
-            --body "Automated submission from ${{ github.event.issue.html_url }}
-
-Please review and approve to merge this verified automation entry." \
+            --body "Automated submission from ${{ github.event.issue.html_url }}" \
+            --body "Please review and approve to merge this verified automation entry." \
             --label automation
