@@ -1,0 +1,63 @@
+name: Process Automation Report
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  process-report:
+    if: contains(github.event.issue.labels.*.name, 'automation')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      pull-requests: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Parse issue and generate entry
+        id: parse
+        run: |
+          npx tsx scripts/parse-automation-issue.ts \
+            '${{ github.event.issue.body }}' \
+            '${{ github.event.issue.html_url }}' \
+            '$(date -u +%Y-%m-%d)'
+
+      - name: Create Pull Request
+        if: success()
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "chore: add verified automation entry"
+          title: "Add verified automation: ${{ github.event.issue.title }}"
+          body: |
+            Automated submission from ${{ github.event.issue.html_url }}
+
+            This PR adds a new entry to the verified automations list based on the submitted issue.
+          branch: automation/add-${{ github.event.issue.number }}
+          delete-branch: true
+          labels: automation
+
+      - name: Comment on issue if parsing failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Failed to process this report. Please check:\n\n**Required fields:**\n- GitHub Username\n- GitHub User ID (must be numeric)\n- Reason (max 200 characters and will be displayed publicly)\n\n**Reason tips:**\n- Keep it under 200 characters\n- Be factual and concise\n- Examples: "Self-disclosed as an AI agent" or "Heavy automation usage creating spam PRs"\n\nPlease edit the issue and reopen it or create a new one with the corrections.'
+            })
