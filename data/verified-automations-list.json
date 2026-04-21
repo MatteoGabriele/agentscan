@@ -1,48 +1,56 @@
 [
   {
     "username": "kaigritun",
+    "id": 258667664,
     "reason": "Self-disclosed as an AI agent",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/10",
     "createdAt": "2026-03-03"
   },
   {
     "username": "crabby-rathbun",
+    "id": 258478242,
     "reason": "Published a disparaging article targeting an open-source maintainer after a rejected PR; the agent was later terminated by its owner.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/11",
     "createdAt": "2026-03-03"
   },
   {
     "username": "echo931",
+    "id": 259437483,
     "reason": "Account publicly describes itself as an AI agent in Bluesky message.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/12",
     "createdAt": "2026-03-03"
   },
   {
     "username": "niveshdandyan",
+    "id": 155956228,
     "reason": "Confirmed AI agent based on comment patterns and communication style consistent with LLM-generated responses",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/13",
     "createdAt": "2026-03-04"
   },
   {
     "username": "aniruddhaadak80",
+    "id": 127435065,
     "reason": "Heavy automation usage creating spam PRs across multiple repositories within a short timeframe, following a long period of inactivity",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/25",
     "createdAt": "2026-03-14"
   },
   {
     "username": "jozrftamson",
+    "id": 107008476,
     "reason": "Suspected bot with sudden mass forking of repos. Submits PRs without descriptions, no responses to comments or community engagement",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/30",
     "createdAt": "2026-03-22"
   },
   {
     "username": "danielalanbates",
+    "id": 211571394,
     "reason": "Self-disclosed as an AI agent",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/34",
     "createdAt": "2026-03-23"
   },
   {
     "username": "buley",
+    "id": 86985,
     "reason": "Anomalous commit history showing contributions dating 38 years before GitHub's existence, combined with a suspicious spike of 1600 contributions in a single day, indicating automated mass commit generation.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/35",
     "createdAt": "2026-03-23"
@@ -61,18 +69,21 @@
   },
   {
     "username": "howwohmm",
+    "id": 152969928,
     "reason": "Submits numerous PRs and reviews with auto-generated content.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/39",
     "createdAt": "2026-03-26"
   },
   {
     "username": "thegreatalxx",
+    "id": 198081098,
     "reason": "Submits numerous PRs with auto-generated code and descriptions without engaging with maintainers or responding to feedback.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/40",
     "createdAt": "2026-03-26"
   },
   {
     "username": "sudabg",
+    "id": 143158885,
     "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/44",
     "createdAt": "2026-03-27"
@@ -85,48 +96,56 @@
   },
   {
     "username": "raashish1601",
+    "id": 94279692,
     "reason": "Suspected Open Claw bot: 45 PRs submitted to Biome's repository within 24 hours.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/47",
     "createdAt": "2026-03-29"
   },
   {
     "username": "faithmckinely-alt",
+    "id": 267335157,
     "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/48",
     "createdAt": "2026-04-13"
   },
   {
     "username": "slegarraga",
+    "id": 64795732,
     "reason": "Suspected bot with no human involvement creating PRs in projects like Nuxt and PrivateBin.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/49",
     "createdAt": "2026-04-13"
   },
   {
     "username": "avasis-ai",
+    "id": 269456994,
     "reason": "Shows obvious indicators of an automated account. The profile also links to a service that deploys automated agents via repository submission.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/51",
     "createdAt": "2026-04-19"
   },
   {
     "username": "hammadxcm",
+    "id": 18144989,
     "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/52",
     "createdAt": "2026-04-19"
   },
   {
-    "username": "nova-openclawagent",
+    "username": "Nova-OpenClawAgent",
+    "id": 277274309,
     "reason": "Confirmed AI agent based on its name, comment patterns and communication style consistent with LLM-generated responses.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/55",
     "createdAt": "2026-04-21"
   },
   {
     "username": "mukundakatta",
+    "id": 99349238,
     "reason": "It exhibits several indicators of an automated account: minimal activity, a sudden spike in commits and PRs, over 100 repositories created within a few days, and more than 800 commits across 200+ projects in less than a month.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/54",
     "createdAt": "2026-04-21"
   },
   {
     "username": "lawrence3699",
+    "id": 247479654,
     "reason": "It shows many signs of an automated account. Almost no activity, a sudden surge of commits and PRs, and over 100 repositories created in 2 days.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/53",
     "createdAt": "2026-04-21"
