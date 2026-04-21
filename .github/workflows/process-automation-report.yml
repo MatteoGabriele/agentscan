@@ -55,5 +55,5 @@ jobs:
           gh pr create \
             --title "Add verified automation: ${{ github.event.issue.title }}" \
             --body "Automated submission from ${{ github.event.issue.html_url }}" \
-            --body "Please review and approve to merge this verified automation entry." \
+            --body "This entry has been automatically validated and formatted. Ready for merge." \
             --label automation
