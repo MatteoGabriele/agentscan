@@ -30,7 +30,7 @@ jobs:
           npx tsx scripts/parse-automation-issue.ts \
             '${{ github.event.issue.body }}' \
             '${{ github.event.issue.html_url }}' \
-            '$(date -u +%Y-%m-%d)' \
+            $(date -u +%Y-%m-%d) \
           || (echo "Parse failed" && exit 1)
 
       - name: Configure git
