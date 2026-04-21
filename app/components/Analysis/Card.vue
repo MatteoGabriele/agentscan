@@ -25,9 +25,9 @@ const { data, status, error } = useFetch(
 const { data: verifiedAutomations } = useVerifiedAutomations();
 
 const verifiedAutomation = computed(() => {
-  return verifiedAutomations.value?.find(
-    (account) => account.username === username.value,
-  );
+  return verifiedAutomations.value?.find((account) => {
+    return account.username === username.value || account.id === props.user.id;
+  });
 });
 
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value);
