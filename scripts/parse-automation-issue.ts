@@ -18,19 +18,27 @@ function parseIssueBody(body: string): Partial<AutomationEntry> {
   // Parse GitHub form template format
   // Form fields are presented as "### Field Name\n\nValue"
 
-  // Extract GitHub Username
-  const usernameMatch = body.match(/### GitHub Username\s*\n+\s*(.+?)(?:\n|$)/);
+  // Extract GitHub Username - single line value
+  const usernameMatch = body.match(
+    /### GitHub Username\s*\n+\s*(.+?)\s*(?:\n|$)/,
+  );
   const username = usernameMatch?.[1]?.trim();
 
-  // Extract GitHub User ID
-  const idMatch = body.match(/### GitHub User ID\s*\n+\s*(\d+)/);
+  // Extract GitHub User ID - numeric value
+  const idMatch = body.match(/### GitHub User ID\s*\n+\s*(\d+)\s*(?:\n|$)/);
   const id = idMatch ? parseInt(idMatch[1], 10) : undefined;
 
-  // Extract Reason - stop at the next ### or end of string
+  // Extract Reason - capture until next ### or end of string
   const reasonMatch = body.match(
-    /### Why do you believe this is an automated account\?\s*\n+\s*([\s\S]*?)(?:\n+### |\n+_No|$)/,
+    /### Why do you believe this is an automated account\?\s*\n+\s*([\s\S]*?)(?:\n{1,}### |$)/,
   );
-  const reason = reasonMatch?.[1]?.trim().split("\n\n")[0];
+
+  // Take first paragraph only (stop at double newline or ### marker)
+  let reason = reasonMatch?.[1]?.trim();
+  if (reason) {
+    // Split by double newline and take first paragraph
+    reason = reason.split(/\n\s*\n/)[0].trim();
+  }
 
   return {
     username,

@@ -30,7 +30,8 @@ jobs:
           npx tsx scripts/parse-automation-issue.ts \
             '${{ github.event.issue.body }}' \
             '${{ github.event.issue.html_url }}' \
-            '$(date -u +%Y-%m-%d)' || exit 1
+            '$(date -u +%Y-%m-%d)' \
+          || (echo "Parse failed" && exit 1)
 
       - name: Create Pull Request
         if: success()
@@ -45,16 +46,3 @@ jobs:
           branch: automation/add-${{ github.event.issue.number }}
           delete-branch: true
           labels: automation
-
-      - name: Comment on issue if parsing failed
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '❌ Failed to process this report. Please check:\n\n**Required fields:**\n- GitHub Username\n- GitHub User ID (must be numeric)\n- Reason (max 200 characters and will be displayed publicly)\n\n**Reason tips:**\n- Keep it under 200 characters\n- Be factual and concise\n- Examples: "Self-disclosed as an AI agent" or "Heavy automation usage creating spam PRs"\n\nPlease edit the issue and reopen it or create a new one with the corrections.'
-            })
