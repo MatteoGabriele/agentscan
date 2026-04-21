@@ -43,10 +43,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git checkout -b automation/add-${{ github.event.issue.number }}
+          BRANCH_NAME="automation/add-${{ github.event.issue.number }}"
+
+          # Delete remote branch if it exists
+          git push origin --delete "$BRANCH_NAME" 2>/dev/null || true
+
+          git checkout -b "$BRANCH_NAME"
           git add data/verified-automations-list.json
           git commit -m "chore: add verified automation entry"
-          git push origin automation/add-${{ github.event.issue.number }}
+          git push origin "$BRANCH_NAME"
           gh pr create \
             --title "Add verified automation: ${{ github.event.issue.title }}" \
             --body "Automated submission from ${{ github.event.issue.html_url }}" \
