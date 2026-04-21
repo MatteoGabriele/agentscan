@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * Parse automation report issues and generate JSON entries
  * Usage: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url]
@@ -60,12 +61,6 @@ function validateEntry(
   }
   if (!entry.reason || typeof entry.reason !== "string") {
     console.error("✗ Missing or invalid reason");
-    return false;
-  }
-  if (entry.reason.length > 200) {
-    console.error(
-      `✗ Reason is too long (${entry.reason.length} chars, max 200). Please be more concise.`,
-    );
     return false;
   }
   if (!entry.issueUrl || typeof entry.issueUrl !== "string") {
