@@ -26,7 +26,10 @@ const { data: verifiedAutomations } = useVerifiedAutomations();
 
 const verifiedAutomation = computed(() => {
   return verifiedAutomations.value?.find((account) => {
-    return account.username === username.value || account.id === props.user.id;
+    return (
+      account.username.toLowerCase() === username.value?.toLowerCase() ||
+      account.id === props.user.id
+    );
   });
 });
 
