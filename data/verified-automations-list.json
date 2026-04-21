@@ -177,5 +177,12 @@
     "reason": "Clear use of automations, exhibiting the classic pattern: a sudden burst of activity followed by fork spam. Created 33 forks and 23 PRs, all directed to multiple projects, within the same day.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/64",
     "createdAt": "2026-04-21"
+  },
+  {
+    "username": "vincent067",
+    "id": 10589818,
+    "reason": "Clear use of automations, exhibiting the classic pattern: a sudden burst of activity followed by fork and PR spam.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/66",
+    "createdAt": "2026-04-21"
   }
 ]
