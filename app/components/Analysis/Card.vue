@@ -104,8 +104,10 @@ const classificationIcon = computed<string>(() => {
 const flagAccountUrl = computed<string>(() => {
   const baseUrl = "https://github.com/MatteoGabriele/agentscan/issues/new";
   const params = new URLSearchParams({
-    template: "report-automated-account.md",
-    title: `Community discussion: ${username.value}`,
+    template: "report-automated-account.yml",
+    title: `[AUTOMATION] ${username.value}`,
+    username: username.value || "",
+    "user-id": props.user.id.toString(),
   });
   return `${baseUrl}?${params.toString()}`;
 });
