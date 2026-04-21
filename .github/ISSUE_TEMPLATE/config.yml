@@ -1,0 +1,7 @@
+contact_links:
+  - name: Join Discussions
+    url: https://github.com/MatteoGabriele/agentscan/discussions
+    about: "Ask questions, share ideas, or get help"
+  - name: View Contributing Guidelines
+    url: https://github.com/MatteoGabriele/agentscan/blob/main/CONTRIBUTING.md
+    about: "Learn how to contribute to this project"

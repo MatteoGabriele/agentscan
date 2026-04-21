@@ -23,7 +23,6 @@ body:
       label: GitHub User ID
       description: "The numeric user ID. Find it at https://api.github.com/users/USERNAME (look for the 'id' field)"
       placeholder: "258667664"
-      type: number
     validations:
       required: true
 
