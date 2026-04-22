@@ -7,11 +7,11 @@ const items = computed(() => {
 });
 
 const fuzzySearch = (query: string, text: string): boolean => {
-  const q = query.toLowerCase();
+  const queryTrimmed = query.toLowerCase();
   let textIndex = 0;
 
-  for (let i = 0; i < q.length; i++) {
-    textIndex = text.toLowerCase().indexOf(q[i] ?? "", textIndex);
+  for (let i = 0; i < queryTrimmed.length; i++) {
+    textIndex = text.toLowerCase().indexOf(queryTrimmed[i] ?? "", textIndex);
     if (textIndex === -1) return false;
     textIndex++;
   }
@@ -20,9 +20,13 @@ const fuzzySearch = (query: string, text: string): boolean => {
 };
 
 const filteredItems = computed(() => {
-  if (!search.value.trim()) return items.value;
+  const query = search.value.trim();
 
-  return items.value.filter((item) => fuzzySearch(search.value, item.username));
+  if (!query) {
+    return items.value;
+  }
+
+  return items.value.filter((item) => fuzzySearch(query, item.username));
 });
 
 definePageMeta({
