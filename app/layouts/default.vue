@@ -47,7 +47,7 @@ const isHomePage = computed<boolean>(() => route.name === "index");
 
   <div class="flex flex-col">
     <main
-      class="max-w-screen-sm mx-auto px-4 py-20 @container w-full min-h-screen flex flex-col"
+      class="max-w-screen-md mx-auto px-4 py-20 @container w-full min-h-screen flex flex-col"
       :class="{ 'justify-center': isHomePage }"
     >
       <MainLogo :heading-level="isHomePage ? 'h1' : 'h2'" />

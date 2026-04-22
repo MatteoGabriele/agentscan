@@ -1,9 +1,10 @@
 <script setup lang="ts">
 const { data, pending } = useVerifiedAutomations();
 
+const MAX_VISIBLE = 10;
 const recentAutomations = computed<VerifiedAutomation[]>(() => {
   const items = data.value ?? [];
-  return items.toReversed().slice(0, 3);
+  return items.toReversed().slice(0, MAX_VISIBLE);
 });
 </script>
 
@@ -18,7 +19,7 @@ const recentAutomations = computed<VerifiedAutomation[]>(() => {
     <div class="flex flex-wrap items-center justify-center gap-2">
       <template v-if="pending">
         <div
-          v-for="i in 3"
+          v-for="i in MAX_VISIBLE"
           :key="`skeleton-${i}`"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gh-border/40"
         >
