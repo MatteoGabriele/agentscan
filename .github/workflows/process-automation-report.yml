@@ -48,16 +48,16 @@ jobs:
           GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
         run: |
           set -x  # Enable debug output
-          
+
           BRANCH_NAME="automation/add-${{ github.event.issue.number }}"
           ISSUE_NUMBER=${{ github.event.issue.number }}
-          
+
           echo "=== Starting PR creation workflow ==="
           echo "Branch: $BRANCH_NAME"
           echo "Issue: #$ISSUE_NUMBER"
           echo "Git user: $(git config --global user.name)"
           echo "Git email: $(git config --global user.email)"
-          
+
           # Check if branch already exists
           echo ""
           echo "=== Checking for existing branch ==="
@@ -76,7 +76,7 @@ jobs:
           echo "=== Staging and committing changes ==="
           git add data/verified-automations-list.json
           git status
-          
+
           # Only commit if there are changes
           if git diff --staged --quiet; then
             echo "No changes to commit"
@@ -102,7 +102,7 @@ jobs:
             echo "No existing PR found, creating new one..."
             PR_BODY="Automated submission from ${{ github.event.issue.html_url }}
 
-This entry has been automatically validated and formatted. Ready for merge."
+            This entry has been automatically validated and formatted. Ready for merge."
             echo "PR Title: Add verified automation: ${{ github.event.issue.title }}"
             echo "PR Body: $PR_BODY"
             
@@ -116,6 +116,6 @@ This entry has been automatically validated and formatted. Ready for merge."
             gh pr reopen "$PR_NUMBER" 2>/dev/null || echo "PR is already open"
             echo "Updated existing PR #$PR_NUMBER"
           fi
-          
+
           echo ""
           echo "=== Workflow complete ==="
