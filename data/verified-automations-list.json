@@ -191,5 +191,12 @@
     "reason": "Self-identified automated account that opens pull requests across repositories, claiming security improvements, but has spammed over 260 projects with more than 360 PRs.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/73",
     "createdAt": "2026-04-27"
+  },
+  {
+    "username": "selenaalpha77-sketch",
+    "id": 270539812,
+    "reason": "Creating over a hundred spam PRs in a single repo within a 24h timespan with clearly no human oversight.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/76",
+    "createdAt": "2026-04-27"
   }
 ]
