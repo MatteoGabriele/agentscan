@@ -75,10 +75,12 @@ jobs:
 
           if [ -z "$PR_NUMBER" ]; then
             # Create new PR if it doesn't exist
+            PR_BODY="Automated submission from ${{ github.event.issue.html_url }}
+
+            This entry has been automatically validated and formatted. Ready for merge."
             gh pr create \
               --title "Add verified automation: ${{ github.event.issue.title }}" \
-              --body "Automated submission from ${{ github.event.issue.html_url }}" \
-              --body "This entry has been automatically validated and formatted. Ready for merge." \
+              --body "$PR_BODY" \
               --label automation
           else
             # PR already exists, just ensure it's open
