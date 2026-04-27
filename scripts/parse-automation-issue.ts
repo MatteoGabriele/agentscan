@@ -19,19 +19,18 @@ function parseIssueBody(body: string): Partial<AutomationEntry> {
   // Parse GitHub form template format
   // Form fields are presented as "### Field Name\n\nValue"
 
-  // Extract GitHub Username - single line value
-  const usernameMatch = body.match(
-    /### GitHub Username\s*\n+\s*(.+?)\s*(?:\n|$)/,
-  );
+  // Extract GitHub Username - single line value, trim and clean
+  const usernameMatch = body.match(/###\s+GitHub Username\s*\n+\s*([^\n]+)/);
   const username = usernameMatch?.[1]?.trim();
 
   // Extract GitHub User ID - numeric value
-  const idMatch = body.match(/### GitHub User ID\s*\n+\s*(\d+)\s*(?:\n|$)/);
+  const idMatch = body.match(/###\s+GitHub User ID\s*\n+\s*(\d+)/);
   const id = idMatch ? parseInt(idMatch[1], 10) : undefined;
 
   // Extract Reason - capture until next ### or end of string
+  // More flexible matching that handles various whitespace and line patterns
   const reasonMatch = body.match(
-    /### Why do you believe this is an automated account\?\s*\n+\s*([\s\S]*?)(?:\n{1,}### |$)/,
+    /###\s+Why do you believe this is an automated account\?\s*\n+([\s\S]*?)(?:\n\s*###|$)/,
   );
 
   // Take first paragraph only (stop at double newline or ### marker)
@@ -39,6 +38,8 @@ function parseIssueBody(body: string): Partial<AutomationEntry> {
   if (reason) {
     // Split by double newline and take first paragraph
     reason = reason.split(/\n\s*\n/)[0].trim();
+    // Clean up any remaining special characters or excessive whitespace
+    reason = reason.replace(/\s+/g, " ");
   }
 
   return {

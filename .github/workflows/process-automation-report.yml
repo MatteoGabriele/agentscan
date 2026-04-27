@@ -44,7 +44,7 @@ jobs:
           GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
         run: |
           BRANCH_NAME="automation/add-${{ github.event.issue.number }}"
-          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          ISSUE_NUMBER=${{ github.event.issue.number }}
 
           # Check if branch already exists
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
@@ -59,7 +59,7 @@ jobs:
 
           # Stage and commit changes
           git add data/verified-automations-list.json
-          
+
           # Only commit if there are changes
           if git diff --staged --quiet; then
             echo "No changes to commit"
