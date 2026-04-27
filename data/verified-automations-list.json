@@ -184,5 +184,12 @@
     "reason": "The account appears to rely heavily on automated PR reviews, and it also appears to spam PRs on Biome.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/68",
     "createdAt": "2026-04-21"
+  },
+  {
+    "username": "orbisai0security",
+    "id": 242526317,
+    "reason": "Self-identified automated account that opens pull requests across repositories, claiming security improvements, but has spammed over 260 projects with more than 360 PRs.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/73",
+    "createdAt": "2026-04-27"
   }
 ]
