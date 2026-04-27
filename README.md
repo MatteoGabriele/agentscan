@@ -24,7 +24,7 @@ AgentScan is also available as a [GitHub Action](https://github.com/MatteoGabrie
 
 If you've found a GitHub account you believe is automated, you can submit it for review.
 
-1. [Open an issue](https://github.com/you/agentscan/issues/new?template=report-automated-account.md) using the report template
+1. [Open an issue](https://github.com/MatteoGabriele/agentscan/issues/new?template=report-automated-account.md) using the report template
 2. Include the GitHub username, your reasoning, and any supporting evidence
 3. A maintainer will review the account manually
 4. If confirmed, the account will be added to the verified list via a pull request
