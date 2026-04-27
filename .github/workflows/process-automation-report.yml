@@ -47,47 +47,75 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
         run: |
+          set -x  # Enable debug output
+          
           BRANCH_NAME="automation/add-${{ github.event.issue.number }}"
           ISSUE_NUMBER=${{ github.event.issue.number }}
-
+          
+          echo "=== Starting PR creation workflow ==="
+          echo "Branch: $BRANCH_NAME"
+          echo "Issue: #$ISSUE_NUMBER"
+          echo "Git user: $(git config --global user.name)"
+          echo "Git email: $(git config --global user.email)"
+          
           # Check if branch already exists
+          echo ""
+          echo "=== Checking for existing branch ==="
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
-            # Branch exists, check out and update it
-            git fetch origin "$BRANCH_NAME"
-            git checkout "$BRANCH_NAME"
-            git rebase origin/main || git merge origin/main
+            echo "Branch exists, checking out and updating..."
+            git fetch origin "$BRANCH_NAME" || { echo "Fetch failed"; exit 1; }
+            git checkout "$BRANCH_NAME" || { echo "Checkout failed"; exit 1; }
+            git rebase origin/main || git merge origin/main || { echo "Rebase/merge failed"; exit 1; }
           else
-            # Branch doesn't exist, create it
-            git checkout -b "$BRANCH_NAME"
+            echo "Branch does not exist, creating new one..."
+            git checkout -b "$BRANCH_NAME" || { echo "Branch creation failed"; exit 1; }
           fi
 
           # Stage and commit changes
+          echo ""
+          echo "=== Staging and committing changes ==="
           git add data/verified-automations-list.json
-
+          git status
+          
           # Only commit if there are changes
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: add verified automation entry" -m "Closes #$ISSUE_NUMBER" || true
+            echo "Committing changes..."
+            git commit -m "chore: add verified automation entry" -m "Closes #$ISSUE_NUMBER" || { echo "Commit failed"; exit 1; }
+            echo "Commit successful"
           fi
 
           # Push to remote
-          git push origin "$BRANCH_NAME" --force-with-lease
+          echo ""
+          echo "=== Pushing to remote ==="
+          git push origin "$BRANCH_NAME" --force-with-lease || { echo "Push failed"; exit 1; }
+          echo "Push successful"
 
           # Check if PR already exists for this branch
-          PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --state all --json number -q '.[0].number' || echo "")
+          echo ""
+          echo "=== Checking for existing PR ==="
+          PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --state all --json number -q '.[0].number' 2>/dev/null || echo "")
+          echo "PR_NUMBER result: '$PR_NUMBER'"
 
           if [ -z "$PR_NUMBER" ]; then
-            # Create new PR if it doesn't exist
+            echo "No existing PR found, creating new one..."
             PR_BODY="Automated submission from ${{ github.event.issue.html_url }}
 
-            This entry has been automatically validated and formatted. Ready for merge."
+This entry has been automatically validated and formatted. Ready for merge."
+            echo "PR Title: Add verified automation: ${{ github.event.issue.title }}"
+            echo "PR Body: $PR_BODY"
+            
             gh pr create \
               --title "Add verified automation: ${{ github.event.issue.title }}" \
               --body "$PR_BODY" \
-              --label automation
+              --label automation || { echo "PR creation failed"; exit 1; }
+            echo "PR created successfully"
           else
-            # PR already exists, just ensure it's open
-            gh pr reopen "$PR_NUMBER" 2>/dev/null || true
+            echo "PR #$PR_NUMBER already exists, reopening..."
+            gh pr reopen "$PR_NUMBER" 2>/dev/null || echo "PR is already open"
             echo "Updated existing PR #$PR_NUMBER"
           fi
+          
+          echo ""
+          echo "=== Workflow complete ==="
