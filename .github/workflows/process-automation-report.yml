@@ -35,36 +35,34 @@ jobs:
 
       - name: Configure git
         env:
-          GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN || github.token }}
         run: |
           echo "=== Verifying credentials ==="
-          
+
           if [ -z "$GH_TOKEN" ]; then
-            echo "ERROR: AUTOMATION_TOKEN secret is not set!"
-            echo "Please create a Personal Access Token with 'repo' and 'workflow' permissions"
-            echo "and add it as a secret named 'AUTOMATION_TOKEN' in your repository settings"
+            echo "ERROR: No token available!"
             exit 1
           fi
-          
+
           # Test the token by checking authentication
           if ! gh auth status 2>&1 | grep -q "Logged in"; then
             echo "ERROR: GitHub token authentication failed!"
             exit 1
           fi
-          
+
           echo "✓ GitHub token is valid"
-          
+
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config --global credential.helper store
           echo "https://x-access-token:${GH_TOKEN}@github.com" > ~/.git-credentials
-          
+
           echo "✓ Git credentials configured"
 
       - name: Create or Update Pull Request
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN != '' && secrets.AUTOMATION_TOKEN || github.token }}
         run: |
           set -x  # Enable debug output
 
