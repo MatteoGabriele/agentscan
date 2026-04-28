@@ -6,6 +6,7 @@
 
 import fs from "fs";
 import path from "path";
+import { parseIssue } from "@github/issue-parser";
 
 interface AutomationEntry {
   username: string;
@@ -15,26 +16,22 @@ interface AutomationEntry {
   createdAt: string;
 }
 
-function parseIssueBody(body: string): Partial<AutomationEntry> {
-  // Parse GitHub form template format
-  // Form fields are presented as "### Field Name\n\nValue"
+export type { AutomationEntry };
 
-  // Extract GitHub Username - single line value, trim and clean
-  const usernameMatch = body.match(/###\s+GitHub Username\s*\n+\s*([^\n]+)/);
-  const username = usernameMatch?.[1]?.trim();
+export function parseIssueBody(body: string): Partial<AutomationEntry> {
+  // Parse GitHub form template format using @github/issue-parser
+  const parsed = parseIssue(body);
 
-  // Extract GitHub User ID - numeric value
-  const idMatch = body.match(/###\s+GitHub User ID\s*\n+\s*(\d+)/);
-  const id = idMatch ? parseInt(idMatch[1], 10) : undefined;
+  // Extract fields from the parsed form
+  const username = parsed["GitHub Username"]?.toString().trim();
+  const idStr = parsed["GitHub User ID"]?.toString().trim();
+  const id = idStr ? parseInt(idStr, 10) : undefined;
+  const reasonRaw = parsed["Why do you believe this is an automated account?"]
+    ?.toString()
+    .trim();
 
-  // Extract Reason - capture until next ### or end of string
-  // More flexible matching that handles various whitespace and line patterns
-  const reasonMatch = body.match(
-    /###\s+Why do you believe this is an automated account\?\s*\n+([\s\S]*?)(?:\n\s*###|$)/,
-  );
-
-  // Take first paragraph only (stop at double newline or ### marker)
-  let reason = reasonMatch?.[1]?.trim();
+  // Clean up reason - take first paragraph and normalize whitespace
+  let reason = reasonRaw;
   if (reason) {
     // Split by double newline and take first paragraph
     reason = reason.split(/\n\s*\n/)[0].trim();
@@ -49,7 +46,7 @@ function parseIssueBody(body: string): Partial<AutomationEntry> {
   };
 }
 
-function validateEntry(
+export function validateEntry(
   entry: Partial<AutomationEntry>,
 ): entry is AutomationEntry {
   if (!entry.username || typeof entry.username !== "string") {
@@ -71,7 +68,7 @@ function validateEntry(
   return true;
 }
 
-function generateEntry(
+export function generateEntry(
   parsed: Partial<AutomationEntry>,
   issueUrl: string,
   createdAt?: string,
@@ -150,7 +147,10 @@ async function main() {
   addEntryToJson(entry);
 }
 
-main().catch((err) => {
-  console.error("Error:", err.message);
-  process.exit(1);
-});
+// Only run main if this script is executed directly (not imported)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error("Error:", err.message);
+    process.exit(1);
+  });
+}

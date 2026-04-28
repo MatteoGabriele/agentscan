@@ -25,9 +25,11 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@github/issue-parser": "^2.0.0",
     "@iconify-json/carbon": "^1.2.18",
     "@octokit/types": "^16.0.0",
     "@unocss/nuxt": "^66.6.7",
-    "unocss": "^66.6.0"
+    "unocss": "^66.6.0",
+    "vitest": "^1.0.0"
   }
 }
