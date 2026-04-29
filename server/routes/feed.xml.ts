@@ -50,7 +50,7 @@ function generateRSSFeed(automations: VerifiedAutomation[]): string {
       <guid isPermaLink="false">${guid}</guid>
       <pubDate>${pubDate}</pubDate>
       <description>${description}</description>
-      <author>agentscan@example.com</author>
+      <author>AgentScan</author>
       <category>Automation</category>
     </item>`;
     })
