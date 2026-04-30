@@ -205,5 +205,12 @@
     "reason": "This user left a lengthy, unsolicited comment on a PR, treating it as a response to feedback. Since the user is not a contributor to the repo, responding to feedback makes no sense. Additionally, the user's name is suffixed with \"claw\".",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/72",
     "createdAt": "2026-04-28"
+  },
+  {
+    "username": "zkDeej",
+    "id": 108093937,
+    "reason": "This user has been submitting automated security advisories marked 'recommended by AI' across multiple projects, which is widely considered spam.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/79",
+    "createdAt": "2026-04-30"
   }
 ]
