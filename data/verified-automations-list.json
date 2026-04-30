@@ -209,8 +209,8 @@
   {
     "username": "zkDeej",
     "id": 108093937,
-    "reason": "This user submitted a github security advisory to us, and the report was full of em-dashes.",
-    "issueUrl": "link",
-    "createdAt": "the"
+    "reason": "This user has been submitting automated security advisories marked 'recommended by AI' across multiple projects, which is widely considered spam.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/79",
+    "createdAt": "2026-04-30"
   }
 ]
