@@ -46,14 +46,46 @@ const isHomePage = computed<boolean>(() => route.name === "index");
   <NuxtLoadingIndicator />
 
   <div class="flex flex-col">
-    <main
-      class="max-w-screen-md mx-auto px-4 py-20 @container w-full min-h-screen flex flex-col"
-      :class="{ 'justify-center': isHomePage }"
-    >
-      <MainLogo :heading-level="isHomePage ? 'h1' : 'h2'" />
+    <div class="min-h-screen flex flex-col">
+      <header class="h-12 flex justify-end items-center px-6 py-4">
+        <nav>
+          <ul class="flex items-center gap-4">
+            <li>
+              <NuxtLink
+                external
+                target="_blank"
+                title="rss feed"
+                to="/feed.xml"
+                class="flex text-gh-muted hover:text-white"
+                aria-label="rss feed"
+              >
+                <span class="i-carbon:rss text-sm" aria-hidden></span>
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink
+                external
+                target="_blank"
+                title="github"
+                to="https://github.com/MatteoGabriele/agentscan"
+                class="flex text-gh-muted hover:text-white"
+                aria-label="rss feed"
+              >
+                <span class="i-carbon:logo-github text-sm" aria-hidden></span>
+              </NuxtLink>
+            </li>
+          </ul>
+        </nav>
+      </header>
 
-      <slot />
-    </main>
+      <div class="flex flex-1 items-center justify-center">
+        <main class="max-w-screen-md mx-auto px-4 py-20 @container w-full">
+          <MainLogo :heading-level="isHomePage ? 'h1' : 'h2'" />
+
+          <slot />
+        </main>
+      </div>
+    </div>
 
     <MainFooter />
   </div>
