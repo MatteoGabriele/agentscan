@@ -122,86 +122,55 @@ async function scanUser(
 }
 
 /**
- * Search for GitHub users using a rolling window approach
- * Cycles through different account age ranges to get diverse accounts with activity history
+ * Fetch random GitHub users by generating random user IDs
+ * Completely unbiased - pulls from all of GitHub regardless of creation date or activity
  */
 async function searchUsers(octokit: Octokit, pageNumber: number) {
-  // Cycle through age ranges: 30-90, 90-180, 180-365 days old
-  // This ensures we get accounts with actual activity history, not brand new accounts
-  const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-  const cyclePosition = daysSinceEpoch % 3; // Cycles through 0, 1, 2
+  // GitHub has ~200+ million users, generate random IDs
+  const MAX_USER_ID = 200000000;
+  const BATCH_SIZE = 100;
 
-  let minDaysOld: number;
-  let maxDaysOld: number;
+  const users: Array<{
+    id: number;
+    login: string;
+    created_at: string;
+    public_repos: number;
+  }> = [];
 
-  if (cyclePosition === 0) {
-    minDaysOld = 30;
-    maxDaysOld = 90;
-  } else if (cyclePosition === 1) {
-    minDaysOld = 90;
-    maxDaysOld = 180;
-  } else {
-    minDaysOld = 180;
-    maxDaysOld = 365;
+  let attempts = 0;
+  const maxAttempts = 500; // Prevent infinite loop if hitting many deleted accounts
+
+  while (users.length < BATCH_SIZE && attempts < maxAttempts) {
+    attempts++;
+    const randomUserId = Math.floor(Math.random() * MAX_USER_ID) + 1;
+
+    try {
+      const userProfile = await octokit.rest.users.getById({
+        account_id: randomUserId,
+      });
+
+      users.push({
+        id: userProfile.data.id,
+        login: userProfile.data.login,
+        created_at: userProfile.data.created_at,
+        public_repos: userProfile.data.public_repos,
+      });
+    } catch (error: any) {
+      // User doesn't exist or is deactivated - just skip and try another
+      if (error.status !== 404) {
+        console.error(
+          `Error fetching user ${randomUserId}:`,
+          (error as Error).message,
+        );
+      }
+    }
   }
 
-  const maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() - minDaysOld);
-  const dateEnd = maxDate.toISOString().split("T")[0];
-
-  const minDate = new Date();
-  minDate.setDate(minDate.getDate() - maxDaysOld);
-  const dateStart = minDate.toISOString().split("T")[0];
-
-  // Search for users created in this age range
-  const query = `created:${dateStart}..${dateEnd}`;
-  console.log(
-    `Searching for users created ${minDaysOld}-${maxDaysOld} days ago...`,
-  );
-
-  try {
-    const response = await octokit.rest.search.users({
-      q: query,
-      per_page: 100,
-      page: pageNumber,
-      sort: "joined",
-      order: "desc",
-    });
-
-    // Fetch full user details for each user found in search
-    // (search API returns limited data, we need full profile)
-    const fullUsers = await Promise.all(
-      response.data.items.map(async (user) => {
-        try {
-          const fullProfile = await octokit.rest.users.getByUsername({
-            username: user.login,
-          });
-          return {
-            id: fullProfile.data.id,
-            login: fullProfile.data.login,
-            created_at: fullProfile.data.created_at,
-            public_repos: fullProfile.data.public_repos,
-          };
-        } catch (error) {
-          console.error(
-            `Error fetching full profile for ${user.login}:`,
-            error,
-          );
-          return null;
-        }
-      }),
-    );
-
-    return fullUsers.filter((user) => user !== null) as Array<{
-      id: number;
-      login: string;
-      created_at: string;
-      public_repos: number;
-    }>;
-  } catch (error) {
-    console.error(`Error searching users (page ${pageNumber}):`, error);
-    return [];
+  if (users.length === 0) {
+    console.error(`Could not find any valid users after ${attempts} attempts`);
   }
+
+  return users;
 }
 
 /**
