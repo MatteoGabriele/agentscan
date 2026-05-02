@@ -81,13 +81,14 @@ function saveScanResults(results: ScanResult[]): void {
 async function scanUser(
   username: string,
   userCreatedAt: string,
+  publicRepos: number,
 ): Promise<number | null> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     const response = await fetch(
-      `${API_BASE_URL}/api/identify-replicant/${encodeURIComponent(username)}?created_at=${userCreatedAt}&pages=2`,
+      `${API_BASE_URL}/api/identify-replicant/${encodeURIComponent(username)}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=2`,
       { signal: controller.signal },
     );
 
@@ -151,6 +152,7 @@ async function searchUsers(octokit: Octokit, pageNumber: number) {
       id: user.id,
       login: user.login,
       created_at: user.created_at,
+      public_repos: user.public_repos,
     }));
   } catch (error) {
     console.error(`Error searching users (page ${pageNumber}):`, error);
@@ -217,7 +219,12 @@ async function main() {
 
       // Scan the user
       console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
-      const score = await scanUser(user.login, user.created_at);
+      console.log(`  User data:`, JSON.stringify(user, null, 2));
+      const score = await scanUser(
+        user.login,
+        user.created_at,
+        user.public_repos,
+      );
 
       // Only save results with actual scores
       if (score !== null) {
