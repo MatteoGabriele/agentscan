@@ -105,7 +105,7 @@ async function scanUser(
 
     console.log(`  API Response:`, JSON.stringify(data, null, 2));
 
-    return data.score ?? null;
+    return data?.analysis?.score ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
       console.error(
