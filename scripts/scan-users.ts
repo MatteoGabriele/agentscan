@@ -102,6 +102,9 @@ async function scanUser(
     }
 
     const data = await response.json();
+
+    console.log(`  API Response:`, JSON.stringify(data, null, 2));
+
     return data.score ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
