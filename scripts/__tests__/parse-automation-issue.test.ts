@@ -1,10 +1,15 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeAll } from "vitest";
 import {
   parseIssueBody,
   validateEntry,
   generateEntry,
   type AutomationEntry,
 } from "../parse-automation-issue";
+
+// Mock console.error to suppress output during tests
+beforeAll(() => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
 
 describe("parseIssueBody", () => {
   const sampleIssueBody = `### GitHub Username
