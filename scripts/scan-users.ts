@@ -130,14 +130,11 @@ async function scanUser(
 }
 
 /**
- * Fetch random GitHub users by generating random user IDs
- * Completely unbiased - pulls from all of GitHub regardless of creation date or activity
+ * Fetch active GitHub users from trending repositories
+ * Gets contributors from popular repos - ensures we sample actually active users
  */
 async function searchUsers(octokit: Octokit, pageNumber: number) {
-  // GitHub has ~200+ million users, generate random IDs
-  const MAX_USER_ID = 200000000;
   const BATCH_SIZE = 100;
-
   const users: Array<{
     id: number;
     login: string;
@@ -145,42 +142,85 @@ async function searchUsers(octokit: Octokit, pageNumber: number) {
     public_repos: number;
   }> = [];
 
-  let attempts = 0;
-  const maxAttempts = 500; // Prevent infinite loop if hitting many deleted accounts
+  try {
+    // Get trending repos from the last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const dateString = sevenDaysAgo.toISOString().split("T")[0];
 
-  while (users.length < BATCH_SIZE && attempts < maxAttempts) {
-    attempts++;
-    const randomUserId = Math.floor(Math.random() * MAX_USER_ID) + 1;
+    const trendingRepos = await octokit.rest.search.repos({
+      q: `created:>${dateString} stars:>10`,
+      sort: "stars",
+      order: "desc",
+      per_page: 30, // Get top 30 trending repos
+    });
 
-    try {
-      const userProfile = await octokit.rest.users.getById({
-        account_id: randomUserId,
-      });
+    console.log(
+      `Found ${trendingRepos.data.items.length} trending repositories`,
+    );
 
-      users.push({
-        id: userProfile.data.id,
-        login: userProfile.data.login,
-        created_at: userProfile.data.created_at,
-        public_repos: userProfile.data.public_repos,
-      });
-    } catch (error: any) {
-      // User doesn't exist or is deactivated - just skip and try another
-      if (error.status !== 404) {
+    const seenLogins = new Set<string>();
+
+    // Extract contributors from each repo
+    for (const repo of trendingRepos.data.items) {
+      if (users.length >= BATCH_SIZE) break;
+
+      // Skip if repo has no owner
+      if (!repo.owner) continue;
+
+      try {
+        const contributors = await octokit.rest.repos.listContributors({
+          owner: repo.owner.login,
+          repo: repo.name,
+          per_page: 100,
+        });
+
+        // Get full profiles for contributors (search API returns limited data)
+        for (const contributor of contributors.data) {
+          if (users.length >= BATCH_SIZE) break;
+          if (!contributor.login) continue;
+          if (seenLogins.has(contributor.login)) continue;
+
+          try {
+            const fullProfile = await octokit.rest.users.getByUsername({
+              username: contributor.login,
+            });
+
+            users.push({
+              id: fullProfile.data.id,
+              login: fullProfile.data.login,
+              created_at: fullProfile.data.created_at,
+              public_repos: fullProfile.data.public_repos,
+            });
+
+            seenLogins.add(contributor.login);
+          } catch (error) {
+            console.error(
+              `Error fetching profile for ${contributor.login}:`,
+              (error as Error).message,
+            );
+          }
+
+          // Rate limiting between GitHub API calls
+          await new Promise((resolve) =>
+            setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
+          );
+        }
+      } catch (error) {
         console.error(
-          `Error fetching user ${randomUserId}:`,
+          `Error fetching contributors for ${repo.full_name}:`,
           (error as Error).message,
         );
       }
     }
 
-    // Rate limiting: delay between GitHub API calls
-    await new Promise((resolve) =>
-      setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
-    );
-  }
-
-  if (users.length === 0) {
-    console.error(`Could not find any valid users after ${attempts} attempts`);
+    if (users.length === 0) {
+      console.error(
+        "Could not find any active users from trending repositories",
+      );
+    }
+  } catch (error) {
+    console.error("Error searching trending repositories:", error);
   }
 
   return users;
@@ -243,15 +283,7 @@ async function main() {
         continue;
       }
 
-      // Skip if user has insufficient activity (fewer than 10 repos)
-      if (user.public_repos < 10) {
-        console.log(
-          `⊘ Skipping user ${user.login} (ID: ${user.id}) - only ${user.public_repos} repos (need at least 10)`,
-        );
-        continue;
-      }
-
-      // Scan the user
+      // Scan the user (all contributors from trending repos are valid for trend data)
       console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
       console.log(`  User data:`, JSON.stringify(user, null, 2));
       const scanData = await scanUser(
@@ -263,8 +295,8 @@ async function main() {
       const score = scanData?.analysis.score;
       const eventsCount = scanData?.eventsCount ?? 0;
 
-      // Only save results with actual scores AND at least 100 events
-      if (score != null && eventsCount >= 100) {
+      // Save all results with valid scores (contributors from trending repos = valid trend data)
+      if (score != null) {
         const result: ScanResult = {
           created_at: today,
           hash,
@@ -287,7 +319,7 @@ async function main() {
           `✓ Completed [${resultsWithScoresToday + completedCount}/${USERS_TO_SCAN}]`,
         );
       } else {
-        console.log(`✗ Insufficient events (${eventsCount}), will retry later`);
+        console.log(`✗ No score available`);
       }
 
       // Conservative delay between API calls to avoid rate limiting
