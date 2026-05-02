@@ -4,6 +4,7 @@ import { createHash } from "crypto";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { Octokit } from "octokit";
+import { IdentifyResult } from "@unveil/identity";
 
 // Configuration
 const STATIC_SALT = "agentscan-v1";
@@ -19,11 +20,12 @@ interface ScannedHash {
 }
 
 interface ScanResult {
-  date: string;
+  created_at: string;
   hash: string;
   score: number;
   user_created_at: string;
   user_public_repos_count: number;
+  events_count: number;
 }
 
 /**
@@ -76,6 +78,11 @@ function saveScanResults(results: ScanResult[]): void {
   writeFileSync(filePath, JSON.stringify(results, null, 2));
 }
 
+type ScanUserResponse = {
+  analysis: IdentifyResult;
+  eventsCount: number;
+};
+
 /**
  * Get the analysis score for a user via the identify-replicant API
  */
@@ -83,7 +90,7 @@ async function scanUser(
   username: string,
   userCreatedAt: string,
   publicRepos: number,
-): Promise<number | null> {
+): Promise<ScanUserResponse | null> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
@@ -106,7 +113,7 @@ async function scanUser(
 
     console.log(`  API Response:`, JSON.stringify(data, null, 2));
 
-    return data?.analysis?.score ?? null;
+    return data ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
       console.error(
@@ -189,7 +196,7 @@ async function main() {
 
   // Count how many results with actual scores we already have today
   const resultsWithScoresToday = scanResults.filter(
-    (r) => r.date === today && r.score !== null,
+    (r) => r.created_at === today && r.score !== null,
   ).length;
   const usersNeeded = Math.max(0, USERS_TO_SCAN - resultsWithScoresToday);
 
@@ -233,20 +240,23 @@ async function main() {
       // Scan the user
       console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
       console.log(`  User data:`, JSON.stringify(user, null, 2));
-      const score = await scanUser(
+      const scanData = await scanUser(
         user.login,
         user.created_at,
         user.public_repos,
       );
 
+      const score = scanData?.analysis.score;
+
       // Only save results with actual scores
-      if (score !== null) {
+      if (score != null) {
         const result: ScanResult = {
-          date: today,
+          created_at: today,
           hash,
           score,
           user_created_at: user.created_at,
           user_public_repos_count: user.public_repos,
+          events_count: scanData?.eventsCount ?? 0,
         };
 
         scanResults.push(result);
