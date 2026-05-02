@@ -89,7 +89,7 @@ const toggleDate = (date: string) => {
             <span
               class="text-sm font-semibold text-gray-700 dark:text-gray-200"
             >
-              Avg: {{ averageScorePerDate?.[date]?.toFixed(2) }}
+              Avg: {{ Math.round(averageScorePerDate?.[date] ?? 0) }}
             </span>
             <span
               :class="[
@@ -112,7 +112,7 @@ const toggleDate = (date: string) => {
               <span
                 >Score:
                 <span class="font-semibold text-gray-700 dark:text-gray-200">{{
-                  item.score.toFixed(2)
+                  Math.round(item.score)
                 }}</span></span
               >
               <span
