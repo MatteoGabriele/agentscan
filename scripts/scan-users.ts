@@ -88,7 +88,7 @@ async function scanUser(
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     const response = await fetch(
-      `${API_BASE_URL}/api/identify-replicant/${encodeURIComponent(username)}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=2`,
+      `${API_BASE_URL}/api/identify-replicant/${username}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=2`,
       { signal: controller.signal },
     );
 
@@ -148,12 +148,36 @@ async function searchUsers(octokit: Octokit, pageNumber: number) {
       order: "desc",
     });
 
-    return response.data.items.map((user) => ({
-      id: user.id,
-      login: user.login,
-      created_at: user.created_at,
-      public_repos: user.public_repos,
-    }));
+    // Fetch full user details for each user found in search
+    // (search API returns limited data, we need full profile)
+    const fullUsers = await Promise.all(
+      response.data.items.map(async (user) => {
+        try {
+          const fullProfile = await octokit.rest.users.getByUsername({
+            username: user.login,
+          });
+          return {
+            id: fullProfile.data.id,
+            login: fullProfile.data.login,
+            created_at: fullProfile.data.created_at,
+            public_repos: fullProfile.data.public_repos,
+          };
+        } catch (error) {
+          console.error(
+            `Error fetching full profile for ${user.login}:`,
+            error,
+          );
+          return null;
+        }
+      }),
+    );
+
+    return fullUsers.filter((user) => user !== null) as Array<{
+      id: number;
+      login: string;
+      created_at: string;
+      public_repos: number;
+    }>;
   } catch (error) {
     console.error(`Error searching users (page ${pageNumber}):`, error);
     return [];
