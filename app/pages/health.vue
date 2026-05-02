@@ -82,14 +82,14 @@ const toggleDate = (date: string) => {
               >{{ date }}</span
             >
             <span class="text-sm text-gray-500 dark:text-gray-400">
-              ({{ groupedByDate[date]?.length }})
+              ({{ groupedByDate[date]?.length }} accounts)
             </span>
           </div>
           <div class="flex items-center gap-4">
             <span
               class="text-sm font-semibold text-gray-700 dark:text-gray-200"
             >
-              Avg: {{ Math.round(averageScorePerDate?.[date] ?? 0) }}
+              Avg score: {{ Math.round(averageScorePerDate?.[date] ?? 0) }}
             </span>
             <span
               :class="[
