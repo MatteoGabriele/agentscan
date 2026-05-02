@@ -21,8 +21,9 @@ interface ScannedHash {
 interface ScanResult {
   date: string;
   hash: string;
-  score: number | null;
-  error?: string;
+  score: number;
+  user_created_at: string;
+  user_public_repos_count: number;
 }
 
 /**
@@ -259,6 +260,8 @@ async function main() {
           date: today,
           hash,
           score,
+          user_created_at: user.created_at,
+          user_public_repos_count: user.public_repos,
         };
 
         scanResults.push(result);
