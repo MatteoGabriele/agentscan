@@ -123,25 +123,41 @@ async function scanUser(
 
 /**
  * Search for GitHub users using a rolling window approach
- * This provides unbiased selection by cycling through different account creation dates
- * rather than filtering by account age
+ * Cycles through different account age ranges to get diverse accounts with activity history
  */
 async function searchUsers(octokit: Octokit, pageNumber: number) {
-  // Use a rolling window: cycle through a year of different creation dates
-  // This ensures we don't bias toward older or newer accounts
+  // Cycle through age ranges: 30-90, 90-180, 180-365 days old
+  // This ensures we get accounts with actual activity history, not brand new accounts
   const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-  const window = daysSinceEpoch % 365; // Cycles through 0-364
+  const cyclePosition = daysSinceEpoch % 3; // Cycles through 0, 1, 2
 
-  const searchDate = new Date();
-  searchDate.setDate(searchDate.getDate() - window);
-  const dateStart = searchDate.toISOString().split("T")[0];
+  let minDaysOld: number;
+  let maxDaysOld: number;
 
-  const nextDay = new Date(searchDate);
-  nextDay.setDate(nextDay.getDate() + 1);
-  const dateEnd = nextDay.toISOString().split("T")[0];
+  if (cyclePosition === 0) {
+    minDaysOld = 30;
+    maxDaysOld = 90;
+  } else if (cyclePosition === 1) {
+    minDaysOld = 90;
+    maxDaysOld = 180;
+  } else {
+    minDaysOld = 180;
+    maxDaysOld = 365;
+  }
 
-  // Search for users created on this specific day (unbiased)
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() - minDaysOld);
+  const dateEnd = maxDate.toISOString().split("T")[0];
+
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() - maxDaysOld);
+  const dateStart = minDate.toISOString().split("T")[0];
+
+  // Search for users created in this age range
   const query = `created:${dateStart}..${dateEnd}`;
+  console.log(
+    `Searching for users created ${minDaysOld}-${maxDaysOld} days ago...`,
+  );
 
   try {
     const response = await octokit.rest.search.users({
