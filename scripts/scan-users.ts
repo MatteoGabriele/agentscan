@@ -243,6 +243,14 @@ async function main() {
         continue;
       }
 
+      // Skip if user has insufficient activity (fewer than 10 repos)
+      if (user.public_repos < 10) {
+        console.log(
+          `⊘ Skipping user ${user.login} (ID: ${user.id}) - only ${user.public_repos} repos (need at least 10)`,
+        );
+        continue;
+      }
+
       // Scan the user
       console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
       console.log(`  User data:`, JSON.stringify(user, null, 2));
