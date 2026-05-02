@@ -57,33 +57,43 @@ const toggleDate = (date: string) => {
 
 <template>
   <div class="p-8 max-w-2xl mx-auto">
-    <div v-if="status === 'pending'" class="text-center text-gray-500">
+    <div
+      v-if="status === 'pending'"
+      class="text-center text-gray-500 dark:text-gray-400"
+    >
       loading data...
     </div>
     <div v-else-if="data" class="space-y-1">
-      <h1 class="text-2xl font-semibold mb-6">Daily Anonymous Analysis</h1>
+      <h1 class="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
+        Daily Anonymous Analysis
+      </h1>
       <div
         v-for="date in sortedDates"
         :key="date"
-        class="border border-gray-200 rounded"
+        class="border border-gray-200 dark:border-gray-700 rounded"
       >
         <button
           @click="toggleDate(date)"
-          class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
+          class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
         >
           <div class="flex items-center gap-3">
-            <span class="text-sm font-semibold text-gray-700">{{ date }}</span>
-            <span class="text-sm text-gray-500">
+            <span
+              class="text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >{{ date }}</span
+            >
+            <span class="text-sm text-gray-500 dark:text-gray-400">
               ({{ groupedByDate[date]?.length }})
             </span>
           </div>
           <div class="flex items-center gap-4">
-            <span class="text-sm font-semibold text-gray-700">
+            <span
+              class="text-sm font-semibold text-gray-700 dark:text-gray-200"
+            >
               Avg: {{ averageScorePerDate?.[date]?.toFixed(2) }}
             </span>
             <span
               :class="[
-                'i-carbon:chevron-down w-5 h-5 text-gray-400 transition-transform',
+                'i-carbon:chevron-down w-5 h-5 text-gray-400 dark:text-gray-500 transition-transform',
                 expandedDates.has(date) ? 'rotate-180' : '',
               ]"
             />
@@ -91,29 +101,29 @@ const toggleDate = (date: string) => {
         </button>
         <div
           v-show="expandedDates.has(date)"
-          class="border-t border-gray-200 divide-y divide-gray-200"
+          class="border-t border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700"
         >
           <div
             v-for="item in groupedByDate[date]"
             :key="item.hash"
-            class="px-4 py-3 hover:bg-gray-50 transition-colors"
+            class="px-4 py-3"
           >
-            <div class="flex gap-4 text-sm text-gray-500">
+            <div class="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
               <span
                 >Score:
-                <span class="font-semibold text-gray-700">{{
+                <span class="font-semibold text-gray-700 dark:text-gray-200">{{
                   item.score.toFixed(2)
                 }}</span></span
               >
               <span
                 >Repos:
-                <span class="font-semibold text-gray-700">{{
+                <span class="font-semibold text-gray-700 dark:text-gray-200">{{
                   item.user_public_repos_count
                 }}</span></span
               >
               <span
                 >Events:
-                <span class="font-semibold text-gray-700">{{
+                <span class="font-semibold text-gray-700 dark:text-gray-200">{{
                   item.events_count
                 }}</span></span
               >
@@ -122,7 +132,7 @@ const toggleDate = (date: string) => {
         </div>
       </div>
     </div>
-    <div v-else-if="error" class="text-red-600 text-sm">
+    <div v-else-if="error" class="text-red-600 dark:text-red-400 text-sm">
       {{ error.message }}
     </div>
   </div>
