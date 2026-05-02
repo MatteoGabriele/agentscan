@@ -10,7 +10,10 @@ definePageMeta({
   <div>
     <div v-if="status === 'pending'">loading data...</div>
     <div v-else-if="data">
-      <pre>{{ data }}</pre>
+      <details>
+        <summary>raw data output ({{ data.length }})</summary>
+        <pre>{{ data }}</pre>
+      </details>
     </div>
     <div v-else-if="error">
       <p>{{ error.message }}</p>
