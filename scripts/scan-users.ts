@@ -9,8 +9,9 @@ import { Octokit } from "octokit";
 const STATIC_SALT = "agentscan-v1";
 const USERS_TO_SCAN = 100;
 const MAX_PAGES = 1; // We'll expand if needed
-const API_TIMEOUT = 5000; // 5 seconds timeout for API calls
+const API_TIMEOUT = 10000; // 10 seconds timeout for API calls
 const API_BASE_URL = "https://agentscan.netlify.app";
+const DELAY_BETWEEN_SCANS = 500; // 500ms conservative delay between API calls
 
 interface ScannedHash {
   hash: string;
@@ -75,26 +76,6 @@ function saveScanResults(results: ScanResult[]): void {
 }
 
 /**
- * Verify API endpoint is reachable
- */
-async function checkApiHealth(baseUrl: string): Promise<boolean> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
-
-    const response = await fetch(`${baseUrl}/api/identify-replicant/health`, {
-      signal: controller.signal,
-      method: "HEAD",
-    });
-
-    clearTimeout(timeoutId);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-/**
  * Get the analysis score for a user via the identify-replicant API
  */
 async function scanUser(
@@ -113,7 +94,9 @@ async function scanUser(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.error(`Failed to scan ${username}: ${response.statusText}`);
+      console.error(
+        `Failed to scan ${username}: HTTP ${response.status} ${response.statusText}`,
+      );
       return null;
     }
 
@@ -121,7 +104,11 @@ async function scanUser(
     return data.score ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
-      console.error(`Timeout scanning ${username} (API not responding)`);
+      console.error(
+        `Timeout scanning ${username} (API took longer than ${API_TIMEOUT}ms)`,
+      );
+    } else if (error instanceof SyntaxError) {
+      console.error(`Invalid JSON response from API for ${username}`);
     } else {
       console.error(`Error scanning ${username}:`, (error as Error).message);
     }
@@ -130,14 +117,26 @@ async function scanUser(
 }
 
 /**
- * Search for GitHub users created at least 30 days ago
+ * Search for GitHub users using a rolling window approach
+ * This provides unbiased selection by cycling through different account creation dates
+ * rather than filtering by account age
  */
 async function searchUsers(octokit: Octokit, pageNumber: number) {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const createdBefore = thirtyDaysAgo.toISOString().split("T")[0];
+  // Use a rolling window: cycle through a year of different creation dates
+  // This ensures we don't bias toward older or newer accounts
+  const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+  const window = daysSinceEpoch % 365; // Cycles through 0-364
 
-  const query = `created:<${createdBefore}`;
+  const searchDate = new Date();
+  searchDate.setDate(searchDate.getDate() - window);
+  const dateStart = searchDate.toISOString().split("T")[0];
+
+  const nextDay = new Date(searchDate);
+  nextDay.setDate(nextDay.getDate() + 1);
+  const dateEnd = nextDay.toISOString().split("T")[0];
+
+  // Search for users created on this specific day (unbiased)
+  const query = `created:${dateStart}..${dateEnd}`;
 
   try {
     const response = await octokit.rest.search.users({
@@ -167,16 +166,6 @@ async function main() {
   if (!token) {
     throw new Error("GITHUB_TOKEN environment variable is not set");
   }
-
-  // Check API health before searching for users
-  console.log(`Checking API endpoint: ${API_BASE_URL}...`);
-  const apiHealthy = await checkApiHealth(API_BASE_URL);
-  if (!apiHealthy) {
-    throw new Error(
-      `API endpoint is not reachable: ${API_BASE_URL}. Aborting to avoid wasting GitHub API quota.`,
-    );
-  }
-  console.log("✓ API endpoint is reachable\n");
 
   const octokit = new Octokit({ auth: token });
   const scannedHashes = loadScannedHashes();
@@ -253,8 +242,8 @@ async function main() {
         scannedAt: today,
       });
 
-      // Add a small delay between API calls to respect rate limits
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Conservative delay between API calls to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_SCANS));
     }
 
     pageNumber++;
