@@ -228,19 +228,20 @@ async function main() {
         };
 
         scanResults.push(result);
+
+        // Mark as scanned only if analysis was successful
+        scannedHashes.set(hash, {
+          hash,
+          scannedAt: today,
+        });
+
         completedCount++;
         console.log(
           `✓ Completed [${resultsWithScoresToday + completedCount}/${USERS_TO_SCAN}]`,
         );
       } else {
-        console.log(`✗ No score available, skipping this user`);
+        console.log(`✗ No score available, will retry later`);
       }
-
-      // Always mark the user as scanned (even if no score) to avoid re-scanning
-      scannedHashes.set(hash, {
-        hash,
-        scannedAt: today,
-      });
 
       // Conservative delay between API calls to avoid rate limiting
       await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_SCANS));
