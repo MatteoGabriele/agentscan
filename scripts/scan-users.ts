@@ -9,6 +9,8 @@ import { Octokit } from "octokit";
 const STATIC_SALT = "agentscan-v1";
 const USERS_TO_SCAN = 100;
 const MAX_PAGES = 1; // We'll expand if needed
+const API_TIMEOUT = 5000; // 5 seconds timeout for API calls
+const API_BASE_URL = "https://agentscan.netlify.app";
 
 interface ScannedHash {
   hash: string;
@@ -73,16 +75,42 @@ function saveScanResults(results: ScanResult[]): void {
 }
 
 /**
+ * Verify API endpoint is reachable
+ */
+async function checkApiHealth(baseUrl: string): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+    const response = await fetch(`${baseUrl}/api/identify-replicant/health`, {
+      signal: controller.signal,
+      method: "HEAD",
+    });
+
+    clearTimeout(timeoutId);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
  * Get the analysis score for a user via the identify-replicant API
  */
 async function scanUser(
   username: string,
-  octokit: Octokit,
+  userCreatedAt: string,
 ): Promise<number | null> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
     const response = await fetch(
-      `${process.env.API_BASE_URL || "http://localhost:3000"}/api/identify-replicant/${encodeURIComponent(username)}?created_at=${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}&pages=1`,
+      `${API_BASE_URL}/api/identify-replicant/${encodeURIComponent(username)}?created_at=${userCreatedAt}&pages=2`,
+      { signal: controller.signal },
     );
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       console.error(`Failed to scan ${username}: ${response.statusText}`);
@@ -92,7 +120,11 @@ async function scanUser(
     const data = await response.json();
     return data.score ?? null;
   } catch (error) {
-    console.error(`Error scanning ${username}:`, error);
+    if ((error as any).name === "AbortError") {
+      console.error(`Timeout scanning ${username} (API not responding)`);
+    } else {
+      console.error(`Error scanning ${username}:`, (error as Error).message);
+    }
     return null;
   }
 }
@@ -119,6 +151,7 @@ async function searchUsers(octokit: Octokit, pageNumber: number) {
     return response.data.items.map((user) => ({
       id: user.id,
       login: user.login,
+      created_at: user.created_at,
     }));
   } catch (error) {
     console.error(`Error searching users (page ${pageNumber}):`, error);
@@ -135,18 +168,41 @@ async function main() {
     throw new Error("GITHUB_TOKEN environment variable is not set");
   }
 
+  // Check API health before searching for users
+  console.log(`Checking API endpoint: ${API_BASE_URL}...`);
+  const apiHealthy = await checkApiHealth(API_BASE_URL);
+  if (!apiHealthy) {
+    throw new Error(
+      `API endpoint is not reachable: ${API_BASE_URL}. Aborting to avoid wasting GitHub API quota.`,
+    );
+  }
+  console.log("✓ API endpoint is reachable\n");
+
   const octokit = new Octokit({ auth: token });
   const scannedHashes = loadScannedHashes();
   const scanResults = loadScanResults();
   const today = new Date().toISOString().split("T")[0];
 
-  let scannedCount = 0;
+  // Count how many results with actual scores we already have today
+  const resultsWithScoresToday = scanResults.filter(
+    (r) => r.date === today && r.score !== null,
+  ).length;
+  const usersNeeded = Math.max(0, USERS_TO_SCAN - resultsWithScoresToday);
+
+  let completedCount = 0;
   let pageNumber = 1;
 
-  console.log(`Starting daily scan - Target: ${USERS_TO_SCAN} users`);
+  console.log(
+    `Starting daily scan - Need ${usersNeeded} more users with analysis (${resultsWithScoresToday} already done today)`,
+  );
 
-  // Loop through pages until we've scanned enough users
-  while (scannedCount < USERS_TO_SCAN && pageNumber <= MAX_PAGES) {
+  if (usersNeeded === 0) {
+    console.log("✓ Already have 100 users with analysis for today");
+    return;
+  }
+
+  // Loop through pages until we've scanned enough users with actual analysis
+  while (completedCount < usersNeeded && pageNumber <= MAX_PAGES) {
     console.log(`\nSearching page ${pageNumber}...`);
     const users = await searchUsers(octokit, pageNumber);
 
@@ -156,7 +212,7 @@ async function main() {
     }
 
     for (const user of users) {
-      if (scannedCount >= USERS_TO_SCAN) {
+      if (completedCount >= usersNeeded) {
         break;
       }
 
@@ -172,23 +228,30 @@ async function main() {
 
       // Scan the user
       console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
-      const score = await scanUser(user.login, octokit);
+      const score = await scanUser(user.login, user.created_at);
 
-      // Record the result (no userId or username for privacy)
-      const result: ScanResult = {
-        date: today,
-        hash,
-        score,
-      };
+      // Only save results with actual scores
+      if (score !== null) {
+        const result: ScanResult = {
+          date: today,
+          hash,
+          score,
+        };
 
-      scanResults.push(result);
+        scanResults.push(result);
+        completedCount++;
+        console.log(
+          `✓ Completed [${resultsWithScoresToday + completedCount}/${USERS_TO_SCAN}]`,
+        );
+      } else {
+        console.log(`✗ No score available, skipping this user`);
+      }
+
+      // Always mark the user as scanned (even if no score) to avoid re-scanning
       scannedHashes.set(hash, {
         hash,
         scannedAt: today,
       });
-
-      scannedCount++;
-      console.log(`✓ Completed [${scannedCount}/${USERS_TO_SCAN}]`);
 
       // Add a small delay between API calls to respect rate limits
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -201,8 +264,12 @@ async function main() {
   saveScannedHashes(scannedHashes);
   saveScanResults(scanResults);
 
-  console.log(`\n✓ Scan complete: ${scannedCount} new users scanned today`);
-  console.log(`Total scanned users in history: ${scannedHashes.size}`);
+  console.log(
+    `\n✓ Scan complete: ${completedCount} new users with analysis scanned today`,
+  );
+  console.log(
+    `Total users with analysis: ${scanResults.filter((r) => r.score !== null).length}`,
+  );
 }
 
 main().catch((error) => {
