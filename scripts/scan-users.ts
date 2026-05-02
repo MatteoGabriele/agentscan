@@ -12,7 +12,8 @@ const USERS_TO_SCAN = 100;
 const MAX_PAGES = 1; // We'll expand if needed
 const API_TIMEOUT = 10000; // 10 seconds timeout for API calls
 const API_BASE_URL = "https://agentscan.netlify.app";
-const DELAY_BETWEEN_SCANS = 500; // 500ms conservative delay between API calls
+const DELAY_BETWEEN_SCANS = 1000; // 1 second conservative delay between identify-replicant API calls
+const DELAY_BETWEEN_GITHUB_CALLS = 200; // 200ms delay between GitHub API calls (random user fetches)
 
 interface ScannedHash {
   hash: string;
@@ -171,6 +172,11 @@ async function searchUsers(octokit: Octokit, pageNumber: number) {
         );
       }
     }
+
+    // Rate limiting: delay between GitHub API calls
+    await new Promise((resolve) =>
+      setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
+    );
   }
 
   if (users.length === 0) {
@@ -247,16 +253,17 @@ async function main() {
       );
 
       const score = scanData?.analysis.score;
+      const eventsCount = scanData?.eventsCount ?? 0;
 
-      // Only save results with actual scores
-      if (score != null) {
+      // Only save results with actual scores AND at least 100 events
+      if (score != null && eventsCount >= 100) {
         const result: ScanResult = {
           created_at: today,
           hash,
           score,
           user_created_at: user.created_at,
           user_public_repos_count: user.public_repos,
-          events_count: scanData?.eventsCount ?? 0,
+          events_count: eventsCount,
         };
 
         scanResults.push(result);
@@ -272,7 +279,7 @@ async function main() {
           `✓ Completed [${resultsWithScoresToday + completedCount}/${USERS_TO_SCAN}]`,
         );
       } else {
-        console.log(`✗ No score available, will retry later`);
+        console.log(`✗ Insufficient events (${eventsCount}), will retry later`);
       }
 
       // Conservative delay between API calls to avoid rate limiting
