@@ -1,8 +1,6 @@
 import { Octokit } from "octokit";
 import type { VerifiedAutomation } from "~~/shared/types/automation";
 
-export type VerifiedAutomationsList = VerifiedAutomation[];
-
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig();
   const octokit = new Octokit({ auth: config.githubToken });
@@ -18,7 +16,7 @@ export default defineEventHandler(async () => {
       const content = Buffer.from(verifiedList.content, "base64").toString(
         "utf-8",
       );
-      const verified = JSON.parse(content) as VerifiedAutomationsList;
+      const verified = JSON.parse(content) as VerifiedAutomation[];
       return verified;
     }
 
