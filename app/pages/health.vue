@@ -10,6 +10,39 @@ import "vue-data-ui/style.css";
 
 const { data, status, error } = useScan();
 
+const rootEl = shallowRef<HTMLElement | null>(null);
+
+onMounted(async () => {
+  rootEl.value = document.documentElement;
+});
+
+const { colors } = useCssVariables(
+  [
+    "--bg",
+    "--card",
+    "--border",
+    "--border-light",
+    "--text",
+    "--text-muted",
+    "--blue",
+    "--green",
+    "--green-hover",
+    "--text-green",
+    "--green-bg",
+    "--danger",
+    "--danger-hover",
+    "--danger-bg",
+    "--red",
+    "--red-hover",
+    "--red-bg",
+  ],
+  {
+    element: rootEl,
+  },
+);
+
+console.log(colors.value);
+
 definePageMeta({
   layout: false,
 });
@@ -47,22 +80,22 @@ const dataset = computed<VueUiScatterDatasetItem[]>(() => {
       dataset: data.value ?? [],
       min: 0,
       max: 50,
-      color: "red",
-      name: "automated",
+      color: colors.value.redHover!,
+      name: "automated (0 - 50)",
     }),
     ...convertToScatterCluster({
       dataset: data.value ?? [],
       min: 51,
       max: 70,
-      color: "orange",
-      name: "mixed",
+      color: colors.value.dangerHover!,
+      name: "mixed (50 - 70)",
     }),
     ...convertToScatterCluster({
       dataset: data.value ?? [],
       min: 71,
       max: 101,
-      color: "green",
-      name: "organic",
+      color: colors.value.greenHover!,
+      name: "organic (70 - 100)",
     }),
   ];
 });
@@ -77,19 +110,30 @@ const averageScore = computed(() => {
 
 const config = computed<VueUiScatterConfig>(() => {
   return {
-    userOptions: { show: false },
+    userOptions: {
+      show: false,
+      useCursorPointer: true,
+    },
     style: {
       backgroundColor: "transparent",
-      legend: { show: true },
+      legend: {
+        show: true,
+        backgroundColor: "transparent",
+        color: colors.value.textMuted,
+      },
       tooltip: { show: false },
       title: {
         text: `Average score: ${Math.round(averageScore.value)}`,
+        bold: false,
+        color: colors.value.text,
       },
       layout: {
+        height: 300,
         plots: {
           radius: 3,
           opacity: 1,
           opacityNotSelected: 1,
+          stroke: colors.value.bg,
           giftWrap: {
             show: true,
           },
@@ -105,21 +149,34 @@ const config = computed<VueUiScatterConfig>(() => {
         axis: {
           xMin: 0,
           xMax: 100,
+          stroke: colors.value.borderLight,
         },
         dataLabels: {
           reverseAxisLabels: true,
           xAxis: {
+            offsetY: -20,
             showValue: false,
             name: "score",
+            color: colors.value.textMuted,
             scales: {
               show: true,
+              steps: 2,
+              labels: {
+                color: colors.value.textMuted,
+              },
             },
           },
           yAxis: {
             name: "event count",
+            offsetX: 28,
             showValue: false,
+            color: colors.value.textMuted,
             scales: {
               show: true,
+              steps: 2,
+              labels: {
+                color: colors.value.textMuted,
+              },
             },
           },
         },
