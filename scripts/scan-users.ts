@@ -143,20 +143,22 @@ async function searchUsers(octokit: Octokit, pageNumber: number) {
   }> = [];
 
   try {
-    // Get trending repos from the last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const dateString = sevenDaysAgo.toISOString().split("T")[0];
+    // Get trending repos from the last 7-14 days, varying by page to get different repos
+    const daysAgo = 7 + pageNumber * 2; // Page 1: 9 days ago, Page 2: 11 days ago, etc.
+    const trendingDate = new Date();
+    trendingDate.setDate(trendingDate.getDate() - daysAgo);
+    const dateString = trendingDate.toISOString().split("T")[0];
 
     const trendingRepos = await octokit.rest.search.repos({
-      q: `created:>${dateString} stars:>10`,
+      q: `created:>${dateString} stars:>5`,
       sort: "stars",
       order: "desc",
-      per_page: 30, // Get top 30 trending repos
+      per_page: 100, // Get more repos per page
+      page: pageNumber, // Use pageNumber to get different results
     });
 
     console.log(
-      `Found ${trendingRepos.data.items.length} trending repositories`,
+      `Page ${pageNumber}: Found ${trendingRepos.data.items.length} trending repositories`,
     );
 
     const seenLogins = new Set<string>();
