@@ -38,5 +38,6 @@ jobs:
           else
             git add data/scanned-users-hashes.json data/scan-results.json
             git commit -m "chore: daily user scan - $(date -u +'%Y-%m-%d')"
+            git pull --rebase origin main
             git push
           fi

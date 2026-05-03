@@ -9,7 +9,7 @@ import { IdentifyResult } from "@unveil/identity";
 // Configuration
 const STATIC_SALT = "agentscan-v1";
 const USERS_TO_SCAN = 100;
-const MAX_PAGES = 1; // We'll expand if needed
+const MAX_PAGES = 10; // Search up to 10 pages to find enough unscanned users
 const API_TIMEOUT = 10000; // 10 seconds timeout for API calls
 const API_BASE_URL = "https://agentscan.netlify.app";
 const DELAY_BETWEEN_SCANS = 1000; // 1 second conservative delay between identify-replicant API calls
