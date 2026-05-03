@@ -80,6 +80,11 @@ export default defineNuxtConfig({
         maxAge: 60 * 5,
       },
     },
+    "/api/scan/**": {
+      cache: {
+        maxAge: 60 * 5,
+      },
+    },
     "/feed.xml": {
       cache: {
         maxAge: 60 * 60,
