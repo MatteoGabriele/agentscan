@@ -1,53 +1,69 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import {
   VueUiScatter,
   type VueUiScatterDatasetItem,
   type VueUiScatterConfig,
 } from "vue-data-ui/vue-ui-scatter";
-import { shiftColorHue } from "vue-data-ui/utils";
+
 import "vue-data-ui/style.css";
 
 const { data, status, error } = useScan();
-const colorMode = useColorMode();
 
 definePageMeta({
   layout: false,
 });
 
-function getScoreColor(score: number): string {
-  const baseColor = colorMode.value === "dark" ? "#FF6B6B" : "#A00000";
-  const shift = colorMode.value === "dark" ? score / 300 : score / 400;
-  return shiftColorHue(baseColor, shift);
-}
+type ScatterClusterParams = {
+  dataset: Scan[];
+  min: number;
+  max: number;
+  color: string;
+  name: string;
+};
 
-function convertToScatterCluster(dataset: Scan[]): VueUiScatterDatasetItem[] {
+function convertToScatterCluster(
+  args: ScatterClusterParams,
+): VueUiScatterDatasetItem[] {
+  const { dataset, min, max, color, name } = args;
   return [
     {
-      name: "",
-      values: dataset.map((item) => ({
-        x: item.score,
-        y: item.events_count,
-        name: "",
-      })),
+      name,
+      color,
+      values: dataset
+        .map((item) => ({
+          x: item.score,
+          y: item.events_count,
+          name: "",
+        }))
+        .filter((item) => item.x >= min && item.x <= max),
     },
   ];
 }
 
-function convertToScatterDataset(rawData: Scan[]): VueUiScatterDatasetItem[] {
-  return rawData.map((plot, i) => {
-    const label = `repos: ${plot.user_public_repos_count}`;
-    return {
-      name: label,
-      color: getScoreColor(plot.score),
-      values: [{ x: plot.score, y: plot.events_count, name: label }],
-    };
-  });
-}
-
 const dataset = computed<VueUiScatterDatasetItem[]>(() => {
   return [
-    ...convertToScatterCluster(data.value ?? []),
-    ...convertToScatterDataset(data.value ?? []),
+    ...convertToScatterCluster({
+      dataset: data.value ?? [],
+      min: 0,
+      max: 50,
+      color: "red",
+      name: "automated",
+    }),
+    ...convertToScatterCluster({
+      dataset: data.value ?? [],
+      min: 51,
+      max: 70,
+      color: "orange",
+      name: "mixed",
+    }),
+    ...convertToScatterCluster({
+      dataset: data.value ?? [],
+      min: 71,
+      max: 101,
+      color: "green",
+      name: "organic",
+    }),
   ];
 });
 
@@ -55,28 +71,19 @@ const averageScore = computed(() => {
   return (
     dataset.value
       .flatMap((d) => d.values.map((v) => v.x))
-      .reduce((a, b) => a + b, 0) / dataset.value.length
+      .reduce((a, b) => a + b, 0) / (data.value ?? []).length
   );
-});
-
-const daySpan = computed(() => {
-  if (!data.value || data.value.length === 0) return 1;
-  const dates = data.value.map((d) => new Date(d.created_at).getTime());
-  const minDate = Math.min(...dates);
-  const maxDate = Math.max(...dates);
-  const days = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
-  return Math.max(1, days);
 });
 
 const config = computed<VueUiScatterConfig>(() => {
   return {
-    theme: "dark",
     userOptions: { show: false },
     style: {
-      legend: { show: false },
+      backgroundColor: "transparent",
+      legend: { show: true },
       tooltip: { show: false },
       title: {
-        text: `Average score per day: ${Math.round(averageScore.value / daySpan.value)}`,
+        text: `Average score: ${Math.round(averageScore.value)}`,
       },
       layout: {
         plots: {
