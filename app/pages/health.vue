@@ -10,25 +10,36 @@ import "vue-data-ui/style.css";
 
 const { data, status, error } = useScan();
 
-const { colors } = useCssVariables([
-  "--bg",
-  "--card",
-  "--border",
-  "--border-light",
-  "--text",
-  "--text-muted",
-  "--blue",
-  "--green",
-  "--green-hover",
-  "--text-green",
-  "--green-bg",
-  "--danger",
-  "--danger-hover",
-  "--danger-bg",
-  "--red",
-  "--red-hover",
-  "--red-bg",
-]);
+const rootEl = shallowRef<HTMLElement | null>(null);
+
+onMounted(async () => {
+  rootEl.value = document.documentElement;
+});
+
+const { colors } = useCssVariables(
+  [
+    "--bg",
+    "--card",
+    "--border",
+    "--border-light",
+    "--text",
+    "--text-muted",
+    "--blue",
+    "--green",
+    "--green-hover",
+    "--text-green",
+    "--green-bg",
+    "--danger",
+    "--danger-hover",
+    "--danger-bg",
+    "--red",
+    "--red-hover",
+    "--red-bg",
+  ],
+  {
+    element: rootEl,
+  },
+);
 
 console.log(colors.value);
 
