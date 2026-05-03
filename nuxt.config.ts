@@ -11,6 +11,7 @@ export default defineNuxtConfig({
         "dayjs", // CJS
         "@unveil/identity",
         "@vueuse/core",
+        "vue-data-ui/vue-ui-scatter",
       ],
     },
   },
