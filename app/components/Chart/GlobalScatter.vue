@@ -44,10 +44,6 @@ const { colors } = useCssVariables(
   },
 );
 
-definePageMeta({
-  layout: false,
-});
-
 type ScatterClusterParams = {
   dataset: Scan[];
   min: number;
