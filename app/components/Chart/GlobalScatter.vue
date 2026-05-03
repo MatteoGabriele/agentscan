@@ -82,30 +82,32 @@ const dataset = computed<VueUiScatterDatasetItem[]>(() => {
       min: 0,
       max: 50,
       color: colors.value.redHover!,
-      name: "automated (0 - 50)",
+      name: "automated",
     }),
     ...convertToScatterCluster({
       dataset: props.data ?? [],
       min: 51,
       max: 70,
       color: colors.value.dangerHover!,
-      name: "mixed (50 - 70)",
+      name: "mixed",
     }),
     ...convertToScatterCluster({
       dataset: props.data ?? [],
       min: 71,
       max: 101,
       color: colors.value.greenHover!,
-      name: "organic (70 - 100)",
+      name: "organic",
     }),
   ];
 });
 
 const averageScore = computed(() => {
+  const count = (props.data ?? []).length;
+  if (count === 0) return 0;
   return (
     dataset.value
       .flatMap((d) => d.values.map((v) => v.x))
-      .reduce((a, b) => a + b, 0) / (props.data ?? []).length
+      .reduce((a, b) => a + b, 0) / count
   );
 });
 
