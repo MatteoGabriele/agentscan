@@ -44,8 +44,6 @@ const { colors } = useCssVariables(
   },
 );
 
-console.log(colors.value);
-
 definePageMeta({
   layout: false,
 });
