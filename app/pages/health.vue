@@ -15,15 +15,17 @@ definePageMeta({
       loading data...
     </div>
     <div v-else-if="data" class="space-y-1">
+      <!-- Probably too hard to read (at least for now, but surely for the layman) so maybe you can get rid of it -->
       <ChartGlobalScatter :data />
 
-      <!--TODO: global line chart -->
+      <!-- Aggregated categories through time: very nice to see the evolution of organic / mixed / automated -->
+      <ChartGlobalStatusTimeline :data />
     </div>
     <div v-else-if="error" class="text-red-600 dark:text-red-400 text-sm">
       {{ error.message }}
     </div>
 
-    <!-- Temporary playground -->
+    <!-- Temporary playground: to be moved to the individual account page -->
     <p class="text-center">username</p>
     <div class="mt-12 grid grid-cols-2">
       <ChartAccountEventsDonut />
