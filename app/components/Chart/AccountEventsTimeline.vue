@@ -184,14 +184,3 @@ const config = computed<VueUiStacklineConfig>(() => {
     </ClientOnly>
   </div>
 </template>
-
-<style scoped>
-:deep(text.vue-data-ui-time-label) {
-  display: none !important;
-}
-
-:deep(text.vue-data-ui-time-label:nth-of-type(1)),
-:deep(text.vue-data-ui-time-label:nth-last-of-type(1)) {
-  display: initial !important;
-}
-</style>
