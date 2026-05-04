@@ -16,6 +16,7 @@ definePageMeta({
     </div>
     <div v-else-if="data" class="space-y-1">
       <ChartGlobalScatter :data />
+
       <!--TODO: global line chart -->
     </div>
     <div v-else-if="error" class="text-red-600 dark:text-red-400 text-sm">
