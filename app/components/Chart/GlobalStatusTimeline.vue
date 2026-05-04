@@ -99,7 +99,8 @@ function createStacklineDataset(source: Scan[] = []): {
   };
 }
 
-const { dataset } = createStacklineDataset(props.data);
+const stacklineData = computed(() => createStacklineDataset(props.data ?? []));
+const dataset = computed(() => stacklineData.value.dataset);
 
 const timestamps = computed(() => {
   if (!props.data?.length) return [];
