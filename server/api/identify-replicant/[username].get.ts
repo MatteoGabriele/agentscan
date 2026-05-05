@@ -77,6 +77,7 @@ export default defineEventHandler(async (event) => {
         createdAt: parsedQuery.output.created_at,
         events,
       }),
+      events,
       eventsCount: events.length,
     };
   } catch (err: unknown) {

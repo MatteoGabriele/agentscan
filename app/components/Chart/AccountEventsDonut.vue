@@ -5,27 +5,37 @@ import {
   type VueUiDonutConfig,
 } from "vue-data-ui/vue-ui-donut";
 
-// TODO: replace with a prop serving Array<GitHubEvent>
-import accountData from "../../../mock-data/account-github-events.json";
-import { eventConfig, eventTypes } from "./chart";
+const props = defineProps<{
+  events: GitHubEvent[];
+}>();
 
-// TODO: replace with a prop
-const username = "[USERNAME]";
+const eventConfig = {
+  ForkEvent: {
+    name: "Forks",
+    color: "var(--event-fork)",
+  },
+  CreateEvent: {
+    name: "New branches",
+    color: "var(--event-branch)",
+  },
+  PullRequestEvent: {
+    name: "Pull requests",
+    color: "var(--event-pr)",
+  },
+};
 
-type SelectedEventType = (typeof eventTypes)[number];
-
-function isSelectedEventType(type: string | null): type is SelectedEventType {
-  return type !== null && eventTypes.includes(type as SelectedEventType);
+function isSelectedEventType(type: string | null): type is GitHubEventType {
+  return type !== null && githubEventTypes.includes(type as GitHubEventType);
 }
 
 const parsedAccountData = computed<GitHubEvent[]>(() => {
-  return accountData.filter((event) =>
+  return props.events.filter((event) =>
     isSelectedEventType(event.type),
   ) as GitHubEvent[];
 });
 
 const dataset = computed<VueUiDonutDatasetItem[]>(() => {
-  const counts: Record<SelectedEventType, number> = {
+  const counts: Record<GitHubEventType, number> = {
     ForkEvent: 0,
     CreateEvent: 0,
     PullRequestEvent: 0,
@@ -37,7 +47,7 @@ const dataset = computed<VueUiDonutDatasetItem[]>(() => {
     }
   }
 
-  return eventTypes.map((eventType) => ({
+  return githubEventTypes.map((eventType) => ({
     name: eventConfig[eventType].name,
     color: eventConfig[eventType].color,
     values: [counts[eventType]],

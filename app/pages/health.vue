@@ -24,12 +24,5 @@ definePageMeta({
     <div v-else-if="error" class="text-red-600 dark:text-red-400 text-sm">
       {{ error.message }}
     </div>
-
-    <!-- Temporary playground: to be moved to the individual account page -->
-    <p class="text-center">username</p>
-    <div class="mt-12 grid grid-cols-2">
-      <ChartAccountEventsDonut />
-      <ChartAccountEventsTimeline />
-    </div>
   </div>
 </template>

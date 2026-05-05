@@ -1,26 +1,3 @@
-export type GitHubEventType = "PullRequestEvent" | "CreateEvent" | "ForkEvent";
-
-export const eventTypes = [
-  "PullRequestEvent",
-  "CreateEvent",
-  "ForkEvent",
-] as const;
-
-export const eventConfig = {
-  ForkEvent: {
-    name: "forks",
-    color: undefined, // TODO: select you preferred color
-  },
-  CreateEvent: {
-    name: "Creations",
-    color: undefined, // TODO: select you preferred color
-  },
-  PullRequestEvent: {
-    name: "Pull requests",
-    color: undefined, // TODO: select you preferred color
-  },
-};
-
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
     return [];

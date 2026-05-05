@@ -229,5 +229,11 @@ useSeoAnalysis(identifyAnalysis, {
         </li>
       </ul>
     </div>
+
+    <ChartAccountEventsTimeline
+      v-if="data.events.length"
+      :classification="data.analysis.classification"
+      :events="data.events"
+    />
   </template>
 </template>

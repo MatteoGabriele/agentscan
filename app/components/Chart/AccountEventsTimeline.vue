@@ -4,15 +4,15 @@ import {
   type VueUiStacklineDatasetItem,
   type VueUiStacklineConfig,
 } from "vue-data-ui/vue-ui-stackline";
-import {
-  getCompleteDayRange,
-  eventTypes,
-  type GitHubEventType,
-  eventConfig,
-} from "./chart";
+import { getCompleteDayRange } from "./chart";
+import type { GitHubEvent, GitHubEventType } from "~~/shared/types/identity";
+import { githubEventTypes } from "~~/shared/types/identity";
+import "vue-data-ui/style.css";
 
-// TODO: replace with a prop serving Array<GitHubEvent>
-import accountData from "../../../mock-data/account-github-events.json";
+const props = defineProps<{
+  events: GitHubEvent[];
+  classification?: "organic" | "mixed" | "automation";
+}>();
 
 const rootEl = shallowRef<HTMLElement | null>(null);
 
@@ -39,30 +39,82 @@ const { colors } = useCssVariables(
     "--red",
     "--red-hover",
     "--red-bg",
+    "--event-fork",
+    "--event-branch",
+    "--event-pr",
+    "--event-organic-pr",
+    "--event-organic-branch",
+    "--event-organic-fork",
+    "--event-mixed-pr",
+    "--event-mixed-branch",
+    "--event-mixed-fork",
+    "--event-automation-pr",
+    "--event-automation-branch",
+    "--event-automation-fork",
   ],
   {
     element: rootEl,
   },
 );
 
+const eventConfig = computed(() => {
+  const classification = props.classification || "mixed";
+  const palette = {
+    organic: {
+      pr: colors.value.eventOrganicPr,
+      branch: colors.value.eventOrganicBranch,
+      fork: colors.value.eventOrganicFork,
+    },
+    mixed: {
+      pr: colors.value.eventMixedPr,
+      branch: colors.value.eventMixedBranch,
+      fork: colors.value.eventMixedFork,
+    },
+    automation: {
+      pr: colors.value.eventAutomationPr,
+      branch: colors.value.eventAutomationBranch,
+      fork: colors.value.eventAutomationFork,
+    },
+  };
+
+  const color = palette[classification];
+
+  return {
+    ForkEvent: {
+      name: "Forks",
+      color: color.fork,
+    },
+    CreateEvent: {
+      name: "New branches",
+      color: color.branch,
+    },
+    PullRequestEvent: {
+      name: "Pull requests",
+      color: color.pr,
+    },
+  };
+});
+
 function isGitHubEventType(type: string | null): type is GitHubEventType {
-  return type !== null && eventTypes.includes(type as GitHubEventType);
+  return type !== null && githubEventTypes.includes(type as GitHubEventType);
 }
 
-function getEventDays(events: GitHubEvent[]): string[] {
+const eventDays = computed(() => {
   return Array.from(
     new Set(
-      events
+      props.events
         .filter((event) => event.created_at && isGitHubEventType(event.type))
         .map((event) => event.created_at!.slice(0, 10)),
     ),
   ).sort();
-}
+});
+
+const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 1);
 
 function createStacklineDataset(
   events: GitHubEvent[],
 ): VueUiStacklineDatasetItem[] {
-  const days = getCompleteDayRange(getEventDays(events));
+  const days = getCompleteDayRange(eventDays.value);
 
   const counts: Record<GitHubEventType, Record<string, number>> = {
     PullRequestEvent: {},
@@ -80,20 +132,20 @@ function createStacklineDataset(
     counts[event.type][day] = (counts[event.type][day] || 0) + 1;
   }
 
-  return eventTypes.map((eventType) => ({
-    name: eventConfig[eventType].name,
-    color: eventConfig[eventType].color,
+  return githubEventTypes.map((eventType) => ({
+    name: eventConfig.value[eventType].name,
+    color: eventConfig.value[eventType].color,
     series: days.map((day) => counts[eventType][day] || 0),
   }));
 }
 
 const dataset = computed<VueUiStacklineDatasetItem[]>(() => {
-  return createStacklineDataset(accountData as GitHubEvent[]);
+  return createStacklineDataset(props.events);
 });
 
 const timestamps = computed<number[]>(() => {
-  return getCompleteDayRange(getEventDays(accountData as GitHubEvent[])).map(
-    (day) => new Date(day).getTime(),
+  return getCompleteDayRange(eventDays.value).map((day) =>
+    new Date(day).getTime(),
   );
 });
 
@@ -150,6 +202,8 @@ const config = computed<VueUiStacklineConfig>(() => {
           smooth: true,
           distributed: isDistributed.value,
           gradient: { show: false },
+          totalValues: { show: false },
+          dataLabels: { show: false },
         },
         padding: {
           left: 48,
@@ -171,17 +225,7 @@ const config = computed<VueUiStacklineConfig>(() => {
 </script>
 
 <template>
-  <div>
-    <label>
-      Distributed
-      <input type="checkbox" v-model="isDistributed" />
-    </label>
-    <ClientOnly>
-      <VueUiStackline :dataset="dataset" :config="config" />
-      <template #fallback>
-        <!-- TODO -->
-        [SKELETON]
-      </template>
-    </ClientOnly>
-  </div>
+  <ClientOnly>
+    <VueUiStackline v-if="hasEnoughDays" :dataset="dataset" :config="config" />
+  </ClientOnly>
 </template>
