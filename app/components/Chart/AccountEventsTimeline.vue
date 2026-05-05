@@ -212,7 +212,7 @@ const config = computed<VueUiStacklineConfig>(() => {
           },
           dot: {
             stroke: "#FFFFFF", // new
-            radius: 3,
+            radius: 0,
           },
         },
         padding: {
