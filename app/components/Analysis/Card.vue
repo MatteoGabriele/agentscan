@@ -15,6 +15,7 @@ const { data, status, error } = useFetch(
       created_at: props.user.created_at,
       repos_count: props.user.public_repos,
       pages: 2,
+      show_events: true,
     },
     key: analysisKey,
     watch: [username],

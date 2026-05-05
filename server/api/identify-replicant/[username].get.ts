@@ -25,6 +25,14 @@ const QuerySchema = v.object({
     v.minValue(MIN_PAGES, "pages must be at least 1"),
     v.maxValue(MAX_PAGES, `pages must be equal or less than ${MAX_PAGES}`),
   ),
+  show_events: v.pipe(
+    v.string("show_events must be a string"),
+    v.check(
+      (value) => value === "true" || value === "false",
+      "show_events must be 'true' or 'false'",
+    ),
+    v.transform((value) => value === "true"),
+  ),
 });
 
 export default defineEventHandler(async (event) => {
@@ -45,6 +53,7 @@ export default defineEventHandler(async (event) => {
     repos_count: query.repos_count
       ? parseInt(String(query.repos_count), 10)
       : 0,
+    show_events: query.show_events ? String(query.show_events) : "false",
   });
 
   if (!parsedQuery.success) {
@@ -77,7 +86,7 @@ export default defineEventHandler(async (event) => {
         createdAt: parsedQuery.output.created_at,
         events,
       }),
-      events,
+      events: parsedQuery.output.show_events ? events : [],
       eventsCount: events.length,
     };
   } catch (err: unknown) {
