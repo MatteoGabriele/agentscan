@@ -120,6 +120,17 @@ const config = computed<VueUiScatterConfig>(() => {
         backgroundColor: "transparent",
         color: colors.value.textMuted,
       },
+      chart: {
+        lines: {
+          path: {
+            useSerieColor: true, // new
+            stroke: "#FFFFFF", // new
+          },
+          dot: {
+            stroke: "#FFFFFF", // new
+          },
+        },
+      },
       tooltip: { show: false },
       title: {
         text: `Average score: ${Math.round(averageScore.value)}`,

@@ -190,7 +190,9 @@ const config = computed<VueUiStacklineConfig>(() => {
           },
         },
         highlighter: {
+          useLine: true,
           color: colors.value.text,
+          opacity: 0,
         },
         legend: {
           backgroundColor: "transparent",
@@ -204,6 +206,14 @@ const config = computed<VueUiStacklineConfig>(() => {
           gradient: { show: false },
           totalValues: { show: false },
           dataLabels: { show: false },
+          path: {
+            useSerieColor: true, // new
+            stroke: "#FFFFFF", // new
+          },
+          dot: {
+            stroke: "#FFFFFF", // new
+            radius: 3,
+          },
         },
         padding: {
           left: 48,
