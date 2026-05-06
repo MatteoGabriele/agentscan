@@ -8,6 +8,7 @@ import { getCompleteDayRange } from "./chart";
 import type { GitHubEvent, GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
 import "vue-data-ui/style.css";
+import { useElementSize } from "@vueuse/core";
 
 const props = defineProps<{
   events: GitHubEvent[];
@@ -19,6 +20,12 @@ const rootEl = shallowRef<HTMLElement | null>(null);
 onMounted(async () => {
   rootEl.value = document.documentElement;
 });
+
+const { width } = useElementSize(rootEl);
+
+const mdBreakpoint = 768;
+
+const isAboveMd = computed(() => width.value >= mdBreakpoint);
 
 const { colors } = useCssVariables(
   [
@@ -207,11 +214,11 @@ const config = computed<VueUiStacklineConfig>(() => {
           totalValues: { show: false },
           dataLabels: { show: false },
           path: {
-            useSerieColor: true, // new
-            stroke: "#FFFFFF", // new
+            useSerieColor: false,
+            stroke: "transparent",
           },
           dot: {
-            stroke: "#FFFFFF", // new
+            stroke: "#FFFFFF",
             radius: 0,
           },
         },
@@ -224,6 +231,8 @@ const config = computed<VueUiStacklineConfig>(() => {
           color: colors.value.text,
           borderColor: colors.value.border,
           backgroundOpacity: 30,
+          offsetY: isAboveMd.value ? -64 : undefined,
+          fontSize: isAboveMd.value ? undefined : 10,
         },
         zoom: {
           show: false,
@@ -239,3 +248,11 @@ const config = computed<VueUiStacklineConfig>(() => {
     <VueUiStackline v-if="hasEnoughDays" :dataset="dataset" :config="config" />
   </ClientOnly>
 </template>
+
+<style>
+@media screen and (min-width: 768px) {
+  .vue-data-ui-tooltip {
+    margin-left: 130px !important;
+  }
+}
+</style>
