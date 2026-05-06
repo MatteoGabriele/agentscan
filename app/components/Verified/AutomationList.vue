@@ -4,7 +4,7 @@ const { data, pending } = useVerifiedAutomations();
 const MAX_VISIBLE = 10;
 const recentAutomations = computed<VerifiedAutomation[]>(() => {
   const items = data.value ?? [];
-  return items.toReversed().slice(0, MAX_VISIBLE);
+  return items.slice(-MAX_VISIBLE).reverse();
 });
 </script>
 
