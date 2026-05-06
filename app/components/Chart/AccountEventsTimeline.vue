@@ -4,7 +4,7 @@ import {
   type VueUiStacklineDatasetItem,
   type VueUiStacklineConfig,
 } from "vue-data-ui/vue-ui-stackline";
-import { getCompleteDayRange } from "./chart";
+import { getCompleteHourRange } from "./chart";
 import type { GitHubEvent, GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
 import "vue-data-ui/style.css";
@@ -106,23 +106,31 @@ function isGitHubEventType(type: string | null): type is GitHubEventType {
   return type !== null && githubEventTypes.includes(type as GitHubEventType);
 }
 
-const eventDays = computed(() => {
+function getEventHourKey(createdAt: string): string {
+  const date = new Date(createdAt);
+  date.setUTCMinutes(0, 0, 0);
+  return date.toISOString();
+}
+
+const eventHours = computed<string[]>(() => {
   return Array.from(
     new Set(
       props.events
         .filter((event) => event.created_at && isGitHubEventType(event.type))
-        .map((event) => event.created_at!.slice(0, 10)),
+        .map((event) => getEventHourKey(event.created_at!)),
     ),
   ).sort();
 });
 
-const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 1);
+const completeHours = computed<string[]>(() => {
+  return getCompleteHourRange(eventHours.value);
+});
+
+const hasEnoughHours = computed<boolean>(() => completeHours.value.length > 1);
 
 function createStacklineDataset(
   events: GitHubEvent[],
 ): VueUiStacklineDatasetItem[] {
-  const days = getCompleteDayRange(eventDays.value);
-
   const counts: Record<GitHubEventType, Record<string, number>> = {
     PullRequestEvent: {},
     CreateEvent: {},
@@ -134,15 +142,15 @@ function createStacklineDataset(
       continue;
     }
 
-    const day = event.created_at.slice(0, 10);
+    const hour = getEventHourKey(event.created_at);
 
-    counts[event.type][day] = (counts[event.type][day] || 0) + 1;
+    counts[event.type][hour] = (counts[event.type][hour] || 0) + 1;
   }
 
   return githubEventTypes.map((eventType) => ({
     name: eventConfig.value[eventType].name,
     color: eventConfig.value[eventType].color,
-    series: days.map((day) => counts[eventType][day] || 0),
+    series: completeHours.value.map((hour) => counts[eventType][hour] || 0),
   }));
 }
 
@@ -151,12 +159,9 @@ const dataset = computed<VueUiStacklineDatasetItem[]>(() => {
 });
 
 const timestamps = computed<number[]>(() => {
-  return getCompleteDayRange(eventDays.value).map((day) =>
-    new Date(day).getTime(),
-  );
+  return completeHours.value.map((hour) => new Date(hour).getTime());
 });
 
-// true: show as percentages
 const isDistributed = shallowRef(false);
 
 const config = computed<VueUiStacklineConfig>(() => {
@@ -185,6 +190,7 @@ const config = computed<VueUiStacklineConfig>(() => {
                   year: "dd MMM",
                   month: "dd MMM",
                   day: "dd MMM",
+                  hour: "dd MMM",
                   minute: "dd MMM",
                   second: "dd MMM",
                 },
@@ -227,6 +233,8 @@ const config = computed<VueUiStacklineConfig>(() => {
           right: 48,
         },
         tooltip: {
+          useDefaultTimeFormat: false,
+          timeFormat: "dd MMM HH:mm",
           backgroundColor: colors.value.bg,
           color: colors.value.text,
           borderColor: colors.value.border,
@@ -245,6 +253,6 @@ const config = computed<VueUiStacklineConfig>(() => {
 
 <template>
   <ClientOnly>
-    <VueUiStackline v-if="hasEnoughDays" :dataset="dataset" :config="config" />
+    <VueUiStackline v-if="hasEnoughHours" :dataset="dataset" :config="config" />
   </ClientOnly>
 </template>
