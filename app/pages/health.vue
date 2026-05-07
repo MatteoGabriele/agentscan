@@ -15,8 +15,9 @@ definePageMeta({
       loading data...
     </div>
     <div v-else-if="data" class="space-y-1">
-      <!-- Probably too hard to read (at least for now, but surely for the layman) so maybe you can get rid of it -->
-      <ChartGlobalScatter :data />
+      <div class="max-w-[300px] mx-auto">
+        <ChartGlobalScoreGauge :data />
+      </div>
 
       <!-- Aggregated categories through time: very nice to see the evolution of organic / mixed / automated -->
       <ChartGlobalStatusTimeline :data />
