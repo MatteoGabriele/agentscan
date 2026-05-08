@@ -46,7 +46,7 @@ const isHomePage = computed<boolean>(() => route.name === "index");
   <NuxtLoadingIndicator />
 
   <div class="flex flex-col">
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-svh flex flex-col">
       <header class="h-12 flex justify-end items-center px-6 py-4">
         <nav>
           <ul class="flex items-center gap-4">
