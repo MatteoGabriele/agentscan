@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 });
 
 function generateRSSFeed(automations: VerifiedAutomation[]): string {
-  const baseUrl = "https://agentscan.netlify.app";
+  const baseUrl = "https://agentscan.tools";
   const lastBuildDate = new Date().toUTCString();
   const feedLastUpdate = automations[0]
     ? new Date(automations[0].createdAt).toUTCString()
