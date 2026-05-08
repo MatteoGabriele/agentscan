@@ -226,5 +226,12 @@
     "reason": "This account has forked around 45 repositories in just 10 days and opened pull requests with identical messages across them, strongly suggesting that it operates in an automated manner.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/99",
     "createdAt": "2026-05-08"
+  },
+  {
+    "username": "veeceey",
+    "id": 34209028,
+    "reason": "Mass automated activity: 604 PRs in 326 repos, 100+ repos created in one month. Multiple commits with unassociated committer emails. Activity volume impossible for legitimate human developer.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/101",
+    "createdAt": "2026-05-08"
   }
 ]
