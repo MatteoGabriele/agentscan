@@ -35,8 +35,13 @@ const dataset = computed<VueUiXyDatasetItem[]>(() =>
 
 const tooltipPosition = useChartTooltipPosition(chartRef);
 
+const viewBoxOffset = computed(() => -props.width * 0.075);
+
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
+  line: {
+    radius: Number.MIN_VALUE, // bug in the lib, 0 does not work
+  },
   chart: {
     userOptions: { show: false },
     backgroundColor: "transparent",
@@ -44,33 +49,17 @@ const config = computed<VueUiXyConfig>(() => ({
     width: props.width,
     height: props.height,
     padding: {
-      left: 0,
-      right: 0,
+      left: viewBoxOffset.value,
+      right: viewBoxOffset.value,
     },
     grid: {
       position: "middle",
-      stroke: colors.value.borderLight,
-      showHorizontalLines: false,
-      showVerticalLines: false,
+      stroke: "transparent",
       labels: {
         show: false,
-        color: colors.value.textMuted,
-        fontSize: 14,
-        axis: {
-          yLabelOffsetX: 0,
-          fontSize: 24,
-        },
         xAxisLabels: {
           show: false,
           values: props.timestamps,
-          color: colors.value.textMuted,
-          fontSize: 14,
-          showOnlyAtModulo: true,
-          modulo: 12,
-          rotation: -30,
-          autoRotate: {
-            enable: false,
-          },
           datetimeFormatter: {
             enable: true,
             useUTC: true,
@@ -84,14 +73,12 @@ const config = computed<VueUiXyConfig>(() => ({
             },
           },
         },
-        yAxis: {
-          useNiceScale: true,
-          commonScaleSteps: 5,
-        },
       },
     },
     highlighter: {
+      opacity: 1,
       color: colors.value.text,
+      useLine: true,
     },
     legend: { show: false },
     tooltip: {
@@ -101,25 +88,9 @@ const config = computed<VueUiXyConfig>(() => ({
       backgroundOpacity: 30,
       position: tooltipPosition.value,
       offsetX: 24,
-      offsetY: -44,
+      offsetY: -56,
     },
-    zoom: {
-      show: false,
-      color: colors.value.text,
-      keepState: true,
-      preview: {
-        strokeDasharray: 6,
-        fill: "transparent",
-      },
-      minimap: {
-        show: true,
-        selectedColor: colors.value.textMuted,
-        selectedColorOpacity: 0.15,
-        indicatorColor: colors.value.text,
-        handleFill: colors.value.bg,
-        frameColor: colors.value.borderLight,
-      },
-    },
+    zoom: { show: false },
   },
 }));
 </script>
