@@ -9,5 +9,5 @@ function handleSubmit(name: string) {
 
 <template>
   <AnalysisForm v-model="accountName" @submit="handleSubmit" />
-  <VerifiedAutomationList class="mt-2 hidden md:block" />
+  <VerifiedAutomationList class="mt-2" />
 </template>
