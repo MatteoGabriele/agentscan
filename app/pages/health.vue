@@ -20,7 +20,7 @@ useHead({
 
 <template>
   <header class="text-center md:text-left">
-    <h1 class="text-2xl font-semibold">GitHub ecosystem health</h1>
+    <h1 class="text-2xl font-semibold">Ecosystem health</h1>
     <p class="text-gh-muted mt-1">
       We analyze 100 unique accounts daily from trending repositories to track
       automation, spam, and bot activity patterns over time. This gives you
@@ -34,7 +34,7 @@ useHead({
     >
       loading data...
     </div>
-    <div v-else-if="data" class="flex items-center justify-center w-full">
+    <div v-else-if="data" class="flex items-center justify-center w-full mt-12">
       <div class="max-w-4xl">
         <ChartGlobalStatusDashboard :data />
       </div>
