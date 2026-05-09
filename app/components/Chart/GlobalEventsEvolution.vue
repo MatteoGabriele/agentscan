@@ -8,6 +8,8 @@ import {
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
 
+import("vue-data-ui/style.css");
+
 const props = defineProps<{
   data: VueUiStacklineDatasetItem[];
   timestamps: string[];
