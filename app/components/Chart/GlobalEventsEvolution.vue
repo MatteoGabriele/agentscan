@@ -117,7 +117,7 @@ const config = computed<VueUiXyConfig>(() => ({
             v-for="series in datapoint"
             :key="`${series.name}-${series.absoluteIndex}`"
           >
-            <div class="h-2 w-2 -mb-1">
+            <div class="h-2 w-2">
               <svg viewBox="0 0 2 2" class="w-full h-full">
                 <circle cx="1" cy="1" r="1" :fill="series.color" />
               </svg>
