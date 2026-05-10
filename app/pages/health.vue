@@ -16,6 +16,7 @@ useHead({
         "Track GitHub ecosystem health with daily analysis of 100 unique accounts from trending repositories. Monitor automation, mixed, and organic activity patterns over time to understand ecosystem trends.",
     },
     { property: "og:title", content: "Ecosystem health | AgentScan" },
+    { property: "og:image", content: "/health.png" },
     {
       property: "og:description",
       content:
