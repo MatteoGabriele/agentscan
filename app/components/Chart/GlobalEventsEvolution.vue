@@ -109,19 +109,21 @@ const config = computed<VueUiXyConfig>(() => ({
 
       <template #tooltip="{ datapoint, timeLabel }">
         <div class="flex flex-col">
-          <div class="mb-1">{{ timeLabel.text }}</div>
+          <div :style="{ color: colors.textMuted }" class="mb-1">
+            {{ timeLabel.text }}
+          </div>
           <div
-            class="flex flex-row gap-2 items-center"
+            class="flex flex-row gap-2 place-items-center"
             v-for="series in datapoint"
             :key="`${series.name}-${series.absoluteIndex}`"
           >
-            <div class="h-3 w-3">
+            <div class="h-2 w-2">
               <svg viewBox="0 0 2 2" class="w-full h-full">
                 <circle cx="1" cy="1" r="1" :fill="series.color" />
               </svg>
             </div>
-            <span :style="{ color: colors.textMuted }">{{ series.name }}</span>
-            <span>{{ series.value }}</span>
+            <span :style="{ color: colors.text }">{{ series.name }}</span>
+            <span :style="{ color: colors.textMuted }">{{ series.value }}</span>
           </div>
         </div>
       </template>

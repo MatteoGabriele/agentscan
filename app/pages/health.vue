@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { IdentityClassification } from "@unveil/identity";
 
-const { data, status, error } = useScan();
+const { data } = useScan();
 
 definePageMeta({
   layout: false,
@@ -16,10 +16,11 @@ useHead({
         "Track GitHub ecosystem health with daily analysis of 100 unique accounts from trending repositories. Monitor automation, mixed, and organic activity patterns over time to understand ecosystem trends.",
     },
     { property: "og:title", content: "Ecosystem health | AgentScan" },
+    { property: "og:image", content: "/health.png" },
     {
       property: "og:description",
       content:
-        "Track GitHub ecosystem health with daily analysis of unique accounts from trending repositories. Monitor automation, mixed, and organic activity patterns over time to understand ecosystem trends.",
+        "A snapshot of GitHub community activity patterns to measure the overall ecosystem health.",
     },
     { property: "og:type", content: "website" },
   ],
@@ -33,7 +34,7 @@ function classifyByScore(score: number): IdentityClassification {
 
 type ClassificationStats = Record<
   IdentityClassification,
-  { count: number; percentage: number }
+  { count: number; percentage: string }
 >;
 
 type ClassificationConfig = {
@@ -47,6 +48,10 @@ const classificationConfigs: ClassificationConfig[] = [
   { key: "mixed", label: "Mixed", bgColor: "bg-amber-500" },
   { key: "automation", label: "Automation", bgColor: "bg-orange-500" },
 ];
+
+function formatPercentage(value: number): string {
+  return value.toFixed(1);
+}
 
 const latestDayStats = computed<ClassificationStats | null>(() => {
   if (!data.value?.length) return null;
@@ -67,52 +72,70 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
   return {
     organic: {
       count: counts.organic,
-      percentage: (counts.organic / totalCount) * 100,
+      percentage: formatPercentage((counts.organic / totalCount) * 100),
     },
     mixed: {
       count: counts.mixed,
-      percentage: (counts.mixed / totalCount) * 100,
+      percentage: formatPercentage((counts.mixed / totalCount) * 100),
     },
     automation: {
       count: counts.automation,
-      percentage: (counts.automation / totalCount) * 100,
+      percentage: formatPercentage((counts.automation / totalCount) * 100),
     },
   };
 });
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 h-svh">
-    <header class="text-center md:text-left mx-auto max-w-xl p-8">
-      <h1 class="text-2xl font-semibold">Ecosystem health</h1>
-      <div class="text-gh-muted mt-2 flex flex-col gap-2">
-        <p>
-          A snapshot of GitHub community activity patterns. We analyze 100
-          unique accounts daily from trending repositories, classifying them as
-          organic, mixed, or automated to gauge the overall ecosystem health.
-        </p>
-      </div>
+  <div class="flex flex-col gap-6 justify-center h-svh">
+    <header class="px-4 py-2">
+      <NuxtLink to="/" aria-label="Homepage">
+        <span class="i-carbon-scan relative top-1 text-gh-text text-xl" />
+      </NuxtLink>
     </header>
-    <ul class="flex gap-4 mx-auto text-sm">
-      <li
-        v-for="config in classificationConfigs"
-        :key="config.key"
-        class="flex gap-2 items-center"
-      >
-        <span :class="`size-2 ${config.bgColor} block rounded-full`"></span>
-        <p>
-          {{ config.label }}
-          <span class="text-gh-muted">
-            {{ latestDayStats?.[config.key].percentage }}% ({{
-              latestDayStats?.[config.key].count
-            }})
-          </span>
-        </p>
-      </li>
-    </ul>
-    <div class="h-full max-h-[300px] sm:max-h-[500px]">
-      <ChartGlobalStatusDashboard :data />
-    </div>
+    <section class="flex flex-col gap-6 h-full">
+      <div class="h-full flex flex-col items-center justify-center w-full">
+        <div class="mx-auto max-w-3xl p-8">
+          <header class="text-center">
+            <h1 class="text-2xl font-semibold">Ecosystem health</h1>
+            <div class="text-gh-muted mt-1 flex flex-col text-pretty">
+              <p>
+                A snapshot* of GitHub community activity patterns to measure the
+                overall ecosystem health.
+              </p>
+              <p class="text-xs text-gh-muted/70">
+                *We analyze 100 unique accounts daily from trending
+                repositories.
+              </p>
+            </div>
+          </header>
+          <ul
+            class="text-center flex flex-col md:flex-row md:gap-6 items-center md:text-left w-full justify-center mt-12"
+          >
+            <li
+              v-for="config in classificationConfigs"
+              :key="config.key"
+              class="flex gap-2 items-center"
+            >
+              <span
+                :class="`size-2 ${config.bgColor} block rounded-full`"
+              ></span>
+              <p class="text-sm">
+                {{ config.label }}
+                <span class="text-gh-muted">
+                  {{ latestDayStats?.[config.key].percentage }}% ({{
+                    latestDayStats?.[config.key].count
+                  }})
+                </span>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="max-h-[300px] sm:max-h-[500px] w-full h-full">
+          <ChartGlobalStatusDashboard :data />
+        </div>
+      </div>
+    </section>
   </div>
   <MainFooter />
 </template>

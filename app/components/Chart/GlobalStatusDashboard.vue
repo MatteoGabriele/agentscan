@@ -16,7 +16,7 @@ onMounted(async () => {
 
 const colors = useColors(rootEl);
 
-function createStacklineDataset(source: Scan[] = []): {
+function createChartDataset(source: Scan[] = []): {
   categories: string[];
   dataset: VueUiStacklineDatasetItem[];
 } {
@@ -25,7 +25,7 @@ function createStacklineDataset(source: Scan[] = []): {
   const sumsByDate: Record<
     string,
     {
-      autiomation: number;
+      automation: number;
       mixed: number;
       organic: number;
     }
@@ -33,7 +33,7 @@ function createStacklineDataset(source: Scan[] = []): {
 
   categories.forEach((date) => {
     sumsByDate[date] = {
-      autiomation: 0,
+      automation: 0,
       mixed: 0,
       organic: 0,
     };
@@ -45,7 +45,7 @@ function createStacklineDataset(source: Scan[] = []): {
     if (!dateSums) return;
 
     if (item.score <= 50) {
-      dateSums.autiomation += 1;
+      dateSums.automation += 1;
     } else if (item.score <= 70) {
       dateSums.mixed += 1;
     } else {
@@ -57,25 +57,25 @@ function createStacklineDataset(source: Scan[] = []): {
     categories,
     dataset: [
       {
-        name: "autiomation",
-        series: categories.map((date) => sumsByDate[date]?.autiomation ?? 0),
-        color: colors.value.red,
+        name: "Organic",
+        series: categories.map((date) => sumsByDate[date]?.organic ?? 0),
+        color: colors.value.greenLine,
       },
       {
-        name: "mixed",
+        name: "Mixed",
         series: categories.map((date) => sumsByDate[date]?.mixed ?? 0),
         color: colors.value.amber,
       },
       {
-        name: "organic",
-        series: categories.map((date) => sumsByDate[date]?.organic ?? 0),
-        color: colors.value.green,
+        name: "Automation",
+        series: categories.map((date) => sumsByDate[date]?.automation ?? 0),
+        color: colors.value.dangerHover,
       },
     ],
   };
 }
 
-const stacklineData = computed(() => createStacklineDataset(props.data ?? []));
+const stacklineData = computed(() => createChartDataset(props.data ?? []));
 const dataset = computed(() => stacklineData.value.dataset);
 
 const timestamps = computed(() => {
@@ -83,23 +83,6 @@ const timestamps = computed(() => {
 
   return [...new Set(props.data.map((item) => item.created_at))].sort();
 });
-
-const selectedIndex = shallowRef<number | undefined>(undefined);
-
-function setSelectedIndex(
-  payload:
-    | number
-    | { index?: number; selectedIndex?: number; seriesIndex?: number }
-    | undefined
-    | null,
-) {
-  if (typeof payload === "number") {
-    selectedIndex.value = payload;
-    return;
-  }
-
-  selectedIndex.value = payload?.index ?? payload?.selectedIndex ?? undefined;
-}
 
 const { width, height } = useElementSize(chartContainer);
 </script>

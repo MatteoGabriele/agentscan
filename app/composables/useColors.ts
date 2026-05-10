@@ -95,6 +95,7 @@ export function useColors(
       "--text-muted",
       "--blue",
       "--green",
+      "--green-line",
       "--green-hover",
       "--text-green",
       "--green-bg",
