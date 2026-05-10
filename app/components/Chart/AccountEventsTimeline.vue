@@ -358,6 +358,9 @@ const configLine = computed<VueUiXyConfig>(() => ({
       strokeWidth: 1,
     },
   },
+  bar: {
+    useGradient: true,
+  },
   chart: {
     userOptions: { show: false },
     backgroundColor: "transparent",
@@ -433,6 +436,14 @@ const configLine = computed<VueUiXyConfig>(() => ({
     >
       <template #area-gradient="{ series, id }">
         <linearGradient :id="id" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
+          <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+        </linearGradient>
+      </template>
+
+      <!-- Remove this if you don't want the total series as bars -->
+      <template #bar-gradient="{ series, positiveId }">
+        <linearGradient :id="positiveId" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
           <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
         </linearGradient>
