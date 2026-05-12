@@ -360,11 +360,11 @@ const configLine = computed<VueUiXyConfig>(() => ({
     </VueUiXy>
     <div
       v-if="isEmpty"
-      class="w-full h-64 flex place-items-center justify-center"
+      class="w-full h-40 flex place-items-center justify-center"
     >
       <div class="flex flex-col items-center gap-4">
         <VueUiIcon name="chartSparkline" :stroke="colors.text" />
-        <p class="text-gh-muted">No recent events</p>
+        <p class="text-gh-muted">No activity to display</p>
       </div>
     </div>
   </ClientOnly>
