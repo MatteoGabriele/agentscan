@@ -11,6 +11,7 @@ import { useElementSize } from "@vueuse/core";
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
 import { identityConfig } from "@unveil/identity";
+import { VueUiIcon } from "vue-data-ui/vue-ui-icon";
 
 import("vue-data-ui/style.css");
 
@@ -195,6 +196,12 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
 }
 
 const datasetLine = computed(() => createLineDataset(props.events));
+const isEmpty = computed(
+  () =>
+    datasetLine.value
+      .flatMap((d) => d.series)
+      .reduce((a, b) => (a ?? 0) + (b ?? 0), 0) === 0,
+);
 
 const maxValBetweenDatasetAndThresholds = computed(() => {
   const maxDataset = Math.max(
@@ -289,7 +296,7 @@ const configLine = computed<VueUiXyConfig>(() => ({
 <template>
   <ClientOnly>
     <VueUiXy
-      v-if="hasEnoughDays"
+      v-if="hasEnoughDays && !isEmpty"
       ref="chartLineRef"
       :dataset="datasetLine"
       :config="configLine"
@@ -351,6 +358,15 @@ const configLine = computed<VueUiXyConfig>(() => ({
         </div>
       </template>
     </VueUiXy>
+    <div
+      v-if="isEmpty"
+      class="w-full h-64 flex place-items-center justify-center"
+    >
+      <div class="flex flex-col items-center gap-4">
+        <VueUiIcon name="chartSparkline" :stroke="colors.text" />
+        <p class="text-gh-muted">No recent events</p>
+      </div>
+    </div>
   </ClientOnly>
 </template>
 
