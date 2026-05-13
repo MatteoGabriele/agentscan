@@ -19,6 +19,7 @@
     "@vueuse/core": "^14.2.1",
     "dayjs": "^1.11.19",
     "nuxt": "^4.3.1",
+    "nuxt-auth-utils": "^0.5.29",
     "octokit": "^5.0.5",
     "valibot": "^1.2.0",
     "vue": "^3.5.28",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@github/issue-parser": "^2.0.0",
     "@iconify-json/carbon": "^1.2.18",
+    "@iconify-json/lucide": "^1.2.107",
     "@octokit/types": "^16.0.0",
     "@unocss/nuxt": "^66.6.7",
     "unocss": "^66.6.0",

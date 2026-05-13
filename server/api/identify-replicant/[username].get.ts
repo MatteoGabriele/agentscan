@@ -63,8 +63,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const session = await getUserSession(event);
+  const token = session?.access_token || config.githubToken;
+
   try {
-    const octokit = new Octokit({ auth: config.githubToken });
+    const octokit = new Octokit({ auth: token });
     const formattedUsername = formatUsername(username);
 
     const validatedPages = Math.min(parsedQuery.output.pages, MAX_PAGES);

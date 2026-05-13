@@ -12,7 +12,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const octokit = new Octokit({ auth: config.githubToken });
+  const session = await getUserSession(event);
+  const token = session?.access_token || config.githubToken;
+
+  const octokit = new Octokit({ auth: token });
 
   try {
     const formattedUsername = formatUsername(username);

@@ -1,7 +1,12 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@unocss/nuxt", "@nuxtjs/color-mode", "@nuxt/fonts"],
+  modules: [
+    "@unocss/nuxt",
+    "@nuxtjs/color-mode",
+    "@nuxt/fonts",
+    "nuxt-auth-utils",
+  ],
 
   vite: {
     optimizeDeps: {
@@ -41,6 +46,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     githubToken: "",
+    oauth: {
+      github: {
+        clientId: "",
+        clientSecret: "",
+        redirectURL: "",
+      },
+    },
   },
 
   css: ["~/assets/main.css"],
@@ -61,7 +73,7 @@ export default defineNuxtConfig({
       cache: { maxAge: 3600 },
     },
 
-    "/privacy-policy": { prerender: true },
+    "/privacy-policy": { cache: { maxAge: 3600 } },
 
     "/api/account/**": {
       cache: {
@@ -84,6 +96,12 @@ export default defineNuxtConfig({
     "/api/scan/**": {
       cache: {
         maxAge: 60 * 5,
+      },
+    },
+    "/api/repo/**": {
+      cache: {
+        maxAge: 60 * 10,
+        headersOnly: true,
       },
     },
     "/feed.xml": {

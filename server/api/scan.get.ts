@@ -1,9 +1,12 @@
 import { Octokit } from "octokit";
 import type { Scan } from "~~/shared/types/scan";
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const octokit = new Octokit({ auth: config.githubToken });
+  const session = await getUserSession(event);
+  const token = session?.githubToken || config.githubToken;
+
+  const octokit = new Octokit({ auth: token });
 
   try {
     const { data: scanList } = await octokit.rest.repos.getContent({
