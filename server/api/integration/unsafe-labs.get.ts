@@ -23,13 +23,22 @@ export default defineEventHandler(async () => {
     if ("content" in data) {
       const content = Buffer.from(data.content, "base64").toString("utf-8");
       const integrationData = JSON.parse(content) as IntegrationUsafeLab[];
-      return integrationData.map((d) => ({
-        label: "UnsafeLabs Bounty Hunters",
-        username: d.username,
-        createdAt: d.first_pr,
-        reason: `This account appears in the UnsafeLabs bounty hunters database. Submitted a total of ${d.total_prs} PR${d.total_prs === 1 ? "" : "s"} to the project. Activity detected from ${dayjs(d.first_pr).format("MMM D, YYYY")} through ${dayjs(d.last_pr).format("MMM D, YYYY")}.`,
-        link: `https://github.com/UnsafeLabs/Bounty-Hunters/pulls?q=is%3Apr+author%3A${d.username}`,
-      })) satisfies IntegrationItem[];
+      return integrationData.map((d) => {
+        const firstPrDate = dayjs(d.first_pr).format("MMM D, YYYY");
+        const lastPrDate = dayjs(d.last_pr).format("MMM D, YYYY");
+        const dateRange =
+          firstPrDate === lastPrDate
+            ? `on ${firstPrDate}`
+            : `from ${firstPrDate} through ${lastPrDate}`;
+
+        return {
+          label: "UnsafeLabs Bounty Hunters",
+          username: d.username,
+          createdAt: d.first_pr,
+          reason: `This account appears in the UnsafeLabs bounty hunters database. Submitted a total of ${d.total_prs} PR${d.total_prs === 1 ? "" : "s"} to the project. Activity detected ${dateRange}.`,
+          link: `https://github.com/UnsafeLabs/Bounty-Hunters/pulls?q=is%3Apr+author%3A${d.username}`,
+        };
+      }) satisfies IntegrationItem[];
     }
 
     return [];
