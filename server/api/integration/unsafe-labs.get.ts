@@ -24,6 +24,7 @@ export default defineEventHandler(async () => {
       const content = Buffer.from(data.content, "base64").toString("utf-8");
       const integrationData = JSON.parse(content) as IntegrationUsafeLab[];
       return integrationData.map((d) => ({
+        label: "UnsafeLabs Bounty Hunters",
         username: d.username,
         createdAt: d.first_pr,
         reason: `This account appears in the UnsafeLabs bounty hunters database. Submitted a total of ${d.total_prs} PR${d.total_prs === 1 ? "" : "s"} to the project. Activity detected from ${dayjs(d.first_pr).format("MMM D, YYYY")} through ${dayjs(d.last_pr).format("MMM D, YYYY")}.`,
