@@ -13,6 +13,8 @@ const counter = computed<number>(() => {
   <section>
     <button
       @click="isDisclosureOpen = !isDisclosureOpen"
+      :aria-expanded="isDisclosureOpen"
+      aria-controls="disclosure-external-analysis"
       class="w-full bg-amber-500/10 text-amber-500 rounded-lg border-amber-500/40 border px-3 py-2 text-left transition-colors"
       :class="{
         'border-b-none rounded-b-none': isDisclosureOpen,
@@ -42,9 +44,14 @@ const counter = computed<number>(() => {
 
     <ul
       v-if="isDisclosureOpen"
+      id="disclosure-external-analysis"
       class="bg-amber-500/5 border border-t-amber-500/30 rounded-b-md border-amber-500/40 p-4 space-y-4"
     >
-      <li v-for="(item, index) in items" :key="index" class="p-3 space-y-2">
+      <li
+        v-for="item in items"
+        :key="`${item.username}-${item.link}`"
+        class="p-3 space-y-2"
+      >
         <h4 class="text-gh-text/90 text-sm">{{ item.label }}</h4>
         <p class="text-gh-text/70 text-sm">
           {{ item.reason }}
