@@ -33,10 +33,11 @@ export default defineEventHandler(async () => {
     }
 
     return [];
-  } catch {
+  } catch (error) {
     throw createError({
       statusCode: 500,
-      message: "Failed to fetch verified automations list",
+      message: "Failed to fetch integration list",
+      cause: error,
     });
   }
 });
