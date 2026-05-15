@@ -240,5 +240,12 @@
     "reason": "Seems to spam with open and then closed PRs. 85 PRs across 32 high-value repos (Anthropic, Facebook, AWS, Vercel). 16 PRs closed without merge in the same repository",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/104",
     "createdAt": "2026-05-08"
+  },
+  {
+    "username": "mzl2233",
+    "id": 109468061,
+    "reason": "Opened 60+ PRs in 24 hours across different repositories",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/120",
+    "createdAt": "2026-05-15"
   }
 ]
