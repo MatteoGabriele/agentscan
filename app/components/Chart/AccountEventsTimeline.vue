@@ -148,7 +148,7 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
     useArea: true,
     smooth: true,
     name: "Combined activity",
-    color: colors.value.borderLight,
+    color: colors.value.text! + 25, // hex + alpha
     series: days.map((_, index) => {
       return individualEvents.reduce((total, event) => {
         return total + Number(event.series[index]);
