@@ -53,14 +53,14 @@ const isHomePage = computed<boolean>(() => route.name === "index");
             <li>
               <NuxtLink
                 to="/health"
-                class="flex text-gh-muted hover:text-white"
+                class="flex text-gh-muted hover:text-gh-text"
               >
                 Ecosystem health
               </NuxtLink>
             </li>
           </ul>
         </nav>
-        <div class="h-full w-px bg-white/30"></div>
+        <div class="h-full w-px bg-gh-border"></div>
         <nav>
           <ul class="flex items-center gap-4">
             <li>
@@ -69,7 +69,7 @@ const isHomePage = computed<boolean>(() => route.name === "index");
                 target="_blank"
                 title="rss feed"
                 to="/feed.xml"
-                class="flex text-gh-muted hover:text-white"
+                class="flex text-gh-muted hover:text-gh-text"
                 aria-label="rss feed"
               >
                 <span class="i-carbon:rss text-sm" aria-hidden></span>
@@ -81,7 +81,7 @@ const isHomePage = computed<boolean>(() => route.name === "index");
                 target="_blank"
                 title="github"
                 to="https://github.com/MatteoGabriele/agentscan"
-                class="flex text-gh-muted hover:text-white"
+                class="flex text-gh-muted hover:text-gh-text"
                 aria-label="rss feed"
               >
                 <span class="i-carbon:logo-github text-sm" aria-hidden></span>

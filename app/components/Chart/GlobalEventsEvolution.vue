@@ -37,7 +37,17 @@ const dataset = computed<VueUiXyDatasetItem[]>(() =>
 
 const tooltipPosition = useChartTooltipPosition(chartRef);
 
-const viewBoxOffset = computed(() => -props.width * 0.075);
+const progressionLabelOffsetX = 6; // compensate hard-coded internal in VueUiXy
+
+const viewBoxPadding = computed(() => {
+  const maxSeries = props.timestamps.length;
+  if (maxSeries <= 1) return { left: 0, right: 0 };
+  const halfVueUiXyDatapointStep = props.width / (2 * (maxSeries - 1));
+  return {
+    left: -halfVueUiXyDatapointStep,
+    right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
+  };
+});
 
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
@@ -51,14 +61,17 @@ const config = computed<VueUiXyConfig>(() => ({
     width: props.width,
     height: props.height,
     padding: {
-      left: viewBoxOffset.value,
-      right: viewBoxOffset.value,
+      left: viewBoxPadding.value.left,
+      right: viewBoxPadding.value.right,
     },
     grid: {
       position: "middle",
       stroke: "transparent",
       labels: {
         show: false,
+        yAxis: {
+          crosshairSize: 0,
+        },
         xAxisLabels: {
           show: false,
           values: props.timestamps,

@@ -7,16 +7,17 @@ import {
 import { getCompleteDayRange } from "./chart";
 import type { GitHubEvent, GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
-import { useElementSize } from "@vueuse/core";
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
-import { identityConfig } from "@unveil/identity";
+import { identityConfig, type IdentityClassification } from "@unveil/identity";
+import { VueUiIcon } from "vue-data-ui/vue-ui-icon";
+import type { VueUiXyDatasetLineItem } from "vue-data-ui/vue-ui-xy";
 
 import("vue-data-ui/style.css");
 
 const props = defineProps<{
   events: GitHubEvent[];
-  classification?: "organic" | "mixed" | "automation";
+  classification?: IdentityClassification;
 }>();
 
 const rootEl = shallowRef<HTMLElement | null>(null);
@@ -27,7 +28,6 @@ onMounted(async () => {
 });
 
 const colors = useColors(rootEl);
-const { width } = useElementSize(rootEl);
 
 const metrics = ["Forks", "New branches", "Pull requests", "Total"];
 
@@ -87,41 +87,6 @@ const eventConfig = computed(() => {
   };
 });
 
-type VueUiXyAnnotation = NonNullable<
-  NonNullable<VueUiXyConfig["chart"]>["annotations"]
->[number];
-
-/**
- * NOTE: thresholds are assumed to have different values for each metric.
- * If 2 metrics share the same threshold, then you might consider merging them into a single one.
- */
-const thresholds = computed<VueUiXyAnnotation[]>(() => {
-  return Object.values(eventConfig.value)
-    .filter((kpi) => selectedLegendItems.value.includes(kpi.name))
-    .filter((kpi) => !!kpi.threshold)
-    .map((kpi) => ({
-      show: true,
-      yAxis: {
-        yTop: kpi.threshold,
-        label: {
-          position: "start", // or 'end', to alternate if needed to prevent overlap between contiguous labels
-          text: `${kpi.name} (${kpi.threshold})`,
-          offsetX: -12, // if position == 'end', needs to be adapted
-          offsetY: kpi.labelOffsetY,
-          fontSize: 16,
-          backgroundColor: "transparent",
-          color: kpi.color,
-          border: { stroke: "transparent" },
-        },
-        line: {
-          stroke: kpi.color,
-          strokeWidth: 2,
-          strokeDasharray: 6,
-        },
-      },
-    }));
-});
-
 function isGitHubEventType(type: string | null): type is GitHubEventType {
   return type !== null && githubEventTypes.includes(type as GitHubEventType);
 }
@@ -136,7 +101,7 @@ const eventDays = computed(() => {
   ).sort();
 });
 
-const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 1);
+const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 4);
 
 const activeGitHubEventTypes = computed(() => {
   return githubEventTypes.filter(
@@ -174,6 +139,7 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
         smooth: true,
         name: config.name,
         color: config.color,
+        threshold: config.threshold,
         series: days.map((day) => counts[eventType][day] || 0),
       };
     });
@@ -195,17 +161,18 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
 }
 
 const datasetLine = computed(() => createLineDataset(props.events));
+const isEmpty = computed(
+  () =>
+    datasetLine.value
+      .flatMap((d) => d.series)
+      .reduce((a, b) => (a ?? 0) + (b ?? 0), 0) === 0,
+);
 
-const maxValBetweenDatasetAndThresholds = computed(() => {
-  const maxDataset = Math.max(
-    ...datasetLine.value
-      .filter((s) => selectedLegendItems.value.includes(s.name))
-      .flatMap((d) => d.series.map((v) => v ?? 0)),
-  );
-  const maxThreshold = Math.max(
-    ...thresholds.value.map((t) => t.yAxis?.yTop ?? 0),
-  );
-  return Math.max(maxDataset, maxThreshold, 1);
+const maxValue = computed(() => {
+  const values = datasetLine.value
+    .filter((s) => selectedLegendItems.value.includes(s.name))
+    .flatMap((d) => d.series.map((v) => v ?? 0));
+  return values.length ? Math.max(...values) : 0;
 });
 
 const timestamps = computed<number[]>(() => {
@@ -233,7 +200,9 @@ const configLine = computed<VueUiXyConfig>(() => ({
     userOptions: { show: false },
     backgroundColor: "transparent",
     color: colors.value.textMuted,
-    annotations: thresholds.value,
+    padding: {
+      top: 24, // leave space in case of alert icon on max chart value
+    },
     highlighter: {
       useLine: true,
       color: colors.value.textMuted,
@@ -244,7 +213,7 @@ const configLine = computed<VueUiXyConfig>(() => ({
       labels: {
         show: false,
         yAxis: {
-          scaleMax: maxValBetweenDatasetAndThresholds.value,
+          scaleMax: maxValue.value,
           useNiceScale: false,
         },
         xAxisLabels: {
@@ -284,12 +253,63 @@ const configLine = computed<VueUiXyConfig>(() => ({
     },
   },
 }));
+
+type Datapoints = Array<VueUiXyDatasetLineItem & { threshold: number }>;
+
+type PlotAlert = {
+  name: string;
+  coordinates: Array<{
+    x: number;
+    y: number;
+    absoluteIndex: number;
+    isAlert: boolean;
+  }>;
+};
+
+function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
+  return data
+    .filter((d) => d.threshold !== null && d.threshold !== undefined)
+    .map((d) => {
+      return {
+        name: d.name,
+        coordinates: d.plots!.map((plot, index) => {
+          const absoluteIndex = index + zoomOffset;
+
+          return {
+            ...plot,
+            absoluteIndex,
+            isAlert:
+              d.absoluteValues[absoluteIndex] !== null &&
+              d.absoluteValues[absoluteIndex]! >= d.threshold,
+          };
+        }),
+      };
+    });
+}
+
+function getSeriesThreshold(seriesName: string): number | null {
+  const datasetItem = datasetLine.value.find(
+    (item) => item.name === seriesName,
+  );
+  if (!datasetItem || !("threshold" in datasetItem)) return null;
+  return datasetItem.threshold as number | null;
+}
+
+function isTooltipAlert(series: {
+  name: string;
+  value: number | null;
+}): boolean {
+  const threshold = getSeriesThreshold(series.name);
+  return (
+    threshold !== null && series.value !== null && series.value >= threshold
+  );
+}
 </script>
 
 <template>
   <ClientOnly>
     <VueUiXy
-      v-if="hasEnoughDays"
+      v-if="hasEnoughDays && !isEmpty"
       ref="chartLineRef"
       :dataset="datasetLine"
       :config="configLine"
@@ -311,7 +331,7 @@ const configLine = computed<VueUiXyConfig>(() => ({
       </template>
 
       <!-- Custom tooltip -->
-      <template #tooltip="{ datapoint, timeLabel }">
+      <template #tooltip="{ datapoint, timeLabel, seriesIndex }">
         <div class="flex flex-col">
           <div class="mb-1">{{ timeLabel.text }}</div>
           <div
@@ -326,6 +346,18 @@ const configLine = computed<VueUiXyConfig>(() => ({
             </div>
             <span :style="{ color: colors.textMuted }">{{ series.name }}</span>
             <span>{{ series.value }}</span>
+            <svg
+              v-if="isTooltipAlert(series)"
+              viewBox="0 0 30 30"
+              class="w-5 h-5"
+              aria-hidden="true"
+            >
+              <path
+                d="M 2 30 L 14 13 L 8 13 L 11 0 L 0 17 L 6 17 L 2 30"
+                :fill="colors.amber"
+                :stroke="colors.bg"
+              />
+            </svg>
           </div>
         </div>
       </template>
@@ -350,7 +382,39 @@ const configLine = computed<VueUiXyConfig>(() => ({
           </button>
         </div>
       </template>
+
+      <!-- Custom SVG content ⚡ -->
+      <template #svg="{ svg }">
+        <g
+          v-for="alerts in alertIcons(svg.data as Datapoints, svg.slicer.start)"
+          :key="alerts.name"
+        >
+          <template
+            v-for="plot in alerts.coordinates"
+            :key="`${alerts.name}-${plot.absoluteIndex}`"
+          >
+            <path
+              v-if="plot.isAlert"
+              class="svg-element-transition"
+              :d="`M ${plot.x - 4} ${plot.y - 6} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`"
+              :fill="colors.amber"
+              :stroke="colors.bg"
+            />
+          </template>
+        </g>
+      </template>
     </VueUiXy>
+    <div v-else class="w-full h-40 flex place-items-center justify-center">
+      <div class="flex flex-col items-center gap-4">
+        <span class="i-carbon:chart-line-smooth text-gh-muted"></span>
+        <div class="flex flex-col items-center">
+          <p class="text-gh-muted text-base">Insufficient activity data</p>
+          <p class="text-gh-muted/50 text-sm">
+            Not enough events to display a timeline
+          </p>
+        </div>
+      </div>
+    </div>
   </ClientOnly>
 </template>
 
@@ -363,7 +427,6 @@ const configLine = computed<VueUiXyConfig>(() => ({
 :deep(.vue-data-ui-component .serie_line_1 path),
 :deep(.vue-data-ui-component .serie_line_2 path),
 :deep(.vue-data-ui-component .serie_line_3 path),
-.svg-element-transition,
 :deep(.vdui-shape-circle) {
   transition: all 0.5s var(--super-ease-out) !important;
 }
@@ -373,7 +436,6 @@ const configLine = computed<VueUiXyConfig>(() => ({
   :deep(.vue-data-ui-component .serie_line_1 path),
   :deep(.vue-data-ui-component .serie_line_2 path),
   :deep(.vue-data-ui-component .serie_line_3 path),
-  .svg-element-transition,
   :deep(.vdui-shape-circle) {
     transition: none !important;
   }

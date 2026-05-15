@@ -25,7 +25,7 @@ const { data, status, error } = useFetch(
 
 const { data: verifiedAutomations } = useVerifiedAutomations();
 
-const verifiedAutomation = computed(() => {
+const verifiedAutomation = computed<VerifiedAutomation | undefined>(() => {
   return verifiedAutomations.value?.find((account) => {
     return (
       account.username.toLowerCase() === username.value?.toLowerCase() ||
@@ -34,6 +34,14 @@ const verifiedAutomation = computed(() => {
   });
 });
 
+const { data: integrations } = useIntegrations();
+const activityReport = computed<IntegrationItem | undefined>(() => {
+  return integrations.value?.find((item) => {
+    return item.username.toLowerCase() === username.value?.toLowerCase();
+  });
+});
+
+const hasActivityReport = computed<boolean>(() => !!activityReport.value);
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value);
 
 const flagCreatedAt = computed<string | undefined>(() => {
@@ -70,14 +78,14 @@ const scoreStyle = computed<ScoreStyle>(() => {
     };
   }
 
-  if (classification.value === "organic") {
+  if (classification.value === "automation") {
     return {
-      text: "text-green-500",
-      border: "border-green-500",
+      text: "text-orange-500",
+      border: "border-orange-500",
     };
   }
 
-  if (classification.value === "mixed") {
+  if (classification.value === "mixed" || hasActivityReport.value) {
     return {
       text: "text-amber-500",
       border: "border-amber-500",
@@ -85,8 +93,8 @@ const scoreStyle = computed<ScoreStyle>(() => {
   }
 
   return {
-    text: "text-orange-500",
-    border: "border-orange-500",
+    text: "text-green-500",
+    border: "border-green-500",
   };
 });
 
@@ -119,6 +127,7 @@ const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
 
 useSeoAnalysis(identifyAnalysis, {
   hasCommunityFlag,
+  hasActivityReport,
 });
 </script>
 
@@ -213,7 +222,7 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
 
     <div
-      v-if="data.analysis.flags.length > 0"
+      v-if="data.analysis.flags.length > 0 || hasActivityReport"
       class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
     >
       <h3 class="mb-4 text-gh-text text-xl font-mono">Activity Signals</h3>
@@ -229,10 +238,15 @@ useSeoAnalysis(identifyAnalysis, {
           </p>
         </li>
       </ul>
+
+      <ExternalAnlysisCard
+        v-if="activityReport"
+        :items="[activityReport]"
+        class="mt-4"
+      />
     </div>
 
     <ChartAccountEventsTimeline
-      v-if="data.events.length"
       :classification="data.analysis.classification"
       :events="data.events"
     />

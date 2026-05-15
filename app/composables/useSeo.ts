@@ -42,6 +42,7 @@ export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
 
 export type UseSeoAnalysisOptions = {
   hasCommunityFlag?: MaybeRefOrGetter<boolean>;
+  hasActivityReport?: MaybeRefOrGetter<boolean>;
 };
 
 export function useSeoAnalysis(
@@ -67,6 +68,10 @@ export function useSeoAnalysis(
 
     if (flagsCounter > 0) {
       descriptions.push(`${flagsCounter} flag${flagsCounter === 1 ? "" : "s"}`);
+    }
+
+    if (toValue(options?.hasActivityReport)) {
+      descriptions.push("Suspiscious activity reported");
     }
 
     if (descriptions.length === 0) {
