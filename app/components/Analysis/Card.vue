@@ -25,12 +25,19 @@ const { data, status, error } = useFetch(
 
 const { data: verifiedAutomations } = useVerifiedAutomations();
 
-const verifiedAutomation = computed(() => {
+const verifiedAutomation = computed<VerifiedAutomation | undefined>(() => {
   return verifiedAutomations.value?.find((account) => {
     return (
       account.username.toLowerCase() === username.value?.toLowerCase() ||
       account.id === props.user.id
     );
+  });
+});
+
+const { data: integrations } = useIntegrations();
+const matchedIntegration = computed<IntegrationItem | undefined>(() => {
+  return integrations.value?.find((item) => {
+    return item.username.toLowerCase() === username.value?.toLowerCase();
   });
 });
 
@@ -120,12 +127,67 @@ const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
 useSeoAnalysis(identifyAnalysis, {
   hasCommunityFlag,
 });
+
+const isActivityDisclosureOpen = ref(false);
 </script>
 
 <template>
   <AnalysisCardSkeleton v-if="status === 'pending'" />
   <ErrorCardGeneric :error v-else-if="error" />
   <template v-else-if="data">
+    <section v-if="matchedIntegration">
+      <button
+        @click="isActivityDisclosureOpen = !isActivityDisclosureOpen"
+        class="w-full bg-orange-500/10 text-orange-500/70 rounded-lg border-orange-500/40 border px-4 py-2 text-left transition-colors"
+        :class="{
+          'border-b-none rounded-b-none': isActivityDisclosureOpen,
+          'hover:border-orange-500': !isActivityDisclosureOpen,
+        }"
+      >
+        <div class="flex items-center justify-between">
+          <h3 class="flex items-center gap-2 text-sm">
+            <span class="i-carbon:warning"></span>
+            <span>Suspicious Activity Reported</span>
+          </h3>
+          <div class="flex items-center gap-3">
+            <span
+              class="bg-gh-danger/20 text-gh-danger text-xs font-semibold px-2 py-1 rounded"
+            >
+              <!-- TODO: this should be dynamic once I we decide to have multiple integrations -->
+              <!-- I could also make an array and check later -->
+              1
+            </span>
+            <span
+              :class="[
+                'i-carbon:chevron-down text-base transition-transform',
+                isActivityDisclosureOpen && 'rotate-180',
+              ]"
+            />
+          </div>
+        </div>
+      </button>
+
+      <div
+        v-if="isActivityDisclosureOpen"
+        class="bg-orange-500/5 border border-t-orange-500/10 rounded-b-md border-orange-500/40 p-4 space-y-4"
+      >
+        <div class="p-3 space-y-2">
+          <p class="text-white/90 text-sm">UnsafeLabs Bounty Hunters</p>
+          <p class="text-white/70 text-sm">
+            {{ matchedIntegration.reason }}
+          </p>
+          <NuxtLink
+            external
+            :to="matchedIntegration.link"
+            class="inline-block text-white/80 underline text-xs font-semibold hover:text-white"
+            target="_blank"
+          >
+            View Report →
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
       :class="scoreStyle.border"
