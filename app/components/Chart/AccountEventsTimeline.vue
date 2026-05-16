@@ -306,10 +306,11 @@ const configLine = computed<VueUiXyConfig>(() => ({
     },
     highlighter: {
       useLine: true,
+      opacity: 0,
       color: colors.value.textMuted,
     },
     grid: {
-      position: "middle",
+      position: "start",
       stroke: "transparent",
       labels: {
         show: false,
