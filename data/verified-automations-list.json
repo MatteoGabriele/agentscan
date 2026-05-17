@@ -268,5 +268,26 @@
     "reason": "This account opened approximately 300 PRs across 90+ projects in under a week, showing clear automated bulk spam behavior.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/128",
     "createdAt": "2026-05-17"
+  },
+  {
+    "username": "testuzerz123",
+    "id": 285229587,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/130",
+    "createdAt": "2026-05-17"
+  },
+  {
+    "username": "vfuriouz7-gif",
+    "id": 285190169,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/131",
+    "createdAt": "2026-05-17"
+  },
+  {
+    "username": "sreedarsan0311",
+    "id": 229950077,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/132",
+    "createdAt": "2026-05-17"
   }
 ]
