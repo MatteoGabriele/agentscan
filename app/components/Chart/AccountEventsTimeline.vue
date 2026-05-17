@@ -414,6 +414,11 @@ const tooltipTimeLabels = computed<string[]>(() => {
 function getTooltipTimeLabel(index: number): string {
   return tooltipTimeLabels.value[index] ?? "";
 }
+
+function getZapIconPath({ x, y }: { x: number; y: number }) {
+  // ⚡ with relative coordinates from initial position
+  return `M ${x} ${y} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`;
+}
 </script>
 
 <template>
@@ -427,14 +432,6 @@ function getTooltipTimeLabel(index: number): string {
     >
       <template #area-gradient="{ series, id }">
         <linearGradient :id="id" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
-          <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-        </linearGradient>
-      </template>
-
-      <!-- Remove this if you don't want the total series as bars -->
-      <template #bar-gradient="{ series, positiveId }">
-        <linearGradient :id="positiveId" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
           <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
         </linearGradient>
@@ -465,7 +462,7 @@ function getTooltipTimeLabel(index: number): string {
               aria-hidden="true"
             >
               <path
-                d="M 2 30 L 14 13 L 8 13 L 11 0 L 0 17 L 6 17 L 2 30"
+                :d="getZapIconPath({ x: 2, y: 30 })"
                 :fill="colors.amber"
                 :stroke="colors.bg"
               />
@@ -506,9 +503,13 @@ function getTooltipTimeLabel(index: number): string {
             :key="`${alerts.name}-${plot.absoluteIndex}`"
           >
             <path
-              v-if="plot.isAlert"
-              class="svg-element-transition"
-              :d="`M ${plot.x - 4} ${plot.y - 6} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`"
+              v-show="plot.isAlert"
+              :d="
+                getZapIconPath({
+                  x: plot.x - 4,
+                  y: plot.y - 6,
+                })
+              "
               :fill="colors.amber"
               :stroke="colors.bg"
             />
