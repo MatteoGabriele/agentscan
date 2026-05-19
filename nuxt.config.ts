@@ -1,13 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: [
-    "@unocss/nuxt",
-    "@nuxtjs/color-mode",
-    "@nuxt/fonts",
-    "nuxt-auth-utils",
-    "@sidebase/nuxt-auth",
-  ],
+  modules: ["@unocss/nuxt", "@nuxtjs/color-mode", "@nuxt/fonts"],
 
   vite: {
     optimizeDeps: {
@@ -45,13 +39,6 @@ export default defineNuxtConfig({
     preference: "system",
     fallback: "dark",
     dataValue: "theme",
-  },
-
-  auth: {
-    baseURL: process.env.AUTH_ORIGIN || "http://localhost:3000/api/auth",
-    provider: {
-      type: "authjs",
-    },
   },
 
   runtimeConfig: {
