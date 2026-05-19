@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/fonts",
     "nuxt-auth-utils",
+    "@sidebase/nuxt-auth",
   ],
 
   vite: {
@@ -46,15 +47,15 @@ export default defineNuxtConfig({
     dataValue: "theme",
   },
 
+  auth: {
+    baseURL: process.env.AUTH_ORIGIN || "http://localhost:3000/api/auth",
+    provider: {
+      type: "authjs",
+    },
+  },
+
   runtimeConfig: {
     githubToken: "",
-    oauth: {
-      github: {
-        clientId: "",
-        clientSecret: "",
-        redirectURL: "",
-      },
-    },
   },
 
   css: ["~/assets/main.css"],
@@ -78,6 +79,12 @@ export default defineNuxtConfig({
     "/privacy-policy": { cache: { maxAge: 3600 } },
 
     "/api/account/**": {
+      cache: {
+        maxAge: 60 * 5,
+      },
+    },
+
+    "/api/scanner/**": {
       cache: {
         maxAge: 60 * 5,
       },

@@ -4,7 +4,15 @@ import type { VerifiedAutomation } from "~~/shared/types/automation";
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const session = await getUserSession(event);
-  const token = session?.githubToken || config.githubToken;
+  const token = session?.apiToken || config.githubToken;
+
+  // Prevent API calls without a valid token to avoid hitting rate limits
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      message: "Unauthorized: GitHub token not available",
+    });
+  }
 
   const octokit = new Octokit({ auth: token });
 

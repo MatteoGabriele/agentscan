@@ -3,6 +3,7 @@ import { usePreferredDark } from "@vueuse/core";
 
 const darkMode = usePreferredDark();
 const colorMode = useColorMode();
+
 const colorScheme = computed(() => {
   return {
     system: darkMode ? "dark light" : "light dark",
@@ -50,6 +51,14 @@ const isHomePage = computed<boolean>(() => route.name === "index");
       <header class="h-12 flex justify-end items-center px-6 py-4 gap-6">
         <nav>
           <ul class="flex items-center gap-4">
+            <li>
+              <NuxtLink
+                to="/scanner"
+                class="flex text-gh-muted hover:text-white"
+              >
+                Scanner
+              </NuxtLink>
+            </li>
             <li>
               <NuxtLink
                 to="/health"

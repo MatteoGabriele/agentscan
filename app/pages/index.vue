@@ -8,6 +8,10 @@ function handleSubmit(name: string) {
 </script>
 
 <template>
-  <AnalysisForm v-model="accountName" @submit="handleSubmit" />
+  <AnalysisForm
+    placeholder="Enter GitHub username..."
+    v-model="accountName"
+    @submit="handleSubmit"
+  />
   <VerifiedAutomationList class="mt-2" />
 </template>

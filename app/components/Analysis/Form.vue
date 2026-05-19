@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineProps<{
+  placeholder?: string;
+}>();
+
 const emit = defineEmits<{
   (e: "submit", value: string): void;
 }>();
@@ -28,13 +32,15 @@ function clear() {
     class="flex flex-col @md:flex-row gap-2 mb-8"
   >
     <div class="w-full relative">
-      <label class="sr-only" for="userName">Enter GitHub username</label>
+      <label v-if="placeholder" class="sr-only" for="userName">{{
+        placeholder
+      }}</label>
       <input
         v-model="accountName"
         ref="inputRef"
         autocomplete="off"
         id="userName"
-        placeholder="Enter GitHub username..."
+        :placeholder
         class="flex-1 w-full py-2 px-4 pr-8 border-1 border-solid border-gh-border rounded-md bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
       />
       <button
