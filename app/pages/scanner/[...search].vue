@@ -227,12 +227,12 @@ watch(
           {{ author }}
         </a>
 
-        <div v-if="authorResults[author]" class="flex items-center gap-3">
-          <template v-if="authorResults[author].status === 'pending'">
-            <span class="i-carbon-loading animate-spin text-gh-muted" />
-          </template>
+        <div v-if="!authorResults[author] || authorResults[author].status === 'pending'" class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
+        </div>
+        <div v-else-if="authorResults[author]" class="flex items-center gap-3">
           <span
-            v-else-if="authorResults[author].isVerifiedAutomation"
+            v-if="authorResults[author].isVerifiedAutomation"
             class="flex items-center gap-2"
           >
             <span class="bg-gh-danger w-2 h-2 rounded-full" />
