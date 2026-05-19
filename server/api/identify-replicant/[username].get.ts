@@ -63,8 +63,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const session = await getUserSession(event);
-  const token = session?.apiToken || config.githubToken;
+  const token = config.githubToken;
 
   try {
     const octokit = new Octokit({ auth: token });

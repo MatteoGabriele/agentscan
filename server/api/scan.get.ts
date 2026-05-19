@@ -3,8 +3,7 @@ import type { Scan } from "~~/shared/types/scan";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const session = await getUserSession(event);
-  const token = session?.apiToken || config.githubToken;
+  const token = config.githubToken;
 
   // Prevent API calls without a valid token to avoid hitting rate limits
   if (!token) {

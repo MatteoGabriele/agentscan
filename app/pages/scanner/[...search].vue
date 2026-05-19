@@ -17,6 +17,8 @@ const { data, status, error } = await useAsyncData(() => {
   });
 });
 
+console.log(data.value);
+
 const authorResults = ref<
   Record<
     string,
@@ -26,7 +28,7 @@ const authorResults = ref<
       analysis?: IdentifyReplicantResult;
       error?: string;
       isVerifiedAutomation?: boolean;
-      hasIntegration?: boolean;
+      hasThirdPartyAutomationSignal?: boolean;
     }
   >
 >({});
@@ -39,6 +41,7 @@ async function analyzeAuthors() {
 
   // Initialize all authors as pending
   data.value.authors.forEach((author) => {
+    console.log(author);
     authorResults.value[author] = { status: "pending" };
   });
 
@@ -77,7 +80,7 @@ async function analyzeAuthors() {
           );
 
           // Check if in integrations list
-          const hasIntegration = integrations.value?.some(
+          const hasThirdPartyAutomationSignal = integrations.value?.some(
             (item) => item.username.toLowerCase() === author.toLowerCase(),
           );
 
@@ -86,7 +89,7 @@ async function analyzeAuthors() {
             user,
             analysis,
             isVerifiedAutomation,
-            hasIntegration,
+            hasThirdPartyAutomationSignal,
           };
         } catch (err: unknown) {
           const error = err as { data?: { message?: string } };
@@ -163,12 +166,19 @@ const flaggedCount = computed(() => {
   return (
     data.value?.authors.reduce((count, author) => {
       const result = authorResults.value[author];
-      return result?.isVerifiedAutomation || result?.hasIntegration
+      return result?.isVerifiedAutomation ||
+        result?.hasThirdPartyAutomationSignal
         ? count + 1
         : count;
     }, 0) ?? 0
   );
 });
+
+const getAuthorContributionUrl = (author: string): string | undefined => {
+  return data.value?.contributions?.find(
+    (contribution) => contribution.author === author,
+  )?.url;
+};
 
 watch(
   () => data.value?.authors,
@@ -209,7 +219,14 @@ watch(
         :key="author"
         class="flex items-center justify-between p-3 bg-gh-card rounded border border-gh-border"
       >
-        <span class="font-mono">{{ author }}</span>
+        <a
+          :href="getAuthorContributionUrl(author)"
+          target="_blank"
+          class="font-mono underline"
+        >
+          {{ author }}
+        </a>
+
         <div v-if="authorResults[author]" class="flex items-center gap-3">
           <template v-if="authorResults[author].status === 'pending'">
             <span class="i-carbon-loading animate-spin text-gh-muted" />
@@ -241,10 +258,10 @@ watch(
               </span>
               <div class="flex gap-1">
                 <span
-                  v-if="authorResults[author].hasIntegration"
+                  v-if="authorResults[author].hasThirdPartyAutomationSignal"
                   class="px-2 py-1 bg-amber-500/10 text-amber-500 text-xs rounded font-mono"
                 >
-                  ⚙️ integration
+                  third-party automation signal
                 </span>
               </div>
             </div>
