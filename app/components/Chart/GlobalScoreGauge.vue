@@ -5,7 +5,6 @@ import {
   type VueUiGaugeConfig,
 } from "vue-data-ui/vue-ui-gauge";
 
-import "vue-data-ui/style.css";
 import { useColors } from "~/composables/useColors";
 
 const props = defineProps<{

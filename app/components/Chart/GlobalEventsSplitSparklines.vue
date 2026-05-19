@@ -8,8 +8,6 @@ import { getPalette } from "vue-data-ui/utils";
 import { useColors } from "~/composables/useColors";
 import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
 
-import("vue-data-ui/style.css");
-
 const props = defineProps<{
   dataset?: Array<VueUiStacklineDatasetItem>;
   dates: string[];

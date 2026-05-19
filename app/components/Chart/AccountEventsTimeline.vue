@@ -12,8 +12,6 @@ import { useColors } from "~/composables/useColors";
 import { identityConfig, type IdentityClassification } from "@unveil/identity";
 import type { VueUiXyDatasetLineItem } from "vue-data-ui/vue-ui-xy";
 
-import("vue-data-ui/style.css");
-
 const props = defineProps<{
   events: GitHubEvent[];
   classification?: IdentityClassification;

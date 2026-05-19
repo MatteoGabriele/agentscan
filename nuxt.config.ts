@@ -13,7 +13,6 @@ export default defineNuxtConfig({
         "@vueuse/core",
         "vue-data-ui/vue-ui-xy",
         "vue-data-ui/vue-ui-heatmap",
-        "vue-data-ui/vue-ui-icon",
       ],
     },
   },
@@ -45,7 +44,7 @@ export default defineNuxtConfig({
     githubToken: "",
   },
 
-  css: ["~/assets/main.css"],
+  css: ["~/assets/main.css", "vue-data-ui/style.css"],
 
   app: {
     head: {

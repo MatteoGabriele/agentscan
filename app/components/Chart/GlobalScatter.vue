@@ -6,7 +6,6 @@ import {
   type VueUiScatterConfig,
 } from "vue-data-ui/vue-ui-scatter";
 
-import "vue-data-ui/style.css";
 import { useColors } from "~/composables/useColors";
 
 const props = defineProps<{

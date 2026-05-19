@@ -7,8 +7,6 @@ import {
 import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
 import { useColors } from "~/composables/useColors";
 
-import("vue-data-ui/style.css");
-
 const props = defineProps<{
   data: Array<VueUiStacklineDatasetItem>;
 }>();

@@ -12,8 +12,6 @@ import { mergeConfigs } from "vue-data-ui/utils";
 
 dayjs.extend(isoWeek);
 
-import("vue-data-ui/style.css");
-
 const props = defineProps<{
   data: VueUiStacklineDatasetItem[];
   timestamps: string[];
