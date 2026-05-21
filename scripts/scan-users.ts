@@ -115,12 +115,12 @@ async function searchUsers(octokit: Octokit) {
   const seenLogins = new Set<string>();
 
   try {
-    // Get top 10 most-starred repos
+    // Get top 15 most-starred repos (in case we need more to find 10 unique users)
     const trendingRepos = await octokit.rest.search.repos({
       q: `stars:>5000`,
       sort: "stars",
       order: "desc",
-      per_page: 10, // Get top 10 repos
+      per_page: 15, // Get more repos as fallback
     });
 
     if (trendingRepos.data.items.length === 0) {
@@ -147,7 +147,7 @@ async function searchUsers(octokit: Octokit) {
           state: "all",
           sort: "created",
           direction: "desc",
-          per_page: 30, // Get recent PRs
+          per_page: 100, // Get more PRs to ensure we find unique authors
         });
 
         console.log(`    Found ${prs.data.length} recent PRs`);
