@@ -89,16 +89,6 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
     },
   };
 });
-
-const hasEnoughData = computed(() => {
-  if (!data.value?.length) {
-    return false;
-  }
-
-  const uniqueDates = new Set(data.value.map((item) => item.created_at));
-
-  return uniqueDates.size >= 3;
-});
 </script>
 
 <template>
@@ -110,7 +100,6 @@ const hasEnoughData = computed(() => {
     </header>
     <section class="flex flex-col gap-6 h-full">
       <div
-        v-if="hasEnoughData"
         class="h-full flex flex-col items-center justify-center w-full"
       >
         <div class="mx-auto max-w-3xl p-8">
@@ -122,8 +111,7 @@ const hasEnoughData = computed(() => {
                 overall ecosystem health.
               </p>
               <p class="text-xs text-gh-muted/70">
-                *We analyze 100 unique accounts daily from trending
-                repositories.
+                *Each day, we analyze 10 PRs from 10 unique authors across 10 randomly selected repositories from GitHub's trending projects of the day.
               </p>
             </div>
           </header>
@@ -151,16 +139,6 @@ const hasEnoughData = computed(() => {
         </div>
         <div class="max-h-[300px] sm:max-h-[500px] w-full h-full">
           <ChartGlobalStatusDashboard :data />
-        </div>
-      </div>
-      <div v-else class="flex items-center justify-center h-full">
-        <div class="text-center max-w-sm">
-          <p class="text-lg font-semibold mb-2">Data collection in progress</p>
-          <p class="text-gh-muted">
-            We're currently collecting fresh data to provide you with more
-            accurate ecosystem health insights.
-          </p>
-          <p class="text-gh-muted">Please check back soon.</p>
         </div>
       </div>
     </section>
