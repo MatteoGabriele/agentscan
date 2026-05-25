@@ -158,6 +158,11 @@ async function searchUsers(octokit: Octokit) {
     "withastro/astro",
     "biomejs/biome",
     "tanstack/query-core",
+    "solidjs/solid",
+    "webpro-nl/knip",
+    "eslint/eslint",
+    "python/cpython",
+    "rolldown/rolldown",
   ];
 
   const users: Array<{
