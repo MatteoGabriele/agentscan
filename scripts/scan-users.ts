@@ -111,12 +111,25 @@ async function scanUser(
 }
 
 /**
- * Fetch PR authors from the top 10 most-starred repositories
+ * Fetch PR authors from curated list of popular OSS libraries and frameworks
  * Gets the first 10 PRs from each repo - collects all authors including duplicates
  */
 async function searchUsers(octokit: Octokit) {
   const PRS_PER_REPO = 10;
-  const TARGET_REPOS = 10;
+
+  const libraries = [
+    "nuxt/nuxt",
+    "vuejs/vue",
+    "facebook/react",
+    "sveltejs/svelte",
+    "vitejs/vite",
+    "vitest-dev/vitest",
+    "vercel/next.js",
+    "withastro/astro",
+    "biomejs/biome",
+    "tanstack/query-core",
+  ];
+
   const users: Array<{
     id: number;
     login: string;
@@ -126,36 +139,23 @@ async function searchUsers(octokit: Octokit) {
   }> = [];
 
   try {
-    // Get top 10 most-starred framework/library repos
-    const trendingRepos = await octokit.rest.search.repos({
-      q: `stars:>5000 (topic:framework OR topic:library OR topic:sdk OR topic:tool) is:public archived:false`,
-      sort: "stars",
-      order: "desc",
-      per_page: TARGET_REPOS,
-    });
-
-    if (trendingRepos.data.items.length === 0) {
-      console.error("No trending repositories found");
-      return users;
-    }
-
     console.log(
-      `\nFetching PR authors from top ${trendingRepos.data.items.length} most-starred repos`,
+      `\nFetching PR authors from ${libraries.length} curated OSS libraries/frameworks`,
     );
 
-    // Loop through each trending repo and get 10 PRs per repo
-    for (const repo of trendingRepos.data.items) {
-      if (!repo.owner) continue;
+    // Loop through each curated repo and get 10 PRs
+    for (const repoFullName of libraries) {
+      const [owner, repo] = repoFullName.split("/");
 
-      console.log(`\n  → ${repo.full_name} (⭐ ${repo.stargazers_count})`);
+      console.log(`\n  → ${repoFullName}`);
 
       let prsFromThisRepo = 0;
 
       try {
         // Get recent PRs from this repo
         const prs = await octokit.rest.pulls.list({
-          owner: repo.owner.login,
-          repo: repo.name,
+          owner,
+          repo,
           state: "all",
           sort: "created",
           direction: "desc",
@@ -179,7 +179,7 @@ async function searchUsers(octokit: Octokit) {
               login: fullProfile.data.login,
               created_at: fullProfile.data.created_at,
               public_repos: fullProfile.data.public_repos,
-              repo_name: repo.full_name,
+              repo_name: repoFullName,
             });
 
             prsFromThisRepo++;
@@ -202,17 +202,17 @@ async function searchUsers(octokit: Octokit) {
         );
       } catch (error) {
         console.error(
-          `    Error fetching PRs for ${repo.full_name}:`,
+          `    Error fetching PRs for ${repoFullName}:`,
           (error as Error).message,
         );
       }
     }
 
     if (users.length === 0) {
-      console.error("Could not find any PR authors from trending repositories");
+      console.error("Could not find any PR authors from OSS libraries");
     } else {
       console.log(
-        `\nSuccessfully fetched ${users.length} PR authors (${(users.length / TARGET_REPOS).toFixed(1)} per repo avg)`,
+        `\nSuccessfully fetched ${users.length} PR authors (${(users.length / libraries.length).toFixed(1)} per repo avg)`,
       );
     }
   } catch (error) {
