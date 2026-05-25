@@ -24,11 +24,20 @@ interface ScanResult {
 }
 
 /**
- * Generate a deterministic one-way hash for a user ID
- * Same userId will always produce the same hash
+ * Load verified automations list
  */
-function generateUserHash(userId: number): string {
-  return createHash("sha256").update(`${userId}:${STATIC_SALT}`).digest("hex");
+function loadVerifiedAutomations(): Set<number> {
+  const filePath = join(
+    process.cwd(),
+    "data",
+    "verified-automations-list.json",
+  );
+  try {
+    const data = JSON.parse(readFileSync(filePath, "utf-8"));
+    return new Set(data.map((item: any) => item.id));
+  } catch {
+    return new Set();
+  }
 }
 
 /**
@@ -224,9 +233,11 @@ async function main() {
 
   const octokit = new Octokit({ auth: token });
   const scanResults = loadScanResults();
+  const verifiedAutomations = loadVerifiedAutomations();
   const now = new Date().toISOString();
 
   console.log(`Starting daily snapshot scan for ${now}`);
+  console.log(`Loaded ${verifiedAutomations.size} verified automations`);
 
   const users = await searchUsers(octokit);
 
@@ -243,14 +254,21 @@ async function main() {
   for (const user of users) {
     // Scan every user - we want a fresh daily snapshot
     console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
+
     const scanData = await scanUser(
       user.login,
       user.created_at,
       user.public_repos,
     );
 
-    const score = scanData?.analysis.score;
+    let score = scanData?.analysis.score;
     const eventsCount = scanData?.eventsCount ?? 0;
+
+    // Check if user is in verified automations list
+    if (verifiedAutomations.has(user.id)) {
+      console.log(` User is in verified automations list, setting score to 0`);
+      score = 0;
+    }
 
     // Save all results regardless of whether they were scanned before
     if (score != null) {
