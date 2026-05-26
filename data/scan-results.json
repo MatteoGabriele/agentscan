@@ -1411,5 +1411,1427 @@
     "user_public_repos_count": 2,
     "events_count": 3,
     "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 287276798,
+    "score": 80,
+    "user_created_at": "2026-05-23T17:48:23Z",
+    "user_public_repos_count": 2,
+    "events_count": 18,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 127209252,
+    "score": 49,
+    "user_created_at": "2023-03-07T12:32:50Z",
+    "user_public_repos_count": 33,
+    "events_count": 200,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 287276798,
+    "score": 80,
+    "user_created_at": "2026-05-23T17:48:23Z",
+    "user_public_repos_count": 2,
+    "events_count": 18,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 28706372,
+    "score": 100,
+    "user_created_at": "2017-05-15T12:06:30Z",
+    "user_public_repos_count": 869,
+    "events_count": 200,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 28706372,
+    "score": 100,
+    "user_created_at": "2017-05-15T12:06:30Z",
+    "user_public_repos_count": 869,
+    "events_count": 200,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 28706372,
+    "score": 100,
+    "user_created_at": "2017-05-15T12:06:30Z",
+    "user_public_repos_count": 869,
+    "events_count": 200,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 28706372,
+    "score": 100,
+    "user_created_at": "2017-05-15T12:06:30Z",
+    "user_public_repos_count": 869,
+    "events_count": 200,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 112722215,
+    "score": 100,
+    "user_created_at": "2022-09-02T17:37:04Z",
+    "user_public_repos_count": 48,
+    "events_count": 22,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 112722215,
+    "score": 100,
+    "user_created_at": "2022-09-02T17:37:04Z",
+    "user_public_repos_count": 48,
+    "events_count": 22,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 27723864,
+    "score": 0,
+    "user_created_at": "2017-04-18T08:34:48Z",
+    "user_public_repos_count": 92,
+    "events_count": 200,
+    "repo_name": "nuxt/nuxt"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 265513410,
+    "score": 65,
+    "user_created_at": "2026-03-04T11:09:38Z",
+    "user_public_repos_count": 3,
+    "events_count": 45,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 283908624,
+    "score": 40,
+    "user_created_at": "2026-05-12T07:22:05Z",
+    "user_public_repos_count": 9,
+    "events_count": 197,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 283908624,
+    "score": 40,
+    "user_created_at": "2026-05-12T07:22:05Z",
+    "user_public_repos_count": 9,
+    "events_count": 197,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 283908624,
+    "score": 40,
+    "user_created_at": "2026-05-12T07:22:05Z",
+    "user_public_repos_count": 9,
+    "events_count": 197,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 129082256,
+    "score": 100,
+    "user_created_at": "2023-03-27T14:29:27Z",
+    "user_public_repos_count": 11,
+    "events_count": 27,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 129082256,
+    "score": 100,
+    "user_created_at": "2023-03-27T14:29:27Z",
+    "user_public_repos_count": 11,
+    "events_count": 27,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 128878088,
+    "score": 49,
+    "user_created_at": "2023-03-25T03:29:06Z",
+    "user_public_repos_count": 8,
+    "events_count": 39,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 270070865,
+    "score": 65,
+    "user_created_at": "2026-03-22T06:27:23Z",
+    "user_public_repos_count": 72,
+    "events_count": 200,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 94847532,
+    "score": 39,
+    "user_created_at": "2021-11-22T13:50:00Z",
+    "user_public_repos_count": 53,
+    "events_count": 86,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 94847532,
+    "score": 39,
+    "user_created_at": "2021-11-22T13:50:00Z",
+    "user_public_repos_count": 53,
+    "events_count": 86,
+    "repo_name": "vuejs/vue"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 13698226,
+    "score": 100,
+    "user_created_at": "2015-08-07T18:09:25Z",
+    "user_public_repos_count": 74,
+    "events_count": 94,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 12292047,
+    "score": 100,
+    "user_created_at": "2015-05-07T08:08:10Z",
+    "user_public_repos_count": 372,
+    "events_count": 200,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 17105810,
+    "score": 100,
+    "user_created_at": "2016-02-07T05:28:35Z",
+    "user_public_repos_count": 22,
+    "events_count": 7,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 151709939,
+    "score": 100,
+    "user_created_at": "2023-11-22T05:15:41Z",
+    "user_public_repos_count": 5,
+    "events_count": 12,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 17105810,
+    "score": 100,
+    "user_created_at": "2016-02-07T05:28:35Z",
+    "user_public_repos_count": 22,
+    "events_count": 7,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 17105810,
+    "score": 100,
+    "user_created_at": "2016-02-07T05:28:35Z",
+    "user_public_repos_count": 22,
+    "events_count": 7,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 12485737,
+    "score": 100,
+    "user_created_at": "2015-05-17T17:41:21Z",
+    "user_public_repos_count": 50,
+    "events_count": 68,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 38076,
+    "score": 100,
+    "user_created_at": "2008-12-03T17:23:03Z",
+    "user_public_repos_count": 99,
+    "events_count": 134,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 7386165,
+    "score": 74,
+    "user_created_at": "2014-04-23T15:45:35Z",
+    "user_public_repos_count": 69,
+    "events_count": 200,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 231829292,
+    "score": 100,
+    "user_created_at": "2025-09-12T05:43:45Z",
+    "user_public_repos_count": 14,
+    "events_count": 29,
+    "repo_name": "facebook/react"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 242963119,
+    "score": 100,
+    "user_created_at": "2025-11-09T14:57:07Z",
+    "user_public_repos_count": 18,
+    "events_count": 87,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 5968653,
+    "score": 100,
+    "user_created_at": "2013-11-18T12:03:35Z",
+    "user_public_repos_count": 60,
+    "events_count": 198,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 37371774,
+    "score": 74,
+    "user_created_at": "2018-03-14T13:02:43Z",
+    "user_public_repos_count": 31,
+    "events_count": 64,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 48158184,
+    "score": 100,
+    "user_created_at": "2019-03-02T15:35:56Z",
+    "user_public_repos_count": 114,
+    "events_count": 138,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 48158184,
+    "score": 100,
+    "user_created_at": "2019-03-02T15:35:56Z",
+    "user_public_repos_count": 114,
+    "events_count": 138,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 48158184,
+    "score": 100,
+    "user_created_at": "2019-03-02T15:35:56Z",
+    "user_public_repos_count": 114,
+    "events_count": 138,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 5968653,
+    "score": 100,
+    "user_created_at": "2013-11-18T12:03:35Z",
+    "user_public_repos_count": 60,
+    "events_count": 198,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3405524,
+    "score": 100,
+    "user_created_at": "2013-01-28T12:12:32Z",
+    "user_public_repos_count": 19,
+    "events_count": 6,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 219721791,
+    "score": 15,
+    "user_created_at": "2025-07-07T17:37:51Z",
+    "user_public_repos_count": 97,
+    "events_count": 200,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 236133619,
+    "score": 39,
+    "user_created_at": "2025-10-05T01:41:03Z",
+    "user_public_repos_count": 408,
+    "events_count": 200,
+    "repo_name": "sveltejs/svelte"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 268919701,
+    "score": 90,
+    "user_created_at": "2026-03-17T13:26:56Z",
+    "user_public_repos_count": 80,
+    "events_count": 23,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 24516654,
+    "score": 100,
+    "user_created_at": "2016-12-12T04:35:22Z",
+    "user_public_repos_count": 240,
+    "events_count": 200,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 49056869,
+    "score": 100,
+    "user_created_at": "2019-03-29T07:11:06Z",
+    "user_public_repos_count": 206,
+    "events_count": 200,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 261208024,
+    "score": 39,
+    "user_created_at": "2026-02-12T13:25:07Z",
+    "user_public_repos_count": 8,
+    "events_count": 77,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 127209252,
+    "score": 49,
+    "user_created_at": "2023-03-07T12:32:50Z",
+    "user_public_repos_count": 33,
+    "events_count": 200,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 127209252,
+    "score": 49,
+    "user_created_at": "2023-03-07T12:32:50Z",
+    "user_public_repos_count": 33,
+    "events_count": 200,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 53560091,
+    "score": 100,
+    "user_created_at": "2019-08-01T09:03:38Z",
+    "user_public_repos_count": 21,
+    "events_count": 44,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 141621065,
+    "score": 100,
+    "user_created_at": "2023-08-07T08:19:22Z",
+    "user_public_repos_count": 10,
+    "events_count": 56,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 151845341,
+    "score": 100,
+    "user_created_at": "2023-11-23T12:44:34Z",
+    "user_public_repos_count": 13,
+    "events_count": 147,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 60376145,
+    "score": 100,
+    "user_created_at": "2020-01-28T04:11:28Z",
+    "user_public_repos_count": 32,
+    "events_count": 31,
+    "repo_name": "vitejs/vite"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 4232207,
+    "score": 65,
+    "user_created_at": "2013-04-23T07:06:08Z",
+    "user_public_repos_count": 405,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 16173870,
+    "score": 100,
+    "user_created_at": "2015-12-06T07:43:18Z",
+    "user_public_repos_count": 57,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 4232207,
+    "score": 65,
+    "user_created_at": "2013-04-23T07:06:08Z",
+    "user_public_repos_count": 405,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 4232207,
+    "score": 65,
+    "user_created_at": "2013-04-23T07:06:08Z",
+    "user_public_repos_count": 405,
+    "events_count": 200,
+    "repo_name": "vitest-dev/vitest"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 21013447,
+    "score": 100,
+    "user_created_at": "2016-08-13T20:48:52Z",
+    "user_public_repos_count": 137,
+    "events_count": 198,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 21013447,
+    "score": 100,
+    "user_created_at": "2016-08-13T20:48:52Z",
+    "user_public_repos_count": 137,
+    "events_count": 198,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 12292047,
+    "score": 100,
+    "user_created_at": "2015-05-07T08:08:10Z",
+    "user_public_repos_count": 372,
+    "events_count": 200,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 6324199,
+    "score": 100,
+    "user_created_at": "2014-01-05T17:48:23Z",
+    "user_public_repos_count": 266,
+    "events_count": 199,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1365881,
+    "score": 100,
+    "user_created_at": "2012-01-22T02:18:14Z",
+    "user_public_repos_count": 130,
+    "events_count": 200,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1365881,
+    "score": 100,
+    "user_created_at": "2012-01-22T02:18:14Z",
+    "user_public_repos_count": 130,
+    "events_count": 200,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1365881,
+    "score": 100,
+    "user_created_at": "2012-01-22T02:18:14Z",
+    "user_public_repos_count": 130,
+    "events_count": 200,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 126740959,
+    "score": 100,
+    "user_created_at": "2023-03-02T02:53:50Z",
+    "user_public_repos_count": 33,
+    "events_count": 200,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 223890119,
+    "score": 100,
+    "user_created_at": "2025-07-31T14:33:25Z",
+    "user_public_repos_count": 9,
+    "events_count": 9,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 19852293,
+    "score": 100,
+    "user_created_at": "2016-06-10T06:32:57Z",
+    "user_public_repos_count": 144,
+    "events_count": 200,
+    "repo_name": "vercel/next.js"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 274926931,
+    "score": 90,
+    "user_created_at": "2026-04-09T21:53:37Z",
+    "user_public_repos_count": 2,
+    "events_count": 14,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 602478,
+    "score": 100,
+    "user_created_at": "2011-02-05T21:48:00Z",
+    "user_public_repos_count": 105,
+    "events_count": 197,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 18169566,
+    "score": 100,
+    "user_created_at": "2016-03-30T14:23:28Z",
+    "user_public_repos_count": 828,
+    "events_count": 48,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 289477,
+    "score": 100,
+    "user_created_at": "2010-05-28T07:13:32Z",
+    "user_public_repos_count": 19,
+    "events_count": 7,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 239513,
+    "score": 65,
+    "user_created_at": "2010-04-08T12:57:17Z",
+    "user_public_repos_count": 413,
+    "events_count": 197,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 281389,
+    "score": 100,
+    "user_created_at": "2010-05-19T13:42:06Z",
+    "user_public_repos_count": 58,
+    "events_count": 199,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 189417202,
+    "score": 100,
+    "user_created_at": "2024-11-23T01:47:53Z",
+    "user_public_repos_count": 12,
+    "events_count": 143,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 108291165,
+    "score": 50,
+    "user_created_at": "2022-06-27T16:19:36Z",
+    "user_public_repos_count": 0,
+    "events_count": 199,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 236133619,
+    "score": 39,
+    "user_created_at": "2025-10-05T01:41:03Z",
+    "user_public_repos_count": 408,
+    "events_count": 200,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 108291165,
+    "score": 50,
+    "user_created_at": "2022-06-27T16:19:36Z",
+    "user_public_repos_count": 0,
+    "events_count": 199,
+    "repo_name": "withastro/astro"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 171769910,
+    "score": 100,
+    "user_created_at": "2024-06-05T05:18:44Z",
+    "user_public_repos_count": 14,
+    "events_count": 35,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 27168277,
+    "score": 100,
+    "user_created_at": "2017-04-09T22:48:31Z",
+    "user_public_repos_count": 54,
+    "events_count": 33,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 11695769,
+    "score": 100,
+    "user_created_at": "2015-03-28T15:03:54Z",
+    "user_public_repos_count": 30,
+    "events_count": 195,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 64079946,
+    "score": 74,
+    "user_created_at": "2020-04-21T11:59:50Z",
+    "user_public_repos_count": 13,
+    "events_count": 82,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 602478,
+    "score": 100,
+    "user_created_at": "2011-02-05T21:48:00Z",
+    "user_public_repos_count": 105,
+    "events_count": 197,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 25768349,
+    "score": 100,
+    "user_created_at": "2017-02-14T11:21:56Z",
+    "user_public_repos_count": 81,
+    "events_count": 34,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 6227442,
+    "score": 100,
+    "user_created_at": "2013-12-20T02:40:35Z",
+    "user_public_repos_count": 27,
+    "events_count": 200,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 6227442,
+    "score": 100,
+    "user_created_at": "2013-12-20T02:40:35Z",
+    "user_public_repos_count": 27,
+    "events_count": 200,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1732357,
+    "score": 39,
+    "user_created_at": "2012-05-12T09:18:53Z",
+    "user_public_repos_count": 111,
+    "events_count": 200,
+    "repo_name": "biomejs/biome"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 184235,
+    "score": 65,
+    "user_created_at": "2010-01-17T22:39:17Z",
+    "user_public_repos_count": 117,
+    "events_count": 180,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 184235,
+    "score": 65,
+    "user_created_at": "2010-01-17T22:39:17Z",
+    "user_public_repos_count": 117,
+    "events_count": 180,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 219721791,
+    "score": 15,
+    "user_created_at": "2025-07-07T17:37:51Z",
+    "user_public_repos_count": 97,
+    "events_count": 200,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 197028264,
+    "score": 14,
+    "user_created_at": "2025-01-30T03:42:23Z",
+    "user_public_repos_count": 120,
+    "events_count": 200,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 2768267,
+    "score": 100,
+    "user_created_at": "2012-11-10T21:21:53Z",
+    "user_public_repos_count": 86,
+    "events_count": 200,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 64156,
+    "score": 100,
+    "user_created_at": "2009-03-17T04:30:28Z",
+    "user_public_repos_count": 99,
+    "events_count": 31,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 184235,
+    "score": 65,
+    "user_created_at": "2010-01-17T22:39:17Z",
+    "user_public_repos_count": 117,
+    "events_count": 180,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 184235,
+    "score": 65,
+    "user_created_at": "2010-01-17T22:39:17Z",
+    "user_public_repos_count": 117,
+    "events_count": 180,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 64156,
+    "score": 100,
+    "user_created_at": "2009-03-17T04:30:28Z",
+    "user_public_repos_count": 99,
+    "events_count": 31,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 143176954,
+    "score": 100,
+    "user_created_at": "2023-08-25T09:37:22Z",
+    "user_public_repos_count": 19,
+    "events_count": 177,
+    "repo_name": "solidjs/solid"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 13872357,
+    "score": 100,
+    "user_created_at": "2015-08-19T15:54:39Z",
+    "user_public_repos_count": 15,
+    "events_count": 9,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3964948,
+    "score": 100,
+    "user_created_at": "2013-03-25T13:59:10Z",
+    "user_public_repos_count": 16,
+    "events_count": 5,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 15133828,
+    "score": 100,
+    "user_created_at": "2015-10-15T01:18:49Z",
+    "user_public_repos_count": 22,
+    "events_count": 102,
+    "repo_name": "webpro-nl/knip"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3242828,
+    "score": 0,
+    "user_created_at": "2013-01-11T08:53:39Z",
+    "user_public_repos_count": 497,
+    "events_count": 200,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 38443830,
+    "score": 49,
+    "user_created_at": "2018-04-16T22:37:22Z",
+    "user_public_repos_count": 111,
+    "events_count": 194,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 133520652,
+    "score": 100,
+    "user_created_at": "2023-05-13T15:34:28Z",
+    "user_public_repos_count": 21,
+    "events_count": 199,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 129483880,
+    "score": 29,
+    "user_created_at": "2023-03-31T05:37:03Z",
+    "user_public_repos_count": 11,
+    "events_count": 43,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 13383618,
+    "score": 50,
+    "user_created_at": "2015-07-17T16:11:32Z",
+    "user_public_repos_count": 0,
+    "events_count": 200,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 86398394,
+    "score": 100,
+    "user_created_at": "2021-06-24T06:07:40Z",
+    "user_public_repos_count": 34,
+    "events_count": 106,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 195726568,
+    "score": 100,
+    "user_created_at": "2025-01-20T06:48:19Z",
+    "user_public_repos_count": 22,
+    "events_count": 145,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 60560836,
+    "score": 100,
+    "user_created_at": "2020-02-02T02:55:30Z",
+    "user_public_repos_count": 34,
+    "events_count": 39,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 195726568,
+    "score": 100,
+    "user_created_at": "2025-01-20T06:48:19Z",
+    "user_public_repos_count": 22,
+    "events_count": 145,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 86398394,
+    "score": 100,
+    "user_created_at": "2021-06-24T06:07:40Z",
+    "user_public_repos_count": 34,
+    "events_count": 106,
+    "repo_name": "eslint/eslint"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 31762852,
+    "score": 100,
+    "user_created_at": "2017-09-08T08:58:22Z",
+    "user_public_repos_count": 16,
+    "events_count": 16,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 699636,
+    "score": 100,
+    "user_created_at": "2011-03-30T15:49:50Z",
+    "user_public_repos_count": 192,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 253604130,
+    "score": 74,
+    "user_created_at": "2026-01-07T23:04:20Z",
+    "user_public_repos_count": 102,
+    "events_count": 64,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 3659035,
+    "score": 65,
+    "user_created_at": "2013-02-21T12:14:41Z",
+    "user_public_repos_count": 19,
+    "events_count": 200,
+    "repo_name": "python/cpython"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 10465670,
+    "score": 100,
+    "user_created_at": "2015-01-09T16:00:23Z",
+    "user_public_repos_count": 163,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 165626830,
+    "score": 65,
+    "user_created_at": "2024-04-01T04:02:13Z",
+    "user_public_repos_count": 61,
+    "events_count": 197,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 17974631,
+    "score": 100,
+    "user_created_at": "2016-03-21T04:47:19Z",
+    "user_public_repos_count": 206,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1430279,
+    "score": 65,
+    "user_created_at": "2012-02-12T05:31:18Z",
+    "user_public_repos_count": 95,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 10465670,
+    "score": 100,
+    "user_created_at": "2015-01-09T16:00:23Z",
+    "user_public_repos_count": 163,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 29533304,
+    "score": 65,
+    "user_created_at": "2017-06-19T07:05:38Z",
+    "user_public_repos_count": 129,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1430279,
+    "score": 65,
+    "user_created_at": "2012-02-12T05:31:18Z",
+    "user_public_repos_count": 95,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1430279,
+    "score": 65,
+    "user_created_at": "2012-02-12T05:31:18Z",
+    "user_public_repos_count": 95,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1430279,
+    "score": 65,
+    "user_created_at": "2012-02-12T05:31:18Z",
+    "user_public_repos_count": 95,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 49502170,
+    "score": 100,
+    "user_created_at": "2019-04-11T00:38:51Z",
+    "user_public_repos_count": 153,
+    "events_count": 200,
+    "repo_name": "rolldown/rolldown"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1309177,
+    "score": 100,
+    "user_created_at": "2012-01-06T11:14:16Z",
+    "user_public_repos_count": 49,
+    "events_count": 200,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1309177,
+    "score": 100,
+    "user_created_at": "2012-01-06T11:14:16Z",
+    "user_public_repos_count": 49,
+    "events_count": 200,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 805930,
+    "score": 100,
+    "user_created_at": "2011-05-23T19:24:42Z",
+    "user_public_repos_count": 66,
+    "events_count": 60,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 46858550,
+    "score": 100,
+    "user_created_at": "2019-01-20T06:00:34Z",
+    "user_public_repos_count": 18,
+    "events_count": 13,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 127209252,
+    "score": 49,
+    "user_created_at": "2023-03-07T12:32:50Z",
+    "user_public_repos_count": 33,
+    "events_count": 200,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 237468078,
+    "score": 100,
+    "user_created_at": "2025-10-11T17:10:31Z",
+    "user_public_repos_count": 10,
+    "events_count": 196,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 38443830,
+    "score": 49,
+    "user_created_at": "2018-04-16T22:37:22Z",
+    "user_public_repos_count": 111,
+    "events_count": 194,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 4272014,
+    "score": 100,
+    "user_created_at": "2013-04-27T09:12:03Z",
+    "user_public_repos_count": 84,
+    "events_count": 157,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 4272014,
+    "score": 100,
+    "user_created_at": "2013-04-27T09:12:03Z",
+    "user_public_repos_count": 84,
+    "events_count": 157,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 66740,
+    "score": 100,
+    "user_created_at": "2009-03-24T21:55:50Z",
+    "user_public_repos_count": 135,
+    "events_count": 200,
+    "repo_name": "astral-sh/uv"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1203881,
+    "score": 100,
+    "user_created_at": "2011-11-18T07:45:23Z",
+    "user_public_repos_count": 84,
+    "events_count": 198,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1309177,
+    "score": 100,
+    "user_created_at": "2012-01-06T11:14:16Z",
+    "user_public_repos_count": 49,
+    "events_count": 200,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1309177,
+    "score": 100,
+    "user_created_at": "2012-01-06T11:14:16Z",
+    "user_public_repos_count": 49,
+    "events_count": 200,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1203881,
+    "score": 100,
+    "user_created_at": "2011-11-18T07:45:23Z",
+    "user_public_repos_count": 84,
+    "events_count": 198,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 66076021,
+    "score": 100,
+    "user_created_at": "2020-05-28T14:26:38Z",
+    "user_public_repos_count": 70,
+    "events_count": 200,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 33715215,
+    "score": 100,
+    "user_created_at": "2017-11-16T08:13:41Z",
+    "user_public_repos_count": 18,
+    "events_count": 8,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 1309177,
+    "score": 100,
+    "user_created_at": "2012-01-06T11:14:16Z",
+    "user_public_repos_count": 49,
+    "events_count": 200,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 860932,
+    "score": 100,
+    "user_created_at": "2011-06-20T05:33:52Z",
+    "user_public_repos_count": 179,
+    "events_count": 88,
+    "repo_name": "astral-sh/ruff"
+  },
+  {
+    "created_at": "2026-05-26T14:37:50.267Z",
+    "user_id": 132134454,
+    "score": 100,
+    "user_created_at": "2023-04-29T09:38:48Z",
+    "user_public_repos_count": 2,
+    "events_count": 3,
+    "repo_name": "astral-sh/ruff"
   }
 ]
