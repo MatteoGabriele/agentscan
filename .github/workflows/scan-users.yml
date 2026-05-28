@@ -2,13 +2,13 @@ name: Daily User Scan
 
 on:
   schedule:
-    - cron: "0 0 1,8,15,22,29 * *" # Days 1,8,15,22,29 → 00:00
-    - cron: "26 3 2,9,16,23,30 * *" # Days 2,9,16,23,30 → 03:26
-    - cron: "51 6 3,10,17,24,31 * *" # Days 3,10,17,24,31 → 06:51
-    - cron: "17 10 4,11,18,25 * *" # Days 4,11,18,25 → 10:17
-    - cron: "43 13 5,12,19,26 * *" # Days 5,12,19,26 → 13:43
-    - cron: "9 17 6,13,20,27 * *" # Days 6,13,20,27 → 17:09
-    - cron: "34 20 7,14,21,28 * *" # Days 7,14,21,28 → 20:34
+    - cron: "0 0 1,8,15,22,29 * *" # Days 1,8,15,22,29 at 00:00 UTC
+    - cron: "26 3 2,9,16,23,30 * *" # Days 2,9,16,23,30 at 03:26 UTC
+    - cron: "51 6 3,10,17,24,31 * *" # Days 3,10,17,24,31 at 06:51 UTC
+    - cron: "17 10 4,11,18,25 * *" # Days 4,11,18,25 at 10:17 UTC
+    - cron: "43 13 5,12,19,26 * *" # Days 5,12,19,26 at 13:43 UTC
+    - cron: "9 17 6,13,20,27 * *" # Days 6,13,20,27 at 17:09 UTC
+    - cron: "34 20 7,14,21,28 * *" # Days 7,14,21,28 at 20:34 UTC
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -26,13 +26,18 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Run user scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm exec tsx scripts/scan-users.ts
+        run: pnpm exec tsx scripts/scan-users.ts
 
       - name: Commit and push results
         run: |
