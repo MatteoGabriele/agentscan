@@ -107,7 +107,10 @@ const timestamps = computed(() => {
 </script>
 
 <template>
-  <div class="h-screen w-screen flex items-center justify-center text-3xl">
+  <div class="my-6 w-screen flex items-center justify-center text-3xl">
     <ChartGlobalEventsHeatmap :data="dataset" :timestamps />
+  </div>
+  <div class="my-6 w-screen flex items-center justify-center text-3xl">
+    <ChartFeaturedPackageHealthRanking class="max-w-150" />
   </div>
 </template>
