@@ -19,25 +19,25 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: "20"
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
         with:
-          version: 8
+          version: "11"
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run user scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm exec tsx scripts/scan-users.ts
+        run: tsx scripts/scan-users.ts
 
       - name: Commit and push results
         run: |
@@ -50,6 +50,14 @@ jobs:
             git add data/scan-results.json
             git commit -m "chore: daily user scan - $(date -u +'%Y-%m-%d')"
             git fetch origin main
-            git merge --no-edit origin/main
-            git push
+            if git merge --no-edit origin/main --no-commit; then
+              git commit --no-edit
+              git push
+            else
+              echo "Merge conflict detected"
+              echo "=== Scan results JSON ==="
+              cat data/scan-results.json
+              echo "=== End of JSON ==="
+              exit 1
+            fi
           fi
