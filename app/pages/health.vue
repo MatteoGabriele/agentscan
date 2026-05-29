@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { IdentityClassification } from "@unveil/identity";
+import { identityConfig } from "@unveil/identity";
 
-const { data } = useScan();
+const { data } = await useEcosystemHealth();
+const { formattedNextScanTime } = useNextScanTime();
 
 definePageMeta({
   layout: false,
@@ -27,9 +29,13 @@ useHead({
 });
 
 function classifyByScore(score: number): IdentityClassification {
-  if (score <= 50) return "automation";
-  if (score <= 70) return "mixed";
-  return "organic";
+  if (score >= identityConfig.THRESHOLD_HUMAN) {
+    return "organic";
+  } else if (score >= identityConfig.THRESHOLD_SUSPICIOUS) {
+    return "mixed";
+  } else {
+    return "automation";
+  }
 }
 
 type ClassificationStats = Record<
@@ -84,6 +90,17 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
     },
   };
 });
+
+const MIN_DAY_DATA_COLLECTION = 4;
+const hasEnoughData = computed(() => {
+  if (!data.value?.length) {
+    return false;
+  }
+
+  const uniqueDates = new Set(data.value.map((item) => item.created_at));
+
+  return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
+});
 </script>
 
 <template>
@@ -93,7 +110,7 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
         <span class="i-carbon-scan relative top-1 text-gh-text text-xl" />
       </NuxtLink>
     </header>
-    <section class="flex flex-col gap-6 h-full">
+    <section v-if="hasEnoughData" class="flex flex-col gap-6 h-full">
       <div class="h-full flex flex-col items-center justify-center w-full">
         <div class="mx-auto max-w-3xl p-8">
           <header class="text-center">
@@ -103,9 +120,12 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
                 A snapshot* of GitHub community activity patterns to measure the
                 overall ecosystem health.
               </p>
-              <p class="text-xs text-gh-muted/70">
-                *We analyze 100 unique accounts daily from trending
+              <p class="text-xs text-gh-muted/70 mt-1">
+                *Each day, we analyze 10 PRs from a curated list of
                 repositories.
+              </p>
+              <p class="text-xs text-gh-muted/70 mt-1">
+                {{ formattedNextScanTime }}
               </p>
             </div>
           </header>
@@ -135,6 +155,22 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
           <ChartGlobalStatusDashboard :data />
         </div>
       </div>
+    </section>
+    <section
+      v-else
+      class="flex items-center justify-center flex-col gap-6 h-full"
+    >
+      <header class="text-center flex items-center flex-col">
+        <AnimationTea class="mb-4" />
+        <h1 class="text-xl font-semibold">Data collection in progress</h1>
+        <div class="text-gh-muted mt-2 flex flex-col text-pretty max-w-lg">
+          <p>
+            We're currently collecting fresh data to provide you with more
+            accurate ecosystem health insights.
+          </p>
+          <p class="mt-2">Please check back soon.</p>
+        </div>
+      </header>
     </section>
   </div>
   <MainFooter />

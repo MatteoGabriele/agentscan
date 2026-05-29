@@ -1,26 +1,27 @@
 name: AgentScan
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened]
-
-permissions:
-  pull-requests: write
-  contents: read
+  issues:
+    types: [opened]
 
 jobs:
   agentscan:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
       - name: Cache AgentScan analysis
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: .agentscan-cache
           key: agentscan-cache-${{ github.actor }}
           restore-keys: agentscan-cache-
       - name: AgentScan
-        uses: MatteoGabriele/agentscan-action@v1.3.0
+        uses: MatteoGabriele/agentscan-action@21f25b07e4dda43e6597ffb71c93f8e4c9fed812
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-members: "MatteoGabriele,graphieros"

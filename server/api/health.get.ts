@@ -1,5 +1,5 @@
 import { Octokit } from "octokit";
-import type { Scan } from "~~/shared/types/scan";
+import type { EcosystemHealthItem } from "~~/shared/types/ecosystem-health";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     if ("content" in scanList) {
       const content = Buffer.from(scanList.content, "base64").toString("utf-8");
-      const scanData = JSON.parse(content) as Scan[];
+      const scanData = JSON.parse(content) as EcosystemHealthItem[];
 
       return scanData;
     }

@@ -4,13 +4,12 @@ import {
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
 } from "vue-data-ui";
-import { getCompleteDayRange } from "./chart";
+import { getCompleteDayRange } from "~/utils/charts";
 import type { GitHubEvent, GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
 import { identityConfig, type IdentityClassification } from "@unveil/identity";
-import { VueUiIcon } from "vue-data-ui/vue-ui-icon";
 import type { VueUiXyDatasetLineItem } from "vue-data-ui/vue-ui-xy";
 
 import("vue-data-ui/style.css");
@@ -26,6 +25,8 @@ const chartLineRef = useTemplateRef("chartLineRef");
 onMounted(async () => {
   rootEl.value = document.documentElement;
 });
+
+const locale = computed(() => "en"); // in case i18n is implemented in the future
 
 const colors = useColors(rootEl);
 
@@ -87,31 +88,123 @@ const eventConfig = computed(() => {
   };
 });
 
+const dayRangeLimit = 90;
+
 function isGitHubEventType(type: string | null): type is GitHubEventType {
   return type !== null && githubEventTypes.includes(type as GitHubEventType);
 }
 
+const activeGitHubEventTypes = [
+  "PullRequestEvent",
+  "CreateEvent",
+  "ForkEvent",
+] as const satisfies readonly GitHubEventType[];
+
+type ActiveGitHubEventType = Exclude<GitHubEventType, "IssueCommentEvent">;
+
+function isActiveGitHubEventType(
+  type: GitHubEventType,
+): type is ActiveGitHubEventType {
+  return activeGitHubEventTypes.includes(type as ActiveGitHubEventType);
+}
+
 const eventDays = computed(() => {
-  return Array.from(
+  const days = Array.from(
     new Set(
       props.events
-        .filter((event) => event.created_at && isGitHubEventType(event.type))
+        .filter((event) => {
+          return (
+            event.created_at &&
+            isGitHubEventType(event.type) &&
+            isActiveGitHubEventType(event.type)
+          );
+        })
         .map((event) => event.created_at!.slice(0, 10)),
     ),
   ).sort();
+
+  const lastDay = days.at(-1);
+  if (!lastDay) return [];
+
+  const startDate = new Date(`${lastDay}T00:00:00.000Z`);
+  startDate.setUTCDate(startDate.getUTCDate() - dayRangeLimit + 1);
+  const startDay = startDate.toISOString().slice(0, 10);
+  return days.filter((day) => day >= startDay);
 });
 
-const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 4);
+const limitedEvents = computed(() => {
+  const firstDay = eventDays.value[0];
+  if (!firstDay) return [];
+  return props.events.filter((event) => {
+    return (
+      event.created_at &&
+      isGitHubEventType(event.type) &&
+      isActiveGitHubEventType(event.type) &&
+      event.created_at.slice(0, 10) >= firstDay
+    );
+  });
+});
 
-const activeGitHubEventTypes = computed(() => {
-  return githubEventTypes.filter(
-    (eventType) => eventType !== "IssueCommentEvent",
-  );
+const completeDayLabels = computed<string[]>(() => {
+  return getCompleteDayRange(eventDays.value);
+});
+
+const usesHourlyGranularity = computed<boolean>(() => {
+  return completeDayLabels.value.length <= 2;
+});
+
+function roundToClosestHour(date: Date): Date {
+  const rounded = new Date(date);
+  if (rounded.getUTCMinutes() >= 30) {
+    rounded.setUTCHours(rounded.getUTCHours() + 1);
+  }
+  rounded.setUTCMinutes(0, 0, 0);
+  return rounded;
+}
+
+function getCompleteHourRange(events: GitHubEvent[]): string[] {
+  const timestamps = events
+    .filter((event) => event.created_at && isGitHubEventType(event.type))
+    .map((event) => roundToClosestHour(new Date(event.created_at!)).getTime())
+    .sort((a, b) => a - b);
+
+  const firstTimestamp = timestamps[0];
+  const lastTimestamp = timestamps[timestamps.length - 1];
+
+  if (firstTimestamp === undefined || lastTimestamp === undefined) return [];
+
+  const start = new Date(firstTimestamp);
+  const end = new Date(lastTimestamp);
+  const hours: string[] = [];
+  const cursor = new Date(start);
+
+  while (cursor.getTime() <= end.getTime()) {
+    hours.push(cursor.toISOString().slice(0, 13));
+    cursor.setUTCHours(cursor.getUTCHours() + 1);
+  }
+
+  return hours;
+}
+
+const timeLabels = computed<string[]>(() => {
+  return usesHourlyGranularity.value
+    ? getCompleteHourRange(limitedEvents.value)
+    : completeDayLabels.value;
+});
+
+const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 1);
+
+const hasEnoughHours = computed<boolean>(() => {
+  return !usesHourlyGranularity.value || timeLabels.value.length > 1;
+});
+
+const hasEnoughDataPoints = computed<boolean>(() => {
+  return usesHourlyGranularity.value
+    ? hasEnoughHours.value
+    : hasEnoughDays.value;
 });
 
 function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
-  const days = getCompleteDayRange(eventDays.value);
-
   const counts: Record<GitHubEventType, Record<string, number>> = {
     PullRequestEvent: {},
     CreateEvent: {},
@@ -120,19 +213,20 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
   };
 
   for (const event of events) {
-    if (!event.created_at || !isGitHubEventType(event.type)) {
-      continue;
-    }
+    if (!event.created_at || !isGitHubEventType(event.type)) continue;
 
-    const day = event.created_at.slice(0, 10);
+    const label = usesHourlyGranularity.value
+      ? roundToClosestHour(new Date(event.created_at!))
+          .toISOString()
+          .slice(0, 13)
+      : event.created_at.slice(0, 10);
 
-    counts[event.type][day] = (counts[event.type][day] || 0) + 1;
+    counts[event.type][label] = (counts[event.type][label] || 0) + 1;
   }
 
-  const individualEvents: VueUiXyDatasetItem[] =
-    activeGitHubEventTypes.value.map((eventType) => {
+  const individualEvents: VueUiXyDatasetItem[] = activeGitHubEventTypes.map(
+    (eventType) => {
       const config = eventConfig.value[eventType];
-
       return {
         type: "line",
         useArea: true,
@@ -140,17 +234,18 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
         name: config.name,
         color: config.color,
         threshold: config.threshold,
-        series: days.map((day) => counts[eventType][day] || 0),
+        series: timeLabels.value.map((label) => counts[eventType][label] || 0),
       };
-    });
+    },
+  );
 
   const totalEvents: VueUiXyDatasetItem = {
     type: "line",
     useArea: true,
     smooth: true,
     name: "Combined activity",
-    color: colors.value.borderLight,
-    series: days.map((_, index) => {
+    color: colors.value.textTransparent,
+    series: timeLabels.value.map((_, index) => {
       return individualEvents.reduce((total, event) => {
         return total + Number(event.series[index]);
       }, 0);
@@ -160,7 +255,8 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
   return [...individualEvents, totalEvents];
 }
 
-const datasetLine = computed(() => createLineDataset(props.events));
+const datasetLine = computed(() => createLineDataset(limitedEvents.value));
+
 const isEmpty = computed(
   () =>
     datasetLine.value
@@ -176,14 +272,61 @@ const maxValue = computed(() => {
 });
 
 const timestamps = computed<number[]>(() => {
-  return getCompleteDayRange(eventDays.value).map((day) =>
-    new Date(day).getTime(),
-  );
+  return timeLabels.value.map((label) => {
+    return usesHourlyGranularity.value
+      ? new Date(`${label}:00:00.000Z`).getTime()
+      : new Date(label).getTime();
+  });
+});
+
+const xAxisLabelValues = computed<string[]>(() => {
+  const dates = timeLabels.value.map((label) => {
+    return usesHourlyGranularity.value
+      ? new Date(`${label}:00:00.000Z`)
+      : new Date(label);
+  });
+
+  const hasMidnight = dates.some((date) => {
+    return date.getUTCHours() === 0 && date.getUTCMinutes() === 0;
+  });
+
+  return dates.map((date, index) => {
+    if (!usesHourlyGranularity.value) {
+      return new Intl.DateTimeFormat(locale.value, {
+        timeZone: "UTC",
+        day: "2-digit",
+        month: "short",
+      }).format(date);
+    }
+
+    const isMidnight = date.getUTCHours() === 0 && date.getUTCMinutes() === 0;
+    const shouldShowDay = isMidnight || (!hasMidnight && index === 0);
+
+    return new Intl.DateTimeFormat(locale.value, {
+      timeZone: "UTC",
+      ...(shouldShowDay
+        ? {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }
+        : {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
+    }).format(date);
+  });
 });
 
 const tooltipPositionLine = useChartTooltipPosition(chartLineRef);
 
 const configLine = computed<VueUiXyConfig>(() => ({
+  downsample: {
+    threshold: 5000,
+  },
   useCssAnimation: false,
   line: {
     useGradient: false,
@@ -205,10 +348,11 @@ const configLine = computed<VueUiXyConfig>(() => ({
     },
     highlighter: {
       useLine: true,
+      opacity: 0,
       color: colors.value.textMuted,
     },
     grid: {
-      position: "middle",
+      position: "start",
       stroke: "transparent",
       labels: {
         show: false,
@@ -219,25 +363,12 @@ const configLine = computed<VueUiXyConfig>(() => ({
         xAxisLabels: {
           show: true,
           color: colors.value.textMuted,
-          values: timestamps.value,
-          showOnlyAtModulo: true,
+          values: xAxisLabelValues.value,
+          showOnlyAtModulo: !usesHourlyGranularity.value,
           modulo: 12,
           rotation: -30,
-          autoRotate: {
-            enable: false,
-          },
-          datetimeFormatter: {
-            enable: true,
-            useUTC: true,
-            locale: "en",
-            options: {
-              year: "dd MMM",
-              month: "dd MMM",
-              day: "dd MMM",
-              minute: "dd MMM",
-              second: "dd MMM",
-            },
-          },
+          autoRotate: { enable: false },
+          datetimeFormatter: { enable: false },
         },
       },
     },
@@ -304,12 +435,38 @@ function isTooltipAlert(series: {
     threshold !== null && series.value !== null && series.value >= threshold
   );
 }
+
+const tooltipTimeLabels = computed<string[]>(() => {
+  return timestamps.value.map((timestamp) => {
+    return new Intl.DateTimeFormat(locale.value, {
+      timeZone: "UTC",
+      day: "2-digit",
+      month: "short",
+      ...(usesHourlyGranularity.value
+        ? {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }
+        : {}),
+    }).format(timestamp);
+  });
+});
+
+function getTooltipTimeLabel(index: number): string {
+  return tooltipTimeLabels.value[index] ?? "";
+}
+
+function getZapIconPath({ x, y }: { x: number; y: number }) {
+  // ⚡ with relative coordinates from initial position
+  return `M ${x} ${y} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`;
+}
 </script>
 
 <template>
   <ClientOnly>
     <VueUiXy
-      v-if="hasEnoughDays && !isEmpty"
+      v-if="hasEnoughDataPoints && !isEmpty"
       ref="chartLineRef"
       :dataset="datasetLine"
       :config="configLine"
@@ -322,18 +479,12 @@ function isTooltipAlert(series: {
         </linearGradient>
       </template>
 
-      <!-- Remove this if you don't want the total series as bars -->
-      <template #bar-gradient="{ series, positiveId }">
-        <linearGradient :id="positiveId" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
-          <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-        </linearGradient>
-      </template>
-
       <!-- Custom tooltip -->
-      <template #tooltip="{ datapoint, timeLabel, seriesIndex }">
+      <template #tooltip="{ datapoint, seriesIndex }">
         <div class="flex flex-col">
-          <div class="mb-1">{{ timeLabel.text }}</div>
+          <div class="mb-1">
+            {{ getTooltipTimeLabel(seriesIndex) }}
+          </div>
           <div
             class="flex flex-row gap-2 items-center"
             v-for="series in datapoint"
@@ -353,7 +504,7 @@ function isTooltipAlert(series: {
               aria-hidden="true"
             >
               <path
-                d="M 2 30 L 14 13 L 8 13 L 11 0 L 0 17 L 6 17 L 2 30"
+                :d="getZapIconPath({ x: 2, y: 30 })"
                 :fill="colors.amber"
                 :stroke="colors.bg"
               />
@@ -394,9 +545,13 @@ function isTooltipAlert(series: {
             :key="`${alerts.name}-${plot.absoluteIndex}`"
           >
             <path
-              v-if="plot.isAlert"
-              class="svg-element-transition"
-              :d="`M ${plot.x - 4} ${plot.y - 6} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`"
+              v-show="plot.isAlert"
+              :d="
+                getZapIconPath({
+                  x: plot.x - 4,
+                  y: plot.y - 6,
+                })
+              "
               :fill="colors.amber"
               :stroke="colors.bg"
             />

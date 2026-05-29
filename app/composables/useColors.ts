@@ -92,6 +92,7 @@ export function useColors(
       "--border",
       "--border-light",
       "--text",
+      "--text-transparent",
       "--text-muted",
       "--blue",
       "--green",
@@ -127,5 +128,6 @@ export function useColors(
       element,
     },
   );
+
   return colors;
 }

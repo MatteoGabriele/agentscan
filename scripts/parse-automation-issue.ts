@@ -1,12 +1,15 @@
 /// <reference types="node" />
 /**
  * Parse automation report issues and generate JSON entries
- * Usage: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url]
+ * Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>
+ *        npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] (legacy mode)
  */
 
+import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { parseIssue } from "@github/issue-parser";
+import { Octokit } from "octokit";
 
 interface AutomationEntry {
   username: string;
@@ -108,19 +111,78 @@ function addEntryToJson(entry: AutomationEntry): void {
   console.log(`✓ Added "${entry.username}" to verified-automations-list.json`);
 }
 
-async function main() {
-  const issueBody = process.argv[2];
-  const issueUrl = process.argv[3];
-  const createdAt = process.argv[4];
+async function fetchIssueFromGitHub(
+  issueNumber: number,
+): Promise<{ body: string; issueUrl: string; createdAt: string }> {
+  const octokit = new Octokit();
 
-  if (!issueBody) {
+  try {
+    const { data: issue } = await octokit.rest.issues.get({
+      owner: "MatteoGabriele",
+      repo: "agentscan",
+      issue_number: issueNumber,
+    });
+
+    return {
+      body: issue.body || "",
+      issueUrl: issue.html_url,
+      createdAt:
+        issue.created_at?.split("T")[0] ||
+        new Date().toISOString().split("T")[0],
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`✗ Failed to fetch issue #${issueNumber}:`, error.message);
+    } else {
+      console.error(`✗ Failed to fetch issue #${issueNumber}`);
+    }
+    process.exit(1);
+  }
+}
+
+function isIssueNumber(arg: string): boolean {
+  return /^\d+$/.test(arg);
+}
+
+async function main() {
+  const firstArg = process.argv[2];
+  const secondArg = process.argv[3];
+  const thirdArg = process.argv[4];
+
+  if (!firstArg) {
     console.error(
-      "Usage: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] [created-at]",
+      "Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>",
+    );
+    console.error(
+      "  or: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] [created-at] (legacy)",
     );
     process.exit(1);
   }
 
   console.log("🔍 Parsing automation report...\n");
+
+  let issueBody: string;
+  let issueUrl: string;
+  let createdAt: string;
+
+  // Check if first argument is an issue number
+  if (isIssueNumber(firstArg)) {
+    const issueNumber = parseInt(firstArg, 10);
+    console.log(`📥 Fetching issue #${issueNumber} from GitHub...\n`);
+    const {
+      body,
+      issueUrl: fetchedUrl,
+      createdAt: fetchedDate,
+    } = await fetchIssueFromGitHub(issueNumber);
+    issueBody = body;
+    issueUrl = fetchedUrl;
+    createdAt = fetchedDate;
+  } else {
+    // Legacy mode: issue body passed directly
+    issueBody = firstArg;
+    issueUrl = secondArg || "";
+    createdAt = thirdArg || new Date().toISOString().split("T")[0];
+  }
 
   const parsed = parseIssueBody(issueBody);
 

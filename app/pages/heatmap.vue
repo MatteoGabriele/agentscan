@@ -4,7 +4,7 @@ import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
 // NOTE: The data treatment is identical to the one on /health
 // Eventually, we can just move the heatmaps there ?
 // If not, we'll make a composable to centralize data computation
-const { data } = useScan();
+const { data } = useEcosystemHealth();
 
 definePageMeta({
   layout: false,
@@ -13,7 +13,7 @@ definePageMeta({
 const rootEl = shallowRef<HTMLElement | null>(null);
 const colors = useColors(rootEl);
 
-function createChartDataset(source?: Scan[]): {
+function createChartDataset(source?: EcosystemHealthItem[]): {
   categories: string[];
   dataset: VueUiStacklineDatasetItem[];
 } {
@@ -107,7 +107,10 @@ const timestamps = computed(() => {
 </script>
 
 <template>
-  <div class="h-screen w-screen flex items-center justify-center text-3xl">
+  <div class="my-6 w-screen flex items-center justify-center text-3xl">
     <ChartGlobalEventsHeatmap :data="dataset" :timestamps />
+  </div>
+  <div class="my-6 w-screen flex items-center justify-center text-3xl">
+    <ChartFeaturedPackageHealthRanking class="max-w-150" />
   </div>
 </template>

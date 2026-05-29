@@ -247,5 +247,54 @@
     "reason": "Opened 60+ PRs in 24 hours across different repositories",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/120",
     "createdAt": "2026-05-15"
+  },
+  {
+    "username": "truffle-dev",
+    "id": 260125384,
+    "reason": "Self-disclosed as an AI agent",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/125",
+    "createdAt": "2026-05-16"
+  },
+  {
+    "username": "EXDEV-oss",
+    "id": 279178120,
+    "reason": "This account posted suspicious comments across multiple repositories attempting to move conversations off-platform to Telegram or email. The messages appeared automated or templated, were posted rapidly across many repos, and showed patterns consistent with scam or phishing attempts.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/126",
+    "createdAt": "2026-05-16"
+  },
+  {
+    "username": "Sean-Kenneth-Doherty",
+    "id": 9375875,
+    "reason": "This account opened approximately 300 PRs across 90+ projects in under a week, showing clear automated bulk spam behavior.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/128",
+    "createdAt": "2026-05-17"
+  },
+  {
+    "username": "testuzerz123",
+    "id": 285229587,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/130",
+    "createdAt": "2026-05-17"
+  },
+  {
+    "username": "vfuriouz7-gif",
+    "id": 285190169,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/131",
+    "createdAt": "2026-05-17"
+  },
+  {
+    "username": "sreedarsan0311",
+    "id": 229950077,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/132",
+    "createdAt": "2026-05-17"
+  },
+  {
+    "username": "ssidharHubble",
+    "id": 156830224,
+    "reason": "600+ issues created within a single day, all advertising identical content. Volume and uniformity strongly suggest automated or coordinated spam activity rather than manual input.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/145",
+    "createdAt": "2026-05-28"
   }
 ]

@@ -51,6 +51,9 @@ const viewBoxPadding = computed(() => {
 
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
+  downsample: {
+    threshold: 5000,
+  },
   line: {
     radius: Number.MIN_VALUE, // bug in the lib, 0 does not work
   },
