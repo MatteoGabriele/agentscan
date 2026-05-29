@@ -195,8 +195,8 @@ watch(
   <div v-else-if="data" class="pb-12">
     <header>
       <p class="mb-4">
-        {{ data.authors.length }} users found from {{ data.issuesCount }} issues
-        and {{ data.pullRequestsCount }} PRs
+        {{ data.authors.length }} users found from
+        {{ data.pullRequestsCount }} PRs
       </p>
       <div class="flex flex-wrap gap-6 text-sm border-t border-gh-border pt-4">
         <div>
@@ -227,7 +227,12 @@ watch(
           {{ author }}
         </a>
 
-        <div v-if="!authorResults[author] || authorResults[author].status === 'pending'" class="flex items-center gap-2">
+        <div
+          v-if="
+            !authorResults[author] || authorResults[author].status === 'pending'
+          "
+          class="flex items-center gap-2"
+        >
           <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
         </div>
         <div v-else-if="authorResults[author]" class="flex items-center gap-3">

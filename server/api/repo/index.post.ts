@@ -29,13 +29,6 @@ export default defineEventHandler(async (event) => {
       per_page: 100,
     });
 
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      state: "open",
-      per_page: 100,
-    });
-
     const prsWithAuthors = pullRequests
       .filter((pr) => {
         return !EXCLUDED_ACCOUNTS.includes(pr.user?.login ?? "");
@@ -52,26 +45,7 @@ export default defineEventHandler(async (event) => {
         type: "pull_request" as const,
       }));
 
-    const issuesWithAuthors = issues
-      .filter((issue) => {
-        return (
-          !issue.pull_request &&
-          !EXCLUDED_ACCOUNTS.includes(issue.user?.login ?? "")
-        );
-      })
-      .map((issue) => ({
-        id: issue.id,
-        number: issue.number,
-        title: issue.title,
-        author: issue.user?.login || "unknown",
-        authorName: issue.user?.name || issue.user?.login || "unknown",
-        url: issue.html_url,
-        createdAt: issue.created_at,
-        updatedAt: issue.updated_at,
-        type: "issue" as const,
-      }));
-
-    const contributions = [...prsWithAuthors, ...issuesWithAuthors];
+    const contributions = prsWithAuthors;
 
     const allAuthors = [
       ...new Set(contributions.map((contribution) => contribution.author)),
@@ -79,7 +53,6 @@ export default defineEventHandler(async (event) => {
 
     return {
       pullRequestsCount: pullRequests.length,
-      issuesCount: issues.length,
       contributions,
       authors: allAuthors,
     };
