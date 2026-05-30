@@ -3,6 +3,7 @@ export type EcosystemHealthItem = {
   user_id: number;
   score: number;
   pr_number: number;
+  pr_status: string; // FIXME: narrow down
   user_created_at: string;
   user_public_repos_count: number;
   events_count: number;

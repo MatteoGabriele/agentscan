@@ -260,14 +260,14 @@ const datasetLine = computed(() => createLineDataset(limitedEvents.value));
 const isEmpty = computed(
   () =>
     datasetLine.value
-      .flatMap((d) => d.series)
+      .flatMap((d) => d.series as (number | null)[])
       .reduce((a, b) => (a ?? 0) + (b ?? 0), 0) === 0,
 );
 
 const maxValue = computed(() => {
   const values = datasetLine.value
     .filter((s) => selectedLegendItems.value.includes(s.name))
-    .flatMap((d) => d.series.map((v) => v ?? 0));
+    .flatMap((d) => d.series.map((v) => v ?? 0)) as number[];
   return values.length ? Math.max(...values) : 0;
 });
 

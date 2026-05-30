@@ -54,10 +54,10 @@ const isHomePage = computed<boolean>(() => route.name === "index");
             external
             target="_blank"
             to="https://github.com/marketplace/actions/agentscan"
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors"
+            class="inline-flex items-center px-2.5 gap-2 py-1 text-xs font-medium rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors"
             title="Use it as a GitHub Action"
           >
-            <span class="i-carbon:logo-github text-xs" />
+            <span class="i-carbon:logo-github text-sm" />
             Use as GitHub Action
           </NuxtLink>
         </div>
@@ -74,10 +74,17 @@ const isHomePage = computed<boolean>(() => route.name === "index");
             <li>
               <NuxtLink
                 to="/health"
-                class="inline-flex items-center gap-1.5 text-xs text-gh-muted hover:text-gh-text transition-colors"
+                class="inline-flex items-center text-sm text-gh-muted hover:text-gh-text transition-colors"
               >
-                <span class="i-carbon:favorite text-xs" />
                 Ecosystem health
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink
+                to="/lab"
+                class="inline-flex items-center text-sm text-gh-muted hover:text-gh-text transition-colors"
+              >
+                The lab
               </NuxtLink>
             </li>
             <li class="hidden md:block w-px h-4 bg-gh-border/80"></li>
@@ -87,9 +94,8 @@ const isHomePage = computed<boolean>(() => route.name === "index");
                 target="_blank"
                 title="RSS feed"
                 to="/feed.xml"
-                class="inline-flex items-center gap-1.5 text-xs text-gh-muted hover:text-gh-text transition-colors"
+                class="inline-flex items-center text-sm text-gh-muted hover:text-gh-text transition-colors"
               >
-                <span class="i-carbon:rss text-xs" />
                 RSS
               </NuxtLink>
             </li>
@@ -99,9 +105,8 @@ const isHomePage = computed<boolean>(() => route.name === "index");
                 target="_blank"
                 title="GitHub repository"
                 to="https://github.com/MatteoGabriele/agentscan"
-                class="inline-flex items-center gap-1.5 text-xs text-gh-muted hover:text-gh-text transition-colors"
+                class="inline-flex items-center text-sm text-gh-muted hover:text-gh-text transition-colors"
               >
-                <span class="i-carbon:logo-github text-xs" />
                 GitHub
               </NuxtLink>
             </li>

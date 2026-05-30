@@ -296,5 +296,12 @@
     "reason": "600+ issues created within a single day, all advertising identical content. Volume and uniformity strongly suggest automated or coordinated spam activity rather than manual input.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/145",
     "createdAt": "2026-05-28"
+  },
+  {
+    "username": "xxiaoxiong",
+    "id": 27723864,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/150",
+    "createdAt": "2026-05-29"
   }
 ]

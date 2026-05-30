@@ -6,7 +6,7 @@ definePageMeta({
 
 <template>
   <h1 class="text-2xl font-semibold">Privacy Policy</h1>
-  <p class="mt-2 text-sm text-gray-500">Last updated: March 2026</p>
+  <p class="mt-2 text-sm text-gray-500">Last updated: May 2026</p>
 
   <p class="mt-6 text-sm leading-relaxed">
     Welcome to AgentScan. We are committed to protecting your privacy. This
@@ -17,8 +17,20 @@ definePageMeta({
   <section class="mt-10">
     <h2 class="text-base font-semibold">What we collect</h2>
     <p class="mt-2 text-sm leading-relaxed">
-      Nothing. AgentScan does not collect, store, or process any personal data.
-      There are no accounts, no cookies, no tracking, and no analytics.
+      AgentScan uses anonymous analytics to understand how the tool is used.
+    </p>
+    <p class="mt-3 text-sm leading-relaxed">
+      All collected data is anonymous and cannot be linked to individual users.
+      We do not use tracking cookies or fingerprinting techniques.
+    </p>
+    <p class="mt-3 text-sm leading-relaxed">
+      You can view the analytics following this
+      <a
+        href="https://dashboard.simpleanalytics.com/agentscan.tools"
+        class="underline font-semibold"
+        >link</a
+      >
+      to the SimpleAnalytics dashboard.
     </p>
   </section>
 
@@ -35,8 +47,8 @@ definePageMeta({
   <section class="mt-8">
     <h2 class="text-base font-semibold">Cookies</h2>
     <p class="mt-2 text-sm leading-relaxed">
-      AgentScan does not use cookies of any kind — no session cookies, no
-      tracking cookies, no analytics cookies.
+      AgentScan does not use tracking or analytics cookies. Simple Analytics
+      tracks usage patterns without storing any personal data or using cookies.
     </p>
   </section>
 
@@ -52,9 +64,15 @@ definePageMeta({
       <li>
         <strong>Netlify</strong> — for hosting and serving the application
       </li>
+      <li>
+        <strong>Simple Analytics</strong> — for anonymous usage analytics and
+        insights
+      </li>
     </ul>
     <p class="mt-3 text-sm leading-relaxed">
-      We do not share any data with advertisers or other third parties.
+      We do not share any personal data with advertisers or other third parties.
+      Anonymous analytics data may be viewed by the public through published
+      dashboards.
     </p>
   </section>
 
@@ -74,9 +92,10 @@ definePageMeta({
     <h2 class="text-base font-semibold">Your rights</h2>
     <p class="mt-2 text-sm leading-relaxed">
       Since we do not collect any personal data, there is nothing to access,
-      export, or delete. If your GitHub account appears in our verified list and
-      you believe it was added in error, you can dispute it via the linked
-      GitHub issue.
+      export, or delete. The analytics data we collect is completely anonymous
+      and cannot be linked to you. If your GitHub account appears in our
+      verified list and you believe it was added in error, you can dispute it
+      via the linked GitHub issue.
     </p>
   </section>
 
@@ -86,6 +105,21 @@ definePageMeta({
       AgentScan is open source. You can read the full code to verify exactly
       what the app does. If you have a concern, open an issue on the GitHub
       repository.
+    </p>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="text-base font-semibold">Public analytics</h2>
+    <p class="mt-2 text-sm leading-relaxed">
+      Our anonymous analytics data is
+      <a
+        href="https://dashboard.simpleanalytics.com/agentscan.tools"
+        class="underline font-semibold"
+        >publicly accessible</a
+      >. You can view aggregated insights about how AgentScan is being used,
+      including scan patterns, classification distributions, and usage trends.
+      This transparency allows the community to understand how the tool is
+      helping detect automation.
     </p>
   </section>
 

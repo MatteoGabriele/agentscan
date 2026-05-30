@@ -1,4 +1,5 @@
 import type { VueUiHorizontalBarDatasetItem } from "vue-data-ui/vue-ui-horizontal-bar";
+import type { VueUiXyDatasetItem } from "vue-data-ui/vue-ui-xy";
 
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
@@ -62,4 +63,187 @@ export function convertToHorizontalBarDataset(
     name,
     value: total / count,
   }));
+}
+
+// Evolution of pull request closure rates by repository for PRs in a given score range.
+
+export type ScoreBounds = [min: number, max: number];
+
+export type RepoClosedPrOptions = {
+  repoKey?: keyof EcosystemHealthItem;
+  prNumberKey?: keyof EcosystemHealthItem;
+  stateKey?: keyof EcosystemHealthItem;
+  scoreKey?: keyof EcosystemHealthItem;
+  dateKey?: keyof EcosystemHealthItem;
+  scoreBounds?: ScoreBounds;
+  openState?: string;
+  closedState?: string;
+  includeAlreadyClosed?: boolean;
+};
+
+export function getClosedPrPercentageByRepo(
+  source: EcosystemHealthItem[],
+  options: RepoClosedPrOptions = {},
+) {
+  const {
+    repoKey = "repo_name",
+    prNumberKey = "pr_number",
+    stateKey = "pr_status",
+    scoreKey = "score",
+    dateKey = "created_at",
+    scoreBounds = [0, 100],
+    openState = "open",
+    closedState = "closed",
+    includeAlreadyClosed = true,
+  } = options;
+
+  const resolvedScoreBounds: ScoreBounds = Array.isArray(scoreBounds)
+    ? scoreBounds
+    : [0, Number(scoreBounds)];
+
+  const [minScore, maxScore] = resolvedScoreBounds;
+
+  const byRepo = new Map<string, Map<number, EcosystemHealthItem[]>>();
+
+  source.forEach((entry) => {
+    const repo = String(entry[repoKey]);
+    const prNumber = Number(entry[prNumberKey]);
+
+    if (!repo || Number.isNaN(prNumber)) return;
+    if (!byRepo.has(repo)) byRepo.set(repo, new Map());
+
+    const repoMap = byRepo.get(repo);
+    if (!repoMap) return;
+    if (!repoMap.has(prNumber)) repoMap.set(prNumber, []);
+
+    const pullRequestEntries = repoMap.get(prNumber);
+    if (!pullRequestEntries) return;
+    pullRequestEntries.push(entry);
+  });
+
+  return Array.from(byRepo.entries()).map(([repo, pullRequests]) => {
+    let elligiblePrs = 0;
+    let closedPrs = 0;
+
+    pullRequests.forEach((entries) => {
+      if (!entries.length) return;
+
+      const sortedEntries = [...entries].sort((a, b) => {
+        return (
+          new Date(String(a[dateKey])).getTime() -
+          new Date(String(b[dateKey])).getTime()
+        );
+      });
+
+      const oldestEntry = sortedEntries[0];
+      if (!oldestEntry) return;
+
+      const latestEntry =
+        sortedEntries.length > 1
+          ? sortedEntries[sortedEntries.length - 1]
+          : undefined;
+
+      const oldestStatus = String(oldestEntry[stateKey]).toLowerCase();
+      const oldestScore = Number(oldestEntry[scoreKey]);
+      const isAlreadyClosed = oldestStatus === closedState;
+
+      const isEligible =
+        oldestScore >= minScore &&
+        oldestScore <= maxScore &&
+        (oldestStatus === openState ||
+          (includeAlreadyClosed && isAlreadyClosed));
+
+      if (!isEligible) return;
+
+      elligiblePrs += 1;
+
+      if (isAlreadyClosed) {
+        closedPrs += 1;
+        return;
+      }
+
+      if (!latestEntry) return;
+      const latestStatus = String(latestEntry[stateKey]).toLowerCase();
+      if (latestStatus === closedState) closedPrs += 1;
+    });
+
+    return {
+      repo,
+      elligiblePrs,
+      closedPrs,
+      percentage: elligiblePrs
+        ? Number(((closedPrs / elligiblePrs) * 100).toFixed(2))
+        : 0,
+    };
+  });
+}
+
+export function getUniqueDatesFromSource(
+  source: EcosystemHealthItem[],
+  dateKey: keyof EcosystemHealthItem = "created_at",
+) {
+  return Array.from(
+    new Set(
+      source
+        .map((entry) => {
+          const rawDate = entry[dateKey];
+          if (rawDate == null) return null;
+          return getDayKey(String(rawDate));
+        })
+        .filter((date): date is string => date !== null),
+    ),
+  ).sort();
+}
+
+export function getClosedPrPercentageByRepoUntilDate(
+  source: EcosystemHealthItem[],
+  untilDate: string | Date,
+  options: RepoClosedPrOptions = {},
+) {
+  const { dateKey = "created_at" } = options;
+  const limitDay = getDayKey(untilDate);
+  const filteredSource = source.filter((entry) => {
+    return getDayKey(String(entry[dateKey])) <= limitDay;
+  });
+  return getClosedPrPercentageByRepo(filteredSource, options);
+}
+
+export type ClosedPrPercentageEvolutionSeries = {
+  name: string;
+  data: (number | null)[];
+};
+
+export function getClosedPrPercentageEvolutionByRepo(
+  source: EcosystemHealthItem[] = [],
+  scoreBounds: ScoreBounds = [0, 100],
+  dateKey: keyof EcosystemHealthItem = "created_at",
+): Array<Array<VueUiXyDatasetItem & { hasData: boolean }>> {
+  const dates = getUniqueDatesFromSource(source, dateKey);
+
+  const repoMap = new Map<string, (number | null)[]>();
+
+  dates.forEach((date, dateIndex) => {
+    const results = getClosedPrPercentageByRepoUntilDate(source, date, {
+      scoreBounds,
+    });
+
+    results.forEach((result) => {
+      if (!repoMap.has(result.repo)) {
+        repoMap.set(result.repo, Array(dates.length).fill(null));
+      }
+      const series = repoMap.get(result.repo);
+      if (!series) return;
+      series[dateIndex] = result.elligiblePrs > 0 ? result.percentage : null;
+    });
+  });
+
+  return Array.from(repoMap.entries()).map(([name, series]) => [
+    {
+      name,
+      series,
+      type: "line",
+      smooth: true,
+      hasData: series.some((value) => value !== null),
+    },
+  ]);
 }
