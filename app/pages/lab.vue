@@ -107,13 +107,47 @@ const timestamps = computed(() => {
 </script>
 
 <template>
-  <div class="my-6 w-screen flex items-center justify-center text-3xl">
-    <ChartGlobalEventsHeatmap :data="dataset" :timestamps />
-  </div>
-  <div class="my-6 w-screen flex items-center justify-center text-3xl">
-    <ChartFeaturedPackageHealthRanking class="max-w-150" />
-  </div>
-  <div class="my-6 w-screen">
-    <ChartHealthResponseSparklines />
+  <div class="flex flex-col gap-6 h-svh">
+    <header class="px-4 py-2">
+      <NuxtLink to="/" aria-label="Homepage">
+        <span class="i-carbon-scan relative top-1 text-gh-text text-xl" />
+      </NuxtLink>
+    </header>
+    <section class="flex flex-col gap-6 h-full px-8">
+      <div class="h-full flex flex-col items-center justify-center w-full">
+        <div class="mx-auto max-w-3xl p-8">
+          <header class="text-center">
+            <h1 class="text-2xl font-semibold">The Lab</h1>
+            <p class="text-gh-muted mt-1 mb-8">Sh*t can be broken here.</p>
+            <div
+              class="mt-4 p-4 bg-gh-card border-1 border-solid border-gh-border rounded-2 text-center"
+            >
+              <span class="i-carbon:flood-warning text-2xl mb-2"></span>
+              <p class="text-sm text-gh-text leading-relaxed">
+                This page is a sandbox where we test new ideas and features.
+                Things here may break, data might be inaccurate, or features
+                could disappear entirely. Take everything on this page with a
+                grain of salt and treat it as early-stage exploration, not
+                production-ready tools.
+              </p>
+            </div>
+          </header>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col gap-20 items-center justify-center max-w-xl mx-auto pb-12"
+      >
+        <div>
+          <ChartHealthResponseSparklines />
+        </div>
+        <div class="w-full">
+          <ChartFeaturedPackageHealthRanking />
+        </div>
+        <div>
+          <ChartGlobalEventsHeatmap :data="dataset" :timestamps />
+        </div>
+      </div>
+    </section>
   </div>
 </template>

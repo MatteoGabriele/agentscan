@@ -195,7 +195,7 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 </script>
 
 <template>
-  <div class="mx-auto max-w-full" :style="{ width: numberOfWeeks * 30 + 'px' }">
+  <div :style="{ width: numberOfWeeks * 60 + 'px' }">
     <ClientOnly>
       <VueUiHeatmap
         v-for="heatmap in heatmaps"
