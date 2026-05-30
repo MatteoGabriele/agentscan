@@ -124,29 +124,49 @@ async function scanUser(
   }
 }
 
+const botPatterns = [
+  "dependabot",
+  "renovate",
+  "greenkeeper",
+  "github-actions",
+  "stale",
+  "snyk",
+  "codecov",
+  "coveralls",
+  "travis",
+  "circle",
+  "appveyor",
+  "azure-pipelines",
+  "netlify",
+  "vercel",
+  "heroku",
+  "aws-amplify",
+];
+
+const libraries = [
+  "nuxt/nuxt",
+  "vuejs/core",
+  "facebook/react",
+  "sveltejs/svelte",
+  "vitejs/vite",
+  "vitest-dev/vitest",
+  "vercel/next.js",
+  "withastro/astro",
+  "biomejs/biome",
+  "tanstack/query-core",
+  "solidjs/solid",
+  "webpro-nl/knip",
+  "eslint/eslint",
+  "python/cpython",
+  "rolldown/rolldown",
+  "astral-sh/uv",
+  "astral-sh/ruff",
+];
+
 /**
  * Check if a username is a known bot
  */
 function isKnownBot(username: string): boolean {
-  const botPatterns = [
-    "dependabot",
-    "renovate",
-    "greenkeeper",
-    "github-actions",
-    "stale",
-    "snyk",
-    "codecov",
-    "coveralls",
-    "travis",
-    "circle",
-    "appveyor",
-    "azure-pipelines",
-    "netlify",
-    "vercel",
-    "heroku",
-    "aws-amplify",
-  ];
-
   const lowerUsername = username.toLowerCase();
   return (
     botPatterns.some((pattern) => lowerUsername.includes(pattern)) ||
@@ -160,26 +180,6 @@ function isKnownBot(username: string): boolean {
  */
 async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
   const PRS_PER_REPO = prsPerRepo;
-
-  const libraries = [
-    "nuxt/nuxt",
-    "vuejs/vue",
-    "facebook/react",
-    "sveltejs/svelte",
-    "vitejs/vite",
-    "vitest-dev/vitest",
-    "vercel/next.js",
-    "withastro/astro",
-    "biomejs/biome",
-    "tanstack/query-core",
-    "solidjs/solid",
-    "webpro-nl/knip",
-    "eslint/eslint",
-    "python/cpython",
-    "rolldown/rolldown",
-    "astral-sh/uv",
-    "astral-sh/ruff",
-  ];
 
   const users: Array<{
     id: number;
