@@ -38,6 +38,7 @@ const config = computed<VueUiXyConfig>(() => ({
     userOptions: { show: false },
     legend: { show: false },
     tooltip: { show: false },
+    zoom: { show: false },
     highlighter: { opacity: 0 },
     padding: {
       top: 6,
