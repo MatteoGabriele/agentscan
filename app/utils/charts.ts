@@ -285,20 +285,9 @@ export function getClosedPrPercentageTotal(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
 ): number | null {
-  const [minScore, maxScore] = scoreBounds;
-
-  const eligiblePrs = source.filter((item) => {
-    const score = item.score ?? 0;
-    return score >= minScore && score <= maxScore;
-  });
-
-  if (eligiblePrs.length === 0) {
-    return null;
-  }
-
-  const closedPrs = eligiblePrs.filter(
-    (item) => item.pr_status === "closed",
-  ).length;
-
-  return Math.round((closedPrs / eligiblePrs.length) * 100);
+  const results = getClosedPrPercentageByRepo(source, { scoreBounds });
+  const totalEligible = results.reduce((s, r) => s + r.elligiblePrs, 0);
+  const totalClosed = results.reduce((s, r) => s + r.closedPrs, 0);
+  if (totalEligible === 0) return null;
+  return Math.round((totalClosed / totalEligible) * 100);
 }

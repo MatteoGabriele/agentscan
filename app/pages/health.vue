@@ -94,7 +94,10 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
 const automatedPrClosure = computed(() => ({
   label: "Automation PR closure rate",
   bgColor: "bg-gray-500",
-  percentage: getClosedPrPercentageTotal(data.value, [0, 50]) + "%",
+  percentage: (() => {
+    const value = getClosedPrPercentageTotal(data.value, [0, 50]);
+    return value === null ? "N/A" : `${value}%`;
+  })(),
 }));
 
 const MIN_DAY_DATA_COLLECTION = 4;
