@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useElementSize } from "@vueuse/core";
 import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
 import {
   VueUiXy,
@@ -11,13 +12,10 @@ import { getClosedPrPercentageEvolutionTotal } from "~/utils/charts";
 
 import("vue-data-ui/style.css");
 
-const props = defineProps<{
-  data: VueUiStacklineDatasetItem[];
-  timestamps: string[];
-  width: number;
-  height: number;
-  rawData?: EcosystemHealthItem[];
-}>();
+const { data } = await useEcosystemHealth();
+
+const chartContainer = useTemplateRef<HTMLElement>("chartContainer");
+const { width, height } = useElementSize(chartContainer);
 
 const rootEl = shallowRef<HTMLElement | null>(null);
 const chartRef = useTemplateRef("chartRef");
@@ -28,36 +26,95 @@ onMounted(async () => {
 
 const colors = useColors(rootEl);
 
-const max = computed(() =>
-  Math.max(...props.data.flatMap((d) => d.series.map((d) => d ?? 0))),
-);
-
 const automatedClosureRateData = computed(() => ({
-  ...getClosedPrPercentageEvolutionTotal(props.rawData, [0, 50]),
+  ...getClosedPrPercentageEvolutionTotal(data.value, [0, 50]),
   scaleMin: 0,
   scaleMax: 100,
   color: "grey",
   dashed: true,
 }));
 
-const averageClosureRate = computed<string>(() => {
-  const values = (
-    automatedClosureRateData.value.series as Array<number | null>
-  ).filter((v): v is number => v !== null);
-  if (values.length === 0) return "0%";
-  const sum = values.reduce((a, b) => a + b, 0);
-  return Math.round(sum / values.length) + "%";
-});
+function composeRawDataset(): VueUiXyDatasetItem[] {
+  const sumsByDate: Record<
+    string,
+    {
+      automation: number;
+      mixed: number;
+      organic: number;
+    }
+  > = {};
 
-const dataset = computed<VueUiXyDatasetItem[]>(() => {
-  const series = props.data.map((d) => ({
+  const categories = [...new Set(data.value.map((d) => d.created_at))].sort();
+
+  categories.forEach((date) => {
+    sumsByDate[date] = {
+      automation: 0,
+      mixed: 0,
+      organic: 0,
+    };
+  });
+
+  data.value.forEach((d) => {
+    const dateSums = sumsByDate[d.created_at];
+    if (!dateSums) return;
+    if (d.score <= 50) {
+      dateSums.automation += 1;
+    } else if (d.score <= 70) {
+      dateSums.mixed += 1;
+    } else {
+      dateSums.organic += 1;
+    }
+  });
+
+  return [
+    {
+      name: "Organic",
+      series: categories.map((date) => sumsByDate[date]?.organic ?? 0),
+      color: colors.value.greenLine,
+      type: "line",
+      smooth: true,
+      useArea: true,
+    },
+    {
+      name: "Mixed",
+      series: categories.map((date) => sumsByDate[date]?.mixed ?? 0),
+      color: colors.value.amber,
+      type: "line",
+      smooth: true,
+      useArea: true,
+    },
+    {
+      name: "Automation",
+      series: categories.map((date) => sumsByDate[date]?.automation ?? 0),
+      color: colors.value.dangerHover,
+      type: "line",
+      smooth: true,
+      useArea: true,
+    },
+  ];
+}
+
+const rawDataset = computed(() => composeRawDataset());
+
+const max = computed(() =>
+  Math.max(
+    ...rawDataset.value.flatMap((d) =>
+      (d.series as Array<number | null>).map((d) => d ?? 0),
+    ),
+  ),
+);
+
+const dataset = computed<VueUiXyDatasetItem[]>(() => [
+  ...rawDataset.value.map((d) => ({
     ...d,
-    type: "line" as const,
-    smooth: true,
-    useArea: true,
     scaleMax: max.value,
-  }));
-  return [...series, automatedClosureRateData.value];
+  })),
+  automatedClosureRateData.value,
+]);
+
+const timestamps = computed(() => {
+  if (!data.value?.length) return [];
+  return [...new Set(data.value.map((item) => item.created_at))].sort();
 });
 
 const tooltipPosition = useChartTooltipPosition(chartRef);
@@ -65,9 +122,9 @@ const tooltipPosition = useChartTooltipPosition(chartRef);
 const progressionLabelOffsetX = 6; // compensate hard-coded internal in VueUiXy
 
 const viewBoxPadding = computed(() => {
-  const maxSeries = props.timestamps.length;
+  const maxSeries = timestamps.value.length;
   if (maxSeries <= 1) return { left: 0, right: 0 };
-  const halfVueUiXyDatapointStep = props.width / (2 * (maxSeries - 1));
+  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1));
   return {
     left: -halfVueUiXyDatapointStep,
     right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
@@ -86,8 +143,8 @@ const config = computed<VueUiXyConfig>(() => ({
     userOptions: { show: false },
     backgroundColor: "transparent",
     color: colors.value.textMuted,
-    width: props.width,
-    height: props.height,
+    width: width.value,
+    height: height.value,
     padding: {
       left: viewBoxPadding.value.left,
       right: viewBoxPadding.value.right,
@@ -103,7 +160,7 @@ const config = computed<VueUiXyConfig>(() => ({
         },
         xAxisLabels: {
           show: false,
-          values: props.timestamps,
+          values: timestamps.value,
           datetimeFormatter: {
             enable: true,
             useUTC: true,
@@ -140,39 +197,50 @@ const config = computed<VueUiXyConfig>(() => ({
 </script>
 
 <template>
-  <ClientOnly>
-    <slot name="teleporter" v-bind="{ averageClosureRate }" />
-    <VueUiXy ref="chartRef" :dataset :config>
-      <template #area-gradient="{ series, id }">
-        <linearGradient :id x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
-          <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-        </linearGradient>
-      </template>
+  <div class="relative h-full w-full flex flex-col">
+    <div class="flex-1 h-full no-chart-transition" ref="chartContainer">
+      <ClientOnly>
+        <VueUiXy ref="chartRef" :dataset :config>
+          <template #area-gradient="{ series, id }">
+            <linearGradient :id x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
+              <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+            </linearGradient>
+          </template>
 
-      <template #tooltip="{ datapoint, timeLabel }">
-        <div class="flex flex-col">
-          <div :style="{ color: colors.textMuted }" class="mb-1">
-            {{ timeLabel.text }}
-          </div>
-          <div
-            class="flex flex-row gap-2 place-items-center"
-            v-for="series in datapoint"
-            :key="`${series.name}-${series.absoluteIndex}`"
-          >
-            <div class="h-2 w-2">
-              <svg viewBox="0 0 2 2" class="w-full h-full">
-                <circle cx="1" cy="1" r="1" :fill="series.color" />
-              </svg>
+          <template #tooltip="{ datapoint, timeLabel }">
+            <div class="flex flex-col">
+              <div :style="{ color: colors.textMuted }" class="mb-1">
+                {{ timeLabel.text }}
+              </div>
+              <div
+                class="flex flex-row gap-2 place-items-center"
+                v-for="series in datapoint"
+                :key="`${series.name}-${series.absoluteIndex}`"
+              >
+                <div class="h-2 w-2">
+                  <svg viewBox="0 0 2 2" class="w-full h-full">
+                    <circle cx="1" cy="1" r="1" :fill="series.color" />
+                  </svg>
+                </div>
+                <span :style="{ color: colors.text }">{{ series.name }}</span>
+                <span :style="{ color: colors.textMuted }">{{
+                  series.value +
+                  (series.slotAbsoluteIndex === dataset.length - 1 ? "%" : "")
+                }}</span>
+              </div>
             </div>
-            <span :style="{ color: colors.text }">{{ series.name }}</span>
-            <span :style="{ color: colors.textMuted }">{{
-              series.value +
-              (series.slotAbsoluteIndex === dataset.length - 1 ? "%" : "")
-            }}</span>
-          </div>
-        </div>
-      </template>
-    </VueUiXy>
-  </ClientOnly>
+          </template>
+        </VueUiXy>
+      </ClientOnly>
+    </div>
+  </div>
 </template>
+
+<style>
+.no-chart-transition path,
+circle {
+  transition: none !important;
+  animation: none !important;
+}
+</style>

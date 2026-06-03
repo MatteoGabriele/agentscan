@@ -176,7 +176,7 @@ const hasEnoughData = computed(() => {
           </ul>
         </div>
         <div class="max-h-[300px] sm:max-h-[500px] w-full h-full">
-          <ChartGlobalStatusDashboard :data />
+          <ChartGlobalEventsEvolution />
         </div>
       </div>
     </section>
