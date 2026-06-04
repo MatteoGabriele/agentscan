@@ -102,7 +102,7 @@ function getLastPlotLabel(serie: Record<string, any>) {
 }
 
 type XyAugmentedSeries = VueUiXySeries[number] & {
-  details: { elligiblePrs: number[]; closedPrs: number[] };
+  details: { eligiblePrs: number[]; closedPrs: number[] };
 };
 
 function getTooltipContent(
@@ -111,18 +111,24 @@ function getTooltipContent(
 ) {
   const { absoluteIndex: index } = timeLabel;
   const datapoint = series[0] as unknown as XyAugmentedSeries;
-  const elligible = datapoint?.details?.elligiblePrs?.[index];
+  const eligible = datapoint?.details?.eligiblePrs?.[index];
   const closed = datapoint?.details?.closedPrs?.[index];
-  if (closed == null || elligible == null) return "";
-  return `${closed} / ${elligible}`;
+  if (closed == null || eligible == null) return "";
+  return `${closed} / ${eligible}`;
 }
 </script>
 
 <template>
-  <h2 class="text-center mb-3">
-    Evolution of pull request closure rates by repository for PRs in a given
-    score range.
-  </h2>
+  <div class="mb-5">
+    <h2 class="text-center">
+      Evolution of pull request closure rates by repository for PRs in a given
+      score range.
+    </h2>
+    <p class="text-sm text-gh-muted text-center">
+      Closure rates are based on daily snapshots, not cumulative history, so
+      counts may change from one day to the next.
+    </p>
+  </div>
 
   <div class="mb-4 flex items-center justify-center gap-6">
     <label class="font-medium">Score range</label>
