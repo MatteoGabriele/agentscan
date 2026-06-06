@@ -1,3 +1,5 @@
+import { identityConfig } from "@unveil/identity";
+
 type EcosystemHealthCategoryCounts = {
   automation: number;
   mixed: number;
@@ -28,9 +30,9 @@ export function useEcosystemHealthCountsByDate() {
 
         if (!dateCounts) return;
 
-        if (item.score <= 50) {
+        if (item.score <= identityConfig.THRESHOLD_SUSPICIOUS) {
           dateCounts.automation += 1;
-        } else if (item.score <= 70) {
+        } else if (item.score <= identityConfig.THRESHOLD_HUMAN) {
           dateCounts.mixed += 1;
         } else {
           dateCounts.organic += 1;
