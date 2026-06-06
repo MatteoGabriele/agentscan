@@ -56,15 +56,14 @@ function getNextScanTime(currentDate: Date = new Date()): Date {
   }
 
   let nextDay = currentDay + 1;
-  let nextDate = now.add(1, "day");
-
-  const daysInMonth = nextDate.daysInMonth();
+  const daysInMonth = now.daysInMonth();
+  let nextDate;
 
   if (nextDay > daysInMonth) {
     nextDay = 1;
-    nextDate = nextDate.add(1, "month").date(1);
+    nextDate = now.add(1, "month").date(1);
   } else {
-    nextDate = nextDate.date(nextDay);
+    nextDate = now.add(1, "day");
   }
 
   const nextSchedule = SCAN_SCHEDULE[nextDay]!;

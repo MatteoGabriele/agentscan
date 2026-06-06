@@ -91,6 +91,15 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
   };
 });
 
+const automatedPrClosure = computed(() => ({
+  label: "Automation PR closure rate",
+  bgColor: "bg-gray-500",
+  percentage: (() => {
+    const value = getClosedPrPercentageTotal(data.value, [0, 50]);
+    return value === null ? "N/A" : `${value}%`;
+  })(),
+}));
+
 const MIN_DAY_DATA_COLLECTION = 4;
 const hasEnoughData = computed(() => {
   if (!data.value?.length) {
@@ -150,9 +159,24 @@ const hasEnoughData = computed(() => {
               </p>
             </li>
           </ul>
+          <ul
+            class="text-center flex flex-col md:flex-row md:gap-6 items-center md:text-left w-full justify-center sm:mt-4"
+          >
+            <li class="flex gap-2 items-center">
+              <span
+                :class="`size-2 ${automatedPrClosure.bgColor} block rounded-full`"
+              ></span>
+              <p class="text-sm">
+                {{ automatedPrClosure.label }}
+                <span class="text-gh-muted">
+                  {{ automatedPrClosure.percentage }}
+                </span>
+              </p>
+            </li>
+          </ul>
         </div>
         <div class="max-h-[300px] sm:max-h-[500px] w-full h-full">
-          <ChartGlobalStatusDashboard :data />
+          <ChartGlobalEventsEvolution />
         </div>
       </div>
     </section>

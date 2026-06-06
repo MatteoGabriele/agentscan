@@ -303,5 +303,26 @@
     "reason": "Heavy automation usage creating spam PRs within short timeframe",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/150",
     "createdAt": "2026-05-29"
+  },
+  {
+    "username": "duongynhi000005-oss",
+    "id": 287305518,
+    "reason": "Account less than a week old, spamming 100+ automated PRs. Caught opening 8 PRs to Next.js within minutes.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/151",
+    "createdAt": "2026-05-30"
+  },
+  {
+    "username": "TIR44",
+    "id": 70480807,
+    "reason": "Caught spamming Nuxt and Gitea at the same time with more than 50 PRs.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/153",
+    "createdAt": "2026-05-31"
+  },
+  {
+    "username": "Nexory",
+    "id": 18486706,
+    "reason": "The account identifies itself as an automated security research tool; however, its actual behavior consists of indiscriminately opening PRs with no subsequent maintenance or response.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/158",
+    "createdAt": "2026-06-02"
   }
 ]

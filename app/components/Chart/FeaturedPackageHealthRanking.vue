@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
 import {
   VueUiHorizontalBar,
   type VueUiHorizontalBarDatasetItem,
@@ -109,9 +108,7 @@ const dataset = computed<VueUiHorizontalBarDatasetItem[]>(() => {
 <template>
   <div class="flex flex-col w-full">
     <!-- FIXME: that crappy date selector would need some love -->
-    <CommonDateSelector :source="healthData" @select-date="setSelectedDate">
-      <template #label> Choose a date </template>
-    </CommonDateSelector>
+    <CommonDateSelector :source="healthData" @select-date="setSelectedDate" />
     <ClientOnly>
       <VueUiHorizontalBar :config="config" :dataset="dataset" />
     </ClientOnly>

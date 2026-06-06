@@ -136,7 +136,7 @@ const timestamps = computed(() => {
       </div>
 
       <div
-        class="flex flex-col gap-20 items-center justify-center max-w-xl mx-auto pb-12"
+        class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto pb-12 w-full px-4"
       >
         <div>
           <ChartHealthResponseSparklines />
@@ -144,8 +144,12 @@ const timestamps = computed(() => {
         <div class="w-full">
           <ChartFeaturedPackageHealthRanking />
         </div>
-        <div>
+        <div class="w-full">
           <ChartGlobalEventsHeatmap :data="dataset" :timestamps />
+        </div>
+        <div class="w-full">
+          <h2 class="text-xl font-semibold mb-4">Scan Results by User ID</h2>
+          <AnalysisScanListTable />
         </div>
       </div>
     </section>
