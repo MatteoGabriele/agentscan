@@ -6,20 +6,28 @@ import {
   type VueUiXySeries,
   type VueUiXyTooltipSlotProps,
 } from "vue-data-ui/vue-ui-xy";
-import "vue-data-ui/style.css";
+import { identityConfig } from "@unveil/identity";
+
+import("vue-data-ui/style.css");
 
 const { data } = useEcosystemHealth();
 const rootEl = shallowRef<HTMLElement | null>(null);
 const colors = useColors(rootEl);
 
-const scoreBounds = shallowRef<ScoreBounds>([0, 50]);
+const scoreBounds = shallowRef<ScoreBounds>([
+  0,
+  identityConfig.THRESHOLD_SUSPICIOUS,
+]);
 
 const selectedRangeColor = computed(() => {
   const [minScore, maxScore] = scoreBounds.value;
-  if (minScore === 0 && maxScore === 50) {
+  if (minScore === 0 && maxScore === identityConfig.THRESHOLD_SUSPICIOUS) {
     return colors.value.danger;
   }
-  if (minScore === 50 && maxScore === 70) {
+  if (
+    minScore === identityConfig.THRESHOLD_SUSPICIOUS &&
+    maxScore === identityConfig.THRESHOLD_HUMAN
+  ) {
     return colors.value.amber;
   }
   return colors.value.green;
@@ -137,30 +145,37 @@ function getTooltipContent(
       <input
         v-model="scoreBounds"
         type="radio"
-        :value="[0, 50]"
+        :value="[0, identityConfig.THRESHOLD_SUSPICIOUS]"
         class="accent-red"
       />
-      <span>0-50</span>
+      <span>0-{{ identityConfig.THRESHOLD_SUSPICIOUS }}</span>
     </label>
 
     <label class="flex items-center gap-2 cursor-pointer">
       <input
         v-model="scoreBounds"
         type="radio"
-        :value="[50, 70]"
+        :value="[
+          identityConfig.THRESHOLD_SUSPICIOUS,
+          identityConfig.THRESHOLD_HUMAN,
+        ]"
         class="accent-amber"
       />
-      <span>50-70</span>
+      <span
+        >{{ identityConfig.THRESHOLD_SUSPICIOUS }}-{{
+          identityConfig.THRESHOLD_HUMAN
+        }}</span
+      >
     </label>
 
     <label class="flex items-center gap-2 cursor-pointer">
       <input
         v-model="scoreBounds"
         type="radio"
-        :value="[70, 100]"
+        :value="[identityConfig.THRESHOLD_HUMAN, 100]"
         class="accent-green"
       />
-      <span>70-100</span>
+      <span>{{ identityConfig.THRESHOLD_HUMAN }}-100</span>
     </label>
   </div>
 

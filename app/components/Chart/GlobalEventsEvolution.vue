@@ -8,10 +8,12 @@ import {
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
 import { getClosedPrPercentageEvolutionTotal } from "~/utils/charts";
+import { identityConfig } from "@unveil/identity";
 
 import("vue-data-ui/style.css");
 
 const { data } = await useEcosystemHealth();
+const { dates, countsByDate } = useEcosystemHealthCountsByDate();
 
 const chartContainer = useTemplateRef<HTMLElement>("chartContainer");
 const { width, height } = useElementSize(chartContainer);
@@ -26,7 +28,10 @@ onMounted(async () => {
 const colors = useColors(rootEl);
 
 const automatedClosureRateData = computed(() => ({
-  ...getClosedPrPercentageEvolutionTotal(data.value, [0, 50]),
+  ...getClosedPrPercentageEvolutionTotal(data.value, [
+    0,
+    identityConfig.THRESHOLD_SUSPICIOUS,
+  ]),
   scaleMin: 0,
   scaleMax: 100,
   color: "grey",
@@ -34,41 +39,10 @@ const automatedClosureRateData = computed(() => ({
 }));
 
 function composeRawDataset(): VueUiXyDatasetItem[] {
-  const sumsByDate: Record<
-    string,
-    {
-      automation: number;
-      mixed: number;
-      organic: number;
-    }
-  > = {};
-
-  const categories = [...new Set(data.value.map((d) => d.created_at))].sort();
-
-  categories.forEach((date) => {
-    sumsByDate[date] = {
-      automation: 0,
-      mixed: 0,
-      organic: 0,
-    };
-  });
-
-  data.value.forEach((d) => {
-    const dateSums = sumsByDate[d.created_at];
-    if (!dateSums) return;
-    if (d.score <= 50) {
-      dateSums.automation += 1;
-    } else if (d.score <= 70) {
-      dateSums.mixed += 1;
-    } else {
-      dateSums.organic += 1;
-    }
-  });
-
   return [
     {
       name: "Organic",
-      series: categories.map((date) => sumsByDate[date]?.organic ?? 0),
+      series: dates.value.map((date) => countsByDate.value[date]?.organic ?? 0),
       color: colors.value.greenLine,
       type: "line",
       smooth: true,
@@ -76,7 +50,7 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
     },
     {
       name: "Mixed",
-      series: categories.map((date) => sumsByDate[date]?.mixed ?? 0),
+      series: dates.value.map((date) => countsByDate.value[date]?.mixed ?? 0),
       color: colors.value.amber,
       type: "line",
       smooth: true,
@@ -84,7 +58,9 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
     },
     {
       name: "Automation",
-      series: categories.map((date) => sumsByDate[date]?.automation ?? 0),
+      series: dates.value.map(
+        (date) => countsByDate.value[date]?.automation ?? 0,
+      ),
       color: colors.value.dangerHover,
       type: "line",
       smooth: true,
@@ -111,17 +87,12 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
   automatedClosureRateData.value,
 ]);
 
-const timestamps = computed(() => {
-  if (!data.value?.length) return [];
-  return [...new Set(data.value.map((item) => item.created_at))].sort();
-});
-
 const tooltipPosition = useChartTooltipPosition(chartRef);
 
 const progressionLabelOffsetX = 6; // compensate hard-coded internal in VueUiXy
 
 const viewBoxPadding = computed(() => {
-  const maxSeries = timestamps.value.length;
+  const maxSeries = dates.value.length;
   if (maxSeries <= 1) return { left: 0, right: 0 };
   const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1));
   return {
@@ -159,7 +130,7 @@ const config = computed<VueUiXyConfig>(() => ({
         },
         xAxisLabels: {
           show: false,
-          values: timestamps.value,
+          values: dates.value,
           datetimeFormatter: {
             enable: true,
             useUTC: true,

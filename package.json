@@ -23,7 +23,7 @@
     "octokit": "^5.0.5",
     "valibot": "^1.2.0",
     "vue": "^3.5.28",
-    "vue-data-ui": "^3.21.0",
+    "vue-data-ui": "^3.21.1",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {

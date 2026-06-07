@@ -110,6 +110,31 @@ const hasEnoughData = computed(() => {
 
   return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
 });
+
+const { progression } = useEcosystemHealthCategoryProgression();
+
+function formatTrend(value: number) {
+  if (value > 0) return `+${(value * 100).toFixed(0)}%`;
+  return `${(value * 100).toFixed(0)}%`;
+}
+
+function getTrendArrow(value: number) {
+  if (value > 0) return "i-lucide:trending-up";
+  if (value < 0) return "i-lucide:trending-down";
+  return "i-lucide:trending-up-down";
+}
+
+function getTrendColor({
+  value,
+  reversed = false,
+}: {
+  value: number;
+  reversed?: boolean;
+}) {
+  if (value > 0) return reversed ? "text-gh-red" : "text-gh-green";
+  if (value < 0) return reversed ? "text-gh-green" : "text-gh-red";
+  return "text-gh-muted";
+}
 </script>
 
 <template>
@@ -140,12 +165,28 @@ const hasEnoughData = computed(() => {
             class="flex gap-2 items-center"
           >
             <span :class="`size-2 ${config.bgColor} block rounded-full`"></span>
+
             <p class="text-sm">
               {{ config.label }}
-              <span class="text-gh-muted">
-                {{ latestDayStats?.[config.key].percentage }}% ({{
-                  latestDayStats?.[config.key].count
-                }})
+
+              <span class="text-gh-muted ml-1">
+                {{ latestDayStats?.[config.key]?.percentage }}%
+              </span>
+
+              <span
+                :class="[
+                  getTrendColor({
+                    value: progression[config.key].trend,
+                    reversed: config.key !== 'organic',
+                  }),
+                ]"
+              >
+                <span
+                  :class="[getTrendArrow(progression[config.key].trend)]"
+                  class="shrink-0"
+                  style="vertical-align: middle"
+                />
+                {{ formatTrend(progression[config.key].trend) }}
               </span>
             </p>
           </li>

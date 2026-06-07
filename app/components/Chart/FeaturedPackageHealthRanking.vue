@@ -4,8 +4,8 @@ import {
   type VueUiHorizontalBarDatasetItem,
   type VueUiHorizontalBarConfig,
 } from "vue-data-ui/vue-ui-horizontal-bar";
-import "vue-data-ui/style.css";
 import { interpolateHexColors } from "~/utils/colors";
+import("vue-data-ui/style.css");
 
 const { data } = useEcosystemHealth();
 

@@ -9,6 +9,7 @@ import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import { mergeConfigs } from "vue-data-ui/utils";
+import("vue-data-ui/style.css");
 
 dayjs.extend(isoWeek);
 
