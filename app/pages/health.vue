@@ -151,8 +151,15 @@ function getTrendColor({
               ecosystem.
             </p>
             <p class="text-xs text-gh-muted/70 mt-1">
-              *Each day, we analyze 10 PRs from a curated list of 17
-              repositories.
+              *Each day, we analyze 10 PRs from a curated
+              <NuxtLink
+                class="underline hover:text-gh-text"
+                external
+                target="_blank"
+                to="https://github.com/MatteoGabriele/agentscan/tree/main/shared/daily-scan.ts"
+                >list of repositories</NuxtLink
+              >
+              .
             </p>
           </div>
         </header>

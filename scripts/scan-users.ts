@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import { createHash } from "crypto";
+import { cicdBots, libraries } from "../shared/daily-scan";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { Octokit } from "octokit";
@@ -124,52 +124,13 @@ async function scanUser(
   }
 }
 
-const botPatterns = [
-  "dependabot",
-  "renovate",
-  "greenkeeper",
-  "github-actions",
-  "stale",
-  "snyk",
-  "codecov",
-  "coveralls",
-  "travis",
-  "circle",
-  "appveyor",
-  "azure-pipelines",
-  "netlify",
-  "vercel",
-  "heroku",
-  "aws-amplify",
-];
-
-const libraries = [
-  "nuxt/nuxt",
-  "vuejs/core",
-  "facebook/react",
-  "sveltejs/svelte",
-  "vitejs/vite",
-  "vitest-dev/vitest",
-  "vercel/next.js",
-  "withastro/astro",
-  "biomejs/biome",
-  "tanstack/query-core",
-  "solidjs/solid",
-  "webpro-nl/knip",
-  "eslint/eslint",
-  "python/cpython",
-  "rolldown/rolldown",
-  "astral-sh/uv",
-  "astral-sh/ruff",
-];
-
 /**
  * Check if a username is a known bot
  */
 function isKnownBot(username: string): boolean {
   const lowerUsername = username.toLowerCase();
   return (
-    botPatterns.some((pattern) => lowerUsername.includes(pattern)) ||
+    cicdBots.some((pattern) => lowerUsername.includes(pattern)) ||
     lowerUsername.endsWith("[bot]")
   );
 }
