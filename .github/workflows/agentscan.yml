@@ -1,7 +1,6 @@
 name: AgentScan
 
 on:
-  workflow_dispatch: # Allow manual trigger
   pull_request_target:
     types: [opened, reopened]
   issues:
@@ -19,5 +18,6 @@ jobs:
         uses: MatteoGabriele/agentscan-action@98e87c8f1db0cdcd923f5eb756cc40582ce9abff
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          skip-members: "MatteoGabriele,graphieros"
+          skip-members: '["MatteoGabriele", "graphieros"]'
           auto-close: true
+          auto-close-classifications: '["automations", "mixed"]'
