@@ -63,18 +63,12 @@ useHead({
 <template>
   <header class="text-center md:text-left text-pretty">
     <h1 class="text-2xl font-semibold">Detected automations</h1>
-    <p class="text-gh-text/80">
-      Accounts detected during daily scans as part of the
+    <p class="text-gh-text mt-2">
+      Accounts identified by the daily
       <NuxtLink to="/health" class="underline hover:text-gh-text">
         GitHub Ecosystem Health
       </NuxtLink>
-      analysis.
-    </p>
-    <p class="text-gh-text mt-2">
-      This list includes accounts that showed signs of automation: spam, stats
-      farming, or simply developers who use automation tools to streamline their
-      workflow. Flags are based on activity patterns and may not always reflect
-      intent.
+      scan as showing signs of automated behavior.
     </p>
 
     <input
