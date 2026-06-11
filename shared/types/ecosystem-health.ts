@@ -8,4 +8,5 @@ export type EcosystemHealthItem = {
   user_public_repos_count: number;
   events_count: number;
   repo_name: string;
+  username: string;
 };

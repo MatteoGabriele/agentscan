@@ -9,8 +9,10 @@ interface RepoStats {
 
 interface UserStat {
   user_id: number;
+  username: string;
   repos: RepoStats[];
   total_open_prs: number;
+  score: number;
   total_prs: number;
   days_seen: string[];
 }
@@ -30,6 +32,8 @@ const userStats = computed<Record<number, UserStat>>(() => {
     if (!stats[entry.user_id]) {
       stats[entry.user_id] = {
         user_id: entry.user_id,
+        username: entry.username,
+        score: entry.score,
         repos: [],
         total_open_prs: 0,
         total_prs: 0,
@@ -163,7 +167,8 @@ function formatDate(dateStr: string): string {
       <table class="w-full">
         <thead class="bg-gh-card border-b border-gh-border">
           <tr>
-            <th class="px-4 py-3 text-left text-sm font-semibold">User ID</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold">Username</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold">Score</th>
             <th class="px-4 py-3 text-left text-sm font-semibold">
               Repositories
             </th>
@@ -185,7 +190,10 @@ function formatDate(dateStr: string): string {
             class="border-b border-gh-border hover:bg-gh-card transition-colors"
           >
             <td class="px-4 py-3 font-mono text-sm text-gh-muted">
-              {{ user.user_id }}
+              {{ user.username }}
+            </td>
+            <td class="px-4 py-3 font-mono text-sm text-gh-muted">
+              {{ user.score }}
             </td>
             <td class="px-4 py-3 text-sm">
               {{ user.repos.length }}
