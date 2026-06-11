@@ -126,28 +126,8 @@ const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
   return data.value?.analysis;
 });
 
-const CLASSIFICATION_PROXIMITY_THRESHOLD = 15;
-const nearestClassification = computed<IdentityClassification | undefined>(
-  () => {
-    if (!data.value) {
-      return;
-    }
-
-    const { score } = data.value.analysis;
-
-    if (score >= 70 && score - 70 <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-      return "mixed";
-    } else if (
-      score >= 50 &&
-      score - 50 <= CLASSIFICATION_PROXIMITY_THRESHOLD
-    ) {
-      return "automation";
-    } else if (score < 50 && 50 - score <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-      return "mixed";
-    } else if (score < 70 && 70 - score <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-      return "organic";
-    }
-  },
+const { nearestClassification } = useNearestClassification(
+  data.value?.analysis.score,
 );
 
 useSeoAnalysis(identifyAnalysis, {
