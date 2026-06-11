@@ -19,27 +19,21 @@ export function useNearestClassification(
 
       if (scoreValue >= identityConfig.THRESHOLD_HUMAN) {
         const dist = scoreValue - identityConfig.THRESHOLD_HUMAN;
-        return dist <= CLASSIFICATION_PROXIMITY_THRESHOLD ? "mixed" : undefined;
-      }
 
-      if (scoreValue >= identityConfig.THRESHOLD_SUSPICIOUS) {
-        const distToAutomation =
-          scoreValue - identityConfig.THRESHOLD_SUSPICIOUS;
-        const distToOrganic = identityConfig.THRESHOLD_HUMAN - scoreValue;
-
-        if (distToAutomation <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-          return "automation";
-        }
-
-        if (distToOrganic <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-          return "organic";
+        if (dist <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
+          return "mixed";
         }
 
         return;
       }
 
-      const dist = identityConfig.THRESHOLD_SUSPICIOUS - scoreValue;
-      return dist <= CLASSIFICATION_PROXIMITY_THRESHOLD ? "mixed" : undefined;
+      if (scoreValue >= identityConfig.THRESHOLD_SUSPICIOUS) {
+        const dist = scoreValue - identityConfig.THRESHOLD_SUSPICIOUS;
+
+        if (dist <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
+          return "automation";
+        }
+      }
     },
   );
 
