@@ -126,9 +126,11 @@ const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
   return data.value?.analysis;
 });
 
-const { nearestClassification } = useNearestClassification(
-  data.value?.analysis.score,
-);
+const score = computed<number | undefined>(() => {
+  return data.value?.analysis.score;
+});
+
+const { nearestClassification } = useNearestClassification(score);
 
 useSeoAnalysis(identifyAnalysis, {
   hasCommunityFlag,
