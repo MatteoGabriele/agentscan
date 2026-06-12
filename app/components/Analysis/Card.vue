@@ -154,10 +154,9 @@ useSeoAnalysis(identifyAnalysis, {
                 v-if="nearestClassification"
                 class="flex items-center gap-2 text-sm text-gh-muted mb-2"
               >
-                <span class="i-lucide:trending-up-down text-xs"></span>
+                <span class="i-lucide:megaphone text-xs"></span>
                 <span class="text-pretty line-height-none">
-                  trending toward
-                  {{ nearestClassification }} activity.
+                  Activity close to {{ nearestClassification }} signals.
                 </span>
               </div>
               <span class="flex gap-2 items-center" :class="scoreStyle.text">
