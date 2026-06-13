@@ -7,7 +7,6 @@ definePageMeta({
 
 const rootEl = shallowRef<HTMLElement | null>(null);
 const colors = useColors(rootEl);
-// const { dates, countsByDate } = useEcosystemHealthCountsByDate();
 
 const { data } = await useEcosystemHealth();
 const dates = computed(() => data.value?.dates ?? []);

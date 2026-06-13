@@ -1,0 +1,53 @@
+import { identityConfig, type IdentityClassification } from "@unveil/identity";
+import type { EcosystemHealthItem } from "./types/ecosystem-health";
+
+export function classifyByScore(score: number): IdentityClassification {
+  if (score >= identityConfig.THRESHOLD_HUMAN) {
+    return "organic";
+  } else if (score >= identityConfig.THRESHOLD_SUSPICIOUS) {
+    return "mixed";
+  } else {
+    return "automation";
+  }
+}
+
+export function formatPercentage(value: number): string {
+  return value.toFixed(1);
+}
+
+export function formatTrend(value: number = 0) {
+  if (value > 0) return `+${(value * 100).toFixed(0)}%`;
+  return `${(value * 100).toFixed(0)}%`;
+}
+
+export function getHealthStats(data: EcosystemHealthItem[] = []) {
+  if (!data.length) return null;
+
+  const totalCount = data.length;
+
+  const counts: Record<IdentityClassification, number> = {
+    organic: 0,
+    mixed: 0,
+    automation: 0,
+  };
+
+  data.forEach((item) => {
+    const classification = classifyByScore(item.score);
+    counts[classification]++;
+  });
+
+  return {
+    organic: {
+      count: counts.organic,
+      percentage: formatPercentage((counts.organic / totalCount) * 100),
+    },
+    mixed: {
+      count: counts.mixed,
+      percentage: formatPercentage((counts.mixed / totalCount) * 100),
+    },
+    automation: {
+      count: counts.automation,
+      percentage: formatPercentage((counts.automation / totalCount) * 100),
+    },
+  };
+}

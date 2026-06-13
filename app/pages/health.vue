@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { IdentityClassification } from "@unveil/identity";
-import { identityConfig } from "@unveil/identity";
+import { formatTrend, getHealthStats } from "~~/shared/health-stats";
 
 const { data: ecosystemHealth } = await useEcosystemHealth();
 const data = computed(() => ecosystemHealth.value?.results);
@@ -33,16 +33,6 @@ useHead({
   ],
 });
 
-function classifyByScore(score: number): IdentityClassification {
-  if (score >= identityConfig.THRESHOLD_HUMAN) {
-    return "organic";
-  } else if (score >= identityConfig.THRESHOLD_SUSPICIOUS) {
-    return "mixed";
-  } else {
-    return "automation";
-  }
-}
-
 type ClassificationStats = Record<
   IdentityClassification,
   { count: number; percentage: string }
@@ -60,40 +50,9 @@ const classificationConfigs: ClassificationConfig[] = [
   { key: "automation", label: "Automation", bgColor: "bg-gh-danger-hover" },
 ];
 
-function formatPercentage(value: number): string {
-  return value.toFixed(1);
-}
-
 const latestDayStats = computed<ClassificationStats | null>(() => {
-  if (!data.value?.length) return null;
-
-  const totalCount = data.value.length;
-
-  const counts: Record<IdentityClassification, number> = {
-    organic: 0,
-    mixed: 0,
-    automation: 0,
-  };
-
-  data.value.forEach((item) => {
-    const classification = classifyByScore(item.score);
-    counts[classification]++;
-  });
-
-  return {
-    organic: {
-      count: counts.organic,
-      percentage: formatPercentage((counts.organic / totalCount) * 100),
-    },
-    mixed: {
-      count: counts.mixed,
-      percentage: formatPercentage((counts.mixed / totalCount) * 100),
-    },
-    automation: {
-      count: counts.automation,
-      percentage: formatPercentage((counts.automation / totalCount) * 100),
-    },
-  };
+  console.log(getHealthStats(data.value));
+  return getHealthStats(data.value);
 });
 
 const automatedPrClosure = computed(() => ({
@@ -117,11 +76,6 @@ const hasEnoughData = computed(() => {
 
   return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
 });
-
-function formatTrend(value: number = 0) {
-  if (value > 0) return `+${(value * 100).toFixed(0)}%`;
-  return `${(value * 100).toFixed(0)}%`;
-}
 
 function getTrendArrow(value: number = 0) {
   if (value > 0) return "i-lucide:trending-up";
