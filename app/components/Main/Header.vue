@@ -1,9 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const route = useRoute();
+const isHomePage = computed<boolean>(() => route.name === "index");
+</script>
 
 <template>
   <header class="h-12 flex justify-between items-center px-4 lg:px-6 py-4">
     <div class="flex-1">
       <NuxtLink
+        v-if="!isHomePage"
         class="flex gap-2 items-center text-gh-text"
         to="/"
         aria-label="Homepage"
@@ -26,14 +30,14 @@
         external
         target="_blank"
         to="https://github.com/marketplace/actions/agentscan"
-        class="inline-flex items-center px-3.5 lg:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
+        class="hidden md:inline-flex items-center px-3.5 lg:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
         title="Use it as a GitHub Action"
       >
-        GitHub action
+        <span class="i-lucide:git-fork"></span>
+        <span>GitHub action</span>
       </NuxtLink>
-      <div class="md:hidden">
-        <MainMobileMenu />
-      </div>
+
+      <MainMobileMenu class="md:hidden" />
     </div>
   </header>
 </template>

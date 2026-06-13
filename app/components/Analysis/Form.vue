@@ -25,7 +25,7 @@ function clear() {
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="flex items-center gap-2 mb-8 border border-gh-border-light relative rounded-full px-6 py-3 focus-within:border-gh-border-light/80"
+    class="flex items-center gap-2 mb-8 border border-gh-border relative rounded-full px-6 py-3 focus-within:border-gh-border-light"
   >
     <label class="flex-1" for="userName">
       <span class="sr-only">Enter account name</span>
@@ -39,7 +39,7 @@ function clear() {
         autocapitalize="none"
         name="userName"
         id="userName"
-        placeholder="Enter account name..."
+        placeholder="Search accounts (e.g. torvalds)"
       />
     </label>
     <div class="flex items-center gap-4">

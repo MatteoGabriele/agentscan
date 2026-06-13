@@ -30,9 +30,9 @@ const filteredItems = computed(() => {
 });
 
 useHead({
-  title: "Verified automations | AgentScan",
+  title: "Community flags | AgentScan",
   meta: [
-    { property: "og:title", content: "Verified automations | AgentScan" },
+    { property: "og:title", content: "Community flags | AgentScan" },
     {
       property: "og:description",
       content: "A list of community flagged automated accounts",
@@ -44,7 +44,7 @@ useHead({
 
 <template>
   <header class="text-center md:text-left">
-    <h1 class="text-2xl font-semibold">Community verified automations</h1>
+    <h1 class="text-2xl font-semibold">Community flags</h1>
     <p class="text-gh-muted mt-2">
       This is a list of accounts verified by the community as using heavy
       automation, spamming through automation, or operating as bots.

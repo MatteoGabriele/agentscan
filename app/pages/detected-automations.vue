@@ -47,9 +47,9 @@ const filteredItems = computed(() => {
 });
 
 useHead({
-  title: "Detected automations | AgentScan",
+  title: "Daily flags | AgentScan",
   meta: [
-    { property: "og:title", content: "Detected automations | AgentScan" },
+    { property: "og:title", content: "Daily flags | AgentScan" },
     {
       property: "og:description",
       content:
@@ -62,7 +62,7 @@ useHead({
 
 <template>
   <header class="text-center md:text-left text-pretty">
-    <h1 class="text-2xl font-semibold">Detected automations</h1>
+    <h1 class="text-2xl font-semibold">Daily flags</h1>
     <p class="text-gh-muted mt-2">
       Accounts identified by the daily
       <NuxtLink to="/health" class="underline hover:text-gh-text">

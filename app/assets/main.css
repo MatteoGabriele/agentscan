@@ -49,8 +49,8 @@
 :root[data-theme="light"] {
   --bg: #f6f8fa;
   --card: #ffffff;
-  --border: #d0d7de;
-  --border-light: #eaeef2;
+  --border: #b7b7b7;
+  --border-light: #d0d7de;
   --text: #222222;
   --text-transparent: rgba(34, 34, 34, 0.25);
   --text-muted: #57606a;
