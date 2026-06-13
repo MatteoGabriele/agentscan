@@ -4,7 +4,7 @@ import {
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
 } from "vue-data-ui";
-import { getCompleteDayRange } from "~/utils/charts";
+import { getCompleteDayRange } from "~~/shared/utils/charts";
 import type { GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";

@@ -7,7 +7,7 @@ import {
 } from "vue-data-ui/vue-ui-xy";
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
-import { getClosedPrPercentageEvolutionTotal } from "~/utils/charts";
+import { getClosedPrPercentageEvolutionTotal } from "~~/shared/utils/charts";
 import { identityConfig } from "@unveil/identity";
 
 import("vue-data-ui/style.css");

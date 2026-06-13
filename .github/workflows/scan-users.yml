@@ -48,3 +48,7 @@ jobs:
             git merge --no-edit origin/main
             git push
           fi
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.OSS_GUILD_DISCORD_WEBHOOK }}
+        run: npm exec tsx scripts/notify-discord.ts
