@@ -45,6 +45,7 @@ function clear() {
     <div class="flex items-center gap-4">
       <button v-if="accountName" type="button" @click="clear" class="flex">
         <span class="i-lucide:x" />
+        <span class="sr-only">Clear input field</span>
       </button>
 
       <button type="submit" class="flex">
