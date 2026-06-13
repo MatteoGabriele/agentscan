@@ -51,3 +51,21 @@ export function getHealthStats(data: EcosystemHealthItem[] = []) {
     },
   };
 }
+
+export function getTrendArrow(value: number = 0) {
+  if (value > 0) return "i-lucide:trending-up";
+  if (value < 0) return "i-lucide:trending-down";
+  return "i-lucide:trending-up-down";
+}
+
+export function getTrendColor({
+  value = 0,
+  reversed = false,
+}: {
+  value?: number;
+  reversed?: boolean;
+}) {
+  if (value > 0) return reversed ? "text-gh-danger-hover" : "text-gh-green";
+  if (value < 0) return reversed ? "text-gh-green" : "text-gh-danger-hover";
+  return "text-gh-muted";
+}

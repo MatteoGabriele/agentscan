@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { IdentityClassification } from "@unveil/identity";
-import { formatTrend, getHealthStats } from "~~/shared/health-stats";
+import {
+  formatTrend,
+  getHealthStats,
+  getTrendArrow,
+  getTrendColor,
+} from "~~/shared/health-stats";
 
 const { data: ecosystemHealth } = await useEcosystemHealth();
 const data = computed(() => ecosystemHealth.value?.results);
@@ -66,7 +71,6 @@ const automatedPrClosure = computed(() => ({
 
 const MIN_DAY_DATA_COLLECTION = 4;
 const hasEnoughData = computed(() => {
-  console.log(data.value?.length);
   if (!data.value?.length) {
     return false;
   }
@@ -76,24 +80,6 @@ const hasEnoughData = computed(() => {
 
   return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
 });
-
-function getTrendArrow(value: number = 0) {
-  if (value > 0) return "i-lucide:trending-up";
-  if (value < 0) return "i-lucide:trending-down";
-  return "i-lucide:trending-up-down";
-}
-
-function getTrendColor({
-  value = 0,
-  reversed = false,
-}: {
-  value?: number;
-  reversed?: boolean;
-}) {
-  if (value > 0) return reversed ? "text-gh-danger-hover" : "text-gh-green";
-  if (value < 0) return reversed ? "text-gh-green" : "text-gh-danger-hover";
-  return "text-gh-muted";
-}
 </script>
 
 <template>
