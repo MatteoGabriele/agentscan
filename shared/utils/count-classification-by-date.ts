@@ -1,8 +1,17 @@
 import { identityConfig } from "@unveil/identity";
 
+type CountWithTrend = {
+  count: number;
+  trend: number;
+};
+
 type CountClassificationByDateResults = Record<
   string,
-  EcosystemHealthCategoryCounts
+  {
+    automation: CountWithTrend;
+    mixed: CountWithTrend;
+    organic: CountWithTrend;
+  }
 >;
 
 export function countClassificationByDate(
@@ -14,9 +23,9 @@ export function countClassificationByDate(
 
   dates.forEach((date) => {
     result[date] = {
-      automation: 0,
-      mixed: 0,
-      organic: 0,
+      automation: { count: 0, trend: 0 },
+      mixed: { count: 0, trend: 0 },
+      organic: { count: 0, trend: 0 },
     };
   });
 
@@ -28,11 +37,11 @@ export function countClassificationByDate(
     }
 
     if (item.score >= identityConfig.THRESHOLD_HUMAN) {
-      dateCounts.organic += 1;
+      dateCounts.organic.count += 1;
     } else if (item.score >= identityConfig.THRESHOLD_SUSPICIOUS) {
-      dateCounts.mixed += 1;
+      dateCounts.mixed.count += 1;
     } else {
-      dateCounts.automation += 1;
+      dateCounts.automation.count += 1;
     }
   });
 

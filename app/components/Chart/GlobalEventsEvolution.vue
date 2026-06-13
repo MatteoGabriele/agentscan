@@ -45,8 +45,13 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
     {
       name: "Organic",
       series:
-        dates.value?.map((date) => countsByDate.value?.[date]?.organic ?? 0) ??
-        [],
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.organic.count ?? 0,
+        ) ?? [],
+      trends:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.organic.trend ?? 0,
+        ) ?? [],
       color: colors.value.greenLine,
       type: "line",
       smooth: true,
@@ -55,8 +60,13 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
     {
       name: "Mixed",
       series:
-        dates.value?.map((date) => countsByDate.value?.[date]?.mixed ?? 0) ??
-        [],
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.mixed.count ?? 0,
+        ) ?? [],
+      trends:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.mixed.trend ?? 0,
+        ) ?? [],
       color: colors.value.amber,
       type: "line",
       smooth: true,
@@ -66,7 +76,11 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
       name: "Automation",
       series:
         dates.value?.map(
-          (date) => countsByDate.value?.[date]?.automation ?? 0,
+          (date) => countsByDate.value?.[date]?.automation.count ?? 0,
+        ) ?? [],
+      trends:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.automation.trend ?? 0,
         ) ?? [],
       color: colors.value.dangerHover,
       type: "line",
@@ -170,6 +184,15 @@ const config = computed<VueUiXyConfig>(() => ({
     zoom: { show: false },
   },
 }));
+
+function getTrend({ series, item, index }: any) {
+  const trend = series?.[item.slotAbsoluteIndex]?.trends?.[index];
+  return {
+    formattedValue: formatTrend(trend),
+    color: getTrendColor({ value: trend, reversed: item.name !== "Organic" }),
+    arrow: getTrendArrow(trend),
+  };
+}
 </script>
 
 <template>
@@ -184,26 +207,59 @@ const config = computed<VueUiXyConfig>(() => ({
             </linearGradient>
           </template>
 
-          <template #tooltip="{ datapoint, timeLabel }">
+          <template #tooltip="{ datapoint, timeLabel, series }">
             <div class="flex flex-col">
               <div :style="{ color: colors.textMuted }" class="mb-1">
                 {{ timeLabel.text }}
               </div>
               <div
                 class="flex flex-row gap-2 place-items-center"
-                v-for="series in datapoint"
-                :key="`${series.name}-${series.absoluteIndex}`"
+                v-for="dp in datapoint"
+                :key="`${dp.name}-${dp.absoluteIndex}`"
               >
                 <div class="h-2 w-2">
                   <svg viewBox="0 0 2 2" class="w-full h-full">
-                    <circle cx="1" cy="1" r="1" :fill="series.color" />
+                    <circle cx="1" cy="1" r="1" :fill="dp.color" />
                   </svg>
                 </div>
-                <span :style="{ color: colors.text }">{{ series.name }}</span>
+                <span :style="{ color: colors.text }">{{ dp.name }}</span>
                 <span :style="{ color: colors.textMuted }">{{
-                  series.value +
-                  (series.slotAbsoluteIndex === dataset.length - 1 ? "%" : "")
+                  dp.value +
+                  (dp.slotAbsoluteIndex === dataset.length - 1 ? "%" : "")
                 }}</span>
+
+                <!-- No trend is possible on the first datapoint -->
+                <template v-if="timeLabel.absoluteIndex > 0">
+                  <span
+                    :class="[
+                      getTrend({
+                        series,
+                        item: dp,
+                        index: timeLabel.absoluteIndex,
+                      }).color,
+                    ]"
+                    v-if="dp.slotAbsoluteIndex < series.length - 1"
+                  >
+                    <span
+                      :class="[
+                        getTrend({
+                          series,
+                          item: dp,
+                          index: timeLabel.absoluteIndex,
+                        }).arrow,
+                      ]"
+                      class="shrink-0"
+                      style="vertical-align: middle"
+                    />
+                    {{
+                      getTrend({
+                        series,
+                        item: dp,
+                        index: timeLabel.absoluteIndex,
+                      }).formattedValue
+                    }}</span
+                  >
+                </template>
               </div>
             </div>
           </template>

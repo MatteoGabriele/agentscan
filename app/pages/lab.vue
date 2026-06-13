@@ -21,21 +21,21 @@ function createChartDataset(): {
       {
         name: "Organic",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.organic ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.organic.count ?? 0,
         ),
         color: colors.value.greenLine,
       },
       {
         name: "Mixed",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.mixed ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.mixed.count ?? 0,
         ),
         color: colors.value.amber,
       },
       {
         name: "Automation",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.automation ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.automation.count ?? 0,
         ),
         color: colors.value.dangerHover,
       },
