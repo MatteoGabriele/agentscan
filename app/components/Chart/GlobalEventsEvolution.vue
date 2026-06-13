@@ -78,13 +78,12 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
 
 const rawDataset = computed(() => composeRawDataset());
 
-const max = computed(() =>
-  Math.max(
-    ...rawDataset.value.flatMap((d) =>
-      (d.series as Array<number | null>).map((d) => d ?? 0),
-    ),
-  ),
-);
+const max = computed(() => {
+  const values = rawDataset.value.flatMap((d) =>
+    (d.series as Array<number | null>).map((point) => point ?? 0),
+  );
+  return values.length > 0 ? Math.max(...values) : 0;
+});
 
 const dataset = computed<VueUiXyDatasetItem[]>(() => [
   ...rawDataset.value.map((d) => ({

@@ -1,7 +1,14 @@
 import { identityConfig } from "@unveil/identity";
 
-export function countClassificationByDate(data: EcosystemHealthItem[] = []) {
-  const result: Record<string, EcosystemHealthCategoryCounts> = {};
+type CountClassificationByDateResults = Record<
+  string,
+  EcosystemHealthCategoryCounts
+>;
+
+export function countClassificationByDate(
+  data: EcosystemHealthItem[] = [],
+): CountClassificationByDateResults {
+  const result: CountClassificationByDateResults = {};
 
   const dates = [...new Set(data.map((item) => item.created_at))].sort();
 
@@ -16,14 +23,16 @@ export function countClassificationByDate(data: EcosystemHealthItem[] = []) {
   data.forEach((item) => {
     const dateCounts = result[item.created_at];
 
-    if (!dateCounts) return;
+    if (!dateCounts) {
+      return;
+    }
 
-    if (item.score <= identityConfig.THRESHOLD_SUSPICIOUS) {
-      dateCounts.automation += 1;
-    } else if (item.score <= identityConfig.THRESHOLD_HUMAN) {
+    if (item.score >= identityConfig.THRESHOLD_HUMAN) {
+      dateCounts.organic += 1;
+    } else if (item.score >= identityConfig.THRESHOLD_SUSPICIOUS) {
       dateCounts.mixed += 1;
     } else {
-      dateCounts.organic += 1;
+      dateCounts.automation += 1;
     }
   });
 

@@ -35,7 +35,7 @@ function createChartDataset(): {
       {
         name: "Automation",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.mixed ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.automation ?? 0,
         ),
         color: colors.value.dangerHover,
       },
