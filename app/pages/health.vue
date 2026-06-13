@@ -64,14 +64,11 @@ const automatedPrClosure = computed(() => ({
 
 const MIN_DAY_DATA_COLLECTION = 4;
 const hasEnoughData = computed(() => {
-  if (!data.value?.length) {
+  if (!ecosystemHealth.value?.dates.length) {
     return false;
   }
 
-  const dates = data.value.map((item) => item.created_at);
-  const uniqueDates = new Set(dates);
-
-  return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
+  return ecosystemHealth.value.dates.length >= MIN_DAY_DATA_COLLECTION;
 });
 </script>
 
