@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type { IdentityClassification } from "@unveil/identity";
-import { identityConfig } from "@unveil/identity";
 
-const { data } = await useEcosystemHealth();
+const { data: ecosystemHealth } = await useEcosystemHealth();
+const data = computed(() => ecosystemHealth.value?.results);
+const categoryProgression = computed(() => {
+  return ecosystemHealth.value?.categoryProgression;
+});
+
 const { formattedNextScanTime } = useNextScanTime();
 
 definePageMeta({
@@ -28,16 +32,6 @@ useHead({
   ],
 });
 
-function classifyByScore(score: number): IdentityClassification {
-  if (score >= identityConfig.THRESHOLD_HUMAN) {
-    return "organic";
-  } else if (score >= identityConfig.THRESHOLD_SUSPICIOUS) {
-    return "mixed";
-  } else {
-    return "automation";
-  }
-}
-
 type ClassificationStats = Record<
   IdentityClassification,
   { count: number; percentage: string }
@@ -55,40 +49,8 @@ const classificationConfigs: ClassificationConfig[] = [
   { key: "automation", label: "Automation", bgColor: "bg-gh-danger-hover" },
 ];
 
-function formatPercentage(value: number): string {
-  return value.toFixed(1);
-}
-
 const latestDayStats = computed<ClassificationStats | null>(() => {
-  if (!data.value?.length) return null;
-
-  const totalCount = data.value.length;
-
-  const counts: Record<IdentityClassification, number> = {
-    organic: 0,
-    mixed: 0,
-    automation: 0,
-  };
-
-  data.value.forEach((item) => {
-    const classification = classifyByScore(item.score);
-    counts[classification]++;
-  });
-
-  return {
-    organic: {
-      count: counts.organic,
-      percentage: formatPercentage((counts.organic / totalCount) * 100),
-    },
-    mixed: {
-      count: counts.mixed,
-      percentage: formatPercentage((counts.mixed / totalCount) * 100),
-    },
-    automation: {
-      count: counts.automation,
-      percentage: formatPercentage((counts.automation / totalCount) * 100),
-    },
-  };
+  return getHealthStats(data.value);
 });
 
 const automatedPrClosure = computed(() => ({
@@ -102,39 +64,12 @@ const automatedPrClosure = computed(() => ({
 
 const MIN_DAY_DATA_COLLECTION = 4;
 const hasEnoughData = computed(() => {
-  if (!data.value?.length) {
+  if (!ecosystemHealth.value?.dates.length) {
     return false;
   }
 
-  const uniqueDates = new Set(data.value.map((item) => item.created_at));
-
-  return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
+  return ecosystemHealth.value.dates.length >= MIN_DAY_DATA_COLLECTION;
 });
-
-const { progression } = useEcosystemHealthCategoryProgression();
-
-function formatTrend(value: number) {
-  if (value > 0) return `+${(value * 100).toFixed(0)}%`;
-  return `${(value * 100).toFixed(0)}%`;
-}
-
-function getTrendArrow(value: number) {
-  if (value > 0) return "i-lucide:trending-up";
-  if (value < 0) return "i-lucide:trending-down";
-  return "i-lucide:trending-up-down";
-}
-
-function getTrendColor({
-  value,
-  reversed = false,
-}: {
-  value: number;
-  reversed?: boolean;
-}) {
-  if (value > 0) return reversed ? "text-gh-danger-hover" : "text-gh-green";
-  if (value < 0) return reversed ? "text-gh-green" : "text-gh-danger-hover";
-  return "text-gh-muted";
-}
 </script>
 
 <template>
@@ -182,17 +117,19 @@ function getTrendColor({
               <span
                 :class="[
                   getTrendColor({
-                    value: progression[config.key].trend,
+                    value: categoryProgression?.[config.key].trend,
                     reversed: config.key !== 'organic',
                   }),
                 ]"
               >
                 <span
-                  :class="[getTrendArrow(progression[config.key].trend)]"
+                  :class="[
+                    getTrendArrow(categoryProgression?.[config.key].trend),
+                  ]"
                   class="shrink-0"
                   style="vertical-align: middle"
                 />
-                {{ formatTrend(progression[config.key].trend) }}
+                {{ formatTrend(categoryProgression?.[config.key].trend) }}
               </span>
             </p>
           </li>

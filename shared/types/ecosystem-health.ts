@@ -1,3 +1,6 @@
+import type { calcLinearProgression } from "../utils/calc-linear-progression";
+import type { IdentityClassification } from "@unveil/identity";
+
 export type EcosystemHealthItem = {
   created_at: string;
   user_id: number;
@@ -10,3 +13,14 @@ export type EcosystemHealthItem = {
   repo_name: string;
   username: string;
 };
+
+export type EcosystemHealthCategoryCounts = {
+  automation: number;
+  mixed: number;
+  organic: number;
+};
+
+export type EcosystemHealthCategoryProgression = Record<
+  IdentityClassification,
+  ReturnType<typeof calcLinearProgression>
+>;

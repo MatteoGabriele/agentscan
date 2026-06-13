@@ -18,7 +18,7 @@ function setSelectedDate(date: string | null) {
   selectedDate.value = date;
 }
 
-const healthData = computed(() => data.value ?? []);
+const healthData = computed(() => data.value?.results ?? []);
 
 const source = computed(() => {
   return convertToHorizontalBarDataset(healthData.value, selectedDate.value);

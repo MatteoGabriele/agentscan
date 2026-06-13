@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { identityConfig } from "@unveil/identity";
+import type {
+  GitHubUser,
+  IdentityClassification,
+  IdentifyResult,
+} from "@unveil/identity";
 import dayjs from "dayjs";
 
 const props = defineProps<{
@@ -122,7 +126,7 @@ const flagAccountUrl = computed<string>(() => {
   return `${baseUrl}?${params.toString()}`;
 });
 
-const identifyAnalysis = computed<IdentifyReplicantResult | undefined>(() => {
+const identifyAnalysis = computed<IdentifyResult | undefined>(() => {
   return data.value?.analysis;
 });
 

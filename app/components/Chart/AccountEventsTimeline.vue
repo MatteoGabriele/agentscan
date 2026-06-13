@@ -5,11 +5,15 @@ import {
   type VueUiXyConfig,
 } from "vue-data-ui";
 import { getCompleteDayRange } from "~/utils/charts";
-import type { GitHubEvent, GitHubEventType } from "~~/shared/types/identity";
+import type { GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
 import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
-import { identityConfig, type IdentityClassification } from "@unveil/identity";
+import {
+  identityConfig,
+  type IdentityClassification,
+  type GitHubEvent,
+} from "@unveil/identity";
 import type { VueUiXyDatasetLineItem } from "vue-data-ui/vue-ui-xy";
 
 import("vue-data-ui/style.css");

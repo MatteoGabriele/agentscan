@@ -7,7 +7,9 @@ definePageMeta({
 
 const rootEl = shallowRef<HTMLElement | null>(null);
 const colors = useColors(rootEl);
-const { dates, countsByDate } = useEcosystemHealthCountsByDate();
+
+const { data } = await useEcosystemHealth();
+const dates = computed(() => data.value?.dates ?? []);
 
 function createChartDataset(): {
   categories: string[];
@@ -19,19 +21,21 @@ function createChartDataset(): {
       {
         name: "Organic",
         series: dates.value.map(
-          (date) => countsByDate.value[date]?.organic ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.organic ?? 0,
         ),
         color: colors.value.greenLine,
       },
       {
         name: "Mixed",
-        series: dates.value.map((date) => countsByDate.value[date]?.mixed ?? 0),
+        series: dates.value.map(
+          (date) => data.value?.countsByDate?.[date]?.mixed ?? 0,
+        ),
         color: colors.value.amber,
       },
       {
         name: "Automation",
         series: dates.value.map(
-          (date) => countsByDate.value[date]?.automation ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.automation ?? 0,
         ),
         color: colors.value.dangerHover,
       },
@@ -83,15 +87,6 @@ const dataset = computed(() => stacklineData.value.dataset);
       </div>
       <div class="w-full">
         <ChartGlobalEventsHeatmap :data="dataset" :timestamps="dates" />
-      </div>
-      <div class="w-full">
-        <h2 class="text-xl font-semibold mb-4">Scan Results by User ID</h2>
-        <AnalysisScanListTable />
-      </div>
-
-      <div class="w-full">
-        <h2 class="text-xl font-semibold mb-4">Scan Results by User ID</h2>
-        <AnalysisScanListTable />
       </div>
     </div>
   </section>

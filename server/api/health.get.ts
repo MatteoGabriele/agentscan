@@ -1,25 +1,53 @@
 import { Octokit } from "octokit";
-import type { EcosystemHealthItem } from "~~/shared/types/ecosystem-health";
+import type {
+  EcosystemHealthItem,
+  EcosystemHealthCategoryProgression,
+} from "~~/shared/types/ecosystem-health";
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig();
   const octokit = new Octokit({ auth: config.githubToken });
 
   try {
-    const { data: scanList } = await octokit.rest.repos.getContent({
+    const { data } = await octokit.rest.repos.getContent({
       owner: "matteogabriele",
       repo: "agentscan",
       path: "data/scan-results.json",
     });
 
-    if ("content" in scanList) {
-      const content = Buffer.from(scanList.content, "base64").toString("utf-8");
-      const scanData = JSON.parse(content) as EcosystemHealthItem[];
+    let results: EcosystemHealthItem[] = [];
 
-      return scanData;
+    if ("content" in data) {
+      const content = Buffer.from(data.content, "base64").toString("utf-8");
+      results = JSON.parse(content);
     }
 
-    return [];
+    const automation: number[] = [];
+    const mixed: number[] = [];
+    const organic: number[] = [];
+
+    const countsByDate = countClassificationByDate(results);
+    const dates = Object.keys(countsByDate).sort();
+
+    dates.forEach((date) => {
+      const counts = countsByDate[date];
+      automation.push(counts?.automation ?? 0);
+      mixed.push(counts?.mixed ?? 0);
+      organic.push(counts?.organic ?? 0);
+    });
+
+    const categoryProgression: EcosystemHealthCategoryProgression = {
+      automation: calcLinearProgression(automation),
+      mixed: calcLinearProgression(mixed),
+      organic: calcLinearProgression(organic),
+    };
+
+    return {
+      results,
+      categoryProgression,
+      countsByDate,
+      dates,
+    };
   } catch {
     throw createError({
       statusCode: 500,
