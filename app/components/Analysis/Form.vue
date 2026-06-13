@@ -25,34 +25,32 @@ function clear() {
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="flex flex-col @md:flex-row gap-2 mb-8"
+    class="flex items-center gap-2 mb-8 border border-gh-border-light relative rounded-full px-6 py-3 focus-within:border-gh-border-light/80"
   >
-    <div class="w-full relative">
-      <label class="sr-only" for="userName">Enter GitHub username</label>
+    <label class="flex-1" for="userName">
+      <span class="sr-only">Enter account name</span>
       <input
         v-model="accountName"
+        class="outline-none w-full"
         ref="inputRef"
         autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        autocapitalize="none"
+        name="userName"
         id="userName"
-        placeholder="Enter GitHub username..."
-        class="flex-1 w-full py-2 px-4 pr-8 border-1 border-solid border-gh-border rounded-md bg-gh-card text-gh-text text-base outline-none focus:border-gh-blue"
+        placeholder="Enter account name..."
       />
-      <button
-        v-if="accountName"
-        type="button"
-        @click="clear"
-        class="absolute rounded-full hover:bg-gh-muted/30 transition-colors size-6 items-center justify-center text-gh-text flex top-1/2 right-2 -translate-y-1/2"
-      >
+    </label>
+    <div class="flex items-center gap-4">
+      <button v-if="accountName" type="button" @click="clear" class="flex">
         <span class="i-lucide:x" />
       </button>
-    </div>
 
-    <button
-      type="submit"
-      class="py-2 px-6 bg-gh-green rounded-md text-white hover:bg-gh-green-hover flex justify-center items-center gap-2 font-mono"
-    >
-      <span class="i-lucide-search" aria-hidden="true" />
-      Analyze
-    </button>
+      <button type="submit" class="flex">
+        <span class="i-lucide-search" aria-hidden="true" />
+        <span class="sr-only">Analyze</span>
+      </button>
+    </div>
   </form>
 </template>

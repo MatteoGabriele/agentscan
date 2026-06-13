@@ -9,7 +9,7 @@ defineProps<{
   <NuxtLink
     :to
     v-slot="{ isActive }"
-    class="inline-flex items-center text-gh-muted hover:text-gh-text transition-colors text-lg lg:text-sm"
+    class="inline-flex items-center text-gh-muted hover:text-gh-text transition-colors text-sm"
   >
     <span
       class="text-gh-muted hover:text-gh-text transition-colors"

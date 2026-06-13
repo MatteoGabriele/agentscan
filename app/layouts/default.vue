@@ -52,10 +52,12 @@ const isHomePage = computed<boolean>(() => route.name === "index");
     <div class="min-h-svh flex flex-col">
       <MainHeader />
 
-      <div class="flex flex-1 items-center justify-center">
-        <main class="max-w-screen-md mx-auto px-4 py-20 @container w-full">
-          <MainBrand v-if="isHomePage" heading-level="h1" />
-
+      <div class="flex flex-1 flex-col gap-2 items-center justify-center">
+        <MainBrand class="mb-4" v-if="isHomePage" />
+        <main
+          class="max-w-screen-md mx-auto px-4 @container w-full"
+          :class="{ 'py-20': !isHomePage }"
+        >
           <slot />
         </main>
       </div>

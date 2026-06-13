@@ -5,7 +5,7 @@ const { headingLevel = "h1" } = defineProps<{
 </script>
 
 <template>
-  <div class="text-center mb-8">
+  <div class="text-center">
     <div class="flex items-center justify-center gap-2 mb-2">
       <MainLogo />
 
