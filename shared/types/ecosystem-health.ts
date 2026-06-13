@@ -1,4 +1,4 @@
-import type { calcLinearProgression } from "../calc-linear-progression";
+import type { calcLinearProgression } from "../utils/calc-linear-progression";
 import type { IdentityClassification } from "@unveil/identity";
 
 export type EcosystemHealthItem = {

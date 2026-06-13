@@ -3,8 +3,6 @@ import type {
   EcosystemHealthItem,
   EcosystemHealthCategoryProgression,
 } from "~~/shared/types/ecosystem-health";
-import { calcLinearProgression } from "~~/shared/calc-linear-progression";
-import { countClassificationByDate } from "~~/shared/count-classification-by-date";
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig();

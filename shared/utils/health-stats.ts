@@ -1,5 +1,5 @@
 import { identityConfig, type IdentityClassification } from "@unveil/identity";
-import type { EcosystemHealthItem } from "./types/ecosystem-health";
+import type { EcosystemHealthItem } from "../types/ecosystem-health";
 
 export function classifyByScore(score: number): IdentityClassification {
   if (score >= identityConfig.THRESHOLD_HUMAN) {

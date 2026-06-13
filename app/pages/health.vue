@@ -1,11 +1,5 @@
 <script setup lang="ts">
 import type { IdentityClassification } from "@unveil/identity";
-import {
-  formatTrend,
-  getHealthStats,
-  getTrendArrow,
-  getTrendColor,
-} from "~~/shared/health-stats";
 
 const { data: ecosystemHealth } = await useEcosystemHealth();
 const data = computed(() => ecosystemHealth.value?.results);
@@ -56,7 +50,6 @@ const classificationConfigs: ClassificationConfig[] = [
 ];
 
 const latestDayStats = computed<ClassificationStats | null>(() => {
-  console.log(getHealthStats(data.value));
   return getHealthStats(data.value);
 });
 
@@ -75,7 +68,7 @@ const hasEnoughData = computed(() => {
     return false;
   }
 
-  const dates = data.value.map((dataItem) => dataItem.created_at);
+  const dates = data.value.map((item) => item.created_at);
   const uniqueDates = new Set(dates);
 
   return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
