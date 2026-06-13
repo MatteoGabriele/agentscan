@@ -2,7 +2,12 @@
 import type { IdentityClassification } from "@unveil/identity";
 import { identityConfig } from "@unveil/identity";
 
-const { data } = await useEcosystemHealth();
+const { data: ecosystemHealth } = await useEcosystemHealth();
+const data = computed(() => ecosystemHealth.value?.results);
+const categoryProgression = computed(() => {
+  return ecosystemHealth.value?.categoryProgression;
+});
+
 const { formattedNextScanTime } = useNextScanTime();
 
 definePageMeta({
@@ -102,33 +107,33 @@ const automatedPrClosure = computed(() => ({
 
 const MIN_DAY_DATA_COLLECTION = 4;
 const hasEnoughData = computed(() => {
+  console.log(data.value?.length);
   if (!data.value?.length) {
     return false;
   }
 
-  const uniqueDates = new Set(data.value.map((item) => item.created_at));
+  const dates = data.value.map((dataItem) => dataItem.created_at);
+  const uniqueDates = new Set(dates);
 
   return uniqueDates.size >= MIN_DAY_DATA_COLLECTION;
 });
 
-const { progression } = useEcosystemHealthCategoryProgression();
-
-function formatTrend(value: number) {
+function formatTrend(value: number = 0) {
   if (value > 0) return `+${(value * 100).toFixed(0)}%`;
   return `${(value * 100).toFixed(0)}%`;
 }
 
-function getTrendArrow(value: number) {
+function getTrendArrow(value: number = 0) {
   if (value > 0) return "i-lucide:trending-up";
   if (value < 0) return "i-lucide:trending-down";
   return "i-lucide:trending-up-down";
 }
 
 function getTrendColor({
-  value,
+  value = 0,
   reversed = false,
 }: {
-  value: number;
+  value?: number;
   reversed?: boolean;
 }) {
   if (value > 0) return reversed ? "text-gh-danger-hover" : "text-gh-green";
@@ -182,17 +187,19 @@ function getTrendColor({
               <span
                 :class="[
                   getTrendColor({
-                    value: progression[config.key].trend,
+                    value: categoryProgression?.[config.key].trend,
                     reversed: config.key !== 'organic',
                   }),
                 ]"
               >
                 <span
-                  :class="[getTrendArrow(progression[config.key].trend)]"
+                  :class="[
+                    getTrendArrow(categoryProgression?.[config.key].trend),
+                  ]"
                   class="shrink-0"
                   style="vertical-align: middle"
                 />
-                {{ formatTrend(progression[config.key].trend) }}
+                {{ formatTrend(categoryProgression?.[config.key].trend) }}
               </span>
             </p>
           </li>

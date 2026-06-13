@@ -1,7 +1,7 @@
 import { Octokit } from "octokit";
 import {
-  ScannedAutomation,
-  type ScannedAutomationResponse,
+  DetectedAutomation,
+  type DetectedAutomationResponse,
 } from "~~/shared/types/automation";
 import { identityConfig } from "@unveil/identity";
 import { cicdBots } from "~~/shared/daily-scan";
@@ -21,8 +21,8 @@ export default defineEventHandler(async () => {
       const content = Buffer.from(scanResults.content, "base64").toString(
         "utf-8",
       );
-      const scanned = JSON.parse(content) as ScannedAutomationResponse[];
-      return scanned.reduce<ScannedAutomation[]>((coll, item) => {
+      const scanned = JSON.parse(content) as DetectedAutomationResponse[];
+      return scanned.reduce<DetectedAutomation[]>((coll, item) => {
         if (
           !item.username ||
           cicdBots.includes(item.username) ||

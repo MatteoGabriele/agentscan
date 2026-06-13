@@ -1,4 +1,4 @@
-import { calcLinearProgression } from "#imports";
+import { calcLinearProgression } from "~~/shared/calc-linear-progression";
 
 export function useEcosystemHealthCategoryProgression() {
   const { dates, countsByDate } = useEcosystemHealthCountsByDate();

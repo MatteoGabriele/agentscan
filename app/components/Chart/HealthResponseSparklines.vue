@@ -35,7 +35,7 @@ const selectedRangeColor = computed(() => {
 
 const sparklines = computed(() => {
   return getClosedPrPercentageEvolutionByRepo(
-    data.value ?? [],
+    data.value?.results ?? [],
     scoreBounds.value,
   ).map((dataset) => {
     return dataset.map((datapoint) => ({

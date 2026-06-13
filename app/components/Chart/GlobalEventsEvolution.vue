@@ -12,8 +12,10 @@ import { identityConfig } from "@unveil/identity";
 
 import("vue-data-ui/style.css");
 
-const { data } = await useEcosystemHealth();
-const { dates, countsByDate } = useEcosystemHealthCountsByDate();
+const { data: ecosystemHealth } = await useEcosystemHealth();
+const data = computed(() => ecosystemHealth.value?.results ?? []);
+const dates = computed(() => ecosystemHealth.value?.dates);
+const countsByDate = computed(() => ecosystemHealth.value?.countsByDate);
 
 const chartContainer = useTemplateRef<HTMLElement>("chartContainer");
 const { width, height } = useElementSize(chartContainer);
@@ -42,7 +44,9 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
   return [
     {
       name: "Organic",
-      series: dates.value.map((date) => countsByDate.value[date]?.organic ?? 0),
+      series:
+        dates.value?.map((date) => countsByDate.value?.[date]?.organic ?? 0) ??
+        [],
       color: colors.value.greenLine,
       type: "line",
       smooth: true,
@@ -50,7 +54,9 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
     },
     {
       name: "Mixed",
-      series: dates.value.map((date) => countsByDate.value[date]?.mixed ?? 0),
+      series:
+        dates.value?.map((date) => countsByDate.value?.[date]?.mixed ?? 0) ??
+        [],
       color: colors.value.amber,
       type: "line",
       smooth: true,
@@ -58,9 +64,10 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
     },
     {
       name: "Automation",
-      series: dates.value.map(
-        (date) => countsByDate.value[date]?.automation ?? 0,
-      ),
+      series:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.automation ?? 0,
+        ) ?? [],
       color: colors.value.dangerHover,
       type: "line",
       smooth: true,
@@ -92,7 +99,7 @@ const tooltipPosition = useChartTooltipPosition(chartRef);
 const progressionLabelOffsetX = 6; // compensate hard-coded internal in VueUiXy
 
 const viewBoxPadding = computed(() => {
-  const maxSeries = dates.value.length;
+  const maxSeries = dates.value?.length ?? 0;
   if (maxSeries <= 1) return { left: 0, right: 0 };
   const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1));
   return {
