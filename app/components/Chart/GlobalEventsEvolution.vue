@@ -127,11 +127,17 @@ const config = computed<VueUiXyConfig>(() => ({
     threshold: 5000,
   },
   line: {
-    radius: Number.MIN_VALUE, // bug in the lib, 0 does not work
+    radius: 0,
+    useGradient: false,
+    dot: {
+      useSerieColor: true,
+      fill: colors.value.bg,
+      strokeWidth: 2,
+    },
   },
   chart: {
     userOptions: { show: false },
-    backgroundColor: "transparent",
+    backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     width: width.value,
     height: height.value,
