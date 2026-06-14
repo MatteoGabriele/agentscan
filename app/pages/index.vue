@@ -12,4 +12,7 @@ function handleSubmit(name: string) {
     <AnalysisForm v-model="accountName" @submit="handleSubmit" />
   </div>
   <VerifiedAutomationList class="mt-2" />
+  <ClientOnly>
+    <ContributorsList class="absolute bottom-4 left-1/2 -translate-x-1/2" />
+  </ClientOnly>
 </template>

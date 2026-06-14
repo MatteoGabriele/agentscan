@@ -56,15 +56,6 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/": {
-      isr: {
-        expiration: 60 * 60,
-        passQuery: true,
-        allowQuery: ["user"],
-      },
-      cache: { maxAge: 3600 },
-    },
-
     "/privacy-policy": { prerender: true },
 
     "/api/account/**": {

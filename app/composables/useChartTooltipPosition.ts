@@ -1,7 +1,6 @@
 /**
  * This composable returns a dynamic position to be fed to vue-data-ui components configugration for the `tooltip.position` attribute.
  */
-
 import { useMouseInElement } from "@vueuse/core";
 
 type TooltipPosition = "left" | "right" | "center";

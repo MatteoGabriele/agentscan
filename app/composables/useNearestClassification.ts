@@ -1,4 +1,4 @@
-import { identityConfig } from "@unveil/identity";
+import { identityConfig, type IdentityClassification } from "@unveil/identity";
 
 export type UseNearestClassificationReturn = {
   nearestClassification: ComputedRef<IdentityClassification | undefined>;
