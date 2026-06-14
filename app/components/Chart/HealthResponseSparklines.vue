@@ -178,7 +178,9 @@ function getTooltipContent(
   const eligible = datapoint?.details?.eligiblePrs?.[index];
   const closed = datapoint?.details?.closedPrs?.[index];
   if (closed == null || eligible == null) return "";
-  return `${closed} / ${eligible} (${Math.round((closed / (eligible || 1)) * 100)}%)`;
+  const percentage =
+    eligible === 0 ? 100 : Math.round((closed / eligible) * 100);
+  return `${closed} / ${eligible} (${percentage}%)`;
 }
 
 function hideDataLabel(chartIndex: number) {
