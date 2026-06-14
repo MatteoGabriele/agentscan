@@ -31,9 +31,15 @@ export default defineEventHandler(async () => {
 
     dates.forEach((date) => {
       const counts = countsByDate[date];
-      automation.push(counts?.automation ?? 0);
-      mixed.push(counts?.mixed ?? 0);
-      organic.push(counts?.organic ?? 0);
+      if (!counts) return;
+
+      automation.push(counts.automation.count);
+      mixed.push(counts.mixed.count);
+      organic.push(counts.organic.count);
+
+      counts.automation.trend = calcLinearProgression(automation).trend;
+      counts.mixed.trend = calcLinearProgression(mixed).trend;
+      counts.organic.trend = calcLinearProgression(organic).trend;
     });
 
     const categoryProgression: EcosystemHealthCategoryProgression = {

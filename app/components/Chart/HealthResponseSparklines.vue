@@ -7,12 +7,27 @@ import {
   type VueUiXyTooltipSlotProps,
 } from "vue-data-ui/vue-ui-xy";
 import { identityConfig } from "@unveil/identity";
+import { useTimeoutFn } from "@vueuse/core";
 
 import("vue-data-ui/style.css");
 
 const { data } = useEcosystemHealth();
+const dates = computed(() => data.value?.dates);
+
 const rootEl = shallowRef<HTMLElement | null>(null);
 const colors = useColors(rootEl);
+
+const loaded = shallowRef(false);
+
+const { start } = useTimeoutFn(
+  () => {
+    loaded.value = true;
+  },
+  250,
+  { immediate: false },
+);
+
+onMounted(start);
 
 const scoreBounds = shallowRef<ScoreBounds>([
   0,
@@ -41,16 +56,32 @@ const sparklines = computed(() => {
     return dataset.map((datapoint) => ({
       ...datapoint,
       color: colors.value.textTransparent,
+      dataLabels: false,
+      suffix: "%",
     }));
   });
 });
 
+const selectedIndex = shallowRef<number | undefined>(undefined);
+const selectedChartIndex = shallowRef<number | undefined>(undefined);
+
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
+  events: {
+    datapointEnter: ({ seriesIndex }) => {
+      selectedIndex.value = seriesIndex;
+    },
+    datapointLeave: () => {
+      selectedIndex.value = undefined;
+    },
+  },
   chart: {
     userOptions: { show: false },
     legend: { show: false },
     zoom: { show: false },
+    labels: {
+      fontSize: 16,
+    },
     tooltip: {
       show: true,
       teleportTo: "#sparklines",
@@ -70,7 +101,7 @@ const config = computed<VueUiXyConfig>(() => ({
       right: 66,
       bottom: 0,
     },
-    backgroundColor: "transparent",
+    backgroundColor: colors.value.bg,
     height: 100,
     width: 450,
     grid: {
@@ -80,6 +111,19 @@ const config = computed<VueUiXyConfig>(() => ({
         show: false,
         xAxisLabels: {
           show: false,
+          values: dates.value,
+          datetimeFormatter: {
+            enable: true,
+            useUTC: true,
+            locale: "en",
+            options: {
+              year: "dd MMM",
+              month: "dd MMM",
+              day: "dd MMM",
+              minute: "dd MMM",
+              second: "dd MMM",
+            },
+          },
         },
         yAxis: {
           scaleMin: 0,
@@ -89,7 +133,19 @@ const config = computed<VueUiXyConfig>(() => ({
     },
   },
   line: {
-    radius: Number.MIN_VALUE,
+    radius: 0,
+    useGradient: false,
+    dot: {
+      useSerieColor: false,
+      fill: selectedRangeColor.value,
+      strokeWidth: 3,
+      selectedRadius: 6,
+    },
+    labels: {
+      show: true,
+      color: colors.value.text,
+      offsetY: -12,
+    },
   },
 }));
 
@@ -122,7 +178,17 @@ function getTooltipContent(
   const eligible = datapoint?.details?.eligiblePrs?.[index];
   const closed = datapoint?.details?.closedPrs?.[index];
   if (closed == null || eligible == null) return "";
-  return `${closed} / ${eligible}`;
+  const percentage =
+    eligible === 0 ? 100 : Math.round((closed / eligible) * 100);
+  return `${closed} / ${eligible} (${percentage}%)`;
+}
+
+function hideDataLabel(chartIndex: number) {
+  return (
+    selectedChartIndex.value === chartIndex ||
+    (selectedIndex.value !== undefined &&
+      selectedIndex.value === (dates.value?.length ?? 0) - 1)
+  );
 }
 </script>
 
@@ -179,8 +245,12 @@ function getTooltipContent(
     </label>
   </div>
 
-  <div class="grid grid-cols-2 gap-4 max-w-[600px] mx-auto" id="sparklines">
-    <ClientOnly v-for="chart in sparklines" :key="chart[0]?.name">
+  <div
+    class="grid grid-cols-2 gap-4 max-w-[600px] mx-auto"
+    id="sparklines"
+    :data-loaded="loaded"
+  >
+    <ClientOnly v-for="(chart, chartIndex) in sparklines" :key="chart[0]?.name">
       <div class="flex flex-col">
         <div class="text-sm mb-1">
           <span class="text-gh-muted">{{ chart[0]?.name.split("/")[0] }}/</span>
@@ -190,10 +260,17 @@ function getTooltipContent(
         <div
           class="w-full h-full border-gh-border border-l border-b rounded-bl"
           v-if="chart[0]?.hasData"
+          :data-hide-label="hideDataLabel(chartIndex)"
         >
-          <VueUiXy :dataset="chart" :config="config">
+          <VueUiXy
+            :dataset="chart"
+            :config
+            :selected-x-index="selectedIndex"
+            @mouseenter="selectedChartIndex = chartIndex"
+          >
             <template #tooltip="{ series, timeLabel }">
-              <div class="text-gh-muted">
+              <div class="text-gh-muted flex flex-col text-center text-xs">
+                <span>{{ timeLabel.text }}</span>
                 {{ getTooltipContent(series, timeLabel) }}
               </div>
             </template>
@@ -248,11 +325,21 @@ function getTooltipContent(
   --super-ease-out: cubic-bezier(0.15, 0.75, 0.35, 1);
 }
 
-:deep(.vue-data-ui-component path),
-:deep(.last-datapoint),
-:deep(.value-label),
-:deep(.value-plot) {
+[data-loaded="true"] :deep(.vue-data-ui-component path),
+[data-loaded="true"] :deep(.last-datapoint),
+[data-loaded="true"] :deep(.value-label),
+[data-loaded="true"] :deep(.value-plot) {
   transition: all 0.5s var(--super-ease-out) !important;
+}
+
+[data-loaded="false"] :deep(.vue-data-ui-component path),
+[data-loaded="false"] :deep(.last-datapoint),
+[data-loaded="false"] :deep(.value-label),
+[data-loaded="false"] :deep(.value-plot) {
+  transition: none !important;
+}
+:deep(.vue-data-ui-component circle) {
+  stroke: var(--bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -262,6 +349,10 @@ function getTooltipContent(
   :deep(.value-plot) {
     transition: none !important;
   }
+}
+
+:deep([data-hide-label="true"] svg text:not(.value-label)) {
+  display: none;
 }
 </style>
 
