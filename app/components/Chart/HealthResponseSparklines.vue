@@ -258,7 +258,7 @@ function hideDataLabel(chartIndex: number) {
         </div>
 
         <div
-          class="w-full h-full border-gh-border border-l border-b rounded-bl"
+          class="w-full h-full border-gh-border border-l-0.5 border-b-0.5 rounded-bl overflow-hidden"
           v-if="chart[0]?.hasData"
           :data-hide-label="hideDataLabel(chartIndex)"
         >
@@ -310,7 +310,7 @@ function hideDataLabel(chartIndex: number) {
           </VueUiXy>
         </div>
         <div
-          class="v-else w-full h-full border-gh-border border-l border-b rounded-bl flex justify-center place-items-center"
+          class="w-full h-full border-gh-border border-l-0.5 border-b-0.5 rounded-bl flex justify-center place-items-center"
           v-else
         >
           <span class="text-xs text-gh-muted">No data to display</span>
@@ -353,6 +353,9 @@ function hideDataLabel(chartIndex: number) {
 
 :deep([data-hide-label="true"] svg text:not(.value-label)) {
   display: none;
+}
+:deep(div:has(.vue-data-ui-xy-svg)) {
+  border-radius: 12px !important;
 }
 </style>
 
