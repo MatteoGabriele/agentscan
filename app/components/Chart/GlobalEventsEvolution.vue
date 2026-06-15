@@ -159,12 +159,12 @@ const config = computed<VueUiXyConfig>(() => ({
           values: dates.value,
           datetimeFormatter: {
             enable: true,
-            useUTC: true,
+            useUTC: false,
             locale: "en",
             options: {
               year: "dd MMM",
               month: "dd MMM",
-              day: "dd MMM",
+              day: "MMM dd • hh:mm",
               minute: "dd MMM",
               second: "dd MMM",
             },
