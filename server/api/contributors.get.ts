@@ -7,13 +7,31 @@ export default defineEventHandler(async () => {
   const octokit = new Octokit({ auth: config.githubToken });
 
   try {
-    const { data } = await octokit.rest.repos.listContributors({
+    const { data: app } = await octokit.rest.repos.listContributors({
       owner: "MatteoGabriele",
       repo: "agentscan",
-      page_page: 100,
+      page_page: 30,
     });
 
-    return data
+    const { data: action } = await octokit.rest.repos.listContributors({
+      owner: "MatteoGabriele",
+      repo: "agentscan-action",
+      page_page: 30,
+    });
+
+    const { data: core } = await octokit.rest.repos.listContributors({
+      owner: "unveil-project",
+      repo: "identity",
+      page_page: 30,
+    });
+
+    const contributors = [
+      ...new Map(
+        [...core, ...app, ...action].map((account) => [account.login, account]),
+      ).values(),
+    ];
+
+    return contributors
       .filter((item) => item.login && !cibotList.includes(item.login))
       .map((item) => ({
         name: item.login,
