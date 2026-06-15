@@ -62,7 +62,18 @@ const unveilIdentityVersion = unveilIdentityPackage.version;
                   to="https://github.com/matteogabriele/agentscan"
                   class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
                 >
-                  AgentScan repository
+                  AgentScan
+                </NuxtLink>
+              </li>
+
+              <li>
+                <NuxtLink
+                  external
+                  target="_blank"
+                  to="https://github.com/unveil-project"
+                  class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+                >
+                  The Unveil Project
                 </NuxtLink>
               </li>
 
@@ -73,7 +84,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version;
                   to="https://github.com/matteogabriele/agentscan-action"
                   class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
                 >
-                  AgentScan Action repository
+                  AgentScan Action
                 </NuxtLink>
               </li>
 
