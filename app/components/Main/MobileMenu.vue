@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute();
-const isHomePage = computed<boolean>(() => route.name === "index");
 
 const isMenuOpen = ref<boolean>(false);
 function toggleMenu() {
@@ -30,11 +29,11 @@ onBeforeUnmount(() => {
 <template>
   <div
     :class="{
-      'absolute flex flex-col inset-0 bg-gh-bg z-40 p-4': isMenuOpen,
+      'fixed flex flex-col inset-0 bg-gh-bg z-40 p-4': isMenuOpen,
     }"
   >
     <div class="flex justify-end">
-      <button @click="toggleMenu" class="lg:hidden flex self-end">
+      <button @click="toggleMenu" class="flex self-end">
         <span v-if="isMenuOpen" class="i-lucide:x"></span>
         <span v-else class="i-lucide:menu"></span>
       </button>
@@ -45,6 +44,9 @@ onBeforeUnmount(() => {
       class="flex items-center flex-col gap-6 justify-center h-full"
     >
       <ul class="flex flex-col items-center gap-4">
+        <li>
+          <MainMenuItem class="text-xl" to="/" label="Search" />
+        </li>
         <li>
           <MainMenuItem class="text-xl" to="/health" label="Ecosystem health" />
         </li>
@@ -60,7 +62,7 @@ onBeforeUnmount(() => {
           <MainMenuItem
             class="text-xl"
             to="/detected-automations"
-            label="Daily flags"
+            label="Daily signals"
           />
         </li>
       </ul>
