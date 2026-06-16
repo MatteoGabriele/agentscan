@@ -22,7 +22,7 @@ export function getCompleteDayRange(days: string[]): string[] {
 
 // Horizontal bar for package scores
 
-function getDayKey(date: string | Date) {
+export function getDayKey(date: string | Date) {
   if (typeof date === "string") {
     return date.slice(0, 10);
   }
