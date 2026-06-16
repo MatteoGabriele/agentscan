@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { formatUsername } from "../../../../server/utils/format-username";
 
 describe("formatUsername", () => {
+  it("does not throw on malformed URL encoding", () => {
+    expect(() => formatUsername("%E0%A4%A")).not.toThrow();
+  });
   it("returns an empty string if username is empty", () => {
     expect(formatUsername("")).toBe("");
   });
