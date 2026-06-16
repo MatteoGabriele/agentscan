@@ -22,37 +22,15 @@ async function main() {
   const percentage = value === null ? "N/A" : `${value}%`;
 
   const payload = {
-    embeds: [
-      {
-        title: "GitHub Ecosystem Health",
-        url: "https://agentscan.tools",
-        color: 5763719, // green
-        fields: [
-          {
-            name: "🟢 Organic",
-            value: `${stats.organic.percentage}%`,
-            inline: false,
-          },
-          {
-            name: "🟡 Mixed",
-            value: `${stats.mixed.percentage}%`,
-            inline: false,
-          },
-          {
-            name: "🔴 Automation",
-            value: `${stats.automation.percentage}%`,
-            inline: false,
-          },
-          {
-            name: "⚫ Automation PR closure rate",
-            value: percentage,
-            inline: false,
-          },
-        ],
-        timestamp: new Date().toISOString(),
-        footer: { text: "agentscan.tools" },
-      },
-    ],
+    content: [
+      "Daily Dose of Clankers",
+      "",
+      `🟢 Organic ${stats.organic.percentage}%`,
+      `🟡 Mixed ${stats.mixed.percentage}%`,
+      `🔴 Automation ${stats.automation.percentage}%`,
+      "",
+      `⚫ Automation PR closure rate ${percentage}`,
+    ].join("\n"),
   };
 
   const webhook = process.env.DISCORD_WEBHOOK;
