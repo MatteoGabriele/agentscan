@@ -55,16 +55,14 @@ describe("convertToHorizontalBarDataset", () => {
   it("creates a dataset for VueUiHorizontalBar", () => {
     const result = convertToHorizontalBarDataset(MOCK_ECOSYSTEM_HEALTH_ITEMS);
 
-    expect(result).toEqual(
-      expect.arrayContaining(
-        result.map(() =>
-          expect.objectContaining({
-            name: expect.any(String),
-            value: expect.any(Number),
-          }),
-        ),
-      ),
-    );
+    result.forEach((item) => {
+      expect(item).toEqual(
+        expect.objectContaining({
+          name: expect.any(String),
+          value: expect.any(Number),
+        }),
+      );
+    });
   });
 });
 
@@ -86,6 +84,19 @@ describe("getClosedPrPercentageByRepo", () => {
         ),
       ),
     );
+
+    expect(result).toEqual(expect.any(Array));
+
+    result.forEach((item) => {
+      expect(item).toEqual(
+        expect.objectContaining({
+          repo: expect.any(String),
+          eligiblePrs: expect.any(Number),
+          closedPrs: expect.any(Number),
+          percentage: expect.any(Number),
+        }),
+      );
+    });
   });
 
   it("maps the source data for a given score range", () => {
