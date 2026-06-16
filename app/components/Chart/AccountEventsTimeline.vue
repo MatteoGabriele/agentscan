@@ -578,28 +578,6 @@ function getZapIconPath({ x, y }: { x: number; y: number }) {
 </template>
 
 <style scoped>
-:deep(.vue-data-ui-component) {
-  --super-ease-out: cubic-bezier(0.15, 0.75, 0.35, 1);
-}
-
-:deep(.vue-data-ui-component .serie_line_0 path),
-:deep(.vue-data-ui-component .serie_line_1 path),
-:deep(.vue-data-ui-component .serie_line_2 path),
-:deep(.vue-data-ui-component .serie_line_3 path),
-:deep(.vdui-shape-circle) {
-  transition: all 0.5s var(--super-ease-out) !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :deep(.vue-data-ui-component .serie_line_0 path),
-  :deep(.vue-data-ui-component .serie_line_1 path),
-  :deep(.vue-data-ui-component .serie_line_2 path),
-  :deep(.vue-data-ui-component .serie_line_3 path),
-  :deep(.vdui-shape-circle) {
-    transition: none !important;
-  }
-}
-
 :deep(.vue-ui-xy-annotation-label) {
   stroke: var(--bg);
   stroke-width: 4;
