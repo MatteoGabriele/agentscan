@@ -12,21 +12,23 @@ describe("countClassificationByDate", () => {
   });
 
   it("returns counts and trends for each date", () => {
-    Object.values(result).forEach(() => {
-      expect.objectContaining({
-        organic: expect.objectContaining({
-          count: expect.any(Number),
-          trend: expect.any(Number),
+    Object.values(result).forEach((value) => {
+      expect(value).toEqual(
+        expect.objectContaining({
+          organic: expect.objectContaining({
+            count: expect.any(Number),
+            trend: expect.any(Number),
+          }),
+          mixed: expect.objectContaining({
+            count: expect.any(Number),
+            trend: expect.any(Number),
+          }),
+          automation: expect.objectContaining({
+            count: expect.any(Number),
+            trend: expect.any(Number),
+          }),
         }),
-        mixed: expect.objectContaining({
-          count: expect.any(Number),
-          trend: expect.any(Number),
-        }),
-        automation: expect.objectContaining({
-          count: expect.any(Number),
-          trend: expect.any(Number),
-        }),
-      });
+      );
     });
   });
 });
