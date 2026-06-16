@@ -26,11 +26,14 @@ describe("formatTrend", () => {
 describe("getHealthStats", () => {
   it("returns a classified dataset from ecosystem data", () => {
     const result = getHealthStats(MOCK_ECOSYSTEM_HEALTH_ITEMS);
-    Object.values(result!).forEach(() => {
-      expect.objectContaining({
-        count: expect.any(Number),
-        percentage: expect.any(String),
-      });
+    expect(result).not.toBeNull();
+    Object.values(result!).forEach((value) => {
+      expect(value).toEqual(
+        expect.objectContaining({
+          count: expect.any(Number),
+          percentage: expect.any(String),
+        }),
+      );
     });
   });
 });
