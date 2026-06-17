@@ -21,9 +21,6 @@ const isHomePage = computed<boolean>(() => route.name === "index");
         <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
         <li><MainMenuItem to="/lab" label="The lab" /></li>
         <li><MainMenuItem to="/automations" label="Community flags" /></li>
-        <li>
-          <MainMenuItem to="/detected-automations" label="Daily signals" />
-        </li>
       </ul>
     </div>
 

@@ -58,13 +58,6 @@ onBeforeUnmount(() => {
             label="Community flags"
           />
         </li>
-        <li>
-          <MainMenuItem
-            class="text-xl"
-            to="/detected-automations"
-            label="Daily signals"
-          />
-        </li>
       </ul>
 
       <div class="w-1/2 border-b h-px border-gh-border-light/80"></div>
