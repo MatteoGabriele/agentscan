@@ -325,3 +325,92 @@ export function getClosedPrPercentageTotal(
   if (totalEligible === 0) return 100;
   return Math.round((totalClosed / totalEligible) * 100);
 }
+
+export type ClosedPrPercentageSnapshot = {
+  date: string | undefined;
+  eligiblePrs: number | null;
+  closedPrs: number | null;
+  percentage: number | null;
+};
+
+export type ClosedPrPercentageComparison = {
+  previousSnapshot: ClosedPrPercentageSnapshot;
+  lastSnapshot: ClosedPrPercentageSnapshot;
+  percentagePointDifference: number | null;
+};
+
+export function getClosedPrSnapshot(
+  source: EcosystemHealthItem[] = [],
+  date: string | Date | undefined,
+  scoreBounds: ScoreBounds = [0, 100],
+  dateKey: keyof EcosystemHealthItem = "created_at",
+): ClosedPrPercentageSnapshot {
+  if (!date) {
+    return {
+      date: undefined,
+      eligiblePrs: null,
+      closedPrs: null,
+      percentage: null,
+    };
+  }
+
+  const results = getClosedPrPercentageByRepoForDate(source, date, {
+    scoreBounds,
+    dateKey,
+  });
+
+  const eligiblePrs = results.reduce(
+    (total, result) => total + result.eligiblePrs,
+    0,
+  );
+
+  const closedPrs = results.reduce(
+    (total, result) => total + result.closedPrs,
+    0,
+  );
+
+  return {
+    date: getDayKey(date),
+    eligiblePrs,
+    closedPrs,
+    // no eligible PRs = 100% closure rate
+    percentage:
+      eligiblePrs === 0 ? 100 : Math.round((closedPrs / eligiblePrs) * 100),
+  };
+}
+
+export function getClosedPrDelta(
+  source: EcosystemHealthItem[] = [],
+  scoreBounds: ScoreBounds = [0, 100],
+  dateKey: keyof EcosystemHealthItem = "created_at",
+): ClosedPrPercentageComparison {
+  const dates = getUniqueDatesFromSource(source, dateKey);
+
+  const previousDate = dates.at(-2);
+  const lastDate = dates.at(-1);
+
+  const previousSnapshot = getClosedPrSnapshot(
+    source,
+    previousDate,
+    scoreBounds,
+    dateKey,
+  );
+
+  const lastSnapshot = getClosedPrSnapshot(
+    source,
+    lastDate,
+    scoreBounds,
+    dateKey,
+  );
+
+  return {
+    previousSnapshot,
+    lastSnapshot,
+    percentagePointDifference:
+      previousSnapshot.percentage == null || lastSnapshot.percentage == null
+        ? null
+        : Math.round(
+            (lastSnapshot.percentage - previousSnapshot.percentage) * 10,
+          ) / 10,
+  };
+}
