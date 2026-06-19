@@ -30,12 +30,13 @@ const filteredItems = computed(() => {
 });
 
 useHead({
-  title: "Community flags | AgentScan",
+  title: "Community reports | AgentScan",
   meta: [
-    { property: "og:title", content: "Community flags | AgentScan" },
+    { property: "og:title", content: "Community reports | AgentScan" },
     {
       property: "og:description",
-      content: "A list of community flagged automated accounts",
+      content:
+        "Accounts reported by the community as showing automation signals",
     },
     { property: "og:type", content: "website" },
   ],
@@ -44,10 +45,18 @@ useHead({
 
 <template>
   <header class="text-center md:text-left">
-    <h1 class="text-2xl font-semibold">Community flags</h1>
+    <h1 class="text-2xl font-semibold">Community reports</h1>
     <p class="text-gh-muted mt-2">
-      This is a list of accounts verified by the community as using heavy
-      automation, spamming through automation, or operating as bots.
+      Accounts reported by the community as showing automation signals. These
+      are not definitive verdicts: if something looks wrong,
+      <NuxtLink
+        to="https://github.com/MatteoGabriele/agentscan/issues"
+        target="_blank"
+        external
+        class="underline hover:text-gh-text"
+      >
+        let us know</NuxtLink
+      >.
     </p>
     <p v-if="items?.[0]" class="mt-6 text-sm text-gh-text">
       Last updated:
@@ -121,7 +130,7 @@ useHead({
 
           <footer class="flex items-baseline justify-between mt-4">
             <p class="text-gh-muted text-xs">
-              Flagged
+              Reported
               <NuxtTime :title="item.createdAt" :datetime="item.createdAt" />
             </p>
             <NuxtLink

@@ -55,7 +55,7 @@ onBeforeUnmount(() => {
           <MainMenuItem
             class="text-xl"
             to="/automations"
-            label="Community flags"
+            label="Community reports"
           />
         </li>
       </ul>

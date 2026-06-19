@@ -64,7 +64,7 @@ export function useSeoAnalysis(
     let descriptions = [];
 
     if (toValue(options?.hasCommunityFlag)) {
-      descriptions.push(`Flagged by the community`);
+      descriptions.push(`Reported by community`);
     } else {
       const details = getClassificationDetails(analysisValue.classification);
       descriptions.push(details.label);
