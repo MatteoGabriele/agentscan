@@ -20,7 +20,7 @@ const isHomePage = computed<boolean>(() => route.name === "index");
         <li><MainMenuItem to="/" label="Search" /></li>
         <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
         <li><MainMenuItem to="/lab" label="The lab" /></li>
-        <li><MainMenuItem to="/automations" label="Community flags" /></li>
+        <li><MainMenuItem to="/automations" label="Community reports" /></li>
       </ul>
     </div>
 

@@ -30,7 +30,7 @@ const { data, status, error } = useFetch(
 
 const { data: verifiedAutomations } = useVerifiedAutomations();
 
-const verifiedAutomation = computed<VerifiedAutomation | undefined>(() => {
+const verifiedAutomation = computed(() => {
   return verifiedAutomations.value?.find((account) => {
     return (
       account.username.toLowerCase() === username.value?.toLowerCase() ||
@@ -207,20 +207,20 @@ useSeoAnalysis(identifyAnalysis, {
           class="mt-4 pt-4 border-t border-gh-border-light/40"
         >
           <p
-            class="flex gap-2 items-center mb-2 text-gh-danger-hover font-mono text-base"
+            class="flex gap-2 items-center mb-2 text-gh-muted font-mono text-base"
           >
-            Community flagged
+            Community reported
           </p>
           <p class="text-gh-text text-sm mb-2">
             {{ verifiedAutomation.reason }}
           </p>
           <footer class="flex items-baseline justify-between">
-            <p class="text-gh-muted text-xs">Flagged {{ flagCreatedAt }}</p>
+            <p class="text-gh-muted text-xs">Reported {{ flagCreatedAt }}</p>
             <NuxtLink
               :to="verifiedAutomation.issueUrl"
               target="_blank"
               external
-              class="text-gh-danger-hover underline inline text-xs"
+              class="text-gh-muted underline inline text-xs"
             >
               View issue
             </NuxtLink>
@@ -229,7 +229,7 @@ useSeoAnalysis(identifyAnalysis, {
 
         <section v-else class="mt-4 pt-4 border-t border-gh-border-light">
           <p class="text-gh-muted text-sm">
-            Have thoughts about this account? Let the community know.
+            Know something about this account? Help the community.
           </p>
           <NuxtLink
             :to="flagAccountUrl"
@@ -237,7 +237,7 @@ useSeoAnalysis(identifyAnalysis, {
             external
             class="underline inline text-xs"
           >
-            Share your thoughts
+            Add report
           </NuxtLink>
         </section>
       </div>
