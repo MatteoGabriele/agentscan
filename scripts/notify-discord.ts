@@ -1,9 +1,15 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
-import { getHealthStats, formatTrend } from "../shared/utils/health-stats";
-import { getClosedPrPercentageTotal } from "../shared/utils/charts";
+import { formatTrend } from "../shared/utils/health-stats";
+import {
+  getClosedPrPercentageTotal,
+  getClosedPrDelta,
+} from "../shared/utils/charts";
 import { calcLinearProgression } from "../shared/utils/calc-linear-progression";
-import { countClassificationByDate } from "../shared/utils/count-classification-by-date";
+import {
+  countClassificationByDate,
+  getCategoryDeltas,
+} from "../shared/utils/count-classification-by-date";
 
 async function main() {
   const results = JSON.parse(readFileSync("data/scan-results.json", "utf-8"));
@@ -13,15 +19,11 @@ async function main() {
     return;
   }
 
-  const stats = getHealthStats(results);
-
-  if (!stats) {
-    console.log("No stats");
-    return;
-  }
-
-  const value = getClosedPrPercentageTotal(results, [0, 50]);
-  const percentage = value === null ? "N/A" : `${value}%`;
+  const closedAutomationPrPercentage = getClosedPrPercentageTotal(
+    results,
+    [0, 50],
+  );
+  const closedAutomationPrDelta = getClosedPrDelta(results, [0, 50]);
 
   const automation: number[] = [];
   const mixed: number[] = [];
@@ -44,20 +46,33 @@ async function main() {
     organic: calcLinearProgression(organic),
   };
 
+  const categoryDeltas = getCategoryDeltas(results);
+
   function trendLabel(trendValue: number): string {
     const arrow = trendValue > 0 ? "↑" : trendValue < 0 ? "↓" : "→";
-    return `${arrow} ${formatTrend(trendValue)}`;
+    return `${arrow} ${formatTrend(trendValue)} overall`;
+  }
+
+  function statLabel(value: number | null, suffix = ""): string {
+    if (value == null || !isFinite(value)) return "N/A";
+    const arrow = value > 0 ? "↑" : value < 0 ? "↓" : "→";
+    const sign = value > 0 ? "+" : "";
+    return `${arrow} ${sign}${value}${suffix}`;
+  }
+
+  function percentageLabel(value: number | null): string {
+    return value === null ? "N/A" : `${value}%`;
   }
 
   const payload = {
     content: [
       "Daily Dose of Clankers",
       "",
-      `🟢 Organic ${stats.organic.percentage}% ${trendLabel(categoryProgression.organic.trend)}`,
-      `🟡 Mixed ${stats.mixed.percentage}% ${trendLabel(categoryProgression.mixed.trend)}`,
-      `🔴 Automation ${stats.automation.percentage}% ${trendLabel(categoryProgression.automation.trend)}`,
+      `🟢 Organic ${percentageLabel(categoryDeltas.organic.lastPercentage)} ${statLabel(categoryDeltas.organic.percentagePointDifference, " pts")} (${trendLabel(categoryProgression.organic.trend)})`,
+      `🟡 Mixed ${percentageLabel(categoryDeltas.mixed.lastPercentage)} ${statLabel(categoryDeltas.mixed.percentagePointDifference, " pts")} (${trendLabel(categoryProgression.mixed.trend)})`,
+      `🔴 Automation ${percentageLabel(categoryDeltas.automation.lastPercentage)} ${statLabel(categoryDeltas.automation.percentagePointDifference, " pts")} (${trendLabel(categoryProgression.automation.trend)})`,
       "",
-      `⚫ Automation PR closure rate ${percentage}`,
+      `⚫ Automation PR closure rate ${percentageLabel(closedAutomationPrDelta.lastSnapshot.percentage)} ${statLabel(closedAutomationPrDelta.percentagePointDifference, " pts")} (${percentageLabel(closedAutomationPrPercentage)} overall)`,
     ].join("\n"),
   };
 
