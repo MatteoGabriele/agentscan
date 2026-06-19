@@ -21,7 +21,12 @@ export function formatTrend(value: number = 0) {
   return `${(value * 100).toFixed(0)}%`;
 }
 
-export function getHealthStats(data: EcosystemHealthItem[] = []) {
+export function getHealthStats(
+  data: EcosystemHealthItem[] = [],
+): Record<
+  IdentityClassification,
+  { count: number; percentage: string }
+> | null {
   if (!data.length) return null;
 
   const totalCount = data.length;

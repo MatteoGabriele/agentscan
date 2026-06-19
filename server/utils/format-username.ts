@@ -1,3 +1,9 @@
 export function formatUsername(username: string): string {
-  return decodeURIComponent(username).trim().toLowerCase().replace(" ", "");
+  let decoded = username;
+  try {
+    decoded = decodeURIComponent(username);
+  } catch {
+    // keep raw input when malformed encoding is provided
+  }
+  return decoded.trim().toLowerCase().replaceAll(" ", "");
 }
