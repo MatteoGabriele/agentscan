@@ -1,7 +1,8 @@
-export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
+import type { EcosystemHealthItem } from "../../../shared/types/ecosystem-health";
+
+export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
   {
     created_at: "2026-05-26T19:27:30.519Z",
-    user_id: 28706372,
     score: 100,
     pr_number: 35191,
     pr_status: "open",
@@ -9,11 +10,9 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
     user_public_repos_count: 869,
     events_count: 200,
     repo_name: "nuxt/nuxt",
-    username: "danielroe",
   },
   {
     created_at: "2026-05-25T19:27:30.519Z",
-    user_id: 287276798,
     score: 80,
     pr_number: 35189,
     pr_status: "open",
@@ -21,11 +20,9 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
     user_public_repos_count: 2,
     events_count: 20,
     repo_name: "nuxt/nuxt",
-    username: "anton-gor-dev",
   },
   {
     created_at: "2026-05-26T19:27:30.519Z",
-    user_id: 287276798,
     score: 40,
     pr_number: 35189,
     pr_status: "closed",
@@ -33,11 +30,9 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
     user_public_repos_count: 2,
     events_count: 20,
     repo_name: "nuxt/nuxt",
-    username: "anton-gor-dev",
   },
   {
     created_at: "2026-05-26T19:27:30.519Z",
-    user_id: 206422,
     score: 100,
     pr_number: 10466,
     pr_status: "open",
@@ -45,11 +40,9 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
     user_public_repos_count: 6,
     events_count: 167,
     repo_name: "biomejs/biome",
-    username: "jfmcdowell",
   },
   {
     created_at: "2026-05-26T19:27:30.519Z",
-    user_id: 64079946,
     score: 1,
     pr_number: 10465,
     pr_status: "open",
@@ -57,11 +50,9 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
     user_public_repos_count: 13,
     events_count: 84,
     repo_name: "biomejs/biome",
-    username: "ClankSupeme",
   },
   {
     created_at: "2026-05-26T19:27:30.519Z",
-    user_id: 64079946,
     score: 100,
     pr_number: 10465,
     pr_status: "closed",
@@ -69,7 +60,6 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS = [
     user_public_repos_count: 13,
     events_count: 84,
     repo_name: "some/repo",
-    username: "Dude",
   },
 ];
 
