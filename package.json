@@ -8,7 +8,6 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "add:fixture": "node scripts/fetch-github-events.js",
     "add:automation": "npx tsx scripts/parse-automation-issue.ts",
     "test": "vitest"
   },
