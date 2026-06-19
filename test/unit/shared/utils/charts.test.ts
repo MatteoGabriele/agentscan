@@ -8,11 +8,13 @@ import {
   getClosedPrPercentageEvolutionByRepo,
   getClosedPrPercentageEvolutionTotal,
   getClosedPrPercentageTotal,
+  getClosedPrDelta,
 } from "../../../../shared/utils/charts";
 import {
   EXPECTED_NB_UNIQUE_REPOS,
   MOCK_ECOSYSTEM_HEALTH_ITEMS,
 } from "../../mocks/ecosystemHealthItems";
+import { EcosystemHealthItem } from "../../../../shared/types/ecosystem-health";
 
 describe("getCompleteDayRange", () => {
   it("returns an empty array for an empty array in input", () => {
@@ -206,5 +208,119 @@ describe("getClosedPrPercentageTotal", () => {
   it("returns the total percentage of closed PRs", () => {
     const result = getClosedPrPercentageTotal(MOCK_ECOSYSTEM_HEALTH_ITEMS);
     expect(result).toEqual(40);
+  });
+});
+
+describe("getClosedPrDelta", () => {
+  const previousDate = "2026-05-25T10:00:00.000Z";
+  const lastDate = "2026-05-26T10:00:00.000Z";
+
+  function createEcosystemHealthItem(
+    created_at: string,
+    repo_name: string,
+    pr_number: number,
+    pr_status: "open" | "closed",
+    score: number,
+  ): EcosystemHealthItem {
+    return {
+      created_at,
+      repo_name,
+      pr_number,
+      pr_status,
+      score,
+    } as EcosystemHealthItem;
+  }
+
+  it("returns closed PR percentage snapshots for the previous and last dates", () => {
+    const result = getClosedPrDelta([
+      createEcosystemHealthItem(lastDate, "some/repo", 1, "closed", 25),
+      createEcosystemHealthItem(lastDate, "someother/repo", 2, "closed", 25),
+      createEcosystemHealthItem(previousDate, "some/repo", 1, "closed", 25),
+      createEcosystemHealthItem(previousDate, "someother/repo", 2, "open", 25),
+    ]);
+
+    expect(result).toEqual({
+      previousSnapshot: expect.objectContaining({
+        date: expect.any(String),
+        eligiblePrs: expect.any(Number),
+        closedPrs: expect.any(Number),
+        percentage: expect.any(Number),
+      }),
+      lastSnapshot: expect.objectContaining({
+        date: expect.any(String),
+        eligiblePrs: expect.any(Number),
+        closedPrs: expect.any(Number),
+        percentage: expect.any(Number),
+      }),
+      percentagePointDifference: expect.any(Number),
+    });
+  });
+
+  it("calculates accurate closed PR percentages and point difference", () => {
+    const result = getClosedPrDelta([
+      createEcosystemHealthItem(lastDate, "some/repo", 1, "closed", 25),
+      createEcosystemHealthItem(lastDate, "someother/repo", 2, "closed", 25),
+      createEcosystemHealthItem(previousDate, "some/repo", 1, "closed", 25),
+      createEcosystemHealthItem(previousDate, "someother/repo", 2, "open", 25),
+    ]);
+
+    expect(result.previousSnapshot).toEqual({
+      date: "2026-05-25",
+      eligiblePrs: 2,
+      closedPrs: 1,
+      percentage: 50,
+    });
+
+    expect(result.lastSnapshot).toEqual({
+      date: "2026-05-26",
+      eligiblePrs: 2,
+      closedPrs: 2,
+      percentage: 100,
+    });
+
+    expect(result.percentagePointDifference).toBe(50);
+  });
+
+  it("returns null previous values when there is only one date", () => {
+    const result = getClosedPrDelta([
+      createEcosystemHealthItem(lastDate, "some/repo", 1, "closed", 25),
+      createEcosystemHealthItem(lastDate, "someother/repo", 2, "open", 25),
+    ]);
+
+    expect(result.previousSnapshot).toEqual({
+      date: undefined,
+      eligiblePrs: null,
+      closedPrs: null,
+      percentage: null,
+    });
+
+    expect(result.lastSnapshot).toEqual({
+      date: "2026-05-26",
+      eligiblePrs: 2,
+      closedPrs: 1,
+      percentage: 50,
+    });
+
+    expect(result.percentagePointDifference).toBeNull();
+  });
+
+  it("returns null snapshots when the source is empty", () => {
+    const result = getClosedPrDelta([]);
+
+    expect(result).toEqual({
+      previousSnapshot: {
+        date: undefined,
+        eligiblePrs: null,
+        closedPrs: null,
+        percentage: null,
+      },
+      lastSnapshot: {
+        date: undefined,
+        eligiblePrs: null,
+        closedPrs: null,
+        percentage: null,
+      },
+      percentagePointDifference: null,
+    });
   });
 });
