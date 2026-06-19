@@ -342,6 +342,10 @@ function hideDataLabel(chartIndex: number) {
   stroke: var(--bg);
 }
 
+:deep(.vdui-shape-circle) {
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :deep(.vue-data-ui-component path),
   :deep(.last-datapoint),

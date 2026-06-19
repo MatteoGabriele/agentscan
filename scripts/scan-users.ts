@@ -14,7 +14,6 @@ const DELAY_BETWEEN_GITHUB_CALLS = 200; // 200ms delay between GitHub API calls 
 
 interface ScanResult {
   created_at: string;
-  user_id: number;
   score: number;
   user_created_at: string;
   user_public_repos_count: number;
@@ -22,7 +21,6 @@ interface ScanResult {
   repo_name: string;
   pr_number: number;
   pr_status: string;
-  username: string;
 }
 
 interface ScanOptions {
@@ -151,7 +149,6 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
     repo_name: string;
     pr_number: number;
     pr_status: string;
-    username: string;
   }> = [];
 
   try {
@@ -204,7 +201,6 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
               pr_status: pr.state,
               public_repos: fullProfile.data.public_repos,
               repo_name: repoFullName,
-              username: pr.user.login,
             });
 
             prsFromThisRepo++;
@@ -303,7 +299,6 @@ export async function main(options: ScanOptions = {}) {
     if (score != null) {
       const result: ScanResult = {
         created_at: now,
-        user_id: user.id,
         score,
         pr_number: user.pr_number,
         pr_status: user.pr_status,
@@ -311,7 +306,6 @@ export async function main(options: ScanOptions = {}) {
         user_public_repos_count: user.public_repos,
         events_count: eventsCount,
         repo_name: user.repo_name,
-        username: user.login,
       };
 
       scanResults.push(result);

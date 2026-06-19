@@ -56,18 +56,6 @@
     "createdAt": "2026-03-23"
   },
   {
-    "username": "ashelythompson72-cloud",
-    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/37",
-    "createdAt": "2026-03-25"
-  },
-  {
-    "username": "rayb64680-ui",
-    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/38",
-    "createdAt": "2026-03-25"
-  },
-  {
     "username": "howwohmm",
     "id": 152969928,
     "reason": "Submits numerous PRs and reviews with auto-generated content.",
@@ -75,38 +63,11 @@
     "createdAt": "2026-03-26"
   },
   {
-    "username": "thegreatalxx",
-    "id": 198081098,
-    "reason": "Submits numerous PRs with auto-generated code and descriptions without engaging with maintainers or responding to feedback.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/40",
-    "createdAt": "2026-03-26"
-  },
-  {
-    "username": "sudabg",
-    "id": 143158885,
-    "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/44",
-    "createdAt": "2026-03-27"
-  },
-  {
-    "username": "supernovarobot",
-    "reason": "Self-disclosed as an AI agent.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/45",
-    "createdAt": "2026-03-28"
-  },
-  {
     "username": "raashish1601",
     "id": 94279692,
     "reason": "Suspected Open Claw bot: 45 PRs submitted to Biome's repository within 24 hours.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/47",
     "createdAt": "2026-03-29"
-  },
-  {
-    "username": "faithmckinely-alt",
-    "id": 267335157,
-    "reason": "Shows obvious indicators of an automated account that spams PRs with comments.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/48",
-    "createdAt": "2026-04-13"
   },
   {
     "username": "slegarraga",
@@ -128,13 +89,6 @@
     "reason": "This account uses automations and has been spotted in multiple PRs within the Biome repository.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/52",
     "createdAt": "2026-04-19"
-  },
-  {
-    "username": "Nova-OpenClawAgent",
-    "id": 277274309,
-    "reason": "Confirmed AI agent based on its name, comment patterns and communication style consistent with LLM-generated responses.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/55",
-    "createdAt": "2026-04-21"
   },
   {
     "username": "mukundakatta",
@@ -172,13 +126,6 @@
     "createdAt": "2026-04-21"
   },
   {
-    "username": "vincent067",
-    "id": 10589818,
-    "reason": "Clear use of automations, exhibiting the classic pattern: a sudden burst of activity followed by fork and PR spam.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/66",
-    "createdAt": "2026-04-21"
-  },
-  {
     "username": "nidhishgajjar",
     "id": 72427739,
     "reason": "The account appears to rely heavily on automated PR reviews, and it also appears to spam PRs on Biome.",
@@ -190,13 +137,6 @@
     "id": 242526317,
     "reason": "Self-identified automated account that opens pull requests across repositories, claiming security improvements, but has spammed over 260 projects with more than 360 PRs.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/73",
-    "createdAt": "2026-04-27"
-  },
-  {
-    "username": "selenaalpha77-sketch",
-    "id": 270539812,
-    "reason": "Creating over a hundred spam PRs in a single repo within a 24h timespan with clearly no human oversight.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/76",
     "createdAt": "2026-04-27"
   },
   {
@@ -212,20 +152,6 @@
     "reason": "This user has been submitting automated security advisories marked 'recommended by AI' across multiple projects, which is widely considered spam.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/79",
     "createdAt": "2026-04-30"
-  },
-  {
-    "username": "voidborne-d",
-    "id": 258577966,
-    "reason": "Self-disclosed as an AI agent",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/84",
-    "createdAt": "2026-05-02"
-  },
-  {
-    "username": "localhost-legend",
-    "id": 232391475,
-    "reason": "This account has forked around 45 repositories in just 10 days and opened pull requests with identical messages across them, strongly suggesting that it operates in an automated manner.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/99",
-    "createdAt": "2026-05-08"
   },
   {
     "username": "veeceey",
@@ -249,46 +175,11 @@
     "createdAt": "2026-05-16"
   },
   {
-    "username": "EXDEV-oss",
-    "id": 279178120,
-    "reason": "This account posted suspicious comments across multiple repositories attempting to move conversations off-platform to Telegram or email. The messages appeared automated or templated, were posted rapidly across many repos, and showed patterns consistent with scam or phishing attempts.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/126",
-    "createdAt": "2026-05-16"
-  },
-  {
     "username": "Sean-Kenneth-Doherty",
     "id": 9375875,
     "reason": "This account opened approximately 300 PRs across 90+ projects in under a week, showing clear automated bulk spam behavior.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/128",
     "createdAt": "2026-05-17"
-  },
-  {
-    "username": "testuzerz123",
-    "id": 285229587,
-    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/130",
-    "createdAt": "2026-05-17"
-  },
-  {
-    "username": "vfuriouz7-gif",
-    "id": 285190169,
-    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/131",
-    "createdAt": "2026-05-17"
-  },
-  {
-    "username": "sreedarsan0311",
-    "id": 229950077,
-    "reason": "Heavy automation usage creating spam PRs within short timeframe.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/132",
-    "createdAt": "2026-05-17"
-  },
-  {
-    "username": "ssidharHubble",
-    "id": 156830224,
-    "reason": "600+ issues created within a single day, all advertising identical content. Volume and uniformity strongly suggest automated or coordinated spam activity rather than manual input.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/145",
-    "createdAt": "2026-05-28"
   },
   {
     "username": "xxiaoxiong",

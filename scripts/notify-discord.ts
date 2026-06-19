@@ -1,7 +1,9 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
-import { getHealthStats } from "../shared/utils/health-stats";
+import { getHealthStats, formatTrend } from "../shared/utils/health-stats";
 import { getClosedPrPercentageTotal } from "../shared/utils/charts";
+import { calcLinearProgression } from "../shared/utils/calc-linear-progression";
+import { countClassificationByDate } from "../shared/utils/count-classification-by-date";
 
 async function main() {
   const results = JSON.parse(readFileSync("data/scan-results.json", "utf-8"));
@@ -21,13 +23,39 @@ async function main() {
   const value = getClosedPrPercentageTotal(results, [0, 50]);
   const percentage = value === null ? "N/A" : `${value}%`;
 
+  const automation: number[] = [];
+  const mixed: number[] = [];
+  const organic: number[] = [];
+
+  const countsByDate = countClassificationByDate(results);
+  const dates = Object.keys(countsByDate).sort();
+
+  dates.forEach((date) => {
+    const counts = countsByDate[date];
+    if (!counts) return;
+    automation.push(counts.automation.count);
+    mixed.push(counts.mixed.count);
+    organic.push(counts.organic.count);
+  });
+
+  const categoryProgression = {
+    automation: calcLinearProgression(automation),
+    mixed: calcLinearProgression(mixed),
+    organic: calcLinearProgression(organic),
+  };
+
+  function trendLabel(trendValue: number): string {
+    const arrow = trendValue > 0 ? "↑" : trendValue < 0 ? "↓" : "→";
+    return `${arrow} ${formatTrend(trendValue)}`;
+  }
+
   const payload = {
     content: [
       "Daily Dose of Clankers",
       "",
-      `🟢 Organic ${stats.organic.percentage}%`,
-      `🟡 Mixed ${stats.mixed.percentage}%`,
-      `🔴 Automation ${stats.automation.percentage}%`,
+      `🟢 Organic ${stats.organic.percentage}% ${trendLabel(categoryProgression.organic.trend)}`,
+      `🟡 Mixed ${stats.mixed.percentage}% ${trendLabel(categoryProgression.mixed.trend)}`,
+      `🔴 Automation ${stats.automation.percentage}% ${trendLabel(categoryProgression.automation.trend)}`,
       "",
       `⚫ Automation PR closure rate ${percentage}`,
     ].join("\n"),
