@@ -2,13 +2,14 @@
   "name": "agentscan",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@11.8.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "add:automation": "npx tsx scripts/parse-automation-issue.ts",
+    "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
     "test": "vitest"
   },
   "dependencies": {
