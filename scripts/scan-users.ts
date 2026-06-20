@@ -93,7 +93,9 @@ async function scanUser(
 
     if (!response.ok) {
       clearTimeout(timeoutId);
-      console.error(`Failed to scan user: HTTP ${response.status} ${response.statusText}`);
+      console.error(
+        `Failed to scan user: HTTP ${response.status} ${response.statusText}`,
+      );
       return null;
     }
 
@@ -103,7 +105,9 @@ async function scanUser(
     return data ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
-      console.error(`Timeout scanning user (API took longer than ${API_TIMEOUT}ms)`);
+      console.error(
+        `Timeout scanning user (API took longer than ${API_TIMEOUT}ms)`,
+      );
     } else if (error instanceof SyntaxError) {
       console.error(`Invalid JSON response from API`);
     } else {
@@ -187,7 +191,10 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
           prsFromThisRepo++;
           console.log(`  ${repoFullName}: ${prsFromThisRepo}/${PRS_PER_REPO}`);
         } catch (error) {
-          console.error(`Error fetching user profile:`, (error as Error).message);
+          console.error(
+            `Error fetching user profile:`,
+            (error as Error).message,
+          );
         }
 
         await new Promise((resolve) =>
@@ -195,7 +202,10 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
         );
       }
     } catch (error) {
-      console.error(`Error fetching PRs for ${repoFullName}:`, (error as Error).message);
+      console.error(
+        `Error fetching PRs for ${repoFullName}:`,
+        (error as Error).message,
+      );
       failed = true;
     }
 
@@ -237,12 +247,16 @@ export async function main(options: ScanOptions = {}) {
     if (status.failed) {
       repoFailures.push(`  ${repo}: failed to fetch PRs`);
     } else if (status.count < prsPerRepo) {
-      repoFailures.push(`  ${repo}: only ${status.count}/${prsPerRepo} PRs collected`);
+      repoFailures.push(
+        `  ${repo}: only ${status.count}/${prsPerRepo} PRs collected`,
+      );
     }
   }
 
   if (repoFailures.length > 0) {
-    console.error(`\nScan incomplete — the following repos did not meet the target:`);
+    console.error(
+      `\nScan incomplete — the following repos did not meet the target:`,
+    );
     for (const msg of repoFailures) console.error(msg);
     process.exit(1);
   }
@@ -251,7 +265,9 @@ export async function main(options: ScanOptions = {}) {
   const repoScores: Map<string, number> = new Map();
 
   for (const user of users) {
-    console.log(`Scanning ${user.login} (${completedCount + 1}/${users.length}) [${user.repo_name}]`);
+    console.log(
+      `Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`,
+    );
     const scanData = await scanUser(
       user.login,
       user.created_at,
