@@ -11,14 +11,16 @@ Thanks for your interest in contributing. This is an open experiment and contrib
 ### Setup
 
 **1. Clone the repo**
+
 ```bash
 git clone https://github.com/MatteoGabriele/agentscan.git
 cd agentscan
 ```
 
 **2. Install dependencies**
+
 ```bash
-npm install
+pnpm install
 ```
 
 **3. Create a `.env` file**
@@ -29,8 +31,9 @@ GITHUB_TOKEN=your_github_personal_access_token
 ```
 
 **4. Start the dev server**
+
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## Project structure
