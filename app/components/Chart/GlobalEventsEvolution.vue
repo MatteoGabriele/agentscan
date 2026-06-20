@@ -164,7 +164,7 @@ const config = computed<VueUiXyConfig>(() => ({
             options: {
               year: "dd MMM",
               month: "dd MMM",
-              day: "MMM dd • HH:mm",
+              day: "dddd • MMM dd • HH:mm",
               minute: "dd MMM",
               second: "dd MMM",
             },
