@@ -218,14 +218,14 @@ describe("getClosedPrDelta", () => {
   function createEcosystemHealthItem(
     created_at: string,
     repo_name: string,
-    pr_number: number,
+    pr_key: string,
     pr_status: "open" | "closed",
     score: number,
   ): EcosystemHealthItem {
     return {
       created_at,
       repo_name,
-      pr_number,
+      pr_key,
       pr_status,
       score,
     } as EcosystemHealthItem;
@@ -233,10 +233,10 @@ describe("getClosedPrDelta", () => {
 
   it("returns closed PR percentage snapshots for the previous and last dates", () => {
     const result = getClosedPrDelta([
-      createEcosystemHealthItem(lastDate, "some/repo", 1, "closed", 25),
-      createEcosystemHealthItem(lastDate, "someother/repo", 2, "closed", 25),
-      createEcosystemHealthItem(previousDate, "some/repo", 1, "closed", 25),
-      createEcosystemHealthItem(previousDate, "someother/repo", 2, "open", 25),
+      createEcosystemHealthItem(lastDate, "some/repo", "pr-1", "closed", 25),
+      createEcosystemHealthItem(lastDate, "someother/repo", "pr-2", "closed", 25),
+      createEcosystemHealthItem(previousDate, "some/repo", "pr-1", "closed", 25),
+      createEcosystemHealthItem(previousDate, "someother/repo", "pr-2", "open", 25),
     ]);
 
     expect(result).toEqual({
@@ -258,10 +258,10 @@ describe("getClosedPrDelta", () => {
 
   it("calculates accurate closed PR percentages and point difference", () => {
     const result = getClosedPrDelta([
-      createEcosystemHealthItem(lastDate, "some/repo", 1, "closed", 25),
-      createEcosystemHealthItem(lastDate, "someother/repo", 2, "closed", 25),
-      createEcosystemHealthItem(previousDate, "some/repo", 1, "closed", 25),
-      createEcosystemHealthItem(previousDate, "someother/repo", 2, "open", 25),
+      createEcosystemHealthItem(lastDate, "some/repo", "pr-1", "closed", 25),
+      createEcosystemHealthItem(lastDate, "someother/repo", "pr-2", "closed", 25),
+      createEcosystemHealthItem(previousDate, "some/repo", "pr-1", "closed", 25),
+      createEcosystemHealthItem(previousDate, "someother/repo", "pr-2", "open", 25),
     ]);
 
     expect(result.previousSnapshot).toEqual({
@@ -283,8 +283,8 @@ describe("getClosedPrDelta", () => {
 
   it("returns null previous values when there is only one date", () => {
     const result = getClosedPrDelta([
-      createEcosystemHealthItem(lastDate, "some/repo", 1, "closed", 25),
-      createEcosystemHealthItem(lastDate, "someother/repo", 2, "open", 25),
+      createEcosystemHealthItem(lastDate, "some/repo", "pr-1", "closed", 25),
+      createEcosystemHealthItem(lastDate, "someother/repo", "pr-2", "open", 25),
     ]);
 
     expect(result.previousSnapshot).toEqual({
