@@ -91,14 +91,14 @@ async function scanUser(
       { signal: controller.signal },
     );
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
+      clearTimeout(timeoutId);
       console.error(`Failed to scan user: HTTP ${response.status} ${response.statusText}`);
       return null;
     }
 
     const data: ScanUserResponse = await response.json();
+    clearTimeout(timeoutId);
 
     return data ?? null;
   } catch (error) {
@@ -251,6 +251,7 @@ export async function main(options: ScanOptions = {}) {
   const repoScores: Map<string, number> = new Map();
 
   for (const user of users) {
+    console.log(`Scanning ${user.login} (${completedCount + 1}/${users.length}) [${user.repo_name}]`);
     const scanData = await scanUser(
       user.login,
       user.created_at,
