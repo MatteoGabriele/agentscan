@@ -63,9 +63,6 @@ function loadScanResults(): ScanResult[] {
  */
 function saveScanResults(results: ScanResult[], dryRun: boolean = false): void {
   if (dryRun) {
-    console.log(
-      `[DRY RUN] Would save ${results.length} scan results to data/scan-results.json`,
-    );
     return;
   }
   const filePath = join(process.cwd(), "data", "scan-results.json");
@@ -97,28 +94,20 @@ async function scanUser(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.error(
-        `Failed to scan ${username}: HTTP ${response.status} ${response.statusText}`,
-      );
+      console.error(`Failed to scan user: HTTP ${response.status} ${response.statusText}`);
       return null;
     }
 
     const data: ScanUserResponse = await response.json();
 
-    console.log(
-      `  Anlysis result - score: ${data.analysis.score} / classification: ${data.analysis.classification}`,
-    );
-
     return data ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
-      console.error(
-        `Timeout scanning ${username} (API took longer than ${API_TIMEOUT}ms)`,
-      );
+      console.error(`Timeout scanning user (API took longer than ${API_TIMEOUT}ms)`);
     } else if (error instanceof SyntaxError) {
-      console.error(`Invalid JSON response from API for ${username}`);
+      console.error(`Invalid JSON response from API`);
     } else {
-      console.error(`Error scanning ${username}:`, (error as Error).message);
+      console.error(`Error scanning user:`, (error as Error).message);
     }
     return null;
   }
@@ -153,15 +142,9 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
   }> = [];
 
   try {
-    console.log(
-      `\nFetching PR authors from ${libraries.length} curated OSS libraries/frameworks`,
-    );
-
     // Loop through each curated repo and get PRs
     for (const repoFullName of libraries) {
       const [owner, repo] = repoFullName.split("/");
-
-      console.log(`\n  → ${repoFullName}`);
 
       let prsFromThisRepo = 0;
 
@@ -176,16 +159,13 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
           per_page: 50, // Fetch 50 to ensure we get enough non-bot authors
         });
 
-        console.log(`    Found ${prs.data.length} recent PRs`);
-
         // Extract authors from PRs - skip known bots, include duplicates
         for (const pr of prs.data) {
           if (prsFromThisRepo >= PRS_PER_REPO) break;
           if (!pr.user?.login) continue;
 
-          // Skip known bots
           if (isKnownBot(pr.user.login)) {
-            console.log(`      ⊘ ${pr.user.login} (bot - skipped)`);
+            console.log(`  ${repoFullName}: skipping known bot`);
             continue;
           }
 
@@ -205,12 +185,9 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
             });
 
             prsFromThisRepo++;
-            console.log(`      • ${pr.user.login}`);
+            console.log(`  ${repoFullName}: ${prsFromThisRepo}/${PRS_PER_REPO}`);
           } catch (error) {
-            console.error(
-              `      ✗ Error fetching profile for ${pr.user.login}:`,
-              (error as Error).message,
-            );
+            console.error(`Error fetching user profile:`, (error as Error).message);
           }
 
           // Rate limiting between GitHub API calls
@@ -218,27 +195,12 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
             setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
           );
         }
-
-        console.log(
-          `    Collected ${prsFromThisRepo}/${PRS_PER_REPO} authors from this repo`,
-        );
       } catch (error) {
-        console.error(
-          `    Error fetching PRs for ${repoFullName}:`,
-          (error as Error).message,
-        );
+        console.error(`Error fetching PRs for ${repoFullName}:`, (error as Error).message);
       }
     }
-
-    if (users.length === 0) {
-      console.error("Could not find any PR authors from OSS libraries");
-    } else {
-      console.log(
-        `\nSuccessfully fetched ${users.length} PR authors (${(users.length / libraries.length).toFixed(1)} per repo avg)`,
-      );
-    }
   } catch (error) {
-    console.error("Error searching trending repositories:", error);
+    console.error(`Error searching repositories:`, (error as Error).message);
   }
 
   return users;
@@ -260,11 +222,6 @@ export async function main(options: ScanOptions = {}) {
   const verifiedAutomations = loadVerifiedAutomations();
   const now = new Date().toISOString();
 
-  if (dryRun) console.log(`[DRY RUN MODE]`);
-  console.log(`Starting daily snapshot scan for ${now}`);
-  console.log(`Loaded ${verifiedAutomations.size} verified automations`);
-  console.log(`Scanning ${prsPerRepo} PRs per repo`);
-
   const users = await searchUsers(octokit, prsPerRepo);
 
   if (users.length === 0) {
@@ -272,15 +229,10 @@ export async function main(options: ScanOptions = {}) {
     process.exit(1);
   }
 
-  console.log(`\nScanning ${users.length} unique PR authors...`);
-
   let completedCount = 0;
   const repoScores: Map<string, number> = new Map();
 
   for (const user of users) {
-    // Scan every user - we want a fresh daily snapshot
-    console.log(`→ Scanning user ${user.login} (ID: ${user.id})...`);
-
     const scanData = await scanUser(
       user.login,
       user.created_at,
@@ -290,13 +242,10 @@ export async function main(options: ScanOptions = {}) {
     let score = scanData?.analysis.score;
     const eventsCount = scanData?.eventsCount ?? 0;
 
-    // Check if user is in verified automations list
     if (verifiedAutomations.has(user.id)) {
-      console.log(` User is in verified automations list, setting score to 0`);
       score = 0;
     }
 
-    // Save all results regardless of whether they were scanned before
     if (score != null) {
       const result: ScanResult = {
         created_at: now,
@@ -311,35 +260,24 @@ export async function main(options: ScanOptions = {}) {
 
       scanResults.push(result);
 
-      // Track score by repository
       const currentScore = repoScores.get(user.repo_name) ?? 0;
       repoScores.set(user.repo_name, currentScore + score);
 
       completedCount++;
-      console.log(`✓ Completed [${completedCount}/${users.length}]`);
-    } else {
-      console.log(`✗ No score available`);
     }
 
     // Conservative delay between API calls to avoid rate limiting
     await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_SCANS));
   }
 
-  // Save the updated data
   saveScanResults(scanResults, dryRun);
 
-  console.log(
-    `\n✓ Daily snapshot complete: ${completedCount} PR authors analyzed for ${now}`,
-  );
-  console.log(`Total historical scan results: ${scanResults.length}`);
-
-  // Log score aggregation by repository
-  console.log(`\nScore Summary by Repository:`);
+  // Score summary by repository
   const sortedRepos = Array.from(repoScores.entries()).sort(
     (a, b) => b[1] - a[1],
   );
   for (const [repo, totalScore] of sortedRepos) {
-    console.log(`  ${repo}: ${totalScore.toFixed(2)}/1000`);
+    console.log(`${repo}: ${totalScore.toFixed(2)}`);
   }
 }
 
