@@ -82,6 +82,11 @@ export default defineNuxtConfig({
         maxAge: 60 * 60,
       },
     },
+    "/api/bounty-repos/**": {
+      cache: {
+        maxAge: 60 * 60,
+      },
+    },
     "/api/detected-automations/**": {
       cache: {
         maxAge: 60 * 60,

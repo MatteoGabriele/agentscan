@@ -1,14 +1,9 @@
-name: Daily User Scan
+name: Bounty Repo Scan
 
 on:
   schedule:
-    - cron: "0 0 1,8,15,22,29 * *" # Days 1,8,15,22,29 → 00:00
-    - cron: "26 3 2,9,16,23,30 * *" # Days 2,9,16,23,30 → 03:26
-    - cron: "51 6 3,10,17,24,31 * *" # Days 3,10,17,24,31 → 06:51
-    - cron: "17 10 4,11,18,25 * *" # Days 4,11,18,25 → 10:17
-    - cron: "43 13 5,12,19,26 * *" # Days 5,12,19,26 → 13:43
-    - cron: "9 17 6,13,20,27 * *" # Days 6,13,20,27 → 17:09
-    - cron: "34 20 7,14,21,28 * *" # Days 7,14,21,28 → 20:34
+    - cron: "0 0 * * *" # Every day at 00:00 UTC
+    - cron: "0 12 * * *" # Every day at 12:00 UTC
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -32,11 +27,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run user scan
+      - name: Scan bounty repositories
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_HASH_SECRET: ${{ secrets.PR_HASH_SECRET }}
-        run: pnpm exec tsx scripts/scan-users.ts
+        run: pnpm exec tsx scripts/scan-bounty-repos.ts
 
       - name: Commit and push results
         run: |
@@ -46,13 +40,9 @@ jobs:
           if git diff --quiet; then
             echo "No changes detected"
           else
-            git add data/scan-results.json
-            git commit -m "chore: daily user scan - $(date -u +'%Y-%m-%d')"
+            git add data/bounty-repos.json
+            git commit -m "chore: bounty repo scan"
             git fetch origin main
             git merge --no-edit origin/main
             git push
           fi
-      - name: Notify Discord
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.OSS_GUILD_DISCORD_WEBHOOK }}
-        run: pnpm exec tsx scripts/notify-discord.ts

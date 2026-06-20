@@ -1,0 +1,882 @@
+[
+  {
+    "repo": "0106hyh/hammer-and-nail",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "0106hyh/kickama-manifest-wizard",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "123a-bcd/nailstorm-bounty-forge-358",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "123a-bcd/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "2lll5/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "9904099/hammer-and-nail-bounty",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "9904099/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "aLexzzz430/Cognitive-OS",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "alulaalmi/Apache-APISIX",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "ANAVHEOBA/PrivacyLayer",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Andyyook/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "aozorayama45/Apache-DolphinScheduler",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "aozorayama45/Traefik",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Arrow-air/website",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "asyncapi/tck",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "atharvnaik1/ipaship-audit",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "auscaster/frantic-board",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "benglezhenjun/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "bitcoin-dot-org/Bitcoin.org",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "bolivian-peru/marketplace-service-template",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "caydyan/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "commaai/opendbc",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "cuentaprueba244w-dotcom/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "cuentaprueba244w-dotcom/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Dasharo/dasharo-issues",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "davontepowlowsk1i/Apache-Pulsar",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "davontepowlowsk1i/CockroachDB",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "davontepowlowsk1i/gofiber-fiber",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "digitaldesignerjazz/atrium-forum",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Dipraise1/Engram",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "dungkimtran3d/Traefik",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "elnahomenick123/Gitea",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "elnahomenick123/Vault",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "eunseobchoi/NIPS26_A_CV2024",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "FreezingMoon/AncientBeast",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "hunki1488-a11y/AIgor",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "illbnm/homelab-stack",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "INDIGOAZUL/la-tanda-web",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "jackjin1997/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "jackjin1997/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "jaxassistant55/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Jennycruzy/sovereign-genesis",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "jeromyritchie52/Apache-ZooKeeper",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "jhosepm352-design/oabp-langchain-tool",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "juanitahagenes/ClickHouse",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "kcolbchain/arka",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "killernova/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "lakhman108/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "lily-protocol/lily-backend",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "lobster-trap/Kickama",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "lobster-trap/SmartGesture",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "maitebloger111/Apache-Arrow",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "manav8498/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "mergeos-bounties/mergeos",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "midnightntwrk/contributor-hub",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "moorcheh-ai/memanto",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Paratii-Video/paratii-js",
+    "sources": [
+      "label:💰 Bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Paratii-Video/paratii-mediaplayer",
+    "sources": [
+      "label:💰 Bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Paratii-Video/paratii-portal",
+    "sources": [
+      "label:💰 Bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "pci-tamper-protect/e-skimming-labs",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Peter7896/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Peter7896/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "priyanshudumps/fuel-agent-kit",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "promptpolish-ai/git-context",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "quachminh11/VictoriaMetrics",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "relayhop/sn-monetization-runtime",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "remotion-dev/remotion",
+    "sources": [
+      "bot:algora-io"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "renaudgenard/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "renaudgenard/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Reqrefusion/FreeCAD-Documentation-Project",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "rodrickparker11/TiKV",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "runxhq/runx",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Scottcjn/bottube",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Scottcjn/Rustchain",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Scottcjn/rustchain-bounties",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Scottcjn/rustchain-dialup",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Scottcjn/vintage-voice",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "SecureBananaLabs/bug-bounty",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "shaiananvari8/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "skndash96/bountic",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "SnowfallHD/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "SnowfallHD/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Soengkit/frailbox-checkpoint",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Soengkit/zeroeye-killernova",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "SolFoundry/solfoundry",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "SPLURT-Station/S.P.L.U.R.T-tg",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tari-project/minotari-cli",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tari-project/tari",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tari-project/universe",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tari-project/wallet-benchmarks",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tari-project/wxtm-bridge-frontend",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "TauCetiStation/TauCetiClassic",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tenstorrent/tt-llk",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "tenstorrent/tt-metal",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "thanhle74/kickama",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "thanhle74/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "thaohuynh14zc/GORM",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "thaohuynh14zc/spf13-cobra",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "thaohuynh14zc/urfave-cli",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "Thecesar85/TentOfTrials-bounty-67",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "vedanshjainvj/Job-Hive",
+    "sources": [
+      "label:💰 Bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "victorjones6awpg/Casbin",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "warpspeedopen-source/warpspeed-bounties",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "watney-ai/open-source-bounties",
+    "sources": [
+      "label:💰 Bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "waxeye7/screeps-bounty-arena",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "weilixiong/TentOfTrials",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "weilixiong/zeroeye",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "wulansari999/Kickama-Wulansari-Bounty",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "xevrion-v2/agent-playground",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  },
+  {
+    "repo": "xxnjms1-code/kickama-prize-lab",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-06-20T20:56:48.349Z",
+    "last_updated": "2026-06-20T20:56:48.349Z"
+  }
+]

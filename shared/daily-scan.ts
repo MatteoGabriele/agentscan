@@ -8,7 +8,6 @@ export const libraries = [
   "vercel/next.js",
   "withastro/astro",
   "biomejs/biome",
-  "tanstack/query-core",
   "solidjs/solid",
   "webpro-nl/knip",
   "eslint/eslint",

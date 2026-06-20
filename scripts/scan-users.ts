@@ -8,7 +8,7 @@ import { IdentifyResult } from "@unveil/identity";
 import { hashPrId } from "./pr-hash";
 
 // Configuration
-const API_TIMEOUT = 10000; // 10 seconds timeout for API calls
+const API_TIMEOUT = 30000; // 30 seconds timeout for API calls
 const API_BASE_URL = "https://agentscan.tools";
 const DELAY_BETWEEN_SCANS = 1000; // 1 second conservative delay between identify-replicant API calls
 const DELAY_BETWEEN_GITHUB_CALLS = 200; // 200ms delay between GitHub API calls (random user fetches)
@@ -91,19 +91,23 @@ async function scanUser(
       { signal: controller.signal },
     );
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
-      console.error(`Failed to scan user: HTTP ${response.status} ${response.statusText}`);
+      clearTimeout(timeoutId);
+      console.error(
+        `Failed to scan user: HTTP ${response.status} ${response.statusText}`,
+      );
       return null;
     }
 
     const data: ScanUserResponse = await response.json();
+    clearTimeout(timeoutId);
 
     return data ?? null;
   } catch (error) {
     if ((error as any).name === "AbortError") {
-      console.error(`Timeout scanning user (API took longer than ${API_TIMEOUT}ms)`);
+      console.error(
+        `Timeout scanning user (API took longer than ${API_TIMEOUT}ms)`,
+      );
     } else if (error instanceof SyntaxError) {
       console.error(`Invalid JSON response from API`);
     } else {
@@ -128,6 +132,8 @@ function isKnownBot(username: string): boolean {
  * Fetch PR authors from curated list of popular OSS libraries and frameworks
  * Gets the specified number of PRs from each repo - collects all authors including duplicates, skipping known bots
  */
+type RepoScanStatus = { count: number; failed: boolean };
+
 async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
   const PRS_PER_REPO = prsPerRepo;
 
@@ -141,69 +147,72 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
     pr_status: string;
   }> = [];
 
-  try {
-    // Loop through each curated repo and get PRs
-    for (const repoFullName of libraries) {
-      const [owner, repo] = repoFullName.split("/");
+  const repoStatus = new Map<string, RepoScanStatus>();
 
-      let prsFromThisRepo = 0;
+  for (const repoFullName of libraries) {
+    const [owner, repo] = repoFullName.split("/");
+    let prsFromThisRepo = 0;
+    let failed = false;
 
-      try {
-        // Get recent PRs from this repo - fetch more to account for bots being filtered out
-        const prs = await octokit.rest.pulls.list({
-          owner,
-          repo,
-          state: "all",
-          sort: "created",
-          direction: "desc",
-          per_page: 50, // Fetch 50 to ensure we get enough non-bot authors
-        });
+    try {
+      const prs = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        state: "all",
+        sort: "created",
+        direction: "desc",
+        per_page: 50,
+      });
 
-        // Extract authors from PRs - skip known bots, include duplicates
-        for (const pr of prs.data) {
-          if (prsFromThisRepo >= PRS_PER_REPO) break;
-          if (!pr.user?.login) continue;
+      for (const pr of prs.data) {
+        if (prsFromThisRepo >= PRS_PER_REPO) break;
+        if (!pr.user?.login) continue;
 
-          if (isKnownBot(pr.user.login)) {
-            console.log(`  ${repoFullName}: skipping known bot`);
-            continue;
-          }
+        if (isKnownBot(pr.user.login)) {
+          console.log(`  ${repoFullName}: skipping known bot`);
+          continue;
+        }
 
-          try {
-            const fullProfile = await octokit.rest.users.getByUsername({
-              username: pr.user.login,
-            });
+        try {
+          const fullProfile = await octokit.rest.users.getByUsername({
+            username: pr.user.login,
+          });
 
-            users.push({
-              id: fullProfile.data.id,
-              login: fullProfile.data.login,
-              created_at: fullProfile.data.created_at,
-              pr_key: hashPrId(repoFullName, pr.number),
-              pr_status: pr.state,
-              public_repos: fullProfile.data.public_repos,
-              repo_name: repoFullName,
-            });
+          users.push({
+            id: fullProfile.data.id,
+            login: fullProfile.data.login,
+            created_at: fullProfile.data.created_at,
+            pr_key: hashPrId(repoFullName, pr.number),
+            pr_status: pr.state,
+            public_repos: fullProfile.data.public_repos,
+            repo_name: repoFullName,
+          });
 
-            prsFromThisRepo++;
-            console.log(`  ${repoFullName}: ${prsFromThisRepo}/${PRS_PER_REPO}`);
-          } catch (error) {
-            console.error(`Error fetching user profile:`, (error as Error).message);
-          }
-
-          // Rate limiting between GitHub API calls
-          await new Promise((resolve) =>
-            setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
+          prsFromThisRepo++;
+          console.log(`  ${repoFullName}: ${prsFromThisRepo}/${PRS_PER_REPO}`);
+        } catch (error) {
+          console.error(
+            `Error fetching user profile:`,
+            (error as Error).message,
           );
         }
-      } catch (error) {
-        console.error(`Error fetching PRs for ${repoFullName}:`, (error as Error).message);
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
+        );
       }
+    } catch (error) {
+      console.error(
+        `Error fetching PRs for ${repoFullName}:`,
+        (error as Error).message,
+      );
+      failed = true;
     }
-  } catch (error) {
-    console.error(`Error searching repositories:`, (error as Error).message);
+
+    repoStatus.set(repoFullName, { count: prsFromThisRepo, failed });
   }
 
-  return users;
+  return { users, repoStatus };
 }
 
 /**
@@ -217,15 +226,38 @@ export async function main(options: ScanOptions = {}) {
     throw new Error("GITHUB_TOKEN environment variable is not set");
   }
 
+  if (!process.env.PR_HASH_SECRET) {
+    throw new Error("PR_HASH_SECRET environment variable is not set");
+  }
+
   const octokit = new Octokit({ auth: token });
   const scanResults = dryRun ? [] : loadScanResults();
   const verifiedAutomations = loadVerifiedAutomations();
   const now = new Date().toISOString();
 
-  const users = await searchUsers(octokit, prsPerRepo);
+  const { users, repoStatus } = await searchUsers(octokit, prsPerRepo);
 
   if (users.length === 0) {
     console.error("No users found to scan");
+    process.exit(1);
+  }
+
+  const repoFailures: string[] = [];
+  for (const [repo, status] of repoStatus) {
+    if (status.failed) {
+      repoFailures.push(`  ${repo}: failed to fetch PRs`);
+    } else if (status.count < prsPerRepo) {
+      repoFailures.push(
+        `  ${repo}: only ${status.count}/${prsPerRepo} PRs collected`,
+      );
+    }
+  }
+
+  if (repoFailures.length > 0) {
+    console.error(
+      `\nScan incomplete — the following repos did not meet the target:`,
+    );
+    for (const msg of repoFailures) console.error(msg);
     process.exit(1);
   }
 
@@ -233,6 +265,9 @@ export async function main(options: ScanOptions = {}) {
   const repoScores: Map<string, number> = new Map();
 
   for (const user of users) {
+    console.log(
+      `Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`,
+    );
     const scanData = await scanUser(
       user.login,
       user.created_at,

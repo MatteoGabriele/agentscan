@@ -91,6 +91,9 @@ const dataset = computed(() => stacklineData.value.dataset);
       <div class="w-full">
         <ChartGlobalEventsHeatmap :data="dataset" :timestamps="dates" />
       </div>
+      <div class="w-full">
+        <LabBountyRepoList />
+      </div>
     </div>
   </section>
 </template>
