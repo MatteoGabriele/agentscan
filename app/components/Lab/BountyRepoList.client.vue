@@ -83,7 +83,7 @@ function nameOf(repo: string) {
     <header class="mb-6">
       <div class="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h2 class="text-lg font-semibold">Bounty repositories</h2>
+          <h2 class="text-lg font-semibold" id="bounty">Bounty repositories</h2>
           <p class="text-sm text-gh-muted mt-0.5">
             Repositories observed with active bounty signals, collected twice
             daily.
