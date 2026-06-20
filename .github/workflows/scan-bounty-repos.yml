@@ -1,0 +1,48 @@
+name: Bounty Repo Scan
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Every day at 00:00 UTC
+    - cron: "0 12 * * *" # Every day at 12:00 UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Scan bounty repositories
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm exec tsx scripts/scan-bounty-repos.ts
+
+      - name: Commit and push results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          if git diff --quiet; then
+            echo "No changes detected"
+          else
+            git add data/bounty-repos.json
+            git commit -m "chore: bounty repo scan"
+            git fetch origin main
+            git merge --no-edit origin/main
+            git push
+          fi
