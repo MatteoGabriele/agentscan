@@ -22,9 +22,13 @@ const clusters = computed(() => {
   return Object.values(map).sort((a, b) => b.entries.length - a.entries.length);
 });
 
-const nameClusters = computed(() => clusters.value.filter((c) => c.entries.length > 1));
+const nameClusters = computed(() =>
+  clusters.value.filter((c) => c.entries.length > 1),
+);
 const singleEntries = computed(() =>
-  clusters.value.filter((c) => c.entries.length === 1).map((c) => c.entries[0]!),
+  clusters.value
+    .filter((c) => c.entries.length === 1)
+    .map((c) => c.entries[0]!),
 );
 
 const crossClusterOwners = computed(() => {
@@ -81,7 +85,8 @@ function nameOf(repo: string) {
         <div>
           <h2 class="text-lg font-semibold">Bounty repositories</h2>
           <p class="text-sm text-gh-muted mt-0.5">
-            Repositories observed with active bounty signals, collected twice daily.
+            Repositories observed with active bounty signals, collected twice
+            daily.
           </p>
         </div>
         <div class="flex items-center gap-3 text-xs shrink-0 flex-wrap">
@@ -141,7 +146,9 @@ function nameOf(repo: string) {
     <template v-else>
       <!-- Name clusters -->
       <div v-if="nameClusters.length" class="mb-8">
-        <h3 class="text-xs font-medium text-gh-muted uppercase tracking-wider mb-3">
+        <h3
+          class="text-xs font-medium text-gh-muted uppercase tracking-wider mb-3"
+        >
           Name clusters
         </h3>
         <div class="space-y-2">
@@ -151,9 +158,11 @@ function nameOf(repo: string) {
             class="rounded-lg border border-gh-border/60 bg-white/1 p-3"
           >
             <div class="flex items-center gap-2 mb-2.5">
-              <span class="text-sm font-medium text-gh-text">{{ cluster.name }}</span>
+              <span class="text-sm font-medium text-gh-text">{{
+                cluster.name
+              }}</span>
               <span
-                class="text-[10px] px-1.5 py-0.5 rounded-full bg-gh-border text-gh-muted font-medium tabular-nums"
+                class="text-[10px] px-1.5 py-0.5 rounded-full bg-gh-border text-gh-text/80 font-medium tabular-nums"
               >
                 {{ cluster.entries.length }} owners
               </span>
@@ -181,7 +190,9 @@ function nameOf(repo: string) {
 
       <!-- Accounts in multiple clusters -->
       <div v-if="crossClusterOwners.length" class="mb-8">
-        <h3 class="text-xs font-medium text-gh-muted uppercase tracking-wider mb-3">
+        <h3
+          class="text-xs font-medium text-gh-muted uppercase tracking-wider mb-3"
+        >
           Accounts in multiple clusters
         </h3>
         <div class="flex flex-wrap gap-2">
@@ -206,7 +217,9 @@ function nameOf(repo: string) {
 
       <!-- Unique repos -->
       <div v-if="singleEntries.length">
-        <h3 class="text-xs font-medium text-gh-muted uppercase tracking-wider mb-3">
+        <h3
+          class="text-xs font-medium text-gh-muted uppercase tracking-wider mb-3"
+        >
           Unique repos
         </h3>
         <div class="flex flex-wrap gap-2">
@@ -218,9 +231,12 @@ function nameOf(repo: string) {
             rel="noopener noreferrer"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border border-gh-border/40 bg-white/2 hover:bg-white/4 hover:border-gh-border/60 transition-all group"
           >
-            <span class="text-gh-muted group-hover:text-gh-text/60 transition-colors"
+            <span
+              class="text-gh-muted group-hover:text-gh-text/60 transition-colors"
               >{{ ownerOf(entry.repo) }}/</span
-            ><span class="text-gh-text font-medium">{{ nameOf(entry.repo) }}</span>
+            ><span class="text-gh-text font-medium">{{
+              nameOf(entry.repo)
+            }}</span>
             <span class="ml-0.5 text-gh-muted/50 text-[10px]">{{
               sourceLabel(entry.sources[0] ?? "")
             }}</span>
