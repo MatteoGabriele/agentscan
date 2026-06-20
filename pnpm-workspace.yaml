@@ -3,3 +3,4 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - "@unveil/identity"
+  - "vue-data-ui"
