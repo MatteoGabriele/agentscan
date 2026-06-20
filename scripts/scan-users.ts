@@ -217,6 +217,10 @@ export async function main(options: ScanOptions = {}) {
     throw new Error("GITHUB_TOKEN environment variable is not set");
   }
 
+  if (!process.env.PR_HASH_SECRET) {
+    throw new Error("PR_HASH_SECRET environment variable is not set");
+  }
+
   const octokit = new Octokit({ auth: token });
   const scanResults = dryRun ? [] : loadScanResults();
   const verifiedAutomations = loadVerifiedAutomations();
