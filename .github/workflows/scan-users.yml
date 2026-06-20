@@ -26,13 +26,18 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run user scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm exec tsx scripts/scan-users.ts
+        run: pnpm exec tsx scripts/scan-users.ts
 
       - name: Commit and push results
         run: |
@@ -51,4 +56,4 @@ jobs:
       - name: Notify Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.OSS_GUILD_DISCORD_WEBHOOK }}
-        run: npm exec tsx scripts/notify-discord.ts
+        run: pnpm exec tsx scripts/notify-discord.ts
