@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { Octokit } from "octokit";
 import { IdentifyResult } from "@unveil/identity";
+import { hashPrId } from "./pr-hash";
 
 // Configuration
 const API_TIMEOUT = 10000; // 10 seconds timeout for API calls
@@ -19,7 +20,7 @@ interface ScanResult {
   user_public_repos_count: number;
   events_count: number;
   repo_name: string;
-  pr_number: number;
+  pr_key: string;
   pr_status: string;
 }
 
@@ -147,7 +148,7 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
     created_at: string;
     public_repos: number;
     repo_name: string;
-    pr_number: number;
+    pr_key: string;
     pr_status: string;
   }> = [];
 
@@ -197,7 +198,7 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
               id: fullProfile.data.id,
               login: fullProfile.data.login,
               created_at: fullProfile.data.created_at,
-              pr_number: pr.number,
+              pr_key: hashPrId(repoFullName, pr.number),
               pr_status: pr.state,
               public_repos: fullProfile.data.public_repos,
               repo_name: repoFullName,
@@ -300,7 +301,7 @@ export async function main(options: ScanOptions = {}) {
       const result: ScanResult = {
         created_at: now,
         score,
-        pr_number: user.pr_number,
+        pr_key: user.pr_key,
         pr_status: user.pr_status,
         user_created_at: user.created_at,
         user_public_repos_count: user.public_repos,

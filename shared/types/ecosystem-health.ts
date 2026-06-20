@@ -4,7 +4,7 @@ import type { IdentityClassification } from "@unveil/identity";
 export type EcosystemHealthItem = {
   created_at: string;
   score: number;
-  pr_number: number;
+  pr_key: string;
   pr_status: string; // FIXME: narrow down
   user_created_at: string;
   user_public_repos_count: number;
