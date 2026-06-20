@@ -104,10 +104,10 @@ export function getClosedPrPercentageByRepo(
   const byRepo = new Map<string, Map<string, EcosystemHealthItem[]>>();
 
   source.forEach((entry) => {
+    if (!entry[repoKey] || !entry[prKey]) return;
+
     const repo = String(entry[repoKey]);
     const prId = String(entry[prKey]);
-
-    if (!repo || !prId) return;
 
     if (!byRepo.has(repo)) {
       byRepo.set(repo, new Map());
