@@ -71,7 +71,7 @@ export type ScoreBounds = [min: number, max: number];
 
 export type RepoClosedPrOptions = {
   repoKey?: keyof EcosystemHealthItem;
-  prNumberKey?: keyof EcosystemHealthItem;
+  prKey?: keyof EcosystemHealthItem;
   stateKey?: keyof EcosystemHealthItem;
   scoreKey?: keyof EcosystemHealthItem;
   dateKey?: keyof EcosystemHealthItem;
@@ -87,7 +87,7 @@ export function getClosedPrPercentageByRepo(
 ) {
   const {
     repoKey = "repo_name",
-    prNumberKey = "pr_number",
+    prKey = "pr_key",
     stateKey = "pr_status",
     scoreKey = "score",
     scoreBounds = [0, 100],
@@ -101,13 +101,13 @@ export function getClosedPrPercentageByRepo(
 
   const [minScore, maxScore] = resolvedScoreBounds;
 
-  const byRepo = new Map<string, Map<number, EcosystemHealthItem[]>>();
+  const byRepo = new Map<string, Map<string, EcosystemHealthItem[]>>();
 
   source.forEach((entry) => {
-    const repo = String(entry[repoKey]);
-    const prNumber = Number(entry[prNumberKey]);
+    if (!entry[repoKey] || !entry[prKey]) return;
 
-    if (!repo || Number.isNaN(prNumber)) return;
+    const repo = String(entry[repoKey]);
+    const prId = String(entry[prKey]);
 
     if (!byRepo.has(repo)) {
       byRepo.set(repo, new Map());
@@ -116,11 +116,11 @@ export function getClosedPrPercentageByRepo(
     const repoMap = byRepo.get(repo);
     if (!repoMap) return;
 
-    if (!repoMap.has(prNumber)) {
-      repoMap.set(prNumber, []);
+    if (!repoMap.has(prId)) {
+      repoMap.set(prId, []);
     }
 
-    repoMap.get(prNumber)?.push(entry);
+    repoMap.get(prId)?.push(entry);
   });
 
   return Array.from(byRepo.entries()).map(([repo, pullRequests]) => {
@@ -209,7 +209,7 @@ export type ClosedPrPercentageEvolutionSeries = {
  *
  * For a given day:
  * - Only entries where `dateKey` matches that given day are considered
- * - PRs are deduped by `pr_number`
+ * - PRs are deduped by `pr_key`
  * - A PR is considered closed if at least one entry for that PR on that day has a closed status
  * - A PR is considered eligible if it has at least one entry within the selected score range for that day
  *

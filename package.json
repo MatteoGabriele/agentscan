@@ -30,8 +30,10 @@
     "@github/issue-parser": "^2.0.0",
     "@iconify-json/lucide": "^1.2.111",
     "@octokit/types": "^16.0.0",
+    "@types/node": "^26.0.0",
     "@unocss/nuxt": "^66.6.7",
     "simple-analytics-vue": "^3.1.0",
+    "tsx": "^4.22.4",
     "unocss": "^66.6.0",
     "vitest": "^4.1.8"
   }
