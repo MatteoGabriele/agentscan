@@ -39,8 +39,8 @@ importers:
         specifier: ^3.5.28
         version: 3.5.35
       vue-data-ui:
-        specifier: ^3.21.9
-        version: 3.21.9(vue@3.5.35)
+        specifier: ^3.21.10
+        version: 3.21.10(vue@3.5.35)
       vue-router:
         specifier: ^4.6.4
         version: 4.6.4(vue@3.5.35)
@@ -4248,8 +4248,8 @@ packages:
   vue-bundle-renderer@2.2.0:
     resolution: {integrity: sha512-sz/0WEdYH1KfaOm0XaBmRZOWgYTEvUDt6yPYaUzl4E52qzgWLlknaPPTTZmp6benaPTlQAI/hN1x3tAzZygycg==}
 
-  vue-data-ui@3.21.9:
-    resolution: {integrity: sha512-Ht0oBVP/QAxMmXWsoUJYRdaQU1jfYsMlZV7IYuPialN8cBoqEN34i13ys25DvdjTPuaKmuv7tYNzfFeCm5ITFQ==}
+  vue-data-ui@3.21.10:
+    resolution: {integrity: sha512-it4a85kcuRaKf4+S8FVQFZgxAXfAOzqESCfuRbo/Z1tf+Tw7lTt7SbGCjgyfc/Bbh3h0/y/FTM/+wDf2I3oOYA==}
     peerDependencies:
       jspdf: '>=3.0.1'
       vue: '>=3.3.0'
@@ -8800,7 +8800,7 @@ snapshots:
     dependencies:
       ufo: 1.6.4
 
-  vue-data-ui@3.21.9(vue@3.5.35):
+  vue-data-ui@3.21.10(vue@3.5.35):
     dependencies:
       vue: 3.5.35
 
