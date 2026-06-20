@@ -82,7 +82,7 @@ function getCategoryPercentageFromCounts(
 ): number | null {
   const total = getTotalClassificationCount(counts);
   if (!counts || !total) return null;
-  return Number(((counts[category].count / total) * 100).toFixed(2));
+  return Number(((counts[category].count / total) * 100).toFixed(1));
 }
 
 function getCategoryPercentageComparison({
