@@ -25,7 +25,7 @@ const uniqueEntries = computed(() => {
 
   return [
     ...new Map(
-      props.data.map((item) => [`${item.repo_name}#${item.pr_number}`, item]),
+      props.data.map((item) => [`${item.repo_name}#${item.pr_key}`, item]),
     ).values(),
   ];
 });
