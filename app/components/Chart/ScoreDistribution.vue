@@ -165,6 +165,7 @@ const config = computed<VueUiXyConfig>(() => ({
       offsetY: -12,
       color: colors.value.text,
       formatter: ({ value }) => {
+        if (!total.value) return "0%";
         return `${Math.round((value / total.value) * 1000) / 10}%`;
       },
     },
