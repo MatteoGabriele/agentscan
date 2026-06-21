@@ -220,7 +220,7 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 
             <span>{{ heatmap.name }}</span>
             <span :style="{ color: colors.textMuted }">{{
-              datapoint.value
+              Math.round((datapoint.value ?? 0) * 10) / 10 + "%"
             }}</span>
           </div>
         </template>

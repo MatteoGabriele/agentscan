@@ -68,7 +68,7 @@ const stackbarDataset = computed<VueUiStackbarDatasetItem[]>(() => {
     return {
       name: classificationKey,
       series: classification.value.map((week) => {
-        return week.classification[classificationKey].count;
+        return week.classification[classificationKey].percentage;
       }),
       color: palette.value[classificationKey],
     };

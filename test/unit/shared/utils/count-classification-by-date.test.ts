@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
-  countClassificationByDate,
+  ClassificationStats,
+  getClassificationStatsByDate,
+  ClassificationMetric,
   getCategoryDeltas,
   getClassificationByDateChunks,
   getClassificationForPreviousDays,
   getWeeklyClassification,
 } from "../../../../shared/utils/count-classification-by-date";
-import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from "../../mocks/ecosystemHealthItems";
-import { EcosystemHealthItem } from "../../../../shared/types/ecosystem-health";
+import type { EcosystemHealthItem } from "../../../../shared/types/ecosystem-health";
 
 function createEcosystemHealthItem(
   created_at: string,
@@ -19,34 +20,92 @@ function createEcosystemHealthItem(
   } as EcosystemHealthItem;
 }
 
-describe("countClassificationByDate", () => {
-  const result = countClassificationByDate(MOCK_ECOSYSTEM_HEALTH_ITEMS);
-  it("returns an object with date keys", () => {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+function expectClassificationMetric(
+  received: ClassificationMetric,
+  expected: ClassificationMetric,
+): void {
+  expect(received.count).toBe(expected.count);
+  expect(received.trend).toBeCloseTo(expected.trend, 5);
+  expect(received.percentage).toBeCloseTo(expected.percentage, 5);
+}
 
-    Object.keys(result).forEach((key) => {
-      expect(key).toMatch(dateRegex);
-    });
+function expectClassificationCounts(
+  received: ClassificationStats,
+  expected: ClassificationStats,
+): void {
+  expectClassificationMetric(received.organic, expected.organic);
+  expectClassificationMetric(received.mixed, expected.mixed);
+  expectClassificationMetric(received.automation, expected.automation);
+  expectClassificationMetric(received.total, expected.total);
+}
+
+describe("getClassificationStatsByDate", () => {
+  it("returns an object with sorted date keys", () => {
+    const result = getClassificationStatsByDate([
+      createEcosystemHealthItem("2026-06-11T10:00:00.000Z", 90),
+      createEcosystemHealthItem("2026-06-10T10:00:00.000Z", 50),
+      createEcosystemHealthItem("2026-06-10T11:00:00.000Z", 10),
+    ]);
+
+    expect(Object.keys(result)).toEqual(["2026-06-10", "2026-06-11"]);
   });
 
-  it("returns counts and trends for each date", () => {
-    Object.values(result).forEach((value) => {
-      expect(value).toEqual(
-        expect.objectContaining({
-          organic: expect.objectContaining({
-            count: expect.any(Number),
-            trend: expect.any(Number),
-          }),
-          mixed: expect.objectContaining({
-            count: expect.any(Number),
-            trend: expect.any(Number),
-          }),
-          automation: expect.objectContaining({
-            count: expect.any(Number),
-            trend: expect.any(Number),
-          }),
-        }),
-      );
+  it("returns counts, percentages, and default trends for each date", () => {
+    const result = getClassificationStatsByDate([
+      createEcosystemHealthItem("2026-06-10T10:00:00.000Z", 90),
+      createEcosystemHealthItem("2026-06-10T11:00:00.000Z", 50),
+      createEcosystemHealthItem("2026-06-10T12:00:00.000Z", 10),
+      createEcosystemHealthItem("2026-06-10T13:00:00.000Z", 10),
+
+      createEcosystemHealthItem("2026-06-11T10:00:00.000Z", 90),
+      createEcosystemHealthItem("2026-06-11T11:00:00.000Z", 90),
+      createEcosystemHealthItem("2026-06-11T12:00:00.000Z", 50),
+    ]);
+
+    expectClassificationCounts(result["2026-06-10"], {
+      organic: {
+        count: 1,
+        trend: 0,
+        percentage: 25,
+      },
+      mixed: {
+        count: 1,
+        trend: 0,
+        percentage: 25,
+      },
+      automation: {
+        count: 2,
+        trend: 0,
+        percentage: 50,
+      },
+      total: {
+        count: 4,
+        trend: 0,
+        percentage: 100,
+      },
+    });
+
+    expectClassificationCounts(result["2026-06-11"], {
+      organic: {
+        count: 2,
+        trend: 0,
+        percentage: 66.66666666666666,
+      },
+      mixed: {
+        count: 1,
+        trend: 0,
+        percentage: 33.33333333333333,
+      },
+      automation: {
+        count: 0,
+        trend: 0,
+        percentage: 0,
+      },
+      total: {
+        count: 3,
+        trend: 0,
+        percentage: 100,
+      },
     });
   });
 });
@@ -55,63 +114,56 @@ describe("getCategoryDeltas", () => {
   const previousDate = "2026-06-18T11:38:32.093Z";
   const lastDate = "2026-06-19T14:37:04.644Z";
 
-  function createEcosystemHealthItem(
-    created_at: string,
-    score: number,
-  ): EcosystemHealthItem {
-    return {
-      created_at,
-      score,
-    } as EcosystemHealthItem;
-  }
-
   it("returns category deltas keyed by category", () => {
     const result = getCategoryDeltas([
       createEcosystemHealthItem(lastDate, 90),
       createEcosystemHealthItem(lastDate, 50),
+      createEcosystemHealthItem(lastDate, 50),
       createEcosystemHealthItem(lastDate, 10),
+
+      createEcosystemHealthItem(previousDate, 90),
       createEcosystemHealthItem(previousDate, 90),
       createEcosystemHealthItem(previousDate, 50),
       createEcosystemHealthItem(previousDate, 10),
     ]);
 
     expect(result).toEqual({
-      organic: expect.objectContaining({
+      organic: {
         category: "organic",
-        lastDate: expect.any(String),
-        lastCount: expect.any(Number),
-        lastTotal: expect.any(Number),
-        lastPercentage: expect.any(Number),
-        previousDate: expect.any(String),
-        previousCount: expect.any(Number),
-        previousTotal: expect.any(Number),
-        previousPercentage: expect.any(Number),
-        percentagePointDifference: expect.any(Number),
-      }),
-      mixed: expect.objectContaining({
+        previousDate: "2026-06-18",
+        previousCount: 2,
+        previousTotal: 4,
+        previousPercentage: 50,
+        lastDate: "2026-06-19",
+        lastCount: 1,
+        lastTotal: 4,
+        lastPercentage: 25,
+        percentagePointDifference: -25,
+      },
+      mixed: {
         category: "mixed",
-        lastDate: expect.any(String),
-        lastCount: expect.any(Number),
-        lastTotal: expect.any(Number),
-        lastPercentage: expect.any(Number),
-        previousDate: expect.any(String),
-        previousCount: expect.any(Number),
-        previousTotal: expect.any(Number),
-        previousPercentage: expect.any(Number),
-        percentagePointDifference: expect.any(Number),
-      }),
-      automation: expect.objectContaining({
+        previousDate: "2026-06-18",
+        previousCount: 1,
+        previousTotal: 4,
+        previousPercentage: 25,
+        lastDate: "2026-06-19",
+        lastCount: 2,
+        lastTotal: 4,
+        lastPercentage: 50,
+        percentagePointDifference: 25,
+      },
+      automation: {
         category: "automation",
-        previousDate: expect.any(String),
-        previousCount: expect.any(Number),
-        previousTotal: expect.any(Number),
-        previousPercentage: expect.any(Number),
-        lastDate: expect.any(String),
-        lastCount: expect.any(Number),
-        lastTotal: expect.any(Number),
-        lastPercentage: expect.any(Number),
-        percentagePointDifference: expect.any(Number),
-      }),
+        previousDate: "2026-06-18",
+        previousCount: 1,
+        previousTotal: 4,
+        previousPercentage: 25,
+        lastDate: "2026-06-19",
+        lastCount: 1,
+        lastTotal: 4,
+        lastPercentage: 25,
+        percentagePointDifference: 0,
+      },
     });
   });
 
@@ -123,42 +175,42 @@ describe("getCategoryDeltas", () => {
     ]);
 
     expect(result).toEqual({
-      organic: expect.objectContaining({
+      organic: {
         category: "organic",
-        lastDate: expect.any(String),
-        lastCount: expect.any(Number),
-        lastTotal: expect.any(Number),
-        lastPercentage: expect.any(Number),
         previousDate: undefined,
         previousCount: null,
         previousTotal: null,
         previousPercentage: null,
+        lastDate: "2026-06-19",
+        lastCount: 1,
+        lastTotal: 3,
+        lastPercentage: 33.3,
         percentagePointDifference: null,
-      }),
-      mixed: expect.objectContaining({
+      },
+      mixed: {
         category: "mixed",
-        lastDate: expect.any(String),
-        lastCount: expect.any(Number),
-        lastTotal: expect.any(Number),
-        lastPercentage: expect.any(Number),
         previousDate: undefined,
         previousCount: null,
         previousTotal: null,
         previousPercentage: null,
+        lastDate: "2026-06-19",
+        lastCount: 1,
+        lastTotal: 3,
+        lastPercentage: 33.3,
         percentagePointDifference: null,
-      }),
-      automation: expect.objectContaining({
+      },
+      automation: {
         category: "automation",
-        lastDate: expect.any(String),
-        lastCount: expect.any(Number),
-        lastTotal: expect.any(Number),
-        lastPercentage: expect.any(Number),
         previousDate: undefined,
         previousCount: null,
         previousTotal: null,
         previousPercentage: null,
+        lastDate: "2026-06-19",
+        lastCount: 1,
+        lastTotal: 3,
+        lastPercentage: 33.3,
         percentagePointDifference: null,
-      }),
+      },
     });
   });
 
@@ -166,74 +218,48 @@ describe("getCategoryDeltas", () => {
     const result = getCategoryDeltas([]);
 
     expect(result).toEqual({
-      organic: expect.objectContaining({
+      organic: {
         category: "organic",
-        lastDate: undefined,
-        lastCount: null,
-        lastTotal: null,
-        lastPercentage: null,
         previousDate: undefined,
         previousCount: null,
         previousTotal: null,
         previousPercentage: null,
+        lastDate: undefined,
+        lastCount: null,
+        lastTotal: null,
+        lastPercentage: null,
         percentagePointDifference: null,
-      }),
-      mixed: expect.objectContaining({
+      },
+      mixed: {
         category: "mixed",
-        lastDate: undefined,
-        lastCount: null,
-        lastTotal: null,
-        lastPercentage: null,
         previousDate: undefined,
         previousCount: null,
         previousTotal: null,
         previousPercentage: null,
+        lastDate: undefined,
+        lastCount: null,
+        lastTotal: null,
+        lastPercentage: null,
         percentagePointDifference: null,
-      }),
-      automation: expect.objectContaining({
+      },
+      automation: {
         category: "automation",
-        lastDate: undefined,
-        lastCount: null,
-        lastTotal: null,
-        lastPercentage: null,
         previousDate: undefined,
         previousCount: null,
         previousTotal: null,
         previousPercentage: null,
+        lastDate: undefined,
+        lastCount: null,
+        lastTotal: null,
+        lastPercentage: null,
         percentagePointDifference: null,
-      }),
+      },
     });
-  });
-
-  it("calculates accurate category percentages and point differences", () => {
-    const result = getCategoryDeltas([
-      createEcosystemHealthItem(lastDate, 90),
-      createEcosystemHealthItem(lastDate, 50),
-      createEcosystemHealthItem(lastDate, 50),
-      createEcosystemHealthItem(lastDate, 10),
-
-      createEcosystemHealthItem(previousDate, 90),
-      createEcosystemHealthItem(previousDate, 90),
-      createEcosystemHealthItem(previousDate, 50),
-      createEcosystemHealthItem(previousDate, 10),
-    ]);
-
-    expect(result.organic.previousPercentage).toBe(50);
-    expect(result.organic.lastPercentage).toBe(25);
-    expect(result.organic.percentagePointDifference).toBe(-25);
-
-    expect(result.mixed.previousPercentage).toBe(25);
-    expect(result.mixed.lastPercentage).toBe(50);
-    expect(result.mixed.percentagePointDifference).toBe(25);
-
-    expect(result.automation.previousPercentage).toBe(25);
-    expect(result.automation.lastPercentage).toBe(25);
-    expect(result.automation.percentagePointDifference).toBe(0);
   });
 });
 
 describe("getClassificationForPreviousDays", () => {
-  it("returns aggregated counts for the requested day span", () => {
+  it("returns aggregated counts and percentage-based trends for the requested day span", () => {
     const result = getClassificationForPreviousDays({
       date: "2026-06-10T18:30:00.000Z",
       days: 3,
@@ -255,18 +281,26 @@ describe("getClassificationForPreviousDays", () => {
       ],
     });
 
-    expect(result).toEqual({
+    expectClassificationCounts(result, {
       organic: {
         count: 2,
-        trend: 100,
+        trend: 33.3,
+        percentage: 33.33333333333333,
       },
       mixed: {
         count: 1,
-        trend: -50,
+        trend: -66.7,
+        percentage: 16.666666666666664,
       },
       automation: {
         count: 3,
-        trend: 200,
+        trend: 100,
+        percentage: 50,
+      },
+      total: {
+        count: 6,
+        trend: 0,
+        percentage: 100,
       },
     });
   });
@@ -278,23 +312,31 @@ describe("getClassificationForPreviousDays", () => {
       data: [createEcosystemHealthItem("2026-06-10T10:00:00.000Z", 90)],
     });
 
-    expect(result).toEqual({
+    expectClassificationCounts(result, {
       organic: {
         count: 0,
         trend: 0,
+        percentage: 0,
       },
       mixed: {
         count: 0,
         trend: 0,
+        percentage: 0,
       },
       automation: {
         count: 0,
         trend: 0,
+        percentage: 0,
+      },
+      total: {
+        count: 0,
+        trend: 0,
+        percentage: 100,
       },
     });
   });
 
-  it("handles missing previous period values when calculating trends", () => {
+  it("handles missing previous period values when calculating percentage-based trends", () => {
     const result = getClassificationForPreviousDays({
       date: "2026-06-10T18:30:00.000Z",
       days: 2,
@@ -304,18 +346,26 @@ describe("getClassificationForPreviousDays", () => {
       ],
     });
 
-    expect(result).toEqual({
+    expectClassificationCounts(result, {
       organic: {
         count: 1,
         trend: 100,
+        percentage: 50,
       },
       mixed: {
         count: 0,
         trend: 0,
+        percentage: 0,
       },
       automation: {
         count: 1,
         trend: 100,
+        percentage: 50,
+      },
+      total: {
+        count: 2,
+        trend: 0,
+        percentage: 100,
       },
     });
   });
@@ -352,63 +402,81 @@ describe("getClassificationByDateChunks", () => {
 
     expect(result).toHaveLength(3);
 
-    expect(result[0]).toEqual({
-      startDate: "2026-06-01T10:00:00.000Z",
-      endDate: "2026-06-03T10:00:00.000Z",
-      days: 3,
-      classification: {
-        organic: {
-          count: 1,
-          trend: 100,
-        },
-        mixed: {
-          count: 1,
-          trend: 100,
-        },
-        automation: {
-          count: 1,
-          trend: 100,
-        },
+    expect(result[0].startDate).toBe("2026-06-01T10:00:00.000Z");
+    expect(result[0].endDate).toBe("2026-06-03T10:00:00.000Z");
+    expect(result[0].days).toBe(3);
+    expectClassificationCounts(result[0].classification, {
+      organic: {
+        count: 1,
+        trend: 100,
+        percentage: 33.33333333333333,
+      },
+      mixed: {
+        count: 1,
+        trend: 100,
+        percentage: 33.33333333333333,
+      },
+      automation: {
+        count: 1,
+        trend: 100,
+        percentage: 33.33333333333333,
+      },
+      total: {
+        count: 3,
+        trend: 0,
+        percentage: 100,
       },
     });
 
-    expect(result[1]).toEqual({
-      startDate: "2026-06-04T10:00:00.000Z",
-      endDate: "2026-06-06T10:00:00.000Z",
-      days: 3,
-      classification: {
-        organic: {
-          count: 2,
-          trend: 100,
-        },
-        mixed: {
-          count: 1,
-          trend: 0,
-        },
-        automation: {
-          count: 1,
-          trend: 0,
-        },
+    expect(result[1].startDate).toBe("2026-06-04T10:00:00.000Z");
+    expect(result[1].endDate).toBe("2026-06-06T10:00:00.000Z");
+    expect(result[1].days).toBe(3);
+    expectClassificationCounts(result[1].classification, {
+      organic: {
+        count: 2,
+        trend: 50,
+        percentage: 50,
+      },
+      mixed: {
+        count: 1,
+        trend: -25,
+        percentage: 25,
+      },
+      automation: {
+        count: 1,
+        trend: -25,
+        percentage: 25,
+      },
+      total: {
+        count: 4,
+        trend: 0,
+        percentage: 100,
       },
     });
 
-    expect(result[2]).toEqual({
-      startDate: "2026-06-07T10:00:00.000Z",
-      endDate: "2026-06-08T10:00:00.000Z",
-      days: 2,
-      classification: {
-        organic: {
-          count: 0,
-          trend: 0,
-        },
-        mixed: {
-          count: 1,
-          trend: 0,
-        },
-        automation: {
-          count: 1,
-          trend: 0,
-        },
+    expect(result[2].startDate).toBe("2026-06-07T10:00:00.000Z");
+    expect(result[2].endDate).toBe("2026-06-08T10:00:00.000Z");
+    expect(result[2].days).toBe(2);
+    expectClassificationCounts(result[2].classification, {
+      organic: {
+        count: 0,
+        trend: 0,
+        percentage: 0,
+      },
+      mixed: {
+        count: 1,
+        trend: 0,
+        percentage: 50,
+      },
+      automation: {
+        count: 1,
+        trend: 0,
+        percentage: 50,
+      },
+      total: {
+        count: 2,
+        trend: 0,
+        percentage: 100,
       },
     });
   });
@@ -447,6 +515,7 @@ describe("getClassificationByDateChunks", () => {
       days: 7,
       data: [createEcosystemHealthItem("2026-06-01T10:00:00.000Z", 90)],
     });
+
     expect(result).toEqual([]);
   });
 
@@ -456,6 +525,7 @@ describe("getClassificationByDateChunks", () => {
       days: 0,
       data: [createEcosystemHealthItem("2026-06-01T10:00:00.000Z", 90)],
     });
+
     expect(result).toEqual([]);
   });
 
@@ -495,115 +565,134 @@ describe("getClassificationByDateChunks", () => {
       ],
     });
 
-    expect(result).toEqual([
-      {
-        startDate: "2026-06-08",
-        endDate: "2026-06-14",
-        days: 7,
-        classification: {
-          organic: {
-            count: 1,
-            trend: 100,
-          },
-          mixed: {
-            count: 1,
-            trend: 100,
-          },
-          automation: {
-            count: 1,
-            trend: 100,
-          },
-        },
+    expect(result).toHaveLength(2);
+
+    expect(result[0].startDate).toBe("2026-06-08");
+    expect(result[0].endDate).toBe("2026-06-14");
+    expect(result[0].days).toBe(7);
+    expectClassificationCounts(result[0].classification, {
+      organic: {
+        count: 1,
+        trend: 100,
+        percentage: 33.33333333333333,
       },
-      {
-        startDate: "2026-06-15",
-        endDate: "2026-06-21",
-        days: 7,
-        classification: {
-          organic: {
-            count: 2,
-            trend: 100,
-          },
-          mixed: {
-            count: 1,
-            trend: 0,
-          },
-          automation: {
-            count: 2,
-            trend: 100,
-          },
-        },
+      mixed: {
+        count: 1,
+        trend: 100,
+        percentage: 33.33333333333333,
       },
-    ]);
+      automation: {
+        count: 1,
+        trend: 100,
+        percentage: 33.33333333333333,
+      },
+      total: {
+        count: 3,
+        trend: 0,
+        percentage: 100,
+      },
+    });
+
+    expect(result[1].startDate).toBe("2026-06-15");
+    expect(result[1].endDate).toBe("2026-06-21");
+    expect(result[1].days).toBe(7);
+    expectClassificationCounts(result[1].classification, {
+      organic: {
+        count: 2,
+        trend: 20,
+        percentage: 40,
+      },
+      mixed: {
+        count: 1,
+        trend: -40,
+        percentage: 20,
+      },
+      automation: {
+        count: 2,
+        trend: 20,
+        percentage: 40,
+      },
+      total: {
+        count: 5,
+        trend: 0,
+        percentage: 100,
+      },
+    });
   });
 });
 
 describe("getWeeklyClassification", () => {
+  const rollingWindowData = [
+    createEcosystemHealthItem("2026-06-05T10:00:00.000Z", 90),
+    createEcosystemHealthItem("2026-06-06T10:00:00.000Z", 50),
+    createEcosystemHealthItem("2026-06-07T10:00:00.000Z", 50),
+    createEcosystemHealthItem("2026-06-08T10:00:00.000Z", 10),
+    createEcosystemHealthItem("2026-06-12T10:00:00.000Z", 90),
+    createEcosystemHealthItem("2026-06-13T10:00:00.000Z", 90),
+    createEcosystemHealthItem("2026-06-14T10:00:00.000Z", 50),
+    createEcosystemHealthItem("2026-06-15T10:00:00.000Z", 10),
+    createEcosystemHealthItem("2026-06-16T10:00:00.000Z", 10),
+    createEcosystemHealthItem("2026-06-18T10:00:00.000Z", 10),
+    createEcosystemHealthItem("2026-06-19T10:00:00.000Z", 90),
+  ];
+
   it("uses a rolling 7 day window by default", () => {
     const result = getWeeklyClassification(
-      [
-        createEcosystemHealthItem("2026-06-05T10:00:00.000Z", 90),
-        createEcosystemHealthItem("2026-06-06T10:00:00.000Z", 50),
-        createEcosystemHealthItem("2026-06-07T10:00:00.000Z", 50),
-        createEcosystemHealthItem("2026-06-08T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-12T10:00:00.000Z", 90),
-        createEcosystemHealthItem("2026-06-13T10:00:00.000Z", 90),
-        createEcosystemHealthItem("2026-06-14T10:00:00.000Z", 50),
-        createEcosystemHealthItem("2026-06-15T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-16T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-18T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-19T10:00:00.000Z", 90),
-      ],
+      rollingWindowData,
       "2026-06-18T18:30:00.000Z",
     );
 
-    expect(result).toEqual({
+    expectClassificationCounts(result, {
       organic: {
         count: 2,
-        trend: 100,
+        trend: 33.3,
+        percentage: 33.33333333333333,
       },
       mixed: {
         count: 1,
-        trend: -50,
+        trend: -66.7,
+        percentage: 16.666666666666664,
       },
       automation: {
         count: 3,
-        trend: 200,
+        trend: 100,
+        percentage: 50,
+      },
+      total: {
+        count: 6,
+        trend: 0,
+        percentage: 100,
       },
     });
   });
 
   it("uses a rolling 7 day window when rolling is true", () => {
     const result = getWeeklyClassification(
-      [
-        createEcosystemHealthItem("2026-06-05T10:00:00.000Z", 90),
-        createEcosystemHealthItem("2026-06-06T10:00:00.000Z", 50),
-        createEcosystemHealthItem("2026-06-07T10:00:00.000Z", 50),
-        createEcosystemHealthItem("2026-06-08T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-12T10:00:00.000Z", 90),
-        createEcosystemHealthItem("2026-06-13T10:00:00.000Z", 90),
-        createEcosystemHealthItem("2026-06-14T10:00:00.000Z", 50),
-        createEcosystemHealthItem("2026-06-15T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-16T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-18T10:00:00.000Z", 10),
-        createEcosystemHealthItem("2026-06-19T10:00:00.000Z", 90),
-      ],
+      rollingWindowData,
       "2026-06-18T18:30:00.000Z",
       true,
     );
 
-    expect(result).toEqual({
+    expectClassificationCounts(result, {
       organic: {
         count: 2,
-        trend: 100,
+        trend: 33.3,
+        percentage: 33.33333333333333,
       },
       mixed: {
         count: 1,
-        trend: -50,
+        trend: -66.7,
+        percentage: 16.666666666666664,
       },
       automation: {
         count: 3,
-        trend: 200,
+        trend: 100,
+        percentage: 50,
+      },
+      total: {
+        count: 6,
+        trend: 0,
+        percentage: 100,
       },
     });
   });
@@ -627,18 +716,26 @@ describe("getWeeklyClassification", () => {
       false,
     );
 
-    expect(result).toEqual({
+    expectClassificationCounts(result, {
       organic: {
         count: 2,
-        trend: 100,
+        trend: 60,
+        percentage: 40,
       },
       mixed: {
         count: 1,
-        trend: -50,
+        trend: -60,
+        percentage: 20,
       },
       automation: {
         count: 2,
-        trend: 100,
+        trend: 60,
+        percentage: 40,
+      },
+      total: {
+        count: 5,
+        trend: 0,
+        percentage: 100,
       },
     });
   });

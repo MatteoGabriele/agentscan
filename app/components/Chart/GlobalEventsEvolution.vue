@@ -46,7 +46,7 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
       name: "Organic",
       series:
         dates.value?.map(
-          (date) => countsByDate.value?.[date]?.organic.count ?? 0,
+          (date) => countsByDate.value?.[date]?.organic.percentage ?? 0,
         ) ?? [],
       trends:
         dates.value?.map(
@@ -61,7 +61,7 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
       name: "Mixed",
       series:
         dates.value?.map(
-          (date) => countsByDate.value?.[date]?.mixed.count ?? 0,
+          (date) => countsByDate.value?.[date]?.mixed.percentage ?? 0,
         ) ?? [],
       trends:
         dates.value?.map(
@@ -76,7 +76,7 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
       name: "Automation",
       series:
         dates.value?.map(
-          (date) => countsByDate.value?.[date]?.automation.count ?? 0,
+          (date) => countsByDate.value?.[date]?.automation.percentage ?? 0,
         ) ?? [],
       trends:
         dates.value?.map(
@@ -230,8 +230,7 @@ function getTrend({ series, item, index }: any) {
                 </div>
                 <span :style="{ color: colors.text }">{{ dp.name }}</span>
                 <span :style="{ color: colors.textMuted }">{{
-                  dp.value +
-                  (dp.slotAbsoluteIndex === dataset.length - 1 ? "%" : "")
+                  Math.round((dp.value ?? 0) * 10) / 10 + "%"
                 }}</span>
 
                 <!-- No trend is possible on the first datapoint -->
