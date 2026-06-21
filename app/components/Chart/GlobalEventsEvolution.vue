@@ -9,6 +9,7 @@ import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
 import { getClosedPrPercentageEvolutionTotal } from "~~/shared/utils/charts";
 import { identityConfig } from "@unveil/identity";
+import { round } from "~~/shared/utils/numbers";
 
 import("vue-data-ui/style.css");
 
@@ -230,7 +231,7 @@ function getTrend({ series, item, index }: any) {
                 </div>
                 <span :style="{ color: colors.text }">{{ dp.name }}</span>
                 <span :style="{ color: colors.textMuted }">{{
-                  Math.round((dp.value ?? 0) * 10) / 10 + "%"
+                  round(dp.value ?? 0, 1) + "%"
                 }}</span>
 
                 <!-- No trend is possible on the first datapoint -->

@@ -5,6 +5,7 @@ import {
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
 } from "vue-data-ui/vue-ui-xy";
+import { round } from "~~/shared/utils/numbers";
 
 import("vue-data-ui/style.css");
 
@@ -168,7 +169,7 @@ const config = computed<VueUiXyConfig>(() => ({
       color: colors.value.text,
       formatter: ({ value }) => {
         if (!total.value) return "0%";
-        return `${Math.round((value / total.value) * 1000) / 10}%`;
+        return `${round((value / total.value) * 100, 1)}%`;
       },
     },
   },

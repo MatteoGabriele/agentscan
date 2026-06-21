@@ -89,12 +89,12 @@ describe("getClassificationStatsByDate", () => {
       organic: {
         count: 2,
         trend: 0,
-        percentage: 66.66666666666666,
+        percentage: 66.67,
       },
       mixed: {
         count: 1,
         trend: 0,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       automation: {
         count: 0,
@@ -285,12 +285,12 @@ describe("getClassificationForPreviousDays", () => {
       organic: {
         count: 2,
         trend: 33.3,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       mixed: {
         count: 1,
         trend: -66.7,
-        percentage: 16.666666666666664,
+        percentage: 16.67,
       },
       automation: {
         count: 3,
@@ -409,17 +409,17 @@ describe("getClassificationByDateChunks", () => {
       organic: {
         count: 1,
         trend: 100,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       mixed: {
         count: 1,
         trend: 100,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       automation: {
         count: 1,
         trend: 100,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       total: {
         count: 3,
@@ -574,17 +574,17 @@ describe("getClassificationByDateChunks", () => {
       organic: {
         count: 1,
         trend: 100,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       mixed: {
         count: 1,
         trend: 100,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       automation: {
         count: 1,
         trend: 100,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       total: {
         count: 3,
@@ -646,12 +646,12 @@ describe("getWeeklyClassification", () => {
       organic: {
         count: 2,
         trend: 33.3,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       mixed: {
         count: 1,
         trend: -66.7,
-        percentage: 16.666666666666664,
+        percentage: 16.67,
       },
       automation: {
         count: 3,
@@ -677,12 +677,12 @@ describe("getWeeklyClassification", () => {
       organic: {
         count: 2,
         trend: 33.3,
-        percentage: 33.33333333333333,
+        percentage: 33.33,
       },
       mixed: {
         count: 1,
         trend: -66.7,
-        percentage: 16.666666666666664,
+        percentage: 16.67,
       },
       automation: {
         count: 3,

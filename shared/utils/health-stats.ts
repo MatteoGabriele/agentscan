@@ -1,6 +1,7 @@
 // @unocss-include
 import { identityConfig, type IdentityClassification } from "@unveil/identity";
 import type { EcosystemHealthItem } from "../types/ecosystem-health";
+import { round } from "./numbers";
 
 export function classifyByScore(score: number): IdentityClassification {
   if (score >= identityConfig.THRESHOLD_HUMAN) {
@@ -17,8 +18,8 @@ export function formatPercentage(value: number): string {
 }
 
 export function formatTrend(value: number = 0) {
-  if (value > 0) return `+${Math.round(value * 100 * 10) / 10}%`;
-  return `${Math.round(value * 100 * 10) / 10}%`;
+  if (value > 0) return `+${round(value * 100, 1)}%`;
+  return `${round(value * 100, 1)}%`;
 }
 
 export function getHealthStats(

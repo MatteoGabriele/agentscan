@@ -1,4 +1,5 @@
 import { identityConfig, type IdentityClassification } from "@unveil/identity";
+import { round } from "./numbers";
 
 export type ClassificationMetric = {
   count: number;
@@ -84,12 +85,15 @@ export function getClassificationStatsByDate(
       dateCounts.mixed.count +
       dateCounts.organic.count;
 
-    dateCounts.automation.percentage =
-      (dateCounts.automation.count / dateCounts.total.count) * 100;
-    dateCounts.mixed.percentage =
-      (dateCounts.mixed.count / dateCounts.total.count) * 100;
-    dateCounts.organic.percentage =
-      (dateCounts.organic.count / dateCounts.total.count) * 100;
+    dateCounts.automation.percentage = round(
+      (dateCounts.automation.count / dateCounts.total.count) * 100,
+    );
+    dateCounts.mixed.percentage = round(
+      (dateCounts.mixed.count / dateCounts.total.count) * 100,
+    );
+    dateCounts.organic.percentage = round(
+      (dateCounts.organic.count / dateCounts.total.count) * 100,
+    );
   });
 
   return result;
@@ -149,7 +153,7 @@ function getCategoryPercentageComparison({
     percentagePointDifference:
       previousPercentage === null || lastPercentage === null
         ? null
-        : Math.round((lastPercentage - previousPercentage) * 10) / 10,
+        : round(lastPercentage - previousPercentage, 1),
   };
 }
 
@@ -292,7 +296,7 @@ function applyClassificationPercentages(
 
   CLASSIFICATION_CATEGORIES.forEach((category) => {
     counts[category].percentage =
-      total === 0 ? 0 : (counts[category].count / total) * 100;
+      total === 0 ? 0 : round((counts[category].count / total) * 100);
   });
 
   return counts;
@@ -309,11 +313,9 @@ function getClassificationPercentageTrend({
     return currentPercentage === 0 ? 0 : 100;
   }
 
-  return Number(
-    (
-      ((currentPercentage - previousPercentage) / previousPercentage) *
-      100
-    ).toFixed(1),
+  return round(
+    ((currentPercentage - previousPercentage) / previousPercentage) * 100,
+    1,
   );
 }
 
