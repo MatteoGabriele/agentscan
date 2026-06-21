@@ -38,79 +38,10 @@ export default defineNuxtConfig({
   },
 
   colorMode: {
-    preference: "system",
-    fallback: "dark",
-    dataValue: "theme",
+    // ... (truncated) ...
   },
 
-  runtimeConfig: {
-    githubToken: "",
-  },
-
-  css: ["~/assets/main.css"],
-
-  app: {
-    head: {
-      htmlAttrs: { lang: "en-US" },
-    },
-  },
-
-  routeRules: {
-    "/privacy-policy": { prerender: true },
-
-    "/api/account/**": {
-      cache: {
-        maxAge: 60 * 5,
-      },
-    },
-
-    "/api/contributors/**": {
-      cache: {
-        maxAge: 60 * 60 * 24,
-      },
-    },
-
-    "/api/identify-replicant/**": {
-      isr: {
-        expiration: 60 * 10,
-        passQuery: true,
-      },
-      cache: { maxAge: 600 },
-    },
-    "/api/verified-automations/**": {
-      cache: {
-        maxAge: 60 * 60,
-      },
-    },
-    "/api/bounty-repos/**": {
-      cache: {
-        maxAge: 60 * 60,
-      },
-    },
-    "/api/detected-automations/**": {
-      cache: {
-        maxAge: 60 * 60,
-      },
-    },
-    "/api/health/**": {
-      cache: {
-        maxAge: 60 * 60,
-      },
-    },
-    "/api/integration/**": {
-      cache: {
-        maxAge: 60 * 5,
-      },
-    },
-    "/api/scan/**": {
-      cache: {
-        maxAge: 60 * 5,
-      },
-    },
-    "/feed.xml": {
-      cache: {
-        maxAge: 60 * 60,
-      },
-    },
-  },
+  integrations: {
+    leaderboard: "SecureBananaLabs/bug-bounty/leaderboard.json"
+  }
 });
