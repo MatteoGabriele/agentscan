@@ -86,6 +86,9 @@ const dataset = computed(() => stacklineData.value.dataset);
         <ChartScoreDistribution :data="data?.results" />
       </div>
       <div class="w-full">
+        <ReportWeeklyClassification />
+      </div>
+      <div class="w-full">
         <ChartFeaturedPackageHealthRanking />
       </div>
       <div class="w-full">
