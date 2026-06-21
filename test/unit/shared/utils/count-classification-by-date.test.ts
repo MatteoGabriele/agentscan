@@ -2,16 +2,29 @@ import { describe, expect, it } from "vitest";
 import {
   countClassificationByDate,
   getCategoryDeltas,
+  getClassificationByDateChunks,
+  getClassificationForPreviousDays,
 } from "../../../../shared/utils/count-classification-by-date";
 import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from "../../mocks/ecosystemHealthItems";
 import { EcosystemHealthItem } from "../../../../shared/types/ecosystem-health";
 
+function createEcosystemHealthItem(
+  created_at: string,
+  score: number,
+): EcosystemHealthItem {
+  return {
+    created_at,
+    score,
+  } as EcosystemHealthItem;
+}
+
 describe("countClassificationByDate", () => {
   const result = countClassificationByDate(MOCK_ECOSYSTEM_HEALTH_ITEMS);
-  it("returns an object with ISO timestamps as keys", () => {
-    const isoTimestampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+  it("returns an object with date keys", () => {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
     Object.keys(result).forEach((key) => {
-      expect(key).toMatch(isoTimestampRegex);
+      expect(key).toMatch(dateRegex);
     });
   });
 
@@ -215,5 +228,233 @@ describe("getCategoryDeltas", () => {
     expect(result.automation.previousPercentage).toBe(25);
     expect(result.automation.lastPercentage).toBe(25);
     expect(result.automation.percentagePointDifference).toBe(0);
+  });
+});
+
+describe("getClassificationForPreviousDays", () => {
+  it("returns aggregated counts for the requested day span", () => {
+    const result = getClassificationForPreviousDays({
+      date: "2026-06-10T18:30:00.000Z",
+      days: 3,
+      data: [
+        createEcosystemHealthItem("2026-06-08T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-08T11:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-09T10:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-10T10:00:00.000Z", 10),
+        createEcosystemHealthItem("2026-06-10T11:00:00.000Z", 10),
+        createEcosystemHealthItem("2026-06-10T12:00:00.000Z", 10),
+
+        createEcosystemHealthItem("2026-06-05T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-06T10:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-06T11:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-07T10:00:00.000Z", 10),
+
+        createEcosystemHealthItem("2026-06-04T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-11T10:00:00.000Z", 90),
+      ],
+    });
+
+    expect(result).toEqual({
+      organic: {
+        count: 2,
+        trend: 100,
+      },
+      mixed: {
+        count: 1,
+        trend: -50,
+      },
+      automation: {
+        count: 3,
+        trend: 200,
+      },
+    });
+  });
+
+  it("returns empty counts when the day span is invalid", () => {
+    const result = getClassificationForPreviousDays({
+      date: "2026-06-10T18:30:00.000Z",
+      days: 0,
+      data: [createEcosystemHealthItem("2026-06-10T10:00:00.000Z", 90)],
+    });
+
+    expect(result).toEqual({
+      organic: {
+        count: 0,
+        trend: 0,
+      },
+      mixed: {
+        count: 0,
+        trend: 0,
+      },
+      automation: {
+        count: 0,
+        trend: 0,
+      },
+    });
+  });
+
+  it("handles missing previous period values when calculating trends", () => {
+    const result = getClassificationForPreviousDays({
+      date: "2026-06-10T18:30:00.000Z",
+      days: 2,
+      data: [
+        createEcosystemHealthItem("2026-06-09T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-10T10:00:00.000Z", 10),
+      ],
+    });
+
+    expect(result).toEqual({
+      organic: {
+        count: 1,
+        trend: 100,
+      },
+      mixed: {
+        count: 0,
+        trend: 0,
+      },
+      automation: {
+        count: 1,
+        trend: 100,
+      },
+    });
+  });
+});
+
+describe("getClassificationByDateChunks", () => {
+  it("returns classification chunks grouped by the requested day span", () => {
+    const dates = [
+      "2026-06-01T10:00:00.000Z",
+      "2026-06-02T10:00:00.000Z",
+      "2026-06-03T10:00:00.000Z",
+      "2026-06-04T10:00:00.000Z",
+      "2026-06-05T10:00:00.000Z",
+      "2026-06-06T10:00:00.000Z",
+      "2026-06-07T10:00:00.000Z",
+      "2026-06-08T10:00:00.000Z",
+    ];
+
+    const result = getClassificationByDateChunks({
+      dates,
+      days: 3,
+      data: [
+        createEcosystemHealthItem("2026-06-01T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-02T10:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-03T10:00:00.000Z", 10),
+        createEcosystemHealthItem("2026-06-04T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-04T11:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-05T10:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-06T10:00:00.000Z", 10),
+        createEcosystemHealthItem("2026-06-07T10:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-08T10:00:00.000Z", 10),
+      ],
+    });
+
+    expect(result).toHaveLength(3);
+
+    expect(result[0]).toEqual({
+      startDate: "2026-06-01T10:00:00.000Z",
+      endDate: "2026-06-03T10:00:00.000Z",
+      days: 3,
+      classification: {
+        organic: {
+          count: 1,
+          trend: 100,
+        },
+        mixed: {
+          count: 1,
+          trend: 100,
+        },
+        automation: {
+          count: 1,
+          trend: 100,
+        },
+      },
+    });
+
+    expect(result[1]).toEqual({
+      startDate: "2026-06-04T10:00:00.000Z",
+      endDate: "2026-06-06T10:00:00.000Z",
+      days: 3,
+      classification: {
+        organic: {
+          count: 2,
+          trend: 100,
+        },
+        mixed: {
+          count: 1,
+          trend: 0,
+        },
+        automation: {
+          count: 1,
+          trend: 0,
+        },
+      },
+    });
+
+    expect(result[2]).toEqual({
+      startDate: "2026-06-07T10:00:00.000Z",
+      endDate: "2026-06-08T10:00:00.000Z",
+      days: 2,
+      classification: {
+        organic: {
+          count: 0,
+          trend: 0,
+        },
+        mixed: {
+          count: 1,
+          trend: 0,
+        },
+        automation: {
+          count: 1,
+          trend: 0,
+        },
+      },
+    });
+  });
+
+  it("sorts dates before creating chunks", () => {
+    const result = getClassificationByDateChunks({
+      days: 2,
+      dates: [
+        "2026-06-04T10:00:00.000Z",
+        "2026-06-01T10:00:00.000Z",
+        "2026-06-03T10:00:00.000Z",
+        "2026-06-02T10:00:00.000Z",
+      ],
+      data: [
+        createEcosystemHealthItem("2026-06-01T10:00:00.000Z", 90),
+        createEcosystemHealthItem("2026-06-02T10:00:00.000Z", 50),
+        createEcosystemHealthItem("2026-06-03T10:00:00.000Z", 10),
+        createEcosystemHealthItem("2026-06-04T10:00:00.000Z", 90),
+      ],
+    });
+
+    expect(result.map((chunk) => chunk.startDate)).toEqual([
+      "2026-06-01T10:00:00.000Z",
+      "2026-06-03T10:00:00.000Z",
+    ]);
+
+    expect(result.map((chunk) => chunk.endDate)).toEqual([
+      "2026-06-02T10:00:00.000Z",
+      "2026-06-04T10:00:00.000Z",
+    ]);
+  });
+
+  it("returns an empty array when dates are empty", () => {
+    const result = getClassificationByDateChunks({
+      dates: [],
+      days: 7,
+      data: [createEcosystemHealthItem("2026-06-01T10:00:00.000Z", 90)],
+    });
+    expect(result).toEqual([]);
+  });
+
+  it("returns an empty array when the day span is invalid", () => {
+    const result = getClassificationByDateChunks({
+      dates: ["2026-06-01T10:00:00.000Z"],
+      days: 0,
+      data: [createEcosystemHealthItem("2026-06-01T10:00:00.000Z", 90)],
+    });
+    expect(result).toEqual([]);
   });
 });
