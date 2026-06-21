@@ -201,14 +201,12 @@ function nameOf(repo: string) {
             :key="owner"
             class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-orange-400/30 bg-orange-400/5"
           >
-            <a
-              :href="`https://github.com/${owner}`"
-              target="_blank"
-              rel="noopener noreferrer"
+            <NuxtLink
+              :to="`/user/${owner}`"
               class="text-orange-300 hover:text-orange-200 transition-colors font-medium"
             >
               {{ owner }}
-            </a>
+            </NuxtLink>
             <span class="text-gh-border">·</span>
             <span class="text-gh-muted/70">{{ names.join(", ") }}</span>
           </div>
