@@ -6,6 +6,8 @@ import {
   type VueUiXyDatasetItem,
 } from "vue-data-ui/vue-ui-xy";
 
+import("vue-data-ui/style.css");
+
 const props = defineProps<{
   data: EcosystemHealthItem[] | undefined;
 }>();
