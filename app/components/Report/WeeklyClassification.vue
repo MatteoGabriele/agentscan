@@ -52,12 +52,14 @@ function formatDateRange({
   const startLabel = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
+    timeZone: "UTC",
   }).format(start);
 
   const endLabel = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   }).format(end);
 
   return `${startLabel} - ${endLabel}`;
