@@ -25,7 +25,7 @@ const classification = computed(() => {
     data: results.value,
     dates: dates.value,
     days: 7,
-    rolling: false, // true = roling weeks; false = monday-sunday weeks (incomplete weeks won't show)
+    rolling: false, // true = rolling weeks; false = monday-sunday weeks (incomplete weeks won't show)
   }).toReversed();
 });
 
