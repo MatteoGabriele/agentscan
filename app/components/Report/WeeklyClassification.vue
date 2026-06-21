@@ -25,6 +25,7 @@ const classification = computed(() => {
     data: results.value,
     dates: dates.value,
     days: 7,
+    rolling: false, // true = roling weeks; false = monday-sunday weeks (incomplete weeks won't show)
   }).toReversed();
 });
 
@@ -120,6 +121,7 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
         },
       },
       tooltip: { show: false },
+      zoom: { show: false },
     },
   },
 }));
@@ -128,6 +130,9 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
 <template>
   <div class="mb-5">
     <h2 class="text-center">Weekly classification breakdown</h2>
+    <p class="text-sm text-gh-muted text-center">
+      A new weekly data point is added after each Sunday scan
+    </p>
   </div>
   <div class="flex flex-col gap-4 weekly-classification">
     <ClientOnly>

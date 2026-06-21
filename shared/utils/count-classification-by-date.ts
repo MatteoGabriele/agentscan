@@ -181,6 +181,62 @@ function getPreviousDays({
   );
 }
 
+function getNextDays({
+  date,
+  length,
+}: {
+  date: string;
+  length: number;
+}): Set<string> {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const startDate = new Date(`${getDateKey(date)}T00:00:00.000Z`);
+  return new Set(
+    Array.from({ length }, (_, dayOffset) => {
+      const currentDate = new Date(
+        startDate.getTime() + dayOffset * millisecondsPerDay,
+      );
+      return getDateKey(currentDate.toISOString());
+    }),
+  );
+}
+
+function getMondayDateKey(date: string): string {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const currentDate = new Date(`${getDateKey(date)}T00:00:00.000Z`);
+  const dayOfWeek = currentDate.getUTCDay();
+  const daysSinceMonday = (dayOfWeek + 6) % 7;
+  const monday = new Date(
+    currentDate.getTime() - daysSinceMonday * millisecondsPerDay,
+  );
+
+  return getDateKey(monday.toISOString());
+}
+
+function getPreviousMondayDateKey(date: string): string {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const monday = new Date(`${getMondayDateKey(date)}T00:00:00.000Z`);
+  return getDateKey(
+    new Date(monday.getTime() - 7 * millisecondsPerDay).toISOString(),
+  );
+}
+
+function applyClassificationCountTrends({
+  currentCounts,
+  previousCounts,
+}: {
+  currentCounts: ClassificationCounts;
+  previousCounts: ClassificationCounts;
+}): ClassificationCounts {
+  CLASSIFICATION_CATEGORIES.forEach((category) => {
+    currentCounts[category].trend = getClassificationCountTrend({
+      currentCount: currentCounts[category].count,
+      previousCount: previousCounts[category].count,
+    });
+  });
+
+  return currentCounts;
+}
+
 function sumClassificationCountsByDates({
   countsByDate,
   dates,
@@ -257,24 +313,50 @@ export function getClassificationForPreviousDays({
     dates: previousDays,
   });
 
-  CLASSIFICATION_CATEGORIES.forEach((category) => {
-    currentCounts[category].trend = getClassificationCountTrend({
-      currentCount: currentCounts[category].count,
-      previousCount: previousCounts[category].count,
-    });
+  return applyClassificationCountTrends({
+    currentCounts,
+    previousCounts,
   });
-
-  return currentCounts;
 }
 
 export function getWeeklyClassification(
   data: EcosystemHealthItem[] = [],
   date: string,
+  rolling = true,
 ): ClassificationCounts {
-  return getClassificationForPreviousDays({
-    data,
-    date,
-    days: 7,
+  if (rolling) {
+    return getClassificationForPreviousDays({
+      data,
+      date,
+      days: 7,
+    });
+  }
+
+  const countsByDate = countClassificationByDate(data);
+
+  const currentWeekDays = getNextDays({
+    date: getMondayDateKey(date),
+    length: 7,
+  });
+
+  const previousWeekDays = getNextDays({
+    date: getPreviousMondayDateKey(date),
+    length: 7,
+  });
+
+  const currentCounts = sumClassificationCountsByDates({
+    countsByDate,
+    dates: currentWeekDays,
+  });
+
+  const previousCounts = sumClassificationCountsByDates({
+    countsByDate,
+    dates: previousWeekDays,
+  });
+
+  return applyClassificationCountTrends({
+    currentCounts,
+    previousCounts,
   });
 }
 
@@ -285,17 +367,74 @@ type ClassificationChunk = {
   classification: ClassificationCounts;
 };
 
+function getSundayDateKey(date: string): string {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const monday = new Date(`${getMondayDateKey(date)}T00:00:00.000Z`);
+
+  return getDateKey(
+    new Date(monday.getTime() + 6 * millisecondsPerDay).toISOString(),
+  );
+}
+
+function getCalendarWeekStartDates(dates: string[]): string[] {
+  return [...new Set(dates.map((date) => getMondayDateKey(date)))].sort();
+}
+
+function getClassificationByCalendarWeekChunks({
+  data = [],
+  dates = [],
+}: {
+  data?: EcosystemHealthItem[];
+  dates?: string[];
+}): ClassificationChunk[] {
+  const availableDateKeys = new Set(dates.map((date) => getDateKey(date)));
+
+  return getCalendarWeekStartDates(dates)
+    .map((startDate) => {
+      const weekDays = getNextDays({
+        date: startDate,
+        length: 7,
+      });
+
+      const endDate = getSundayDateKey(startDate);
+      const isCompleteWeek = [...weekDays].every((date) => {
+        return availableDateKeys.has(date);
+      });
+
+      if (!isCompleteWeek) {
+        return null;
+      }
+
+      return {
+        startDate,
+        endDate,
+        days: 7,
+        classification: getWeeklyClassification(data, endDate, false),
+      };
+    })
+    .filter((chunk): chunk is ClassificationChunk => Boolean(chunk));
+}
+
 export function getClassificationByDateChunks({
   data = [],
   dates = [],
   days = 7,
+  rolling = true,
 }: {
   data?: EcosystemHealthItem[];
   dates?: string[];
   days?: number;
+  rolling?: boolean;
 }): ClassificationChunk[] {
   if (!Number.isInteger(days) || days < 1) {
     return [];
+  }
+
+  if (!rolling && days === 7) {
+    return getClassificationByCalendarWeekChunks({
+      data,
+      dates,
+    });
   }
 
   const sortedDates = [...dates].sort();
