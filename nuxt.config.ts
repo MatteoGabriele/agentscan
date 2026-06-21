@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
@@ -41,6 +43,10 @@ export default defineNuxtConfig({
     preference: "system",
     fallback: "dark",
     dataValue: "theme",
+  },
+
+  nitro: {
+    serverAssets: [{ baseName: "data", dir: resolve("data") }],
   },
 
   runtimeConfig: {
