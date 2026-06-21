@@ -11,11 +11,11 @@ describe("formatTrend", () => {
     expect(formatTrend(-1)).toEqual("-100%");
     expect(formatTrend(-0.5)).toEqual("-50%");
     expect(formatTrend(-0.33)).toEqual("-33%");
-    expect(formatTrend(-0.339)).toEqual("-34%");
-    expect(formatTrend(-0.333)).toEqual("-33%");
+    expect(formatTrend(-0.339)).toEqual("-33.9%");
+    expect(formatTrend(-0.333)).toEqual("-33.3%");
     expect(formatTrend(0)).toEqual("0%");
-    expect(formatTrend(0.333)).toEqual("+33%");
-    expect(formatTrend(0.339)).toEqual("+34%");
+    expect(formatTrend(0.333)).toEqual("+33.3%");
+    expect(formatTrend(0.339)).toEqual("+33.9%");
     expect(formatTrend(0.33)).toEqual("+33%");
     expect(formatTrend(0.5)).toEqual("+50%");
     expect(formatTrend(1)).toEqual("+100%");

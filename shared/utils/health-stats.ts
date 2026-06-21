@@ -17,8 +17,8 @@ export function formatPercentage(value: number): string {
 }
 
 export function formatTrend(value: number = 0) {
-  if (value > 0) return `+${(value * 100).toFixed(1)}%`;
-  return `${(value * 100).toFixed(1)}%`;
+  if (value > 0) return `+${Math.round(value * 100 * 10) / 10}%`;
+  return `${Math.round(value * 100 * 10) / 10}%`;
 }
 
 export function getHealthStats(
