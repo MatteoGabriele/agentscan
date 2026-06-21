@@ -57,8 +57,11 @@ function loadScanResults(): ScanResult[] {
   const filePath = join(process.cwd(), "data", "scan-results.txt");
   try {
     return unpack(readFileSync(filePath, "utf-8")) as ScanResult[];
-  } catch {
-    return [];
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+    throw err;
   }
 }
 

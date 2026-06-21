@@ -73,6 +73,7 @@ export function unpack(content: string): EcosystemHealthItem[] {
     const line = lines[i];
     if (!line?.trim()) continue;
 
+    const fields = line.split(",");
     const [
       createdTs,
       score,
@@ -82,19 +83,33 @@ export function unpack(content: string): EcosystemHealthItem[] {
       publicRepos,
       events,
       repoIdx,
-    ] = line.split(",");
+    ] = fields;
 
-    if (!createdTs) continue;
+    if (fields.length < 8) continue;
+
+    const numCreatedTs = Number(createdTs);
+    const numUserCreatedTs = Number(userCreatedTs);
+    const numPublicRepos = Number(publicRepos);
+    const numEvents = Number(events);
+    const numRepoIdx = Number(repoIdx);
+
+    if (
+      !Number.isFinite(numCreatedTs) ||
+      !Number.isFinite(numUserCreatedTs) ||
+      !Number.isFinite(numPublicRepos) ||
+      !Number.isFinite(numEvents) ||
+      !Number.isFinite(numRepoIdx)
+    ) continue;
 
     results.push({
-      created_at: fromUnixSecs(Number(createdTs)),
+      created_at: fromUnixSecs(numCreatedTs),
       score: Number(score),
       pr_key: base64UrlToHex(prKeyB64!),
       pr_status: STATUS_DECODE[status!] ?? status!,
-      user_created_at: fromUnixSecs(Number(userCreatedTs)),
-      user_public_repos_count: Number(publicRepos),
-      events_count: Number(events),
-      repo_name: repos[Number(repoIdx)] ?? "",
+      user_created_at: fromUnixSecs(numUserCreatedTs),
+      user_public_repos_count: numPublicRepos,
+      events_count: numEvents,
+      repo_name: repos[numRepoIdx] ?? "",
     });
   }
 
