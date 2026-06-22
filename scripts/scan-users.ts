@@ -6,6 +6,10 @@ import { join } from "path";
 import { Octokit } from "octokit";
 import { IdentifyResult } from "@unveil/identity";
 import { hashPrId } from "./pr-hash";
+import {
+  pack,
+  unpack,
+} from "../shared/utils/compactor";
 
 // Configuration
 const API_TIMEOUT = 30000; // 30 seconds timeout for API calls
@@ -50,11 +54,14 @@ function loadVerifiedAutomations(): Set<number> {
  * Load existing scan results
  */
 function loadScanResults(): ScanResult[] {
-  const filePath = join(process.cwd(), "data", "scan-results.json");
+  const filePath = join(process.cwd(), "data", "scan-results.txt");
   try {
-    return JSON.parse(readFileSync(filePath, "utf-8"));
-  } catch {
-    return [];
+    return unpack(readFileSync(filePath, "utf-8")) as ScanResult[];
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+    throw err;
   }
 }
 
@@ -65,8 +72,8 @@ function saveScanResults(results: ScanResult[], dryRun: boolean = false): void {
   if (dryRun) {
     return;
   }
-  const filePath = join(process.cwd(), "data", "scan-results.json");
-  writeFileSync(filePath, JSON.stringify(results, null, 2));
+  const filePath = join(process.cwd(), "data", "scan-results.txt");
+  writeFileSync(filePath, pack(results));
 }
 
 type ScanUserResponse = {

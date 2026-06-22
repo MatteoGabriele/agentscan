@@ -46,7 +46,7 @@ jobs:
           if git diff --quiet; then
             echo "No changes detected"
           else
-            git add data/scan-results.json
+            git add data/scan-results.txt
             git commit -m "chore: daily user scan - $(date -u +'%Y-%m-%d')"
             git fetch origin main
             git merge --no-edit origin/main

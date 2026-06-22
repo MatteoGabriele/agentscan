@@ -10,9 +10,12 @@ import {
   getClassificationStatsByDate,
   getCategoryDeltas,
 } from "../shared/utils/count-classification-by-date";
+import { unpack } from "../shared/utils/compactor";
 
 async function main() {
-  const results = JSON.parse(readFileSync("data/scan-results.json", "utf-8"));
+  const results = unpack(
+    readFileSync("data/scan-results.txt", "utf-8"),
+  );
 
   if (!results?.length) {
     console.log("No data returned from API");
