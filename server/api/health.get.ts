@@ -45,11 +45,16 @@ export default defineEventHandler(async () => {
       organic: calcLinearProgression(organicPercentages),
     };
 
+    const scanTimes = dates.map(
+      (date) => countsByDate[date]?.createdAt ?? `${date}T00:00:00.000Z`,
+    );
+
     return {
       results,
       categoryProgression,
       countsByDate,
       dates,
+      scanTimes,
     };
   } catch (error) {
     console.error("Ecosystem health fetch error:", error);
