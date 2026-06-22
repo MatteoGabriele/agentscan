@@ -75,7 +75,8 @@ export function getClassificationStatsByDate(
       return;
     }
 
-    if (!dateCounts.createdAt) {
+    // pick earliest date
+    if (!dateCounts.createdAt || item.created_at < dateCounts.createdAt) {
       dateCounts.createdAt = item.created_at;
     }
 
