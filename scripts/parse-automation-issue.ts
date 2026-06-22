@@ -5,7 +5,6 @@
  *        npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] (legacy mode)
  */
 
-import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { parseIssue } from "@github/issue-parser";
