@@ -11,8 +11,7 @@ import { getClosedPrPercentageEvolutionTotal } from "~~/shared/utils/charts";
 import { identityConfig } from "@unveil/identity";
 import { round } from "~~/shared/utils/numbers";
 
-import("vue-data-ui/style.css");
-
+import "vue-data-ui/style.css";
 const { data: ecosystemHealth } = await useEcosystemHealth();
 const data = computed(() => ecosystemHealth.value?.results ?? []);
 const dates = computed(() => ecosystemHealth.value?.dates);
@@ -21,10 +20,14 @@ const countsByDate = computed(() => ecosystemHealth.value?.countsByDate);
 const chartContainer = useTemplateRef<HTMLElement>("chartContainer");
 const { width, height } = useElementSize(chartContainer);
 
+const hasStableChartDimensions = computed(
+  () => width.value > 0 && height.value > 0,
+);
+
 const rootEl = shallowRef<HTMLElement | null>(null);
 const chartRef = useTemplateRef("chartRef");
 
-onMounted(async () => {
+onMounted(() => {
   rootEl.value = document.documentElement;
 });
 
@@ -94,15 +97,16 @@ function composeRawDataset(): VueUiXyDatasetItem[] {
 const rawDataset = computed(() => composeRawDataset());
 
 const max = computed(() => {
-  const values = rawDataset.value.flatMap((d) =>
-    (d.series as Array<number | null>).map((point) => point ?? 0),
+  const values = rawDataset.value.flatMap((datasetItem) =>
+    (datasetItem.series as Array<number | null>).map((point) => point ?? 0),
   );
+
   return values.length > 0 ? Math.max(...values) : 0;
 });
 
 const dataset = computed<VueUiXyDatasetItem[]>(() => [
-  ...rawDataset.value.map((d) => ({
-    ...d,
+  ...rawDataset.value.map((datasetItem) => ({
+    ...datasetItem,
     scaleMax: max.value,
   })),
   automatedClosureRateData.value,
@@ -110,12 +114,17 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
 
 const tooltipPosition = useChartTooltipPosition(chartRef);
 
-const progressionLabelOffsetX = 6; // compensate hard-coded internal in VueUiXy
+const progressionLabelOffsetX = 6;
 
 const viewBoxPadding = computed(() => {
   const maxSeries = dates.value?.length ?? 0;
-  if (maxSeries <= 1) return { left: 0, right: 0 };
+
+  if (maxSeries <= 1 || width.value <= 0) {
+    return { left: 0, right: 0 };
+  }
+
   const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1));
+
   return {
     left: -halfVueUiXyDatapointStep,
     right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
@@ -140,8 +149,8 @@ const config = computed<VueUiXyConfig>(() => ({
     userOptions: { show: false },
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
-    width: width.value,
-    height: height.value,
+    width: Math.round(width.value),
+    height: Math.round(height.value),
     padding: {
       left: viewBoxPadding.value.left,
       right: viewBoxPadding.value.right,
@@ -194,6 +203,7 @@ const config = computed<VueUiXyConfig>(() => ({
 
 function getTrend({ series, item, index }: any) {
   const trend = series?.[item.slotAbsoluteIndex]?.trends?.[index];
+
   return {
     formattedValue: formatTrend(trend),
     color: getTrendColor({ value: trend, reversed: item.name !== "Organic" }),
@@ -201,83 +211,105 @@ function getTrend({ series, item, index }: any) {
   };
 }
 </script>
-
 <template>
   <div class="relative h-full w-full flex flex-col">
     <div class="flex-1 h-full no-chart-transition" ref="chartContainer">
       <ClientOnly>
-        <VueUiXy ref="chartRef" :dataset :config>
-          <template #area-gradient="{ series, id }">
-            <linearGradient :id x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
-              <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-            </linearGradient>
-          </template>
+        <Transition name="chart-fade" appear>
+          <VueUiXy
+            v-if="hasStableChartDimensions"
+            ref="chartRef"
+            :dataset
+            :config
+          >
+            <template #area-gradient="{ series, id }">
+              <linearGradient :id x1="0" x2="0" y1="0" y2="1">
+                <stop
+                  offset="0%"
+                  :stop-color="series.color"
+                  stop-opacity="0.3"
+                />
+                <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+              </linearGradient>
+            </template>
 
-          <template #tooltip="{ datapoint, timeLabel, series }">
-            <div class="flex flex-col">
-              <div :style="{ color: colors.textMuted }" class="mb-1">
-                {{ timeLabel.text }}
-              </div>
-              <div
-                class="flex flex-row gap-2 place-items-center"
-                v-for="dp in datapoint"
-                :key="`${dp.name}-${dp.absoluteIndex}`"
-              >
-                <div class="h-2 w-2">
-                  <svg viewBox="0 0 2 2" class="w-full h-full">
-                    <circle cx="1" cy="1" r="1" :fill="dp.color" />
-                  </svg>
+            <template #tooltip="{ datapoint, timeLabel, series }">
+              <div class="flex flex-col">
+                <div :style="{ color: colors.textMuted }" class="mb-1">
+                  {{ timeLabel.text }}
                 </div>
-                <span :style="{ color: colors.text }">{{ dp.name }}</span>
-                <span :style="{ color: colors.textMuted }">{{
-                  round(dp.value ?? 0, 1) + "%"
-                }}</span>
+                <div
+                  class="flex flex-row gap-2 place-items-center"
+                  v-for="dp in datapoint"
+                  :key="`${dp.name}-${dp.absoluteIndex}`"
+                >
+                  <div class="h-2 w-2">
+                    <svg viewBox="0 0 2 2" class="w-full h-full">
+                      <circle cx="1" cy="1" r="1" :fill="dp.color" />
+                    </svg>
+                  </div>
+                  <span :style="{ color: colors.text }">{{ dp.name }}</span>
+                  <span :style="{ color: colors.textMuted }">
+                    {{ round(dp.value ?? 0, 1) + "%" }}
+                  </span>
 
-                <!-- No trend is possible on the first datapoint -->
-                <template v-if="timeLabel.absoluteIndex > 0">
-                  <span
-                    :class="[
-                      getTrend({
-                        series,
-                        item: dp,
-                        index: timeLabel.absoluteIndex,
-                      }).color,
-                    ]"
-                    v-if="dp.slotAbsoluteIndex < series.length - 1"
-                  >
+                  <!-- No trend is possible on the first datapoint -->
+                  <template v-if="timeLabel.absoluteIndex > 0">
                     <span
+                      v-if="dp.slotAbsoluteIndex < series.length - 1"
                       :class="[
                         getTrend({
                           series,
                           item: dp,
                           index: timeLabel.absoluteIndex,
-                        }).arrow,
+                        }).color,
                       ]"
-                      class="shrink-0"
-                      style="vertical-align: middle"
-                    />
-                    {{
-                      getTrend({
-                        series,
-                        item: dp,
-                        index: timeLabel.absoluteIndex,
-                      }).formattedValue
-                    }}</span
-                  >
-                </template>
+                    >
+                      <span
+                        :class="[
+                          getTrend({
+                            series,
+                            item: dp,
+                            index: timeLabel.absoluteIndex,
+                          }).arrow,
+                        ]"
+                        class="shrink-0"
+                        style="vertical-align: middle"
+                      />
+                      {{
+                        getTrend({
+                          series,
+                          item: dp,
+                          index: timeLabel.absoluteIndex,
+                        }).formattedValue
+                      }}
+                    </span>
+                  </template>
+                </div>
               </div>
-            </div>
-          </template>
-        </VueUiXy>
+            </template>
+          </VueUiXy>
+        </Transition>
       </ClientOnly>
     </div>
   </div>
 </template>
 
 <style>
+.chart-fade-enter-active {
+  transition: opacity 300ms ease;
+}
+
+.chart-fade-enter-from {
+  opacity: 0;
+}
+
+.chart-fade-enter-to {
+  opacity: 1;
+}
+
 .no-chart-transition path,
-circle {
+.no-chart-transition circle {
   transition: none !important;
   animation: none !important;
 }
