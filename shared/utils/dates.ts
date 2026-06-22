@@ -18,6 +18,8 @@ export function formatDateRange({
   const start = new Date(startDate);
   const end = new Date(endDate);
 
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return "";
+
   const startLabel = new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "short",
