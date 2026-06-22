@@ -106,6 +106,9 @@ const dataset = computed<VueUiHorizontalBarDatasetItem[]>(() => {
 });
 </script>
 <template>
+  <div class="mb-5">
+    <h2 class="text-center">Score breakdown per featured repository</h2>
+  </div>
   <div class="flex flex-col w-full">
     <!-- FIXME: that crappy date selector would need some love -->
     <CommonDateSelector :source="healthData" @select-date="setSelectedDate" />

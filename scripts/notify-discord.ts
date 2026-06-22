@@ -7,7 +7,7 @@ import {
 } from "../shared/utils/charts";
 import { calcLinearProgression } from "../shared/utils/calc-linear-progression";
 import {
-  countClassificationByDate,
+  getClassificationStatsByDate,
   getCategoryDeltas,
 } from "../shared/utils/count-classification-by-date";
 
@@ -29,15 +29,15 @@ async function main() {
   const mixed: number[] = [];
   const organic: number[] = [];
 
-  const countsByDate = countClassificationByDate(results);
+  const countsByDate = getClassificationStatsByDate(results);
   const dates = Object.keys(countsByDate).sort();
 
   dates.forEach((date) => {
     const counts = countsByDate[date];
     if (!counts) return;
-    automation.push(counts.automation.count);
-    mixed.push(counts.mixed.count);
-    organic.push(counts.organic.count);
+    automation.push(counts.automation.percentage);
+    mixed.push(counts.mixed.percentage);
+    organic.push(counts.organic.percentage);
   });
 
   const categoryProgression = {

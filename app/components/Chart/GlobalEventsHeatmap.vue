@@ -9,6 +9,7 @@ import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import { mergeConfigs } from "vue-data-ui/utils";
+import { round } from "~~/shared/utils/numbers";
 import("vue-data-ui/style.css");
 
 dayjs.extend(isoWeek);
@@ -220,7 +221,7 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 
             <span>{{ heatmap.name }}</span>
             <span :style="{ color: colors.textMuted }">{{
-              datapoint.value
+              round(datapoint.value ?? 0, 1) + "%"
             }}</span>
           </div>
         </template>
