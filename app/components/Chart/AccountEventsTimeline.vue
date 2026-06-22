@@ -589,4 +589,10 @@ I figure out why it is not so in this project, as I don't replicate in vue-data-
 :deep(.vdui-shape-circle) {
   transition: 300ms all ease-in-out !important;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  :deep(.vdui-shape-circle) {
+    transition: none !important;
+  }
+}
 </style>
