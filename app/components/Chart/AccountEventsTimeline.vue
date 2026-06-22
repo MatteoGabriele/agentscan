@@ -583,4 +583,10 @@ function getZapIconPath({ x, y }: { x: number; y: number }) {
   stroke-width: 4;
   paint-order: stroke;
 }
+
+/** For some reason when filtering the legend, datapoint circles are not transitioned, this is until
+I figure out why it is not so in this project, as I don't replicate in vue-data-ui playgrounds */
+:deep(.vdui-shape-circle) {
+  transition: 300ms all ease-in-out !important;
+}
 </style>
