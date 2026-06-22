@@ -98,4 +98,21 @@ describe("formatDateRange", () => {
       }),
     ).toBe("");
   });
+
+  it("returns an empty string when the start date is invalid", () => {
+    expect(
+      formatDateRange({
+        startDate: "invalid-date",
+        endDate: "2026-05-29",
+      }),
+    ).toBe("");
+  });
+  +it("returns an empty string when the end date is invalid", () => {
+    expect(
+      formatDateRange({
+        startDate: "2026-05-26",
+        endDate: "2026-13-45",
+      }),
+    ).toBe("");
+  });
 });
