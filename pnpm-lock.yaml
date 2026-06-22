@@ -18,8 +18,8 @@ importers:
         specifier: ^66.6.0
         version: 66.6.7
       '@unveil/identity':
-        specifier: ^1.8.0
-        version: 1.8.0
+        specifier: ^1.10.0
+        version: 1.10.0
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.35)
@@ -1831,8 +1831,8 @@ packages:
     peerDependencies:
       webpack: ^4 || ^5
 
-  '@unveil/identity@1.8.0':
-    resolution: {integrity: sha512-fP9Kyq17kFQkR7KiaMrS9UtzE6iLOZUKrb3nKGmsBG0HjQO1LpGJAv3s3R1071D0MWsAu1TWpV9bPz3Ii4jgPQ==}
+  '@unveil/identity@1.10.0':
+    resolution: {integrity: sha512-g6wEQG2va24z2m4U6kv2avXX47lY9iJiF3iW9QmZQXiRFKXCYGBg/rrMNaL8RXWt4DmlWXhvdCFRxdN6FPBbqA==}
 
   '@vercel/nft@1.10.2':
     resolution: {integrity: sha512-w+WyX5Ulmj4dtTZrxaulqrjaLZHSbnPzx75SJsTNYmotKsqn1JlLnDJa+lz5hn90HJofhl/2MAtw0mCrgM3qYw==}
@@ -6094,7 +6094,7 @@ snapshots:
       webpack: 5.105.4
       webpack-sources: 3.3.4
 
-  '@unveil/identity@1.8.0': {}
+  '@unveil/identity@1.10.0': {}
 
   '@vercel/nft@1.10.2(rollup@4.60.4)':
     dependencies:

@@ -134,7 +134,25 @@ const score = computed<number | undefined>(() => {
   return data.value?.analysis.score;
 });
 
+const isBountyHunter = computed<boolean>(() => {
+  return !!data.value?.analysis.isBountyHunter;
+});
+
 const { nearestClassification } = useNearestClassification(score);
+
+const warnings = computed<string[]>(() => {
+  const list: string[] = [];
+
+  if (nearestClassification.value) {
+    list.push(`Activity close to ${nearestClassification.value} signals.`);
+  }
+
+  if (isBountyHunter.value) {
+    list.push("Possible bounty activity.");
+  }
+
+  return list;
+});
 
 useSeoAnalysis(identifyAnalysis, {
   hasCommunityFlag,
@@ -155,14 +173,21 @@ useSeoAnalysis(identifyAnalysis, {
           <div class="w-full">
             <div class="mb-2 flex flex-col">
               <div
-                v-if="nearestClassification"
-                class="flex items-center gap-2 text-sm text-gh-muted mb-2"
+                v-if="warnings.length"
+                class="flex items-start gap-2 text-sm text-gh-muted mb-2"
               >
-                <span class="i-lucide:megaphone text-xs"></span>
-                <span class="text-pretty line-height-none">
-                  Activity close to {{ nearestClassification }} signals.
-                </span>
+                <span class="i-lucide:megaphone text-xs shrink-0"></span>
+                <ul class="flex flex-col gap-1">
+                  <li
+                    v-for="(warning, i) in warnings"
+                    :key="i"
+                    class="text-pretty line-height-none"
+                  >
+                    {{ warning }}
+                  </li>
+                </ul>
               </div>
+
               <span class="flex gap-2 items-center" :class="scoreStyle.text">
                 <span :class="classificationIcon" class="text-base" />
                 <h3 class="text-xl font-mono">

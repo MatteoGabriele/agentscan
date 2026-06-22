@@ -72,7 +72,8 @@ available at [http://contributor-covenant.org/version/1/4][version]
 
 ## AI Usage
 
-We aim to keep this an AI-free zone. We will close pull requests that appear to be predominantly AI-generated without meaningful human decision-making and oversight. We apologize in advance if this affects contributions made with good intentions, but these are challenging times, and we're making deliberate choices about how we want this project to evolve.
+This is an AI-free zone. If AgentScan's analysis fails, we will close your PR or issue.
+We apologize in advance if this affects contributions made with good intentions, but these are challenging times, and we're making deliberate choices about how we want this project to evolve.
 
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/
