@@ -21,21 +21,22 @@ function createChartDataset(): {
       {
         name: "Organic",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.organic.count ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.organic.percentage ?? 0,
         ),
         color: colors.value.greenLine,
       },
       {
         name: "Mixed",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.mixed.count ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.mixed.percentage ?? 0,
         ),
         color: colors.value.amber,
       },
       {
         name: "Automation",
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.automation.count ?? 0,
+          (date) =>
+            data.value?.countsByDate?.[date]?.automation.percentage ?? 0,
         ),
         color: colors.value.dangerHover,
       },
@@ -81,6 +82,12 @@ const dataset = computed(() => stacklineData.value.dataset);
     >
       <div>
         <ChartHealthResponseSparklines />
+      </div>
+      <div class="w-full">
+        <ChartScoreDistribution :data="data?.results" />
+      </div>
+      <div class="w-full">
+        <ReportWeeklyClassification />
       </div>
       <div class="w-full">
         <ChartFeaturedPackageHealthRanking />

@@ -2,7 +2,9 @@ import type {
   EcosystemHealthItem,
   EcosystemHealthCategoryProgression,
 } from "~~/shared/types/ecosystem-health";
+
 import { unpack } from "~~/shared/utils/compactor";
+import { getClassificationStatsByDate } from "~~/shared/utils/count-classification-by-date";
 
 export default defineEventHandler(async () => {
   try {
@@ -15,30 +17,32 @@ export default defineEventHandler(async () => {
     const content = Buffer.isBuffer(raw) ? raw.toString("utf-8") : String(raw);
     const results: EcosystemHealthItem[] = unpack(content);
 
-    const automation: number[] = [];
-    const mixed: number[] = [];
-    const organic: number[] = [];
+    const automationPercentages: number[] = [];
+    const mixedPercentages: number[] = [];
+    const organicPercentages: number[] = [];
 
-    const countsByDate = countClassificationByDate(results);
+    const countsByDate = getClassificationStatsByDate(results);
     const dates = Object.keys(countsByDate).sort();
 
     dates.forEach((date) => {
       const counts = countsByDate[date];
       if (!counts) return;
 
-      automation.push(counts.automation.count);
-      mixed.push(counts.mixed.count);
-      organic.push(counts.organic.count);
+      automationPercentages.push(counts.automation.percentage);
+      mixedPercentages.push(counts.mixed.percentage);
+      organicPercentages.push(counts.organic.percentage);
 
-      counts.automation.trend = calcLinearProgression(automation).trend;
-      counts.mixed.trend = calcLinearProgression(mixed).trend;
-      counts.organic.trend = calcLinearProgression(organic).trend;
+      counts.automation.trend = calcLinearProgression(
+        automationPercentages,
+      ).trend;
+      counts.mixed.trend = calcLinearProgression(mixedPercentages).trend;
+      counts.organic.trend = calcLinearProgression(organicPercentages).trend;
     });
 
     const categoryProgression: EcosystemHealthCategoryProgression = {
-      automation: calcLinearProgression(automation),
-      mixed: calcLinearProgression(mixed),
-      organic: calcLinearProgression(organic),
+      automation: calcLinearProgression(automationPercentages),
+      mixed: calcLinearProgression(mixedPercentages),
+      organic: calcLinearProgression(organicPercentages),
     };
 
     return {
