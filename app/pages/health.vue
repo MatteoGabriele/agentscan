@@ -56,7 +56,9 @@ useHead({
         </div>
       </div>
 
-      <div class="max-h-[300px] sm:max-h-[500px] w-full h-full">
+      <div
+        class="w-full min-h-0 shrink overflow-hidden basis-[300px] max-h-[300px] sm:basis-[500px] sm:max-h-[500px]"
+      >
         <ChartGlobalEventsEvolution />
       </div>
 
