@@ -12,6 +12,7 @@ export type ClassificationStats = {
   mixed: ClassificationMetric;
   organic: ClassificationMetric;
   total: ClassificationMetric;
+  createdAt: string | null;
 };
 
 type getClassificationStatsByDateResults = Record<string, ClassificationStats>;
@@ -50,6 +51,7 @@ function createEmptyClassificationStats(): ClassificationStats {
     mixed: { count: 0, trend: 0, percentage: 0 },
     organic: { count: 0, trend: 0, percentage: 0 },
     total: { count: 0, trend: 0, percentage: 100 },
+    createdAt: null,
   };
 }
 
@@ -71,6 +73,10 @@ export function getClassificationStatsByDate(
 
     if (!dateCounts) {
       return;
+    }
+
+    if (!dateCounts.createdAt) {
+      dateCounts.createdAt = item.created_at;
     }
 
     if (item.score >= identityConfig.THRESHOLD_HUMAN) {

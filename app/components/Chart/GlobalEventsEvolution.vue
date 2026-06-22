@@ -157,7 +157,7 @@ const config = computed<VueUiXyConfig>(() => ({
         },
         xAxisLabels: {
           show: false,
-          values: dates.value,
+          values: ecosystemHealth.value?.scanTimes,
           datetimeFormatter: {
             enable: true,
             useUTC: false,
