@@ -11,11 +11,10 @@ import {
   getCategoryDeltas,
 } from "../shared/utils/count-classification-by-date";
 import { unpack } from "../shared/utils/compactor";
+import { formatDateRange } from "../shared/utils/dates";
 
 async function main() {
-  const results = unpack(
-    readFileSync("data/scan-results.txt", "utf-8"),
-  );
+  const results = unpack(readFileSync("data/scan-results.txt", "utf-8"));
 
   if (!results?.length) {
     console.log("No data returned from API");
@@ -53,7 +52,7 @@ async function main() {
 
   function trendLabel(trendValue: number): string {
     const arrow = trendValue > 0 ? "↑" : trendValue < 0 ? "↓" : "→";
-    return `${arrow} ${formatTrend(trendValue)} overall`;
+    return `${arrow} ${formatTrend(trendValue)}`;
   }
 
   function statLabel(value: number | null, suffix = ""): string {
@@ -71,11 +70,25 @@ async function main() {
     content: [
       "Daily Dose of Clankers",
       "",
-      `🟢 Organic ${percentageLabel(categoryDeltas.organic.lastPercentage)} ${statLabel(categoryDeltas.organic.percentagePointDifference, " pts")} (${trendLabel(categoryProgression.organic.trend)})`,
-      `🟡 Mixed ${percentageLabel(categoryDeltas.mixed.lastPercentage)} ${statLabel(categoryDeltas.mixed.percentagePointDifference, " pts")} (${trendLabel(categoryProgression.mixed.trend)})`,
-      `🔴 Automation ${percentageLabel(categoryDeltas.automation.lastPercentage)} ${statLabel(categoryDeltas.automation.percentagePointDifference, " pts")} (${trendLabel(categoryProgression.automation.trend)})`,
+      `${formatDateRange({ startDate: dates[0], endDate: dates.at(-1), startYear: true, endYear: true, locale: "en-GB" })}`,
       "",
-      `⚫ Automation PR closure rate ${percentageLabel(closedAutomationPrDelta.lastSnapshot.percentage)} ${statLabel(closedAutomationPrDelta.percentagePointDifference, " pts")} (${percentageLabel(closedAutomationPrPercentage)} overall)`,
+      `🟢 Organic`,
+      `   today: ${percentageLabel(categoryDeltas.organic.lastPercentage)}, ${statLabel(categoryDeltas.organic.percentagePointDifference, " pts")}`,
+      `   overall trend: ${trendLabel(categoryProgression.organic.trend)}`,
+      "",
+      `🟡 Mixed`,
+      `   today: ${percentageLabel(categoryDeltas.mixed.lastPercentage)}, ${statLabel(categoryDeltas.mixed.percentagePointDifference, " pts")}`,
+      `   overall trend: ${trendLabel(categoryProgression.mixed.trend)}`,
+      "",
+      `🔴 Automation`,
+      `   today: ${percentageLabel(categoryDeltas.automation.lastPercentage)}, ${statLabel(categoryDeltas.automation.percentagePointDifference, " pts")}`,
+      `   overall trend: ${trendLabel(categoryProgression.automation.trend)}`,
+      "",
+      "",
+      `⚫ Automation PR closure rate`,
+      `   today: ${percentageLabel(closedAutomationPrDelta.lastSnapshot.percentage)}, ${statLabel(closedAutomationPrDelta.percentagePointDifference, " pts")}`,
+      `   overall: ${percentageLabel(closedAutomationPrPercentage)}`,
+      "",
     ].join("\n"),
   };
 
@@ -84,6 +97,7 @@ async function main() {
   if (!webhook) {
     console.log("Discord webhook URL not found!");
     console.log(JSON.stringify(payload, null, 2));
+    console.log(payload.content);
     return;
   }
 

@@ -9,6 +9,7 @@ import {
   CLASSIFICATION_CATEGORIES,
   getClassificationByDateChunks,
 } from "~~/shared/utils/count-classification-by-date";
+import { formatDateRange } from "~~/shared/utils/dates";
 
 import("vue-data-ui/style.css");
 
@@ -35,36 +36,6 @@ const palette = computed(() => ({
   automation: colors.value.red,
 }));
 
-function formatDateRange({
-  startDate,
-  endDate,
-}: {
-  startDate: string | undefined;
-  endDate: string | undefined;
-}): string {
-  if (!startDate || !endDate) {
-    return "";
-  }
-
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const startLabel = new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    timeZone: "UTC",
-  }).format(start);
-
-  const endLabel = new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(end);
-
-  return `${startLabel} - ${endLabel}`;
-}
-
 const stackbarDataset = computed<VueUiStackbarDatasetItem[]>(() => {
   return CLASSIFICATION_CATEGORIES.map((classificationKey) => {
     return {
@@ -88,6 +59,9 @@ const timeLabels = computed<string[]>(() => {
     return `Week ${weekNumber} (${formatDateRange({
       startDate: week.startDate,
       endDate: week.endDate,
+      startYear: false,
+      endYear: true,
+      locale: "en-GB",
     })})`;
   });
 });
