@@ -210,6 +210,48 @@ function getTrend({ series, item, index }: any) {
     arrow: getTrendArrow(trend),
   };
 }
+
+/**
+ * Temporary landmark for sample updates
+ * We can remove it later if we don't notice any before/after trend shifts
+ * The landmark is visible only when it is a week older than the last date of the dataset.
+ */
+const landmarks = [
+  {
+    date: "2026-06-23",
+    name: "Sample update",
+  },
+];
+
+const keyDates = computed(() => {
+  const dateList = dates.value ?? [];
+  const lastDate = dateList.at(-1);
+
+  if (!lastDate) {
+    return [];
+  }
+
+  const millisecondsInOneWeek = 7 * 24 * 60 * 60 * 1000;
+  const lastDateTime = new Date(lastDate).getTime();
+
+  return landmarks
+    .map((item) => {
+      const index = dateList.indexOf(item.date);
+
+      if (index === -1) {
+        return null;
+      }
+
+      const landmarkDateTime = new Date(item.date).getTime();
+
+      return {
+        ...item,
+        index,
+        visible: lastDateTime - landmarkDateTime >= millisecondsInOneWeek,
+      };
+    })
+    .filter(Boolean);
+});
 </script>
 <template>
   <div class="relative h-full w-full flex flex-col">
@@ -222,6 +264,53 @@ function getTrend({ series, item, index }: any) {
             :dataset
             :config
           >
+            <template #svg="{ svg }">
+              <!-- LANDMARKS -->
+              <g
+                v-for="(plot, i) in svg?.data?.[0]?.plots"
+                :key="`plot_${i}`"
+                style="pointer-events: none"
+              >
+                <template
+                  v-for="(landmark, j) in keyDates"
+                  :key="landmark?.name"
+                >
+                  <g
+                    v-if="
+                      landmark &&
+                      landmark.index === i + svg.slicer.start &&
+                      landmark.visible
+                    "
+                  >
+                    <line
+                      :x1="plot.x"
+                      :x2="plot.x"
+                      :y1="svg.drawingArea.top"
+                      :y2="svg.drawingArea.bottom"
+                      :stroke="colors.border"
+                      stroke-linecap="round"
+                      stroke-width="1"
+                      opacity="0.5"
+                    />
+                    <text
+                      :fill="colors.textMuted"
+                      :stroke="colors.bg"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      font-size="12"
+                      :transform="`translate(${plot.x + 14}, ${svg.drawingArea.bottom}) rotate(-90)`"
+                      text-anchor="start"
+                      dominant-baseline="middle"
+                      paint-order="stroke fill"
+                    >
+                      {{ landmark.name }}
+                    </text>
+                  </g>
+                </template>
+              </g>
+            </template>
+
             <template #area-gradient="{ series, id }">
               <linearGradient :id x1="0" x2="0" y1="0" y2="1">
                 <stop
