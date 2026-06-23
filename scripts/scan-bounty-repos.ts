@@ -36,6 +36,26 @@ const PAGES_PER_QUERY = 5;
 const PER_PAGE = 100;
 // Pause between API calls to stay within the 30 req/min Search API rate limit.
 const DELAY_MS = 2500;
+const RETRY_DELAY_MS = 5000;
+
+async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  const MAX_RETRIES = 2;
+  let lastError: Error;
+  for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      if (attempt <= MAX_RETRIES) {
+        console.warn(
+          `  [retry ${attempt}/${MAX_RETRIES}] ${label}: ${lastError.message} — retrying in ${RETRY_DELAY_MS}ms...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
+    }
+  }
+  throw lastError!;
+}
 
 interface BountyRepo {
   repo: string;
@@ -76,30 +96,29 @@ async function fetchReposForQuery(
   const found = new Map<string, string>(); // repo slug → source
 
   for (let page = 1; page <= PAGES_PER_QUERY; page++) {
-    try {
-      const res = await octokit.rest.search.issuesAndPullRequests({
-        q: query,
-        per_page: PER_PAGE,
-        page,
-      });
+    const res = await withRetry(
+      () =>
+        octokit.rest.search.issuesAndPullRequests({
+          q: query,
+          per_page: PER_PAGE,
+          page,
+        }),
+      `[${source}] page ${page}`,
+    );
 
-      for (const item of res.data.items) {
-        const slug = repoSlugFromUrl(item.repository_url);
-        if (!found.has(slug)) {
-          found.set(slug, source);
-        }
+    for (const item of res.data.items) {
+      const slug = repoSlugFromUrl(item.repository_url);
+      if (!found.has(slug)) {
+        found.set(slug, source);
       }
-
-      console.log(
-        `  [${source}] page ${page}: ${res.data.items.length} results (${found.size} unique repos so far)`,
-      );
-
-      // Stop early if we've received fewer results than requested
-      if (res.data.items.length < PER_PAGE) break;
-    } catch (error) {
-      console.error(`  [${source}] page ${page} error:`, (error as Error).message);
-      break;
     }
+
+    console.log(
+      `  [${source}] page ${page}: ${res.data.items.length} results (${found.size} unique repos so far)`,
+    );
+
+    // Stop early if we've received fewer results than requested
+    if (res.data.items.length < PER_PAGE) break;
 
     await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
   }
@@ -108,7 +127,7 @@ async function fetchReposForQuery(
 }
 
 async function main() {
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.GITHUB_TOKEN ?? process.env.NUXT_GITHUB_TOKEN;
   if (!token) throw new Error("GITHUB_TOKEN is not set");
 
   const octokit = new Octokit({ auth: token });
