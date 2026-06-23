@@ -218,8 +218,9 @@ function getTrend({ series, item, index }: any) {
  */
 const landmarks = [
   {
-    date: "2026-06-23",
+    date: "2026-06-12", // 23
     name: "Sample update",
+    description: "13 repositories added to the dataset",
   },
 ];
 
@@ -251,6 +252,16 @@ const keyDates = computed(() => {
       };
     })
     .filter(Boolean);
+});
+
+const visibleLandmarkByIndex = computed(() => {
+  const landmarkMap = new Map<number, (typeof keyDates.value)[number]>();
+  keyDates.value.forEach((landmark) => {
+    if (landmark?.visible) {
+      landmarkMap.set(landmark.index, landmark);
+    }
+  });
+  return landmarkMap;
 });
 </script>
 <template>
@@ -374,6 +385,27 @@ const keyDates = computed(() => {
                       }}
                     </span>
                   </template>
+                </div>
+
+                <!-- LANDMARK INFO-->
+                <div
+                  v-if="visibleLandmarkByIndex.has(timeLabel.absoluteIndex)"
+                  class="mt-2 text-xs text-gh-muted"
+                >
+                  <div class="flex flex-row gap-2 max-w-[200px]">
+                    <span class="i-lucide:info w-6" />
+                    <span
+                      >{{
+                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
+                          ?.name
+                      }}
+                      :
+                      {{
+                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
+                          ?.description
+                      }}</span
+                    >
+                  </div>
                 </div>
               </div>
             </template>
