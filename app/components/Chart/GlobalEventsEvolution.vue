@@ -218,7 +218,7 @@ function getTrend({ series, item, index }: any) {
  */
 const landmarks = [
   {
-    date: "2026-06-12", // 23
+    date: "2026-06-12", // FIXME: for prod, replace with 2026-06-23
     name: "Sample update",
     description: "13 repositories added to the dataset",
   },
@@ -284,7 +284,7 @@ const visibleLandmarkByIndex = computed(() => {
               >
                 <template
                   v-for="(landmark, j) in keyDates"
-                  :key="landmark?.name"
+                  :key="`${landmark?.date}-${landmark?.name}-${j}`"
                 >
                   <g
                     v-if="
