@@ -5,12 +5,13 @@ import type { EcosystemHealthItem } from "../types/ecosystem-health";
 // Compact CSV format for scan results — ~72% smaller than pretty-printed JSON.
 //
 // Line 0:  REPOS:<comma-separated repo names>   (index lookup)
-// Lines 1+: <created_ts>,<score>,<pr_key_b64url>,<status>,<user_ts>,<repos>,<events>,<repo_idx>
+// Lines 1+: <created_ts>,<score>,<pr_key_b64url>,<status>,<user_ts>,<repos>,<events>,<repo_idx>,<is_bounty>
 //
 //   created_ts / user_ts : unix seconds (drops sub-second precision)
 //   pr_key               : base64url, no padding  (64 hex → 43 chars)
 //   status               : "o" = open | "c" = closed
 //   repo_idx             : index into the REPOS header
+//   is_bounty            : 1 = bounty hunter | 0 = not
 
 const STATUS_ENCODE: Record<string, string> = { open: "o", closed: "c" };
 const STATUS_DECODE: Record<string, string> = { o: "open", c: "closed" };
@@ -55,6 +56,7 @@ export function pack(results: EcosystemHealthItem[]): string {
         r.user_public_repos_count,
         r.events_count,
         repoIndex.get(r.repo_name),
+        r.is_bounty ? 1 : 0,
       ].join(","),
     );
   }
@@ -83,6 +85,7 @@ export function unpack(content: string): EcosystemHealthItem[] {
       publicRepos,
       events,
       repoIdx,
+      isBounty,
     ] = fields;
 
     if (fields.length < 8) continue;
@@ -110,6 +113,7 @@ export function unpack(content: string): EcosystemHealthItem[] {
       user_public_repos_count: numPublicRepos,
       events_count: numEvents,
       repo_name: repos[numRepoIdx] ?? "",
+      is_bounty: isBounty === "1",
     });
   }
 

@@ -10,6 +10,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
+    "scan:users": "pnpm exec tsx --env-file=.env scripts/scan-users.ts",
+    "scan:bounty": "pnpm exec tsx --env-file=.env scripts/scan-bounty-repos.ts",
     "test": "vitest"
   },
   "dependencies": {
