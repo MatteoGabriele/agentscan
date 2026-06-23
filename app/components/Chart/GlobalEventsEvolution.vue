@@ -227,10 +227,7 @@ const landmarks = [
 const keyDates = computed(() => {
   const dateList = dates.value ?? [];
   const lastDate = dateList.at(-1);
-
-  if (!lastDate) {
-    return [];
-  }
+  if (!lastDate) return [];
 
   const millisecondsInOneWeek = 7 * 24 * 60 * 60 * 1000;
   const lastDateTime = new Date(lastDate).getTime();
@@ -238,11 +235,7 @@ const keyDates = computed(() => {
   return landmarks
     .map((item) => {
       const index = dateList.indexOf(item.date);
-
-      if (index === -1) {
-        return null;
-      }
-
+      if (index === -1) return null;
       const landmarkDateTime = new Date(item.date).getTime();
 
       return {
@@ -293,6 +286,7 @@ const visibleLandmarkByIndex = computed(() => {
                       landmark.visible
                     "
                   >
+                    <!-- Landmark vertical line-->
                     <line
                       :x1="plot.x"
                       :x2="plot.x"
@@ -303,6 +297,7 @@ const visibleLandmarkByIndex = computed(() => {
                       stroke-width="1"
                       opacity="0.5"
                     />
+                    <!-- Landmark label -->
                     <text
                       :fill="colors.textMuted"
                       :stroke="colors.bg"
