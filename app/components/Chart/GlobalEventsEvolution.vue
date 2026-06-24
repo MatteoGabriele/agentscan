@@ -5,7 +5,8 @@ import {
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
 } from "vue-data-ui/vue-ui-xy";
-import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
+import { useTooltipPosition } from "vue-data-ui/composables";
+
 import { useColors } from "~/composables/useColors";
 import { getClosedPrPercentageEvolutionTotal } from "~~/shared/utils/charts";
 import { identityConfig } from "@unveil/identity";
@@ -112,7 +113,7 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
   automatedClosureRateData.value,
 ]);
 
-const tooltipPosition = useChartTooltipPosition(chartRef);
+const tooltipPosition = useTooltipPosition(chartRef);
 
 const progressionLabelOffsetX = 6;
 
@@ -195,7 +196,7 @@ const config = computed<VueUiXyConfig>(() => ({
       backgroundOpacity: 30,
       position: tooltipPosition.value,
       offsetX: 24,
-      offsetY: -56,
+      offsetY: -64,
     },
     zoom: { show: false },
   },

@@ -10,6 +10,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
+    "scan:users": "pnpm exec tsx --env-file=.env scripts/scan-users.ts",
+    "scan:bounty": "pnpm exec tsx --env-file=.env scripts/scan-bounty-repos.ts",
     "test": "vitest"
   },
   "dependencies": {
@@ -23,7 +25,7 @@
     "octokit": "^5.0.5",
     "valibot": "^1.2.0",
     "vue": "^3.5.28",
-    "vue-data-ui": "^3.21.10",
+    "vue-data-ui": "^3.22.0",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {

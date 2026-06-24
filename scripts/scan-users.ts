@@ -6,16 +6,16 @@ import { join } from "path";
 import { Octokit } from "octokit";
 import { IdentifyResult } from "@unveil/identity";
 import { hashPrId } from "./pr-hash";
-import {
-  pack,
-  unpack,
-} from "../shared/utils/compactor";
+import { pack, unpack } from "../shared/utils/compactor";
 
 // Configuration
-const API_TIMEOUT = 30000; // 30 seconds timeout for API calls
+const API_TIMEOUT = 30000;
 const API_BASE_URL = "https://agentscan.tools";
-const DELAY_BETWEEN_SCANS = 1000; // 1 second conservative delay between identify-replicant API calls
-const DELAY_BETWEEN_GITHUB_CALLS = 200; // 200ms delay between GitHub API calls (random user fetches)
+const DELAY_BETWEEN_SCANS = 1000;
+const DELAY_BETWEEN_GITHUB_CALLS = 200;
+const RETRY_DELAY_MS = 5000;
+const RETRY_MAX_ATTEMPT = 2;
+const PR_SCAN_AMOUNT = 10;
 
 interface ScanResult {
   created_at: string;
@@ -26,6 +26,7 @@ interface ScanResult {
   repo_name: string;
   pr_key: string;
   pr_status: string;
+  is_bounty: boolean;
 }
 
 interface ScanOptions {
@@ -33,9 +34,24 @@ interface ScanOptions {
   prsPerRepo?: number;
 }
 
-/**
- * Load verified automations list
- */
+async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  let lastError: Error;
+  for (let attempt = 1; attempt <= RETRY_MAX_ATTEMPT + 1; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      if (attempt <= RETRY_MAX_ATTEMPT) {
+        console.warn(
+          `  [retry ${attempt}/${RETRY_MAX_ATTEMPT}] ${label}: ${lastError.message} — retrying in ${RETRY_DELAY_MS}ms...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
+    }
+  }
+  throw lastError!;
+}
+
 function loadVerifiedAutomations(): Set<number> {
   const filePath = join(
     process.cwd(),
@@ -50,9 +66,6 @@ function loadVerifiedAutomations(): Set<number> {
   }
 }
 
-/**
- * Load existing scan results
- */
 function loadScanResults(): ScanResult[] {
   const filePath = join(process.cwd(), "data", "scan-results.txt");
   try {
@@ -65,9 +78,6 @@ function loadScanResults(): ScanResult[] {
   }
 }
 
-/**
- * Save scan results
- */
 function saveScanResults(results: ScanResult[], dryRun: boolean = false): void {
   if (dryRun) {
     return;
@@ -81,69 +91,46 @@ type ScanUserResponse = {
   eventsCount: number;
 };
 
-/**
- * Get the analysis score for a user via the identify-replicant API
- */
 async function scanUser(
   username: string,
   userCreatedAt: string,
   publicRepos: number,
-): Promise<ScanUserResponse | null> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+): Promise<ScanUserResponse> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
+  try {
     const response = await fetch(
       `${API_BASE_URL}/api/identify-replicant/${username}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=2`,
       { signal: controller.signal },
     );
 
     if (!response.ok) {
-      clearTimeout(timeoutId);
-      console.error(
-        `Failed to scan user: HTTP ${response.status} ${response.statusText}`,
-      );
-      return null;
+      throw new Error(`HTTP ${response.status} ${response.statusText}`);
     }
 
-    const data: ScanUserResponse = await response.json();
+    return (await response.json()) as ScanUserResponse;
+  } finally {
     clearTimeout(timeoutId);
-
-    return data ?? null;
-  } catch (error) {
-    if ((error as any).name === "AbortError") {
-      console.error(
-        `Timeout scanning user (API took longer than ${API_TIMEOUT}ms)`,
-      );
-    } else if (error instanceof SyntaxError) {
-      console.error(`Invalid JSON response from API`);
-    } else {
-      console.error(`Error scanning user:`, (error as Error).message);
-    }
-    return null;
   }
 }
 
-/**
- * Check if a username is a known bot
- */
 function isKnownBot(username: string): boolean {
   const lowerUsername = username.toLowerCase();
+  console.log(
+    username,
+    cicdBots.some((name) => lowerUsername.includes(name)),
+  );
   return (
     cicdBots.some((name) => lowerUsername.includes(name)) ||
     lowerUsername.endsWith("[bot]")
   );
 }
 
-/**
- * Fetch PR authors from curated list of popular OSS libraries and frameworks
- * Gets the specified number of PRs from each repo - collects all authors including duplicates, skipping known bots
- */
-type RepoScanStatus = { count: number; failed: boolean };
-
-async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
-  const PRS_PER_REPO = prsPerRepo;
-
+async function searchUsers(
+  octokit: Octokit,
+  prsPerRepo: number = PR_SCAN_AMOUNT,
+) {
   const users: Array<{
     id: number;
     login: string;
@@ -154,81 +141,69 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = 10) {
     pr_status: string;
   }> = [];
 
-  const repoStatus = new Map<string, RepoScanStatus>();
-
   for (const repoFullName of libraries) {
     const [owner, repo] = repoFullName.split("/");
     let prsFromThisRepo = 0;
-    let failed = false;
 
-    try {
-      const prs = await octokit.rest.pulls.list({
-        owner,
-        repo,
-        state: "all",
-        sort: "created",
-        direction: "desc",
-        per_page: 50,
+    const prs = await withRetry(
+      () =>
+        octokit.rest.pulls.list({
+          owner,
+          repo,
+          state: "all",
+          sort: "created",
+          direction: "desc",
+          per_page: 50,
+        }),
+      `${repoFullName}: fetch PRs`,
+    );
+
+    for (const pr of prs.data) {
+      if (prsFromThisRepo >= prsPerRepo) break;
+      if (!pr.user?.login) continue;
+
+      if (isKnownBot(pr.user.login)) {
+        console.log(`  ${repoFullName}: skipping known bot`);
+        continue;
+      }
+
+      const fullProfile = await withRetry(
+        () => octokit.rest.users.getByUsername({ username: pr.user!.login }),
+        `${repoFullName}: fetch user ${pr.user.login}`,
+      );
+
+      users.push({
+        id: fullProfile.data.id,
+        login: fullProfile.data.login,
+        created_at: fullProfile.data.created_at,
+        pr_key: hashPrId(repoFullName, pr.number),
+        pr_status: pr.state,
+        public_repos: fullProfile.data.public_repos,
+        repo_name: repoFullName,
       });
 
-      for (const pr of prs.data) {
-        if (prsFromThisRepo >= PRS_PER_REPO) break;
-        if (!pr.user?.login) continue;
+      prsFromThisRepo++;
+      console.log(`  ${repoFullName}: ${prsFromThisRepo}/${prsPerRepo}`);
 
-        if (isKnownBot(pr.user.login)) {
-          console.log(`  ${repoFullName}: skipping known bot`);
-          continue;
-        }
-
-        try {
-          const fullProfile = await octokit.rest.users.getByUsername({
-            username: pr.user.login,
-          });
-
-          users.push({
-            id: fullProfile.data.id,
-            login: fullProfile.data.login,
-            created_at: fullProfile.data.created_at,
-            pr_key: hashPrId(repoFullName, pr.number),
-            pr_status: pr.state,
-            public_repos: fullProfile.data.public_repos,
-            repo_name: repoFullName,
-          });
-
-          prsFromThisRepo++;
-          console.log(`  ${repoFullName}: ${prsFromThisRepo}/${PRS_PER_REPO}`);
-        } catch (error) {
-          console.error(
-            `Error fetching user profile:`,
-            (error as Error).message,
-          );
-        }
-
-        await new Promise((resolve) =>
-          setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
-        );
-      }
-    } catch (error) {
-      console.error(
-        `Error fetching PRs for ${repoFullName}:`,
-        (error as Error).message,
+      await new Promise((resolve) =>
+        setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
       );
-      failed = true;
     }
 
-    repoStatus.set(repoFullName, { count: prsFromThisRepo, failed });
+    if (prsFromThisRepo < prsPerRepo) {
+      throw new Error(
+        `${repoFullName}: only ${prsFromThisRepo}/${prsPerRepo} PRs collected — aborting scan`,
+      );
+    }
   }
 
-  return { users, repoStatus };
+  return users;
 }
 
-/**
- * Main scanning function
- */
 export async function main(options: ScanOptions = {}) {
-  const { dryRun = false, prsPerRepo = 10 } = options;
+  const { dryRun = false, prsPerRepo = PR_SCAN_AMOUNT } = options;
 
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.GITHUB_TOKEN ?? process.env.NUXT_GITHUB_TOKEN;
   if (!token) {
     throw new Error("GITHUB_TOKEN environment variable is not set");
   }
@@ -242,31 +217,7 @@ export async function main(options: ScanOptions = {}) {
   const verifiedAutomations = loadVerifiedAutomations();
   const now = new Date().toISOString();
 
-  const { users, repoStatus } = await searchUsers(octokit, prsPerRepo);
-
-  if (users.length === 0) {
-    console.error("No users found to scan");
-    process.exit(1);
-  }
-
-  const repoFailures: string[] = [];
-  for (const [repo, status] of repoStatus) {
-    if (status.failed) {
-      repoFailures.push(`  ${repo}: failed to fetch PRs`);
-    } else if (status.count < prsPerRepo) {
-      repoFailures.push(
-        `  ${repo}: only ${status.count}/${prsPerRepo} PRs collected`,
-      );
-    }
-  }
-
-  if (repoFailures.length > 0) {
-    console.error(
-      `\nScan incomplete — the following repos did not meet the target:`,
-    );
-    for (const msg of repoFailures) console.error(msg);
-    process.exit(1);
-  }
+  const users = await searchUsers(octokit, prsPerRepo);
 
   let completedCount = 0;
   const repoScores: Map<string, number> = new Map();
@@ -275,46 +226,42 @@ export async function main(options: ScanOptions = {}) {
     console.log(
       `Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`,
     );
-    const scanData = await scanUser(
-      user.login,
-      user.created_at,
-      user.public_repos,
+
+    const scanData = await withRetry(
+      () => scanUser(user.login, user.created_at, user.public_repos),
+      `scan user ${user.login}`,
     );
 
-    let score = scanData?.analysis.score;
-    const eventsCount = scanData?.eventsCount ?? 0;
+    let score = scanData.analysis.score;
+    const eventsCount = scanData.eventsCount ?? 0;
 
     if (verifiedAutomations.has(user.id)) {
       score = 0;
     }
 
-    if (score != null) {
-      const result: ScanResult = {
-        created_at: now,
-        score,
-        pr_key: user.pr_key,
-        pr_status: user.pr_status,
-        user_created_at: user.created_at,
-        user_public_repos_count: user.public_repos,
-        events_count: eventsCount,
-        repo_name: user.repo_name,
-      };
+    scanResults.push({
+      created_at: now,
+      score,
+      pr_key: user.pr_key,
+      pr_status: user.pr_status,
+      user_created_at: user.created_at,
+      user_public_repos_count: user.public_repos,
+      events_count: eventsCount,
+      repo_name: user.repo_name,
+      is_bounty: scanData.analysis.isBountyHunter,
+    });
 
-      scanResults.push(result);
+    const currentScore = repoScores.get(user.repo_name) ?? 0;
+    repoScores.set(user.repo_name, currentScore + score);
 
-      const currentScore = repoScores.get(user.repo_name) ?? 0;
-      repoScores.set(user.repo_name, currentScore + score);
+    completedCount++;
 
-      completedCount++;
-    }
-
-    // Conservative delay between API calls to avoid rate limiting
     await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_SCANS));
   }
 
+  // Only reached if every repo and every user scan succeeded
   saveScanResults(scanResults, dryRun);
 
-  // Score summary by repository
   const sortedRepos = Array.from(repoScores.entries()).sort(
     (a, b) => b[1] - a[1],
   );
@@ -323,10 +270,16 @@ export async function main(options: ScanOptions = {}) {
   }
 }
 
-// Run with default options when executed directly (for workflow)
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error("Fatal error:", error);
+  const args = process.argv.slice(2);
+  const dryRun = args.includes("--dry-run");
+  const prsPerRepoArg = args.find((a) => a.startsWith("--prs-per-repo="));
+  const prsPerRepo = prsPerRepoArg
+    ? parseInt(prsPerRepoArg.split("=")[1], PR_SCAN_AMOUNT)
+    : undefined;
+
+  main({ dryRun, ...(prsPerRepo != null && { prsPerRepo }) }).catch((error) => {
+    console.error("Fatal error:", error.message);
     process.exit(1);
   });
 }
