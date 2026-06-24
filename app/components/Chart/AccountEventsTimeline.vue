@@ -4,10 +4,10 @@ import {
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
 } from "vue-data-ui";
+import { useTooltipPosition } from "vue-data-ui/composables";
 import { getCompleteDayRange } from "~~/shared/utils/charts";
 import type { GitHubEventType } from "~~/shared/types/identity";
 import { githubEventTypes } from "~~/shared/types/identity";
-import { useChartTooltipPosition } from "~/composables/useChartTooltipPosition";
 import { useColors } from "~/composables/useColors";
 import {
   identityConfig,
@@ -325,7 +325,7 @@ const xAxisLabelValues = computed<string[]>(() => {
   });
 });
 
-const tooltipPositionLine = useChartTooltipPosition(chartLineRef);
+const tooltipPositionLine = useTooltipPosition(chartLineRef);
 
 const configLine = computed<VueUiXyConfig>(() => ({
   downsample: {
