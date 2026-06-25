@@ -54,7 +54,7 @@ function parseDataPoint(point: FlagDataPoint): {
   displayValue: string;
   displayThreshold: string | undefined;
 } {
-  const unitMatch = point.label.match(/^(.*?)\s*\((\w+)\)$/);
+  const unitMatch = point.label.match(/^(.*?)\s*\(([^)]+)\)$/);
   if (!unitMatch) {
     return {
       label: point.label,
