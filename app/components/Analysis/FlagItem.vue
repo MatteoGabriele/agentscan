@@ -113,9 +113,10 @@ const visibleEvents = computed(() =>
                   :href="getEventUrl(ev)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-gh-text text-sm hover:underline"
+                  class="text-gh-text text-sm hover:underline inline-flex items-center gap-1"
                 >
                   {{ getEventDescription(ev) }}
+                  <span class="i-lucide:external-link text-gh-muted opacity-60" style="font-size:0.6rem" />
                 </a>
                 <span v-else class="text-gh-text text-sm">
                   {{ getEventDescription(ev) }}
