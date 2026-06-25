@@ -4,7 +4,79 @@ import type {
   IdentityClassification,
   IdentifyResult,
 } from "@unveil/identity";
+
+type FlagDataPoint = IdentifyResult["flags"][number]["data"][number];
 import dayjs from "dayjs";
+
+function getDataPointIcon(label: string): string {
+  const l = label.toLowerCase();
+  if (l.includes("branch")) return "i-lucide:git-branch";
+  if (l.includes("fork")) return "i-lucide:git-fork";
+  if (l.includes("merge") || l.includes("merged")) return "i-lucide:git-merge";
+  if (l.includes("pr") || l.includes("pull request"))
+    return "i-lucide:git-pull-request";
+  if (l.includes("closed")) return "i-lucide:git-pull-request-closed";
+  if (l.includes("star") || l.includes("watch")) return "i-lucide:star";
+  if (l.includes("comment")) return "i-lucide:message-square";
+  if (l.includes("push")) return "i-lucide:upload";
+  if (l.includes("repo")) return "i-lucide:folder-git-2";
+  if (l.includes("bounty")) return "i-lucide:trophy";
+  if (l.includes("ratio") || l.includes("%")) return "i-lucide:percent";
+  if (l.includes("entropy") || l.includes("diversity") || l.includes("types"))
+    return "i-lucide:layers";
+  if (l.includes("age") || l.includes("date")) return "i-lucide:calendar";
+  if (
+    l.includes("hour") ||
+    l.includes("interval") ||
+    l.includes("gap") ||
+    l.includes("window") ||
+    l.includes("span") ||
+    l.includes("(s)") ||
+    l.includes("(min)")
+  )
+    return "i-lucide:timer";
+  if (l.includes("consecutive") || l.includes("rapid") || l.includes("burst"))
+    return "i-lucide:zap";
+  if (l.includes("event") || l.includes("activity")) return "i-lucide:activity";
+  return "i-lucide:bar-chart-2";
+}
+
+function isExceeded(point: FlagDataPoint): boolean {
+  if (point.threshold === undefined) return false;
+  const v = parseFloat(String(point.value).replace("%", ""));
+  const t = parseFloat(String(point.threshold).replace("%", ""));
+  return !isNaN(v) && !isNaN(t) && v > t;
+}
+
+function parseDataPoint(point: FlagDataPoint): {
+  label: string;
+  displayValue: string;
+  displayThreshold: string | undefined;
+} {
+  const unitMatch = point.label.match(/^(.*?)\s*\((\w+)\)$/);
+  if (!unitMatch) {
+    return {
+      label: point.label,
+      displayValue: String(point.value),
+      displayThreshold:
+        point.threshold !== undefined ? String(point.threshold) : undefined,
+    };
+  }
+
+  const [, cleanLabel, unit] = unitMatch as [string, string, string];
+  const withUnit = (val: FlagDataPoint["value"]) => {
+    if (typeof val === "boolean") return String(val);
+    const n = parseFloat(String(val));
+    return !isNaN(n) ? `${val}${unit}` : String(val);
+  };
+
+  return {
+    label: cleanLabel,
+    displayValue: withUnit(point.value),
+    displayThreshold:
+      point.threshold !== undefined ? withUnit(point.threshold) : undefined,
+  };
+}
 
 const props = defineProps<{
   user: GitHubUser;
@@ -279,10 +351,57 @@ useSeoAnalysis(identifyAnalysis, {
           :key="flag.label"
           class="not-last:border-b border-gh-border-light/40 py-4 @md:py-4"
         >
-          <h4 class="font-mono">{{ flag.label }}</h4>
-          <p class="text-gh-muted">
-            {{ flag.detail }}
-          </p>
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <h4 class="font-mono">{{ flag.label }}</h4>
+            <span
+              class="shrink-0 text-xs font-mono text-gh-muted bg-gh-border-light/20 px-2 py-0.5 rounded"
+            >
+              +{{ flag.points }}pts
+            </span>
+          </div>
+          <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
+          <div v-if="flag.data.length" class="mt-3 flex flex-wrap gap-2">
+            <div
+              v-for="point in flag.data"
+              :key="point.label"
+              class="flex flex-col bg-gh-border-light/10 border border-gh-border-light/30 rounded-lg px-3 py-2.5 gap-1 min-w-28"
+            >
+              <div class="flex items-center gap-1.5 text-gh-muted">
+                <span
+                  :class="getDataPointIcon(point.label)"
+                  class="text-xs shrink-0"
+                />
+                <span class="text-xs leading-tight">{{
+                  parseDataPoint(point).label
+                }}</span>
+              </div>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <template v-if="typeof point.value === 'boolean'">
+                  <span
+                    :class="
+                      point.value
+                        ? 'i-lucide:check text-green-500'
+                        : 'i-lucide:x text-gh-muted'
+                    "
+                    class="text-sm"
+                  />
+                </template>
+                <span
+                  v-else
+                  class="font-mono font-semibold text-sm"
+                  :class="isExceeded(point) ? 'text-amber-400' : 'text-gh-text'"
+                >
+                  {{ parseDataPoint(point).displayValue }}
+                </span>
+                <span
+                  v-if="parseDataPoint(point).displayThreshold !== undefined"
+                  class="text-gh-muted text-xs"
+                >
+                  limit {{ parseDataPoint(point).displayThreshold }}
+                </span>
+              </div>
+            </div>
+          </div>
         </li>
       </ul>
 
