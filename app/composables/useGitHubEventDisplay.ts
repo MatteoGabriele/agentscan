@@ -4,37 +4,27 @@ import dayjs from "dayjs";
 
 const ZERO_SHA = "0000000000000000000000000000000000000000";
 
+const EVENT_ICONS: [string[], string][] = [
+  [["PullRequestEvent"], "i-lucide:git-pull-request"],
+  [["PushEvent"], "i-lucide:upload"],
+  [["CreateEvent"], "i-lucide:git-branch"],
+  [["DeleteEvent"], "i-lucide:trash-2"],
+  [["ForkEvent"], "i-lucide:git-fork"],
+  [["WatchEvent"], "i-lucide:star"],
+  [["IssueCommentEvent", "PullRequestReviewCommentEvent"], "i-lucide:message-square"],
+  [["IssuesEvent"], "i-lucide:circle-dot"],
+  [["PullRequestReviewEvent"], "i-lucide:eye"],
+  [["ReleaseEvent"], "i-lucide:tag"],
+  [["CommitCommentEvent"], "i-lucide:message-circle"],
+  [["MemberEvent"], "i-lucide:user-plus"],
+];
+
 export function useGitHubEventDisplay() {
   function getEventIcon(event: GitHubEvent): string {
-    switch (event.type) {
-      case "PullRequestEvent":
-        return "i-lucide:git-pull-request";
-      case "PushEvent":
-        return "i-lucide:upload";
-      case "CreateEvent":
-        return "i-lucide:git-branch";
-      case "DeleteEvent":
-        return "i-lucide:trash-2";
-      case "ForkEvent":
-        return "i-lucide:git-fork";
-      case "WatchEvent":
-        return "i-lucide:star";
-      case "IssueCommentEvent":
-      case "PullRequestReviewCommentEvent":
-        return "i-lucide:message-square";
-      case "IssuesEvent":
-        return "i-lucide:circle-dot";
-      case "PullRequestReviewEvent":
-        return "i-lucide:eye";
-      case "ReleaseEvent":
-        return "i-lucide:tag";
-      case "CommitCommentEvent":
-        return "i-lucide:message-circle";
-      case "MemberEvent":
-        return "i-lucide:user-plus";
-      default:
-        return "i-lucide:activity";
-    }
+    return (
+      EVENT_ICONS.find(([types]) => types.includes(event.type ?? ""))?.[1] ??
+      "i-lucide:activity"
+    );
   }
 
   function getEventDescription(event: GitHubEvent): string {
