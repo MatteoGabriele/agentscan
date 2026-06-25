@@ -79,8 +79,8 @@ function parseDataPoint(point: FlagDataPoint): {
   };
 }
 
-function getEventIcon(type: string | null | undefined): string {
-  switch (type) {
+function getEventIcon(event: GitHubEvent): string {
+  switch (event.type) {
     case "PullRequestEvent":
       return "i-lucide:git-pull-request";
     case "PushEvent":
@@ -124,8 +124,8 @@ function getEventDescription(event: GitHubEvent): string {
     }
     case "PushEvent": {
       const commits =
-        (payload?.commits as unknown[])?.length ??
         (payload?.size as number) ??
+        (payload?.commits as unknown[])?.length ??
         0;
       const ref = (payload?.ref as string)?.replace("refs/heads/", "") ?? "";
       return ref
@@ -363,6 +363,38 @@ function areFlagEventsExpanded(label: string) {
   return expandedFlagEvents.value.includes(label);
 }
 
+function groupDataPoints(
+  data: FlagDataPoint[],
+): { icon: string; points: FlagDataPoint[] }[] {
+  const groups: { icon: string; points: FlagDataPoint[] }[] = [];
+  for (const point of data) {
+    const icon = getDataPointIcon(point.label);
+    const last = groups[groups.length - 1];
+    if (last && last.icon === icon) {
+      last.points.push(point);
+    } else {
+      groups.push({ icon, points: [point] });
+    }
+  }
+  return groups;
+}
+
+function groupEvents(
+  events: GitHubEvent[],
+): { icon: string; events: GitHubEvent[] }[] {
+  const groups: { icon: string; events: GitHubEvent[] }[] = [];
+  for (const ev of events) {
+    const icon = getEventIcon(ev);
+    const last = groups[groups.length - 1];
+    if (last && last.icon === icon) {
+      last.events.push(ev);
+    } else {
+      groups.push({ icon, events: [ev] });
+    }
+  }
+  return groups;
+}
+
 const EVENT_PREVIEW_COUNT = 5;
 
 function visibleEvents(flag: IdentifyResult["flags"][number]) {
@@ -535,42 +567,54 @@ function getEventUrl(event: GitHubEvent): string | undefined {
               class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2"
             >
               <div
-                v-for="point in flag.data"
-                :key="point.label"
-                class="flex items-center gap-2"
+                v-for="group in groupDataPoints(flag.data)"
+                :key="group.icon"
+                class="flex gap-2"
               >
                 <span
-                  :class="getDataPointIcon(point.label)"
-                  class="text-xs text-gh-muted shrink-0"
+                  :class="group.icon"
+                  class="text-xs text-gh-muted shrink-0 sticky top-4 self-start mt-0.5"
                 />
-                <span class="text-gh-muted text-xs flex-1">{{
-                  parseDataPoint(point).label
-                }}</span>
-                <template v-if="typeof point.value === 'boolean'">
-                  <span
-                    :class="
-                      point.value
-                        ? 'i-lucide:check text-green-500'
-                        : 'i-lucide:x text-gh-muted'
-                    "
-                    class="text-sm shrink-0"
-                  />
-                </template>
-                <span
-                  v-else
-                  class="font-mono font-semibold text-xs shrink-0"
-                  :class="
-                    isExceeded(point) ? 'text-gh-danger-hover' : 'text-gh-text'
-                  "
-                >
-                  {{ parseDataPoint(point).displayValue }}
-                </span>
-                <span
-                  v-if="parseDataPoint(point).displayThreshold !== undefined"
-                  class="text-gh-muted text-xs shrink-0"
-                >
-                  / {{ parseDataPoint(point).displayThreshold }}
-                </span>
+                <div class="flex-1 space-y-2">
+                  <div
+                    v-for="point in group.points"
+                    :key="point.label"
+                    class="flex items-center gap-2"
+                  >
+                    <span class="text-gh-muted text-xs flex-1">{{
+                      parseDataPoint(point).label
+                    }}</span>
+                    <template v-if="typeof point.value === 'boolean'">
+                      <span
+                        :class="
+                          point.value
+                            ? 'i-lucide:check text-green-500'
+                            : 'i-lucide:x text-gh-muted'
+                        "
+                        class="text-sm shrink-0"
+                      />
+                    </template>
+                    <span
+                      v-else
+                      class="font-mono font-semibold text-xs shrink-0"
+                      :class="
+                        isExceeded(point)
+                          ? 'text-gh-danger-hover'
+                          : 'text-gh-text'
+                      "
+                    >
+                      {{ parseDataPoint(point).displayValue }}
+                    </span>
+                    <span
+                      v-if="
+                        parseDataPoint(point).displayThreshold !== undefined
+                      "
+                      class="text-gh-muted text-xs shrink-0"
+                    >
+                      / {{ parseDataPoint(point).displayThreshold }}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <template v-if="flag.events.length">
@@ -580,34 +624,42 @@ function getEventUrl(event: GitHubEvent): string | undefined {
                   Evidence
                 </p>
                 <div
-                  v-for="(ev, i) in visibleEvents(flag)"
-                  :key="i"
-                  class="flex items-center gap-2"
+                  v-for="group in groupEvents(visibleEvents(flag))"
+                  :key="group.icon"
+                  class="flex gap-2"
                 >
                   <span
-                    :class="getEventIcon(ev.type)"
-                    class="text-xs text-gh-muted shrink-0"
+                    :class="group.icon"
+                    class="text-xs text-gh-muted shrink-0 sticky top-4 self-start mt-0.5"
                   />
-                  <a
-                    v-if="getEventUrl(ev)"
-                    :href="getEventUrl(ev)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-gh-text text-xs flex-1 truncate hover:underline"
-                  >
-                    {{ getEventDescription(ev) }}
-                  </a>
-                  <span v-else class="text-gh-text text-xs flex-1 truncate">
-                    {{ getEventDescription(ev) }}
-                  </span>
-                  <span
-                    class="text-gh-muted text-xs shrink-0 truncate max-w-32"
-                  >
-                    {{ ev.repo?.name }}
-                  </span>
-                  <span class="text-gh-muted text-xs shrink-0">
-                    {{ formatEventTime(ev.created_at) }}
-                  </span>
+                  <div class="flex-1 space-y-2">
+                    <div
+                      v-for="(ev, i) in group.events"
+                      :key="i"
+                      class="flex items-center gap-2"
+                    >
+                      <a
+                        v-if="getEventUrl(ev)"
+                        :href="getEventUrl(ev)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-gh-text text-xs flex-1 truncate hover:underline"
+                      >
+                        {{ getEventDescription(ev) }}
+                      </a>
+                      <span v-else class="text-gh-text text-xs flex-1 truncate">
+                        {{ getEventDescription(ev) }}
+                      </span>
+                      <span
+                        class="text-gh-muted text-xs shrink-0 truncate max-w-32"
+                      >
+                        {{ ev.repo?.name }}
+                      </span>
+                      <span class="text-gh-muted text-xs shrink-0">
+                        {{ formatEventTime(ev.created_at) }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 <button
                   v-if="flag.events.length > EVENT_PREVIEW_COUNT"
