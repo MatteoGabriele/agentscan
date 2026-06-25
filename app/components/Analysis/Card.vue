@@ -230,6 +230,21 @@ useSeoAnalysis(identifyAnalysis, {
   hasCommunityFlag,
   hasActivityReport,
 });
+
+const expandedFlags = ref<string[]>([]);
+
+function toggleFlag(label: string) {
+  const idx = expandedFlags.value.indexOf(label);
+  if (idx === -1) {
+    expandedFlags.value.push(label);
+  } else {
+    expandedFlags.value.splice(idx, 1);
+  }
+}
+
+function isFlagExpanded(label: string) {
+  return expandedFlags.value.includes(label);
+}
 </script>
 
 <template>
@@ -349,7 +364,7 @@ useSeoAnalysis(identifyAnalysis, {
         <li
           v-for="flag in data.analysis.flags"
           :key="flag.label"
-          class="not-last:border-b border-gh-border-light/40 py-4 @md:py-4"
+          class="not-last:border-b border-gh-border-light/40 py-4"
         >
           <div class="flex items-center justify-between gap-2 mb-1">
             <h4 class="font-mono">{{ flag.label }}</h4>
@@ -360,22 +375,35 @@ useSeoAnalysis(identifyAnalysis, {
             </span>
           </div>
           <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
-          <div v-if="flag.data.length" class="mt-3 flex flex-wrap gap-2">
-            <div
-              v-for="point in flag.data"
-              :key="point.label"
-              class="flex flex-col bg-gh-border-light/10 border border-gh-border-light/30 rounded-lg px-3 py-2.5 gap-1 min-w-28"
+
+          <template v-if="flag.data.length">
+            <button
+              class="flex items-center gap-1 mt-2 text-xs text-gh-muted hover:text-gh-text transition-colors"
+              @click="toggleFlag(flag.label)"
             >
-              <div class="flex items-center gap-1.5 text-gh-muted">
+              <span
+                class="i-lucide:chevron-down text-xs transition-transform"
+                :class="isFlagExpanded(flag.label) && 'rotate-180'"
+              />
+              {{ isFlagExpanded(flag.label) ? "Hide" : "Show" }} data
+            </button>
+
+            <div
+              v-if="isFlagExpanded(flag.label)"
+              class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2"
+            >
+              <div
+                v-for="point in flag.data"
+                :key="point.label"
+                class="flex items-center gap-2"
+              >
                 <span
                   :class="getDataPointIcon(point.label)"
-                  class="text-xs shrink-0"
+                  class="text-xs text-gh-muted shrink-0"
                 />
-                <span class="text-xs leading-tight">{{
+                <span class="text-gh-muted text-xs flex-1">{{
                   parseDataPoint(point).label
                 }}</span>
-              </div>
-              <div class="flex items-baseline gap-2 mt-0.5">
                 <template v-if="typeof point.value === 'boolean'">
                   <span
                     :class="
@@ -383,25 +411,27 @@ useSeoAnalysis(identifyAnalysis, {
                         ? 'i-lucide:check text-green-500'
                         : 'i-lucide:x text-gh-muted'
                     "
-                    class="text-sm"
+                    class="text-sm shrink-0"
                   />
                 </template>
                 <span
                   v-else
-                  class="font-mono font-semibold text-sm"
-                  :class="isExceeded(point) ? 'text-amber-400' : 'text-gh-text'"
+                  class="font-mono font-semibold text-sm shrink-0"
+                  :class="
+                    isExceeded(point) ? 'text-amber-400' : 'text-gh-text'
+                  "
                 >
                   {{ parseDataPoint(point).displayValue }}
                 </span>
                 <span
                   v-if="parseDataPoint(point).displayThreshold !== undefined"
-                  class="text-gh-muted text-xs"
+                  class="text-gh-muted text-xs shrink-0"
                 >
-                  limit {{ parseDataPoint(point).displayThreshold }}
+                  / {{ parseDataPoint(point).displayThreshold }}
                 </span>
               </div>
             </div>
-          </div>
+          </template>
         </li>
       </ul>
 
