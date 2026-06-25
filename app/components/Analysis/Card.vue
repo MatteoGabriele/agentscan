@@ -268,30 +268,11 @@ useSeoAnalysis(identifyAnalysis, {
       </div>
     </div>
 
-    <div
+    <AnalysisFlags
       v-if="data.analysis.flags.length > 0 || hasActivityReport"
-      class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border"
-    >
-      <h3 class="mb-4 text-gh-text text-xl font-mono">Activity Signals</h3>
-      <ul>
-        <li
-          v-for="flag in data.analysis.flags"
-          :key="flag.label"
-          class="not-last:border-b border-gh-border-light/40 py-4 @md:py-4"
-        >
-          <h4 class="font-mono">{{ flag.label }}</h4>
-          <p class="text-gh-muted">
-            {{ flag.detail }}
-          </p>
-        </li>
-      </ul>
-
-      <ExternalAnlysisCard
-        v-if="activityReport"
-        :items="[activityReport]"
-        class="mt-4"
-      />
-    </div>
+      :flags="data.analysis.flags"
+      :activity-report="activityReport"
+    />
 
     <ChartAccountEventsTimeline
       :classification="data.analysis.classification"
