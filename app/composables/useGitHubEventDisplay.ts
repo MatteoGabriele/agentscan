@@ -1,0 +1,159 @@
+// @unocss-include
+import type { GitHubEvent } from "@unveil/identity";
+import dayjs from "dayjs";
+
+const ZERO_SHA = "0000000000000000000000000000000000000000";
+
+export function useGitHubEventDisplay() {
+  function getEventIcon(event: GitHubEvent): string {
+    switch (event.type) {
+      case "PullRequestEvent":
+        return "i-lucide:git-pull-request";
+      case "PushEvent":
+        return "i-lucide:upload";
+      case "CreateEvent":
+        return "i-lucide:git-branch";
+      case "DeleteEvent":
+        return "i-lucide:trash-2";
+      case "ForkEvent":
+        return "i-lucide:git-fork";
+      case "WatchEvent":
+        return "i-lucide:star";
+      case "IssueCommentEvent":
+      case "PullRequestReviewCommentEvent":
+        return "i-lucide:message-square";
+      case "IssuesEvent":
+        return "i-lucide:circle-dot";
+      case "PullRequestReviewEvent":
+        return "i-lucide:eye";
+      case "ReleaseEvent":
+        return "i-lucide:tag";
+      case "CommitCommentEvent":
+        return "i-lucide:message-circle";
+      case "MemberEvent":
+        return "i-lucide:user-plus";
+      default:
+        return "i-lucide:activity";
+    }
+  }
+
+  function getEventDescription(event: GitHubEvent): string {
+    const payload = event.payload as Record<string, unknown> | undefined;
+    switch (event.type) {
+      case "PullRequestEvent": {
+        const action = payload?.action as string | undefined;
+        const pr = payload?.pull_request as { number?: number } | undefined;
+        return pr?.number
+          ? `PR #${pr.number} ${action ?? ""}`.trim()
+          : `Pull request ${action ?? ""}`.trim();
+      }
+      case "PushEvent": {
+        const commits =
+          (payload?.size as number) ??
+          (payload?.commits as unknown[])?.length ??
+          0;
+        const ref = (payload?.ref as string)?.replace("refs/heads/", "") ?? "";
+        return ref
+          ? `${commits} commit${commits !== 1 ? "s" : ""} → ${ref}`
+          : `${commits} commit${commits !== 1 ? "s" : ""}`;
+      }
+      case "CreateEvent": {
+        const refType = payload?.ref_type as string | undefined;
+        const ref = payload?.ref as string | undefined;
+        return ref
+          ? `${refType} created: ${ref}`
+          : `${refType ?? "ref"} created`;
+      }
+      case "DeleteEvent": {
+        const refType = payload?.ref_type as string | undefined;
+        const ref = payload?.ref as string | undefined;
+        return ref
+          ? `${refType} deleted: ${ref}`
+          : `${refType ?? "ref"} deleted`;
+      }
+      case "ForkEvent": {
+        const forkee = payload?.forkee as { full_name?: string } | undefined;
+        return forkee?.full_name ? `forked → ${forkee.full_name}` : "forked";
+      }
+      case "WatchEvent":
+        return "starred";
+      case "IssueCommentEvent": {
+        const issue = payload?.issue as { number?: number } | undefined;
+        return issue?.number ? `comment on #${issue.number}` : "issue comment";
+      }
+      case "IssuesEvent": {
+        const action = payload?.action as string | undefined;
+        const issue = payload?.issue as { number?: number } | undefined;
+        return issue?.number
+          ? `issue #${issue.number} ${action ?? ""}`.trim()
+          : `issue ${action ?? ""}`.trim();
+      }
+      case "PullRequestReviewEvent": {
+        const pr = payload?.pull_request as { number?: number } | undefined;
+        return pr?.number ? `reviewed PR #${pr.number}` : "PR review";
+      }
+      case "PullRequestReviewCommentEvent": {
+        const pr = payload?.pull_request as { number?: number } | undefined;
+        return pr?.number ? `comment on PR #${pr.number}` : "PR comment";
+      }
+      case "ReleaseEvent": {
+        const release = payload?.release as { tag_name?: string } | undefined;
+        return release?.tag_name ? `released ${release.tag_name}` : "release";
+      }
+      default:
+        return event.type?.replace("Event", "") ?? "event";
+    }
+  }
+
+  function getEventUrl(event: GitHubEvent): string | undefined {
+    const repo = event.repo?.name;
+    const payload = event.payload as Record<string, unknown> | undefined;
+    if (!repo) return undefined;
+    const base = `https://github.com/${repo}`;
+    switch (event.type) {
+      case "PullRequestEvent":
+      case "PullRequestReviewEvent":
+      case "PullRequestReviewCommentEvent": {
+        const pr = payload?.pull_request as { number?: number } | undefined;
+        return pr?.number ? `${base}/pull/${pr.number}` : undefined;
+      }
+      case "PushEvent": {
+        const after = payload?.after as string | undefined;
+        return after && after !== ZERO_SHA
+          ? `${base}/commit/${after}`
+          : undefined;
+      }
+      default:
+        return undefined;
+    }
+  }
+
+  function formatEventTime(date: string | null | undefined): string {
+    if (!date) return "";
+    return dayjs(date).format("MMM D, h:mma");
+  }
+
+  function groupEvents(
+    events: GitHubEvent[],
+  ): { icon: string; events: GitHubEvent[] }[] {
+    const groups: { icon: string; events: GitHubEvent[] }[] = [];
+    for (const ev of events) {
+      const icon = getEventIcon(ev);
+      const last = groups[groups.length - 1];
+      if (last && last.icon === icon) {
+        last.events.push(ev);
+      } else {
+        groups.push({ icon, events: [ev] });
+      }
+    }
+    return groups;
+  }
+
+  return {
+    getEventIcon,
+    getEventDescription,
+    getEventUrl,
+    formatEventTime,
+    groupEvents,
+  };
+}
