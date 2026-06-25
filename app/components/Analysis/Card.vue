@@ -81,20 +81,33 @@ function parseDataPoint(point: FlagDataPoint): {
 
 function getEventIcon(type: string | null | undefined): string {
   switch (type) {
-    case "PullRequestEvent": return "i-lucide:git-pull-request";
-    case "PushEvent": return "i-lucide:upload";
-    case "CreateEvent": return "i-lucide:git-branch";
-    case "DeleteEvent": return "i-lucide:trash-2";
-    case "ForkEvent": return "i-lucide:git-fork";
-    case "WatchEvent": return "i-lucide:star";
+    case "PullRequestEvent":
+      return "i-lucide:git-pull-request";
+    case "PushEvent":
+      return "i-lucide:upload";
+    case "CreateEvent":
+      return "i-lucide:git-branch";
+    case "DeleteEvent":
+      return "i-lucide:trash-2";
+    case "ForkEvent":
+      return "i-lucide:git-fork";
+    case "WatchEvent":
+      return "i-lucide:star";
     case "IssueCommentEvent":
-    case "PullRequestReviewCommentEvent": return "i-lucide:message-square";
-    case "IssuesEvent": return "i-lucide:circle-dot";
-    case "PullRequestReviewEvent": return "i-lucide:eye";
-    case "ReleaseEvent": return "i-lucide:tag";
-    case "CommitCommentEvent": return "i-lucide:message-circle";
-    case "MemberEvent": return "i-lucide:user-plus";
-    default: return "i-lucide:activity";
+    case "PullRequestReviewCommentEvent":
+      return "i-lucide:message-square";
+    case "IssuesEvent":
+      return "i-lucide:circle-dot";
+    case "PullRequestReviewEvent":
+      return "i-lucide:eye";
+    case "ReleaseEvent":
+      return "i-lucide:tag";
+    case "CommitCommentEvent":
+      return "i-lucide:message-circle";
+    case "MemberEvent":
+      return "i-lucide:user-plus";
+    default:
+      return "i-lucide:activity";
   }
 }
 
@@ -105,12 +118,19 @@ function getEventDescription(event: GitHubEvent): string {
     case "PullRequestEvent": {
       const action = payload?.action as string | undefined;
       const pr = payload?.pull_request as { number?: number } | undefined;
-      return pr?.number ? `PR #${pr.number} ${action ?? ""}`.trim() : `Pull request ${action ?? ""}`.trim();
+      return pr?.number
+        ? `PR #${pr.number} ${action ?? ""}`.trim()
+        : `Pull request ${action ?? ""}`.trim();
     }
     case "PushEvent": {
-      const commits = (payload?.commits as unknown[])?.length ?? (payload?.size as number) ?? 0;
+      const commits =
+        (payload?.commits as unknown[])?.length ??
+        (payload?.size as number) ??
+        0;
       const ref = (payload?.ref as string)?.replace("refs/heads/", "") ?? "";
-      return ref ? `${commits} commit${commits !== 1 ? "s" : ""} → ${ref}` : `${commits} commit${commits !== 1 ? "s" : ""}`;
+      return ref
+        ? `${commits} commit${commits !== 1 ? "s" : ""} → ${ref}`
+        : `${commits} commit${commits !== 1 ? "s" : ""}`;
     }
     case "CreateEvent": {
       const refType = payload?.ref_type as string | undefined;
@@ -126,7 +146,8 @@ function getEventDescription(event: GitHubEvent): string {
       const forkee = payload?.forkee as { full_name?: string } | undefined;
       return forkee?.full_name ? `forked → ${forkee.full_name}` : "forked";
     }
-    case "WatchEvent": return "starred";
+    case "WatchEvent":
+      return "starred";
     case "IssueCommentEvent": {
       const issue = payload?.issue as { number?: number } | undefined;
       return issue?.number ? `comment on #${issue.number}` : "issue comment";
@@ -134,7 +155,9 @@ function getEventDescription(event: GitHubEvent): string {
     case "IssuesEvent": {
       const action = payload?.action as string | undefined;
       const issue = payload?.issue as { number?: number } | undefined;
-      return issue?.number ? `issue #${issue.number} ${action ?? ""}`.trim() : `issue ${action ?? ""}`.trim();
+      return issue?.number
+        ? `issue #${issue.number} ${action ?? ""}`.trim()
+        : `issue ${action ?? ""}`.trim();
     }
     case "PullRequestReviewEvent": {
       const pr = payload?.pull_request as { number?: number } | undefined;
@@ -493,23 +516,25 @@ function getEventUrl(event: GitHubEvent): string | undefined {
           :key="flag.label"
           class="not-last:border-b border-gh-border-light/40 py-4"
         >
-          <div class="flex items-center justify-between gap-2 mb-1">
+          <div class="flex items-center justify-between gap-4 mb-1">
             <h4 class="font-mono">{{ flag.label }}</h4>
+            <button
+              v-if="flag.data.length"
+              class="flex rounded-full p-1.5 text-gh-muted hover:text-gh-text hover:bg-gh-muted/20 transition-all shrink-0"
+              :title="
+                isFlagExpanded(flag.label) ? 'Hide breakdown' : 'Show breakdown'
+              "
+              @click="toggleFlag(flag.label)"
+            >
+              <span
+                class="i-lucide:chevron-down text-sm transition-transform block"
+                :class="isFlagExpanded(flag.label) && 'rotate-180'"
+              />
+            </button>
           </div>
           <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
 
           <template v-if="flag.data.length">
-            <button
-              class="flex items-center gap-1 mt-2 text-xs text-gh-muted hover:text-gh-text transition-colors"
-              @click="toggleFlag(flag.label)"
-            >
-              <span
-                class="i-lucide:chevron-down text-xs transition-transform"
-                :class="isFlagExpanded(flag.label) && 'rotate-180'"
-              />
-              {{ isFlagExpanded(flag.label) ? "Hide" : "Show" }} data
-            </button>
-
             <div
               v-if="isFlagExpanded(flag.label)"
               class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2"
@@ -539,7 +564,9 @@ function getEventUrl(event: GitHubEvent): string | undefined {
                 <span
                   v-else
                   class="font-mono font-semibold text-xs shrink-0"
-                  :class="isExceeded(point) ? 'text-gh-danger-hover' : 'text-gh-text'"
+                  :class="
+                    isExceeded(point) ? 'text-gh-danger-hover' : 'text-gh-text'
+                  "
                 >
                   {{ parseDataPoint(point).displayValue }}
                 </span>
@@ -552,7 +579,9 @@ function getEventUrl(event: GitHubEvent): string | undefined {
               </div>
 
               <template v-if="flag.events.length">
-                <p class="text-gh-muted text-xs pt-2 pb-1 border-t border-gh-border-light/20">
+                <p
+                  class="text-gh-muted text-xs pt-2 pb-1 border-t border-gh-border-light/20"
+                >
                   Evidence
                 </p>
                 <div
@@ -576,7 +605,9 @@ function getEventUrl(event: GitHubEvent): string | undefined {
                   <span v-else class="text-gh-text text-xs flex-1 truncate">
                     {{ getEventDescription(ev) }}
                   </span>
-                  <span class="text-gh-muted text-xs shrink-0 truncate max-w-32">
+                  <span
+                    class="text-gh-muted text-xs shrink-0 truncate max-w-32"
+                  >
                     {{ ev.repo?.name }}
                   </span>
                   <span class="text-gh-muted text-xs shrink-0">
@@ -588,7 +619,11 @@ function getEventUrl(event: GitHubEvent): string | undefined {
                   class="text-gh-muted text-xs hover:text-gh-text transition-colors"
                   @click="toggleFlagEvents(flag.label)"
                 >
-                  {{ areFlagEventsExpanded(flag.label) ? "Show less" : `Show ${flag.events.length - EVENT_PREVIEW_COUNT} more` }}
+                  {{
+                    areFlagEventsExpanded(flag.label)
+                      ? "Show less"
+                      : `Show ${flag.events.length - EVENT_PREVIEW_COUNT} more`
+                  }}
                 </button>
               </template>
             </div>
