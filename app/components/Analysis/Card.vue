@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {
+  GitHubEvent,
   GitHubUser,
   IdentityClassification,
   IdentifyResult,
@@ -76,6 +77,85 @@ function parseDataPoint(point: FlagDataPoint): {
     displayThreshold:
       point.threshold !== undefined ? withUnit(point.threshold) : undefined,
   };
+}
+
+function getEventIcon(type: string | null | undefined): string {
+  switch (type) {
+    case "PullRequestEvent": return "i-lucide:git-pull-request";
+    case "PushEvent": return "i-lucide:upload";
+    case "CreateEvent": return "i-lucide:git-branch";
+    case "DeleteEvent": return "i-lucide:trash-2";
+    case "ForkEvent": return "i-lucide:git-fork";
+    case "WatchEvent": return "i-lucide:star";
+    case "IssueCommentEvent":
+    case "PullRequestReviewCommentEvent": return "i-lucide:message-square";
+    case "IssuesEvent": return "i-lucide:circle-dot";
+    case "PullRequestReviewEvent": return "i-lucide:eye";
+    case "ReleaseEvent": return "i-lucide:tag";
+    case "CommitCommentEvent": return "i-lucide:message-circle";
+    case "MemberEvent": return "i-lucide:user-plus";
+    default: return "i-lucide:activity";
+  }
+}
+
+function getEventDescription(event: GitHubEvent): string {
+  const payload = event.payload as Record<string, unknown> | undefined;
+
+  switch (event.type) {
+    case "PullRequestEvent": {
+      const action = payload?.action as string | undefined;
+      const pr = payload?.pull_request as { number?: number } | undefined;
+      return pr?.number ? `PR #${pr.number} ${action ?? ""}`.trim() : `Pull request ${action ?? ""}`.trim();
+    }
+    case "PushEvent": {
+      const commits = (payload?.commits as unknown[])?.length ?? (payload?.size as number) ?? 0;
+      const ref = (payload?.ref as string)?.replace("refs/heads/", "") ?? "";
+      return ref ? `${commits} commit${commits !== 1 ? "s" : ""} → ${ref}` : `${commits} commit${commits !== 1 ? "s" : ""}`;
+    }
+    case "CreateEvent": {
+      const refType = payload?.ref_type as string | undefined;
+      const ref = payload?.ref as string | undefined;
+      return ref ? `${refType} created: ${ref}` : `${refType ?? "ref"} created`;
+    }
+    case "DeleteEvent": {
+      const refType = payload?.ref_type as string | undefined;
+      const ref = payload?.ref as string | undefined;
+      return ref ? `${refType} deleted: ${ref}` : `${refType ?? "ref"} deleted`;
+    }
+    case "ForkEvent": {
+      const forkee = payload?.forkee as { full_name?: string } | undefined;
+      return forkee?.full_name ? `forked → ${forkee.full_name}` : "forked";
+    }
+    case "WatchEvent": return "starred";
+    case "IssueCommentEvent": {
+      const issue = payload?.issue as { number?: number } | undefined;
+      return issue?.number ? `comment on #${issue.number}` : "issue comment";
+    }
+    case "IssuesEvent": {
+      const action = payload?.action as string | undefined;
+      const issue = payload?.issue as { number?: number } | undefined;
+      return issue?.number ? `issue #${issue.number} ${action ?? ""}`.trim() : `issue ${action ?? ""}`.trim();
+    }
+    case "PullRequestReviewEvent": {
+      const pr = payload?.pull_request as { number?: number } | undefined;
+      return pr?.number ? `reviewed PR #${pr.number}` : "PR review";
+    }
+    case "PullRequestReviewCommentEvent": {
+      const pr = payload?.pull_request as { number?: number } | undefined;
+      return pr?.number ? `comment on PR #${pr.number}` : "PR comment";
+    }
+    case "ReleaseEvent": {
+      const release = payload?.release as { tag_name?: string } | undefined;
+      return release?.tag_name ? `released ${release.tag_name}` : "release";
+    }
+    default:
+      return event.type?.replace("Event", "") ?? "event";
+  }
+}
+
+function formatEventTime(date: string | null | undefined): string {
+  if (!date) return "";
+  return dayjs(date).format("MMM D, h:mma");
 }
 
 const props = defineProps<{
@@ -232,6 +312,7 @@ useSeoAnalysis(identifyAnalysis, {
 });
 
 const expandedFlags = ref<string[]>([]);
+const expandedFlagEvents = ref<string[]>([]);
 
 function toggleFlag(label: string) {
   const idx = expandedFlags.value.indexOf(label);
@@ -244,6 +325,52 @@ function toggleFlag(label: string) {
 
 function isFlagExpanded(label: string) {
   return expandedFlags.value.includes(label);
+}
+
+function toggleFlagEvents(label: string) {
+  const idx = expandedFlagEvents.value.indexOf(label);
+  if (idx === -1) {
+    expandedFlagEvents.value.push(label);
+  } else {
+    expandedFlagEvents.value.splice(idx, 1);
+  }
+}
+
+function areFlagEventsExpanded(label: string) {
+  return expandedFlagEvents.value.includes(label);
+}
+
+const EVENT_PREVIEW_COUNT = 5;
+
+function visibleEvents(flag: IdentifyResult["flags"][number]) {
+  return areFlagEventsExpanded(flag.label)
+    ? flag.events
+    : flag.events.slice(0, EVENT_PREVIEW_COUNT);
+}
+
+function getEventUrl(event: GitHubEvent): string | undefined {
+  const repo = event.repo?.name;
+  const payload = event.payload as Record<string, unknown> | undefined;
+  if (!repo) return undefined;
+  const base = `https://github.com/${repo}`;
+
+  switch (event.type) {
+    case "PullRequestEvent":
+    case "PullRequestReviewEvent":
+    case "PullRequestReviewCommentEvent": {
+      const pr = payload?.pull_request as { number?: number } | undefined;
+      return pr?.number ? `${base}/pull/${pr.number}` : undefined;
+    }
+    case "PushEvent": {
+      const after = payload?.after as string | undefined;
+      if (after && after !== "0000000000000000000000000000000000000000") {
+        return `${base}/commit/${after}`;
+      }
+      return undefined;
+    }
+    default:
+      return undefined;
+  }
 }
 </script>
 
@@ -368,11 +495,6 @@ function isFlagExpanded(label: string) {
         >
           <div class="flex items-center justify-between gap-2 mb-1">
             <h4 class="font-mono">{{ flag.label }}</h4>
-            <span
-              class="shrink-0 text-xs font-mono text-gh-muted bg-gh-border-light/20 px-2 py-0.5 rounded"
-            >
-              +{{ flag.points }}pts
-            </span>
           </div>
           <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
 
@@ -416,10 +538,8 @@ function isFlagExpanded(label: string) {
                 </template>
                 <span
                   v-else
-                  class="font-mono font-semibold text-sm shrink-0"
-                  :class="
-                    isExceeded(point) ? 'text-amber-400' : 'text-gh-text'
-                  "
+                  class="font-mono font-semibold text-xs shrink-0"
+                  :class="isExceeded(point) ? 'text-gh-danger-hover' : 'text-gh-text'"
                 >
                   {{ parseDataPoint(point).displayValue }}
                 </span>
@@ -430,6 +550,47 @@ function isFlagExpanded(label: string) {
                   / {{ parseDataPoint(point).displayThreshold }}
                 </span>
               </div>
+
+              <template v-if="flag.events.length">
+                <p class="text-gh-muted text-xs pt-2 pb-1 border-t border-gh-border-light/20">
+                  Evidence
+                </p>
+                <div
+                  v-for="(ev, i) in visibleEvents(flag)"
+                  :key="i"
+                  class="flex items-center gap-2"
+                >
+                  <span
+                    :class="getEventIcon(ev.type)"
+                    class="text-xs text-gh-muted shrink-0"
+                  />
+                  <a
+                    v-if="getEventUrl(ev)"
+                    :href="getEventUrl(ev)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-gh-text text-xs flex-1 truncate hover:underline"
+                  >
+                    {{ getEventDescription(ev) }}
+                  </a>
+                  <span v-else class="text-gh-text text-xs flex-1 truncate">
+                    {{ getEventDescription(ev) }}
+                  </span>
+                  <span class="text-gh-muted text-xs shrink-0 truncate max-w-32">
+                    {{ ev.repo?.name }}
+                  </span>
+                  <span class="text-gh-muted text-xs shrink-0">
+                    {{ formatEventTime(ev.created_at) }}
+                  </span>
+                </div>
+                <button
+                  v-if="flag.events.length > EVENT_PREVIEW_COUNT"
+                  class="text-gh-muted text-xs hover:text-gh-text transition-colors"
+                  @click="toggleFlagEvents(flag.label)"
+                >
+                  {{ areFlagEventsExpanded(flag.label) ? "Show less" : `Show ${flag.events.length - EVENT_PREVIEW_COUNT} more` }}
+                </button>
+              </template>
             </div>
           </template>
         </li>
