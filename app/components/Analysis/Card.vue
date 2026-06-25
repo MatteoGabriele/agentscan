@@ -516,22 +516,17 @@ function getEventUrl(event: GitHubEvent): string | undefined {
           :key="flag.label"
           class="not-last:border-b border-gh-border-light/40 py-4"
         >
-          <div class="flex items-center justify-between gap-4 mb-1">
+          <button
+            class="flex items-center gap-1 mb-1"
+            @click="flag.data.length ? toggleFlag(flag.label) : undefined"
+          >
             <h4 class="font-mono">{{ flag.label }}</h4>
-            <button
+            <span
               v-if="flag.data.length"
-              class="flex rounded-full p-1.5 text-gh-muted hover:text-gh-text hover:bg-gh-muted/20 transition-all shrink-0"
-              :title="
-                isFlagExpanded(flag.label) ? 'Hide breakdown' : 'Show breakdown'
-              "
-              @click="toggleFlag(flag.label)"
-            >
-              <span
-                class="i-lucide:chevron-down text-sm transition-transform block"
-                :class="isFlagExpanded(flag.label) && 'rotate-180'"
-              />
-            </button>
-          </div>
+              class="i-lucide:chevron-down text-sm text-gh-muted transition-transform mt-0.5 shrink-0"
+              :class="isFlagExpanded(flag.label) && 'rotate-180'"
+            />
+          </button>
           <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
 
           <template v-if="flag.data.length">
