@@ -118,9 +118,9 @@ export function useGitHubEventDisplay() {
         return pr?.number ? `${base}/pull/${pr.number}` : undefined;
       }
       case "PushEvent": {
-        const after = payload?.after as string | undefined;
-        return after && after !== ZERO_SHA
-          ? `${base}/commit/${after}`
+        const sha = (payload?.head ?? payload?.after) as string | undefined;
+        return sha && sha !== ZERO_SHA
+          ? `${base}/commit/${sha}`
           : undefined;
       }
       default:
