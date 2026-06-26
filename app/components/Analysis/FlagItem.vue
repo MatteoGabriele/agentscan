@@ -31,7 +31,10 @@ const visibleEvents = computed(() =>
 
 <template>
   <li class="not-last:border-b border-gh-border-light/40 py-4">
-    <button class="flex items-center gap-1 mb-1" @click="toggleExpanded">
+    <button
+      class="flex text-left items-center gap-1 mb-1"
+      @click="toggleExpanded"
+    >
       <h4 class="font-mono">{{ flag.label }}</h4>
       <span
         v-if="flag.data.length"
