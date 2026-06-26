@@ -5,7 +5,7 @@ type Flag = IdentifyResult["flags"][number];
 
 const props = defineProps<{ flag: Flag }>();
 
-const { isExceeded, parseDataPoint, groupDataPoints } = useFlagDataPoints();
+const { parseDataPoint, groupDataPoints } = useFlagDataPoints();
 const { getEventDescription, getEventUrl, formatEventTime, groupEvents } =
   useGitHubEventDisplay();
 
@@ -116,7 +116,10 @@ const visibleEvents = computed(() =>
                   class="text-gh-text text-sm hover:underline inline-flex items-center gap-1"
                 >
                   {{ getEventDescription(ev) }}
-                  <span class="i-lucide:external-link text-gh-muted opacity-60" style="font-size:0.6rem" />
+                  <span
+                    class="i-lucide:external-link text-gh-muted opacity-60"
+                    style="font-size: 0.6rem"
+                  />
                 </a>
                 <span v-else class="text-gh-text text-sm">
                   {{ getEventDescription(ev) }}

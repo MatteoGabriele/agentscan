@@ -33,13 +33,6 @@ export function useFlagDataPoints() {
     );
   }
 
-  function isExceeded(point: FlagDataPoint): boolean {
-    if (point.threshold === undefined) return false;
-    const v = parseFloat(String(point.value).replace("%", ""));
-    const t = parseFloat(String(point.threshold).replace("%", ""));
-    return !isNaN(v) && !isNaN(t) && v > t;
-  }
-
   function parseDataPoint(point: FlagDataPoint): {
     label: string;
     displayValue: string;
@@ -54,12 +47,14 @@ export function useFlagDataPoints() {
           point.threshold !== undefined ? String(point.threshold) : undefined,
       };
     }
+
     const [, cleanLabel, unit] = unitMatch as [string, string, string];
     const withUnit = (val: FlagDataPoint["value"]) => {
       if (typeof val === "boolean") return String(val);
       const n = parseFloat(String(val));
       return !isNaN(n) ? `${val}${unit}` : String(val);
     };
+
     return {
       label: cleanLabel,
       displayValue: withUnit(point.value),
@@ -72,17 +67,24 @@ export function useFlagDataPoints() {
     data: FlagDataPoint[],
   ): { icon: string; points: FlagDataPoint[] }[] {
     const groups: { icon: string; points: FlagDataPoint[] }[] = [];
+
     for (const point of data) {
       const icon = getDataPointIcon(point.label);
       const last = groups[groups.length - 1];
+
       if (last && last.icon === icon) {
         last.points.push(point);
       } else {
         groups.push({ icon, points: [point] });
       }
     }
+
     return groups;
   }
 
-  return { getDataPointIcon, isExceeded, parseDataPoint, groupDataPoints };
+  return {
+    getDataPointIcon,
+    parseDataPoint,
+    groupDataPoints,
+  };
 }
