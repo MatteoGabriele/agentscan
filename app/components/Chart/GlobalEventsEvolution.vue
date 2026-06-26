@@ -219,7 +219,7 @@ function getTrend({ series, item, index }: any) {
  */
 const landmarks = [
   {
-    date: "2026-06-12", // FIXME: for prod, replace with 2026-06-23
+    date: "2026-06-12", // FIXME: for prod, replace with 2026-07-01
     name: "Sample update",
     description: "13 repositories added to the dataset",
   },
