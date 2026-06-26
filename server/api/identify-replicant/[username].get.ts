@@ -4,7 +4,7 @@ import * as v from "valibot";
 import { formatUsername } from "~~/server/utils/format-username";
 
 const MIN_PAGES = 1;
-const MAX_PAGES = 2;
+const MAX_PAGES = 3;
 
 const QuerySchema = v.object({
   created_at: v.pipe(

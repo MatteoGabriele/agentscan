@@ -19,7 +19,7 @@ const { data, status, error } = useFetch(
     query: {
       created_at: props.user.created_at,
       repos_count: props.user.public_repos,
-      pages: 2,
+      pages: 3,
       show_events: true,
     },
     key: analysisKey,
