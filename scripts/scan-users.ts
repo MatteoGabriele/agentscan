@@ -101,7 +101,7 @@ async function scanUser(
 
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/identify-replicant/${username}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=2`,
+      `${API_BASE_URL}/api/identify-replicant/${username}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=3`,
       { signal: controller.signal },
     );
 
