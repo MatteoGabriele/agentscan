@@ -113,6 +113,21 @@ export function useGitHubEventDisplay() {
           ? `${base}/commit/${sha}`
           : undefined;
       }
+      case "IssueCommentEvent": {
+        const issue = payload?.issue as { number?: number } | undefined;
+        const comment = payload?.comment as { id?: number } | undefined;
+        if (!issue?.number) return undefined;
+        return comment?.id
+          ? `${base}/issues/${issue.number}#issuecomment-${comment.id}`
+          : `${base}/issues/${issue.number}`;
+      }
+      case "CommitCommentEvent": {
+        const comment = payload?.comment as { commit_id?: string; id?: number } | undefined;
+        if (!comment?.commit_id) return undefined;
+        return comment.id
+          ? `${base}/commit/${comment.commit_id}#commitcomment-${comment.id}`
+          : `${base}/commit/${comment.commit_id}`;
+      }
       default:
         return undefined;
     }
@@ -121,6 +136,41 @@ export function useGitHubEventDisplay() {
   function formatEventTime(date: string | null | undefined): string {
     if (!date) return "";
     return dayjs(date).format("MMM D, h:mma");
+  }
+
+  function getDeltaSeconds(a: GitHubEvent, b: GitHubEvent): number {
+    return dayjs(b.created_at ?? 0).diff(dayjs(a.created_at ?? 0), "second");
+  }
+
+  function sortByTime(evts: GitHubEvent[]): GitHubEvent[] {
+    return [...evts].sort(
+      (a, b) => dayjs(a.created_at ?? 0).valueOf() - dayjs(b.created_at ?? 0).valueOf(),
+    );
+  }
+
+  function getRapidBurst(
+    evts: GitHubEvent[],
+  ): { count: number; spanSeconds: number } | null {
+    if (evts.length < 3) return null;
+    const sorted = sortByTime(evts);
+    const first = sorted.at(0);
+    const last = sorted.at(-1);
+    if (!first || !last) return null;
+    const spanSeconds = dayjs(last.created_at ?? 0).diff(
+      dayjs(first.created_at ?? 0),
+      "second",
+    );
+    if (spanSeconds / (sorted.length - 1) < 120) {
+      return { count: sorted.length, spanSeconds };
+    }
+    return null;
+  }
+
+  function formatSpan(seconds: number): string {
+    if (seconds < 60) return `${seconds}s`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return s > 0 ? `${m}m ${s}s` : `${m}m`;
   }
 
   function groupEvents(
@@ -145,5 +195,9 @@ export function useGitHubEventDisplay() {
     getEventUrl,
     formatEventTime,
     groupEvents,
+    getDeltaSeconds,
+    sortByTime,
+    getRapidBurst,
+    formatSpan,
   };
 }

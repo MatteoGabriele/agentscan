@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { IdentifyResult } from "@unveil/identity";
+import type { IdentifyFlag } from "@unveil/identity";
 import type { IntegrationItem } from "~~/shared/types/integrations";
 
 defineProps<{
-  flags: IdentifyResult["flags"];
+  flags: IdentifyFlag[];
   activityReport: IntegrationItem | undefined;
 }>();
 </script>
