@@ -124,7 +124,7 @@ const hiddenCount = computed(() => {
       </div>
 
       <button
-        v-if="hiddenCount > 0"
+        v-if="hiddenCount > 0 || showAllEvidence"
         class="text-gh-muted text-xs hover:text-gh-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
@@ -172,7 +172,7 @@ const hiddenCount = computed(() => {
       </div>
 
       <button
-        v-if="hiddenCount > 0"
+        v-if="hiddenCount > 0 || showAllEvidence"
         class="text-gh-muted text-xs hover:text-gh-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
@@ -222,7 +222,7 @@ const hiddenCount = computed(() => {
       </div>
 
       <button
-        v-if="hiddenCount > 0"
+        v-if="hiddenCount > 0 || showAllEvidence"
         class="text-gh-muted text-xs hover:text-gh-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
