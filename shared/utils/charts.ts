@@ -1,184 +1,180 @@
-import type { VueUiHorizontalBarDatasetItem } from "vue-data-ui/vue-ui-horizontal-bar";
-import type { VueUiXyDatasetItem } from "vue-data-ui/vue-ui-xy";
+import type { VueUiHorizontalBarDatasetItem } from 'vue-data-ui/vue-ui-horizontal-bar'
+import type { VueUiXyDatasetItem } from 'vue-data-ui/vue-ui-xy'
 
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
-    return [];
+    return []
   }
 
-  const firstDay = days[0]!;
-  const lastDay = days[days.length - 1]!;
-  const firstDayTime = new Date(firstDay).getTime();
-  const lastDayTime = new Date(lastDay).getTime();
-  const oneDay = 24 * 60 * 60 * 1000;
-  const completeDays: string[] = [];
+  const firstDay = days[0]!
+  const lastDay = days[days.length - 1]!
+  const firstDayTime = new Date(firstDay).getTime()
+  const lastDayTime = new Date(lastDay).getTime()
+  const oneDay = 24 * 60 * 60 * 1000
+  const completeDays: string[] = []
 
   for (let time = firstDayTime; time <= lastDayTime; time += oneDay) {
-    completeDays.push(new Date(time).toISOString().slice(0, 10));
+    completeDays.push(new Date(time).toISOString().slice(0, 10))
   }
 
-  return completeDays;
+  return completeDays
 }
 
 // Horizontal bar for package scores
 
 export function getDayKey(date: string | Date) {
-  if (typeof date === "string") {
-    return date.slice(0, 10);
+  if (typeof date === 'string') {
+    return date.slice(0, 10)
   }
 
   return [
     date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-");
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-')
 }
 
 export function convertToHorizontalBarDataset(
   source: EcosystemHealthItem[] = [],
   date?: Date | string | null,
 ): VueUiHorizontalBarDatasetItem[] {
-  const targetDay = date ? getDayKey(date) : null;
+  const targetDay = date ? getDayKey(date) : null
 
-  const grouped = source.reduce<
-    Record<string, { total: number; count: number }>
-  >((acc, item) => {
-    const createdDay = getDayKey(item.created_at);
+  const grouped = source.reduce<Record<string, { total: number; count: number }>>((acc, item) => {
+    const createdDay = getDayKey(item.created_at)
 
     if (targetDay && createdDay !== targetDay) {
-      return acc;
+      return acc
     }
 
-    const existing = acc[item.repo_name] ?? { total: 0, count: 0 };
+    const existing = acc[item.repo_name] ?? { total: 0, count: 0 }
 
     acc[item.repo_name] = {
       total: existing.total + item.score,
       count: existing.count + 1,
-    };
+    }
 
-    return acc;
-  }, {});
+    return acc
+  }, {})
 
   return Object.entries(grouped).map(([name, { total, count }]) => ({
     name,
     value: total / count,
-  }));
+  }))
 }
 
 // Evolution of pull request closure rates by repository for PRs in a given score range.
 
-export type ScoreBounds = [min: number, max: number];
+export type ScoreBounds = [min: number, max: number]
 
 export type RepoClosedPrOptions = {
-  repoKey?: keyof EcosystemHealthItem;
-  prKey?: keyof EcosystemHealthItem;
-  stateKey?: keyof EcosystemHealthItem;
-  scoreKey?: keyof EcosystemHealthItem;
-  dateKey?: keyof EcosystemHealthItem;
-  scoreBounds?: ScoreBounds;
-  openState?: string;
-  closedState?: string;
-  includeAlreadyClosed?: boolean;
-};
+  repoKey?: keyof EcosystemHealthItem
+  prKey?: keyof EcosystemHealthItem
+  stateKey?: keyof EcosystemHealthItem
+  scoreKey?: keyof EcosystemHealthItem
+  dateKey?: keyof EcosystemHealthItem
+  scoreBounds?: ScoreBounds
+  openState?: string
+  closedState?: string
+  includeAlreadyClosed?: boolean
+}
 
 export function getClosedPrPercentageByRepo(
   source: EcosystemHealthItem[],
   options: RepoClosedPrOptions = {},
 ) {
   const {
-    repoKey = "repo_name",
-    prKey = "pr_key",
-    stateKey = "pr_status",
-    scoreKey = "score",
+    repoKey = 'repo_name',
+    prKey = 'pr_key',
+    stateKey = 'pr_status',
+    scoreKey = 'score',
     scoreBounds = [0, 100],
-    openState = "open",
-    closedState = "closed",
-  } = options;
+    openState = 'open',
+    closedState = 'closed',
+  } = options
 
   const resolvedScoreBounds: ScoreBounds = Array.isArray(scoreBounds)
     ? scoreBounds
-    : [0, Number(scoreBounds)];
+    : [0, Number(scoreBounds)]
 
-  const [minScore, maxScore] = resolvedScoreBounds;
+  const [minScore, maxScore] = resolvedScoreBounds
 
-  const byRepo = new Map<string, Map<string, EcosystemHealthItem[]>>();
+  const byRepo = new Map<string, Map<string, EcosystemHealthItem[]>>()
 
   source.forEach((entry) => {
-    if (!entry[repoKey] || !entry[prKey]) return;
+    if (!entry[repoKey] || !entry[prKey]) return
 
-    const repo = String(entry[repoKey]);
-    const prId = String(entry[prKey]);
+    const repo = String(entry[repoKey])
+    const prId = String(entry[prKey])
 
     if (!byRepo.has(repo)) {
-      byRepo.set(repo, new Map());
+      byRepo.set(repo, new Map())
     }
 
-    const repoMap = byRepo.get(repo);
-    if (!repoMap) return;
+    const repoMap = byRepo.get(repo)
+    if (!repoMap) return
 
     if (!repoMap.has(prId)) {
-      repoMap.set(prId, []);
+      repoMap.set(prId, [])
     }
 
-    repoMap.get(prId)?.push(entry);
-  });
+    repoMap.get(prId)?.push(entry)
+  })
 
   return Array.from(byRepo.entries()).map(([repo, pullRequests]) => {
-    let eligiblePrs = 0;
-    let closedPrs = 0;
+    let eligiblePrs = 0
+    let closedPrs = 0
 
     pullRequests.forEach((entries) => {
       const entriesInScoreRange = entries.filter((entry) => {
-        const score = Number(entry[scoreKey]);
-        const status = String(entry[stateKey]).toLowerCase();
+        const score = Number(entry[scoreKey])
+        const status = String(entry[stateKey]).toLowerCase()
 
         return (
           !Number.isNaN(score) &&
           score >= minScore &&
           score <= maxScore &&
           (status === openState || status === closedState)
-        );
-      });
+        )
+      })
 
-      if (!entriesInScoreRange.length) return;
+      if (!entriesInScoreRange.length) return
 
       const hasClosedEntry = entriesInScoreRange.some((entry) => {
-        return String(entry[stateKey]).toLowerCase() === closedState;
-      });
+        return String(entry[stateKey]).toLowerCase() === closedState
+      })
 
-      eligiblePrs += 1;
+      eligiblePrs += 1
 
       if (hasClosedEntry) {
-        closedPrs += 1;
+        closedPrs += 1
       }
-    });
+    })
 
     return {
       repo,
       eligiblePrs,
       closedPrs,
-      percentage: eligiblePrs
-        ? Number(((closedPrs / eligiblePrs) * 100).toFixed(2))
-        : 100,
-    };
-  });
+      percentage: eligiblePrs ? Number(((closedPrs / eligiblePrs) * 100).toFixed(2)) : 100,
+    }
+  })
 }
 
 export function getUniqueDatesFromSource(
   source: EcosystemHealthItem[],
-  dateKey: keyof EcosystemHealthItem = "created_at",
+  dateKey: keyof EcosystemHealthItem = 'created_at',
 ) {
   return Array.from(
     new Set(
       source
         .map((entry) => {
-          const rawDate = entry[dateKey];
-          if (rawDate == null) return null;
-          return getDayKey(String(rawDate));
+          const rawDate = entry[dateKey]
+          if (rawDate == null) return null
+          return getDayKey(String(rawDate))
         })
         .filter((date): date is string => date !== null),
     ),
-  ).sort();
+  ).sort()
 }
 
 export function getClosedPrPercentageByRepoForDate(
@@ -186,18 +182,18 @@ export function getClosedPrPercentageByRepoForDate(
   untilDate: string | Date,
   options: RepoClosedPrOptions = {},
 ) {
-  const { dateKey = "created_at" } = options;
-  const limitDay = getDayKey(untilDate);
+  const { dateKey = 'created_at' } = options
+  const limitDay = getDayKey(untilDate)
   const filteredSource = source.filter((entry) => {
-    return getDayKey(String(entry[dateKey])) === limitDay; // <= limitDay to make it cumulative instead of daily
-  });
-  return getClosedPrPercentageByRepo(filteredSource, options);
+    return getDayKey(String(entry[dateKey])) === limitDay // <= limitDay to make it cumulative instead of daily
+  })
+  return getClosedPrPercentageByRepo(filteredSource, options)
 }
 
 export type ClosedPrPercentageEvolutionSeries = {
-  name: string;
-  data: (number | null)[];
-};
+  name: string
+  data: (number | null)[]
+}
 
 /**
  * Sorry for the beefy comment but could not make the code clearer.
@@ -228,24 +224,24 @@ export type ClosedPrPercentageEvolutionSeries = {
 export function getClosedPrPercentageEvolutionByRepo(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
-  dateKey: keyof EcosystemHealthItem = "created_at",
+  dateKey: keyof EcosystemHealthItem = 'created_at',
 ): Array<Array<VueUiXyDatasetItem & { hasData: boolean }>> {
-  const dates = getUniqueDatesFromSource(source, dateKey);
+  const dates = getUniqueDatesFromSource(source, dateKey)
 
   const repoMap = new Map<
     string,
     {
-      percentages: (number | null)[];
-      eligiblePrs: number[];
-      closedPrs: number[];
+      percentages: (number | null)[]
+      eligiblePrs: number[]
+      closedPrs: number[]
     }
-  >();
+  >()
 
   dates.forEach((date, dateIndex) => {
     const results = getClosedPrPercentageByRepoForDate(source, date, {
       scoreBounds,
       dateKey,
-    });
+    })
 
     results.forEach((result) => {
       if (!repoMap.has(result.repo)) {
@@ -253,24 +249,24 @@ export function getClosedPrPercentageEvolutionByRepo(
           percentages: Array(dates.length).fill(100),
           eligiblePrs: Array(dates.length).fill(0),
           closedPrs: Array(dates.length).fill(0),
-        });
+        })
       }
 
-      const repoData = repoMap.get(result.repo);
+      const repoData = repoMap.get(result.repo)
 
-      if (!repoData) return;
+      if (!repoData) return
 
-      repoData.percentages[dateIndex] = result.percentage;
-      repoData.eligiblePrs[dateIndex] = result.eligiblePrs;
-      repoData.closedPrs[dateIndex] = result.closedPrs;
-    });
-  });
+      repoData.percentages[dateIndex] = result.percentage
+      repoData.eligiblePrs[dateIndex] = result.eligiblePrs
+      repoData.closedPrs[dateIndex] = result.closedPrs
+    })
+  })
 
   return Array.from(repoMap.entries()).map(([name, data]) => [
     {
       name,
       series: data.percentages,
-      type: "line",
+      type: 'line',
       smooth: true,
       hasData: data.percentages.some((value) => value !== null),
       details: {
@@ -278,72 +274,66 @@ export function getClosedPrPercentageEvolutionByRepo(
         closedPrs: data.closedPrs,
       },
     },
-  ]);
+  ])
 }
 
 export function getClosedPrPercentageEvolutionTotal(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
-  dateKey: keyof EcosystemHealthItem = "created_at",
+  dateKey: keyof EcosystemHealthItem = 'created_at',
 ): VueUiXyDatasetItem {
-  const dates = getUniqueDatesFromSource(source, dateKey);
+  const dates = getUniqueDatesFromSource(source, dateKey)
 
   const series = dates.map((date) => {
     const results = getClosedPrPercentageByRepoForDate(source, date, {
       scoreBounds,
       dateKey,
-    });
+    })
 
-    const totalEligible = results.reduce(
-      (sum, result) => sum + result.eligiblePrs,
-      0,
-    );
+    const totalEligible = results.reduce((sum, result) => sum + result.eligiblePrs, 0)
 
-    const totalClosed = results.reduce(
-      (sum, result) => sum + result.closedPrs,
-      0,
-    );
+    const totalClosed = results.reduce((sum, result) => sum + result.closedPrs, 0)
 
-    return totalEligible > 0 ? (totalClosed / totalEligible) * 100 : 100;
-  });
+    return totalEligible > 0 ? (totalClosed / totalEligible) * 100 : 100
+  })
 
   return {
-    name: "Automation PR closure rate",
+    name: 'Automation PR closure rate',
     series: series.map((value) => Math.round(value)),
-    type: "line",
+    type: 'line',
     smooth: true,
-  };
+  }
 }
 
 export function getClosedPrPercentageTotal(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
 ): number | null {
-  const results = getClosedPrPercentageByRepo(source, { scoreBounds });
-  const totalEligible = results.reduce((s, r) => s + r.eligiblePrs, 0);
-  const totalClosed = results.reduce((s, r) => s + r.closedPrs, 0);
-  if (totalEligible === 0) return 100;
-  return Math.round((totalClosed / totalEligible) * 100);
+  const results = getClosedPrPercentageByRepo(source, { scoreBounds })
+  const totalEligible = results.reduce((s, r) => s + r.eligiblePrs, 0)
+  const totalClosed = results.reduce((s, r) => s + r.closedPrs, 0)
+  if (totalEligible === 0) return 100
+  return Math.round((totalClosed / totalEligible) * 100)
 }
 
 export type ClosedPrPercentageSnapshot = {
-  date: string | undefined;
-  eligiblePrs: number | null;
-  closedPrs: number | null;
-  percentage: number | null;
-};
+  date: string | undefined
+  eligiblePrs: number | null
+  closedPrs: number | null
+  percentage: number | null
+}
 
 export type ClosedPrPercentageComparison = {
-  previousSnapshot: ClosedPrPercentageSnapshot;
-  lastSnapshot: ClosedPrPercentageSnapshot;
-  percentagePointDifference: number | null;
-};
+  previousSnapshot: ClosedPrPercentageSnapshot
+  lastSnapshot: ClosedPrPercentageSnapshot
+  percentagePointDifference: number | null
+}
 
 export function getClosedPrSnapshot(
   source: EcosystemHealthItem[] = [],
   date: string | Date | undefined,
   scoreBounds: ScoreBounds = [0, 100],
-  dateKey: keyof EcosystemHealthItem = "created_at",
+  dateKey: keyof EcosystemHealthItem = 'created_at',
 ): ClosedPrPercentageSnapshot {
   if (!date) {
     return {
@@ -351,57 +341,40 @@ export function getClosedPrSnapshot(
       eligiblePrs: null,
       closedPrs: null,
       percentage: null,
-    };
+    }
   }
 
   const results = getClosedPrPercentageByRepoForDate(source, date, {
     scoreBounds,
     dateKey,
-  });
+  })
 
-  const eligiblePrs = results.reduce(
-    (total, result) => total + result.eligiblePrs,
-    0,
-  );
+  const eligiblePrs = results.reduce((total, result) => total + result.eligiblePrs, 0)
 
-  const closedPrs = results.reduce(
-    (total, result) => total + result.closedPrs,
-    0,
-  );
+  const closedPrs = results.reduce((total, result) => total + result.closedPrs, 0)
 
   return {
     date: getDayKey(date),
     eligiblePrs,
     closedPrs,
     // no eligible PRs = 100% closure rate
-    percentage:
-      eligiblePrs === 0 ? 100 : Math.round((closedPrs / eligiblePrs) * 100),
-  };
+    percentage: eligiblePrs === 0 ? 100 : Math.round((closedPrs / eligiblePrs) * 100),
+  }
 }
 
 export function getClosedPrDelta(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
-  dateKey: keyof EcosystemHealthItem = "created_at",
+  dateKey: keyof EcosystemHealthItem = 'created_at',
 ): ClosedPrPercentageComparison {
-  const dates = getUniqueDatesFromSource(source, dateKey);
+  const dates = getUniqueDatesFromSource(source, dateKey)
 
-  const previousDate = dates.at(-2);
-  const lastDate = dates.at(-1);
+  const previousDate = dates.at(-2)
+  const lastDate = dates.at(-1)
 
-  const previousSnapshot = getClosedPrSnapshot(
-    source,
-    previousDate,
-    scoreBounds,
-    dateKey,
-  );
+  const previousSnapshot = getClosedPrSnapshot(source, previousDate, scoreBounds, dateKey)
 
-  const lastSnapshot = getClosedPrSnapshot(
-    source,
-    lastDate,
-    scoreBounds,
-    dateKey,
-  );
+  const lastSnapshot = getClosedPrSnapshot(source, lastDate, scoreBounds, dateKey)
 
   return {
     previousSnapshot,
@@ -409,8 +382,6 @@ export function getClosedPrDelta(
     percentagePointDifference:
       previousSnapshot.percentage == null || lastSnapshot.percentage == null
         ? null
-        : Math.round(
-            (lastSnapshot.percentage - previousSnapshot.percentage) * 10,
-          ) / 10,
-  };
+        : Math.round((lastSnapshot.percentage - previousSnapshot.percentage) * 10) / 10,
+  }
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { IdentifyFlag } from "@unveil/identity";
-import type { IntegrationItem } from "~~/shared/types/integrations";
+import type { IdentifyFlag } from '@unveil/identity'
+import type { IntegrationItem } from '~~/shared/types/integrations'
 
 defineProps<{
-  flags: IdentifyFlag[];
-  activityReport: IntegrationItem | undefined;
-}>();
+  flags: IdentifyFlag[]
+  activityReport: IntegrationItem | undefined
+}>()
 </script>
 
 <template>
@@ -15,10 +15,6 @@ defineProps<{
       <AnalysisFlagItem v-for="flag in flags" :key="flag.label" :flag="flag" />
     </ul>
 
-    <ExternalAnlysisCard
-      v-if="activityReport"
-      :items="[activityReport]"
-      class="mt-4"
-    />
+    <ExternalAnlysisCard v-if="activityReport" :items="[activityReport]" class="mt-4" />
   </div>
 </template>

@@ -4,116 +4,109 @@ import {
   type VueUiHeatmapDatasetItem,
   type VueUiHeatmapConfig,
   type VueUiHeatmapDatapoint,
-} from "vue-data-ui/vue-ui-heatmap";
-import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
-import dayjs from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
-import { mergeConfigs } from "vue-data-ui/utils";
-import { round } from "~~/shared/utils/numbers";
-import("vue-data-ui/style.css");
+} from 'vue-data-ui/vue-ui-heatmap'
+import type { VueUiStacklineDatasetItem } from 'vue-data-ui/vue-ui-stackline'
+import dayjs from 'dayjs'
+import isoWeek from 'dayjs/plugin/isoWeek'
+import { mergeConfigs } from 'vue-data-ui/utils'
+import { round } from '~~/shared/utils/numbers'
+import('vue-data-ui/style.css')
 
-dayjs.extend(isoWeek);
+dayjs.extend(isoWeek)
 
-import("vue-data-ui/style.css");
+import('vue-data-ui/style.css')
 
 const props = defineProps<{
-  data: VueUiStacklineDatasetItem[];
-  timestamps: string[];
-}>();
+  data: VueUiStacklineDatasetItem[]
+  timestamps: string[]
+}>()
 
-const rootEl = shallowRef<HTMLElement | null>(null);
+const rootEl = shallowRef<HTMLElement | null>(null)
 
 onMounted(() => {
-  rootEl.value = document.documentElement;
-});
+  rootEl.value = document.documentElement
+})
 
-const colors = useColors(rootEl);
+const colors = useColors(rootEl)
 
-const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 
 const dayIndexes = daysOfWeek.reduce(
   (accumulator, dayName, dayIndex) => {
-    accumulator[dayName] = dayIndex;
-    return accumulator;
+    accumulator[dayName] = dayIndex
+    return accumulator
   },
   {} as Record<string, number>,
-);
+)
 
 const heatmapSeries = computed(() => [
   {
-    name: "Organic",
+    name: 'Organic',
     color: colors.value.greenLine,
   },
   {
-    name: "Mixed",
+    name: 'Mixed',
     color: colors.value.amber,
   },
   {
-    name: "Automation",
+    name: 'Automation',
     color: colors.value.dangerHover,
   },
-]);
+])
 
 const weekKeys = computed(() =>
   [
     ...new Set(
-      props.timestamps.map((timestamp) =>
-        dayjs(timestamp).startOf("isoWeek").format("YYYY-MM-DD"),
-      ),
+      props.timestamps.map((timestamp) => dayjs(timestamp).startOf('isoWeek').format('YYYY-MM-DD')),
     ),
   ].sort(),
-);
+)
 
 const weekLabels = computed(() =>
   weekKeys.value.map((weekKey) => {
-    const start = dayjs(weekKey);
-    const end = start.endOf("isoWeek");
+    const start = dayjs(weekKey)
+    const end = start.endOf('isoWeek')
 
-    return `${start.format("MMM D")} - ${end.format("MMM D")}`;
+    return `${start.format('MMM D')} - ${end.format('MMM D')}`
   }),
-);
+)
 
 function createHeatmapDataset(
   dataset: VueUiStacklineDatasetItem[],
   timestamps: string[],
   seriesName: string,
 ): VueUiHeatmapDatasetItem[] {
-  const selectedSeries = dataset.find(
-    (seriesItem) => seriesItem.name === seriesName,
-  );
+  const selectedSeries = dataset.find((seriesItem) => seriesItem.name === seriesName)
 
   if (!selectedSeries) {
     return daysOfWeek.map((dayName) => ({
       name: dayName,
       values: [],
-    }));
+    }))
   }
 
-  const valuesByWeekAndDay = new Map<string, number[]>();
+  const valuesByWeekAndDay = new Map<string, number[]>()
 
   timestamps.forEach((timestamp, timestampIndex) => {
-    const date = dayjs(timestamp);
-    const weekKey = date.startOf("isoWeek").format("YYYY-MM-DD");
-    const dayIndex = date.isoWeekday() - 1;
+    const date = dayjs(timestamp)
+    const weekKey = date.startOf('isoWeek').format('YYYY-MM-DD')
+    const dayIndex = date.isoWeekday() - 1
 
-    const weekValues = valuesByWeekAndDay.get(weekKey) ?? [0, 0, 0, 0, 0, 0, 0];
+    const weekValues = valuesByWeekAndDay.get(weekKey) ?? [0, 0, 0, 0, 0, 0, 0]
 
     weekValues[dayIndex] =
-      (weekValues[dayIndex] ?? 0) +
-      (selectedSeries.series[timestampIndex] ?? 0);
+      (weekValues[dayIndex] ?? 0) + (selectedSeries.series[timestampIndex] ?? 0)
 
-    valuesByWeekAndDay.set(weekKey, weekValues);
-  });
+    valuesByWeekAndDay.set(weekKey, weekValues)
+  })
 
   return daysOfWeek.map((dayName, dayIndex) => ({
     name: dayName,
-    values: weekKeys.value.map(
-      (weekKey) => valuesByWeekAndDay.get(weekKey)?.[dayIndex] ?? 0,
-    ),
-  }));
+    values: weekKeys.value.map((weekKey) => valuesByWeekAndDay.get(weekKey)?.[dayIndex] ?? 0),
+  }))
 }
 
-const numberOfWeeks = computed(() => weekKeys.value.length);
+const numberOfWeeks = computed(() => weekKeys.value.length)
 
 const baseConfig = computed<VueUiHeatmapConfig>(() => ({
   userOptions: { show: false },
@@ -152,7 +145,7 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
       backgroundOpacity: 70,
     },
   },
-}));
+}))
 
 function createHeatmapConfig(hotColor: string): VueUiHeatmapConfig {
   return mergeConfigs({
@@ -168,38 +161,32 @@ function createHeatmapConfig(hotColor: string): VueUiHeatmapConfig {
         },
       },
     },
-  });
+  })
 }
 
 const heatmaps = computed(() =>
   heatmapSeries.value.map((seriesItem) => ({
     name: seriesItem.name,
     color: seriesItem.color,
-    dataset: createHeatmapDataset(
-      props.data,
-      props.timestamps,
-      seriesItem.name,
-    ),
+    dataset: createHeatmapDataset(props.data, props.timestamps, seriesItem.name),
     config: createHeatmapConfig(seriesItem.color!),
   })),
-);
+)
 
 function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
-  const xName = datapoint?.xAxisName ?? "";
-  const yName = datapoint?.yAxisName ?? "";
-  const weekIndex = weekLabels.value.indexOf(xName);
-  const weekKey = weekKeys.value[weekIndex];
-  if (!weekKey) return "";
-  const targetDate = dayjs(weekKey).add(dayIndexes[yName] ?? 0, "day");
+  const xName = datapoint?.xAxisName ?? ''
+  const yName = datapoint?.yAxisName ?? ''
+  const weekIndex = weekLabels.value.indexOf(xName)
+  const weekKey = weekKeys.value[weekIndex]
+  if (!weekKey) return ''
+  const targetDate = dayjs(weekKey).add(dayIndexes[yName] ?? 0, 'day')
 
-  return targetDate.format("DD MMM (ddd)");
+  return targetDate.format('DD MMM (ddd)')
 }
 </script>
 
 <template>
-  <div
-    class="flex flex-col px-12 md:flex-row md:px-0 items-center gap-6 w-full"
-  >
+  <div class="flex flex-col px-12 md:flex-row md:px-0 items-center gap-6 w-full">
     <ClientOnly>
       <VueUiHeatmap
         v-for="heatmap in heatmaps"
@@ -221,7 +208,7 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 
             <span>{{ heatmap.name }}</span>
             <span :style="{ color: colors.textMuted }">{{
-              round(datapoint.value ?? 0, 1) + "%"
+              round(datapoint.value ?? 0, 1) + '%'
             }}</span>
           </div>
         </template>

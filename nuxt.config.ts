@@ -1,23 +1,23 @@
-import { resolve } from "path";
+import { resolve } from 'path'
 
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
-  modules: ["@unocss/nuxt", "@nuxtjs/color-mode", "@nuxt/fonts"],
-  plugins: ["~/plugins/simpleanalytics.client"],
+  modules: ['@nuxt/eslint', '@unocss/nuxt', '@nuxtjs/color-mode', '@nuxt/fonts'],
+  plugins: ['~/plugins/simpleanalytics.client'],
 
   vite: {
     optimizeDeps: {
       include: [
-        "@vue/devtools-core",
-        "@vue/devtools-kit",
-        "dayjs", // CJS
-        "@unveil/identity",
-        "@vueuse/core",
-        "vue-data-ui/vue-ui-xy",
-        "vue-data-ui/vue-ui-heatmap",
-        "vue-data-ui/vue-ui-icon",
-        "vue-data-ui/vue-ui-horizontal-bar",
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        'dayjs', // CJS
+        '@unveil/identity',
+        '@vueuse/core',
+        'vue-data-ui/vue-ui-xy',
+        'vue-data-ui/vue-ui-heatmap',
+        'vue-data-ui/vue-ui-icon',
+        'vue-data-ui/vue-ui-horizontal-bar',
       ],
     },
   },
@@ -25,14 +25,14 @@ export default defineNuxtConfig({
   fonts: {
     families: [
       {
-        name: "Roboto",
-        weights: ["400", "500", "600"],
+        name: 'Roboto',
+        weights: ['400', '500', '600'],
         preload: true,
         global: true,
       },
       {
-        name: "Open Sans",
-        weights: ["400", "500"],
+        name: 'Open Sans',
+        weights: ['400', '500'],
         preload: true,
         global: true,
       },
@@ -40,83 +40,83 @@ export default defineNuxtConfig({
   },
 
   colorMode: {
-    preference: "system",
-    fallback: "dark",
-    dataValue: "theme",
+    preference: 'system',
+    fallback: 'dark',
+    dataValue: 'theme',
   },
 
   nitro: {
-    serverAssets: [{ baseName: "data", dir: resolve("data") }],
+    serverAssets: [{ baseName: 'data', dir: resolve('data') }],
   },
 
   runtimeConfig: {
-    githubToken: "",
+    githubToken: '',
   },
 
-  css: ["~/assets/main.css"],
+  css: ['~/assets/main.css'],
 
   app: {
     head: {
-      htmlAttrs: { lang: "en-US" },
+      htmlAttrs: { lang: 'en-US' },
     },
   },
 
   routeRules: {
-    "/privacy-policy": { prerender: true },
+    '/privacy-policy': { prerender: true },
 
-    "/api/account/**": {
+    '/api/account/**': {
       cache: {
         maxAge: 60 * 5,
       },
     },
 
-    "/api/contributors/**": {
+    '/api/contributors/**': {
       cache: {
         maxAge: 60 * 60 * 24,
       },
     },
 
-    "/api/identify-replicant/**": {
+    '/api/identify-replicant/**': {
       isr: {
         expiration: 60 * 10,
         passQuery: true,
       },
       cache: { maxAge: 600 },
     },
-    "/api/verified-automations/**": {
+    '/api/verified-automations/**': {
       cache: {
         maxAge: 60 * 60,
       },
     },
-    "/api/bounty-repos/**": {
+    '/api/bounty-repos/**': {
       cache: {
         maxAge: 60 * 60,
       },
     },
-    "/api/detected-automations/**": {
+    '/api/detected-automations/**': {
       cache: {
         maxAge: 60 * 60,
       },
     },
-    "/api/health/**": {
+    '/api/health/**': {
       cache: {
         maxAge: 60 * 60,
       },
     },
-    "/api/integration/**": {
+    '/api/integration/**': {
       cache: {
         maxAge: 60 * 5,
       },
     },
-    "/api/scan/**": {
+    '/api/scan/**': {
       cache: {
         maxAge: 60 * 5,
       },
     },
-    "/feed.xml": {
+    '/feed.xml': {
       cache: {
         maxAge: 60 * 60,
       },
     },
   },
-});
+})

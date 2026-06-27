@@ -4,15 +4,15 @@ import {
   presetWind4,
   transformerDirectives,
   transformerVariantGroup,
-} from "unocss";
+} from 'unocss'
 
 export default defineConfig({
   presets: [
     presetWind4(),
     presetIcons({
       extraProperties: {
-        display: "inline-block",
-        "forced-color-adjust": "preserve-parent-color",
+        display: 'inline-block',
+        'forced-color-adjust': 'preserve-parent-color',
       },
       warn: true,
       scale: 1.2,
@@ -26,39 +26,39 @@ export default defineConfig({
     },
     colors: {
       gh: {
-        bg: "var(--bg)",
-        card: "var(--card)",
-        border: "var(--border)",
-        "border-light": "var(--border-light)",
-        text: "var(--text)",
-        muted: "var(--text-muted)",
-        blue: "var(--blue)",
-        green: "var(--green)",
-        amber: "var(--amber)",
-        "green-hover": "var(--green-hover)",
-        "green-text": "var(--text-green)",
-        "green-bg": "var(--green-bg)",
-        danger: "var(--danger)",
-        "danger-hover": "var(--danger-hover)",
-        "danger-bg": "var(--danger-bg)",
-        red: "var(--red)",
-        "red-hover": "var(--red-hover)",
-        "red-bg": "var(--red-bg)",
+        bg: 'var(--bg)',
+        card: 'var(--card)',
+        border: 'var(--border)',
+        'border-light': 'var(--border-light)',
+        text: 'var(--text)',
+        muted: 'var(--text-muted)',
+        blue: 'var(--blue)',
+        green: 'var(--green)',
+        amber: 'var(--amber)',
+        'green-hover': 'var(--green-hover)',
+        'green-text': 'var(--text-green)',
+        'green-bg': 'var(--green-bg)',
+        danger: 'var(--danger)',
+        'danger-hover': 'var(--danger-hover)',
+        'danger-bg': 'var(--danger-bg)',
+        red: 'var(--red)',
+        'red-hover': 'var(--red-hover)',
+        'red-bg': 'var(--red-bg)',
       },
     },
     animation: {
       keyframes: {
-        spin: "{ from { transform: rotate(0deg) } to { transform: rotate(360deg) } }",
+        spin: '{ from { transform: rotate(0deg) } to { transform: rotate(360deg) } }',
       },
       durations: {
-        spin: "1s",
+        spin: '1s',
       },
       timingFns: {
-        spin: "linear",
+        spin: 'linear',
       },
       counts: {
-        spin: "infinite",
+        spin: 'infinite',
       },
     },
   },
-});
+})

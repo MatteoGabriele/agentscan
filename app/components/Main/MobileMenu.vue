@@ -1,29 +1,29 @@
 <script setup lang="ts">
-const route = useRoute();
+const route = useRoute()
 
-const isMenuOpen = ref<boolean>(false);
+const isMenuOpen = ref<boolean>(false)
 function toggleMenu() {
-  isMenuOpen.value = !isMenuOpen.value;
+  isMenuOpen.value = !isMenuOpen.value
 }
 
 watch(isMenuOpen, (value) => {
   if (value) {
-    window.document.body.classList.add("overflow-hidden");
+    window.document.body.classList.add('overflow-hidden')
   } else {
-    window.document.body.classList.remove("overflow-hidden");
+    window.document.body.classList.remove('overflow-hidden')
   }
-});
+})
 
 watch(
   () => route.path,
   () => {
-    isMenuOpen.value = false;
+    isMenuOpen.value = false
   },
-);
+)
 
 onBeforeUnmount(() => {
-  window.document.body.classList.remove("overflow-hidden");
-});
+  window.document.body.classList.remove('overflow-hidden')
+})
 </script>
 
 <template>
@@ -33,16 +33,13 @@ onBeforeUnmount(() => {
     }"
   >
     <div class="flex justify-end">
-      <button @click="toggleMenu" class="flex self-end">
+      <button class="flex self-end" @click="toggleMenu">
         <span v-if="isMenuOpen" class="i-lucide:x"></span>
         <span v-else class="i-lucide:menu"></span>
       </button>
     </div>
 
-    <div
-      v-if="isMenuOpen"
-      class="flex items-center flex-col gap-6 justify-center h-full"
-    >
+    <div v-if="isMenuOpen" class="flex items-center flex-col gap-6 justify-center h-full">
       <ul class="flex flex-col items-center gap-4">
         <li>
           <MainMenuItem class="text-xl" to="/" label="Search" />
@@ -52,11 +49,7 @@ onBeforeUnmount(() => {
         </li>
         <li><MainMenuItem class="text-xl" to="/lab" label="The lab" /></li>
         <li>
-          <MainMenuItem
-            class="text-xl"
-            to="/automations"
-            label="Community reports"
-          />
+          <MainMenuItem class="text-xl" to="/automations" label="Community reports" />
         </li>
       </ul>
 

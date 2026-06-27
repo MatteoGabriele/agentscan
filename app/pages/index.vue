@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const router = useRouter();
-const accountName = ref("");
+const router = useRouter()
+const accountName = ref('')
 
 function handleSubmit(name: string) {
-  router.push({ name: "user-name", params: { name } });
+  router.push({ name: 'user-name', params: { name } })
 }
 </script>
 
@@ -14,7 +14,5 @@ function handleSubmit(name: string) {
 
   <VerifiedAutomationList />
 
-  <ContributorsList
-    class="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex"
-  />
+  <ContributorsList class="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex" />
 </template>

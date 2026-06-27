@@ -12,6 +12,10 @@
     "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
     "scan:users": "pnpm exec tsx --env-file=.env scripts/scan-users.ts",
     "scan:bounty": "pnpm exec tsx --env-file=.env scripts/scan-bounty-repos.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest"
   },
   "dependencies": {
@@ -31,11 +35,16 @@
   "devDependencies": {
     "@github/issue-parser": "^2.0.0",
     "@iconify-json/lucide": "^1.2.111",
+    "@nuxt/eslint": "^1.16.0",
     "@octokit/types": "^16.0.0",
     "@types/node": "^26.0.0",
     "@unocss/nuxt": "^66.6.7",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.5",
     "simple-analytics-vue": "^3.1.0",
     "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
     "unocss": "^66.6.0",
     "vitest": "^4.1.8"
   }

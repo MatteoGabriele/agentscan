@@ -3,33 +3,33 @@ import {
   VueUiSparkline,
   type VueUiSparklineConfig,
   type VueUiSparklineDatasetItem,
-} from "vue-data-ui/vue-ui-sparkline";
-import { getPalette } from "vue-data-ui/utils";
-import { useColors } from "~/composables/useColors";
-import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
+} from 'vue-data-ui/vue-ui-sparkline'
+import { getPalette } from 'vue-data-ui/utils'
+import { useColors } from '~/composables/useColors'
+import type { VueUiStacklineDatasetItem } from 'vue-data-ui/vue-ui-stackline'
 
-import("vue-data-ui/style.css");
+import('vue-data-ui/style.css')
 
 const props = defineProps<{
-  dataset?: Array<VueUiStacklineDatasetItem>;
-  dates: string[];
-  selectedXIndex: number | undefined;
-}>();
+  dataset?: Array<VueUiStacklineDatasetItem>
+  dates: string[]
+  selectedXIndex: number | undefined
+}>()
 
 const emit = defineEmits<{
-  (e: "selectIndex", selectedIndex: number | undefined): void;
-}>();
+  (e: 'selectIndex', selectedIndex: number | undefined): void
+}>()
 
-const rootEl = shallowRef<HTMLElement | null>(null);
-const palette = getPalette("");
+const rootEl = shallowRef<HTMLElement | null>(null)
+const palette = getPalette('')
 
-const step = ref(0);
+const step = ref(0)
 
 onMounted(() => {
-  rootEl.value = document.documentElement;
-});
+  rootEl.value = document.documentElement
+})
 
-const colors = useColors(rootEl);
+const colors = useColors(rootEl)
 
 const datasets = computed<VueUiSparklineDatasetItem[][]>(() => {
   return (props.dataset ?? []).map((unit) => {
@@ -37,41 +37,40 @@ const datasets = computed<VueUiSparklineDatasetItem[][]>(() => {
       return {
         period,
         value: unit.series[i] ?? 0,
-      };
-    });
-  });
-});
+      }
+    })
+  })
+})
 
 const selectedIndex = computed<number | undefined>({
   get() {
-    return props.selectedXIndex;
+    return props.selectedXIndex
   },
   set(value) {
-    emit("selectIndex", value);
+    emit('selectIndex', value)
   },
-});
+})
 
 function hoverIndex({ index }: { index: number | undefined | null }) {
-  selectedIndex.value = typeof index === "number" ? index : undefined;
+  selectedIndex.value = typeof index === 'number' ? index : undefined
 }
 
 function resetHover() {
-  selectedIndex.value = undefined;
-  step.value += 1;
+  selectedIndex.value = undefined
+  step.value += 1
 }
 
 const configs = computed(() => {
   return (props.dataset || []).map<VueUiSparklineConfig>((unit, i) => {
-    const dashIndices = unit.dashIndices;
+    const dashIndices = unit.dashIndices
 
     // Ensure we loop through available palette colours when the series count is higher than the available palette
-    const fallbackColor =
-      palette[i] ?? palette[i % palette.length] ?? palette[0]!;
-    const seriesColor = unit.color ?? fallbackColor;
+    const fallbackColor = palette[i] ?? palette[i % palette.length] ?? palette[0]!
+    const seriesColor = unit.color ?? fallbackColor
 
     return {
       style: {
-        backgroundColor: "transparent",
+        backgroundColor: 'transparent',
         animation: { show: false },
         chartWidth: 400,
         area: {
@@ -85,11 +84,11 @@ const configs = computed(() => {
           bold: false,
           color: unit.color,
           formatter: ({ value }) => {
-            return Math.round(value);
+            return Math.round(value)
           },
           datetimeFormatter: {
             enable: true,
-            locale: "en",
+            locale: 'en',
             useUTC: true,
           },
         },
@@ -117,26 +116,22 @@ const configs = computed(() => {
           bottom: 0,
         },
       },
-    };
-  });
-});
+    }
+  })
+})
 </script>
 
 <template>
   <div class="grid gap-8 sm:grid-cols-3 sm:px-16 mb-4">
     <ClientOnly v-for="(config, i) in configs" :key="`config_${i}`">
-      <div
-        @mouseleave="resetHover"
-        @keydown.esc="resetHover"
-        class="w-full max-w-[400px] mx-auto"
-      >
+      <div class="w-full max-w-[400px] mx-auto" @mouseleave="resetHover" @keydown.esc="resetHover">
         <VueUiSparkline
           v-if="datasets[i]"
           :key="`${i}_${step}`"
           :config
           :dataset="datasets[i]"
-          :selectedIndex
-          @hoverIndex="hoverIndex"
+          :selected-index
+          @hover-index="hoverIndex"
         >
           <template #skeleton>
             <!-- This empty div overrides the default built-in scanning animation on load -->

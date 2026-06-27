@@ -1,23 +1,23 @@
 <script setup lang="ts">
 interface Props {
-  width?: string;
-  height?: string;
-  rounded?: "none" | "sm" | "md" | "lg" | "full";
+  width?: string
+  height?: string
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  width: "w-full",
-  height: "h-4",
-  rounded: "md",
-});
+  width: 'w-full',
+  height: 'h-4',
+  rounded: 'md',
+})
 
 const roundedClasses = {
-  none: "rounded-none",
-  sm: "rounded-1",
-  md: "rounded-2",
-  lg: "rounded-3",
-  full: "rounded-full",
-};
+  none: 'rounded-none',
+  sm: 'rounded-1',
+  md: 'rounded-2',
+  lg: 'rounded-3',
+  full: 'rounded-full',
+}
 </script>
 
 <template>

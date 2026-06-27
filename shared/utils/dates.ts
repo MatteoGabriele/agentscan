@@ -3,36 +3,36 @@ export function formatDateRange({
   endDate,
   startYear = false,
   endYear = true,
-  locale = "en-GB",
+  locale = 'en-GB',
 }: {
-  startDate: string | undefined;
-  endDate: string | undefined;
-  startYear?: boolean;
-  endYear?: boolean;
-  locale?: string;
+  startDate: string | undefined
+  endDate: string | undefined
+  startYear?: boolean
+  endYear?: boolean
+  locale?: string
 }): string {
   if (!startDate || !endDate) {
-    return "";
+    return ''
   }
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = new Date(startDate)
+  const end = new Date(endDate)
 
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) return "";
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return ''
 
   const startLabel = new Intl.DateTimeFormat(locale, {
-    day: "2-digit",
-    month: "short",
-    timeZone: "UTC",
-    year: startYear ? "numeric" : undefined,
-  }).format(start);
+    day: '2-digit',
+    month: 'short',
+    timeZone: 'UTC',
+    year: startYear ? 'numeric' : undefined,
+  }).format(start)
 
   const endLabel = new Intl.DateTimeFormat(locale, {
-    day: "2-digit",
-    month: "short",
-    year: endYear ? "numeric" : undefined,
-    timeZone: "UTC",
-  }).format(end);
+    day: '2-digit',
+    month: 'short',
+    year: endYear ? 'numeric' : undefined,
+    timeZone: 'UTC',
+  }).format(end)
 
-  return `${startLabel} - ${endLabel}`;
+  return `${startLabel} - ${endLabel}`
 }

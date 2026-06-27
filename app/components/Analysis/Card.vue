@@ -1,168 +1,161 @@
 <script setup lang="ts">
-import type {
-  GitHubUser,
-  IdentityClassification,
-  IdentifyResult,
-} from "@unveil/identity";
-import dayjs from "dayjs";
+import type { GitHubUser, IdentityClassification, IdentifyResult } from '@unveil/identity'
+import dayjs from 'dayjs'
 
 const props = defineProps<{
-  user: GitHubUser;
-}>();
+  user: GitHubUser
+}>()
 
-const username = computed<string | undefined | null>(() => props.user.login);
+const username = computed<string | undefined | null>(() => props.user.login)
 
-const analysisKey = computed<string>(() => `analysis:${username.value}`);
-const { data, status, error } = useFetch(
-  () => `/api/identify-replicant/${username.value}`,
-  {
-    query: {
-      created_at: props.user.created_at,
-      repos_count: props.user.public_repos,
-      pages: 3,
-      show_events: true,
-    },
-    key: analysisKey,
-    watch: [username],
-    lazy: true,
+const analysisKey = computed<string>(() => `analysis:${username.value}`)
+const { data, status, error } = useFetch(() => `/api/identify-replicant/${username.value}`, {
+  query: {
+    created_at: props.user.created_at,
+    repos_count: props.user.public_repos,
+    pages: 3,
+    show_events: true,
   },
-);
+  key: analysisKey,
+  watch: [username],
+  lazy: true,
+})
 
-const { data: verifiedAutomations } = useVerifiedAutomations();
+const { data: verifiedAutomations } = useVerifiedAutomations()
 
 const verifiedAutomation = computed(() => {
   return verifiedAutomations.value?.find((account) => {
     return (
       account.username.toLowerCase() === username.value?.toLowerCase() ||
       account.id === props.user.id
-    );
-  });
-});
+    )
+  })
+})
 
-const { data: integrations } = useIntegrations();
+const { data: integrations } = useIntegrations()
 const activityReport = computed<IntegrationItem | undefined>(() => {
   return integrations.value?.find((item) => {
-    return item.username.toLowerCase() === username.value?.toLowerCase();
-  });
-});
+    return item.username.toLowerCase() === username.value?.toLowerCase()
+  })
+})
 
-const hasActivityReport = computed<boolean>(() => !!activityReport.value);
-const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value);
+const hasActivityReport = computed<boolean>(() => !!activityReport.value)
+const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
 const flagCreatedAt = computed<string | undefined>(() => {
   if (!verifiedAutomation.value) {
-    return;
+    return
   }
 
-  return dayjs(verifiedAutomation.value.createdAt).format("MMM D, YYYY");
-});
+  return dayjs(verifiedAutomation.value.createdAt).format('MMM D, YYYY')
+})
 
 const classification = computed<IdentityClassification | undefined>(() => {
-  return data.value?.analysis.classification;
-});
+  return data.value?.analysis.classification
+})
 
-const { classificationDetails } = useClassificationDetails(classification);
+const { classificationDetails } = useClassificationDetails(classification)
 
 type ScoreStyle = {
-  text: string;
-  border: string;
-};
+  text: string
+  border: string
+}
 
 const scoreStyle = computed<ScoreStyle>(() => {
   if (hasCommunityFlag.value) {
     return {
-      text: "text-gh-danger-hover",
-      border: "border-gh-danger-hover",
-    };
+      text: 'text-gh-danger-hover',
+      border: 'border-gh-danger-hover',
+    }
   }
 
   if (!classification.value) {
     return {
-      text: "text-gray-500",
-      border: "border-gray-500",
-    };
+      text: 'text-gray-500',
+      border: 'border-gray-500',
+    }
   }
 
-  if (classification.value === "automation") {
+  if (classification.value === 'automation') {
     return {
-      text: "text-gh-danger-hover",
-      border: "border-gh-danger-hover",
-    };
+      text: 'text-gh-danger-hover',
+      border: 'border-gh-danger-hover',
+    }
   }
 
-  if (classification.value === "mixed" || hasActivityReport.value) {
+  if (classification.value === 'mixed' || hasActivityReport.value) {
     return {
-      text: "text-amber-500",
-      border: "border-amber-500",
-    };
+      text: 'text-amber-500',
+      border: 'border-amber-500',
+    }
   }
 
   return {
-    text: "text-green-500",
-    border: "border-green-500",
-  };
-});
+    text: 'text-green-500',
+    border: 'border-green-500',
+  }
+})
 
 const classificationIcon = computed<string>(() => {
-  if (classification.value === "organic") {
-    return "i-lucide:heart-handshake";
+  if (classification.value === 'organic') {
+    return 'i-lucide:heart-handshake'
   }
 
-  if (classification.value === "mixed") {
-    return "i-lucide:blend";
+  if (classification.value === 'mixed') {
+    return 'i-lucide:blend'
   }
 
-  return "i-lucide:shield-alert";
-});
+  return 'i-lucide:shield-alert'
+})
 
 const flagAccountUrl = computed<string>(() => {
-  const baseUrl = "https://github.com/MatteoGabriele/agentscan/issues/new";
+  const baseUrl = 'https://github.com/MatteoGabriele/agentscan/issues/new'
   const params = new URLSearchParams({
-    template: "report-automated-account.yml",
+    template: 'report-automated-account.yml',
     title: `[AUTOMATION] ${username.value}`,
-    username: username.value || "",
-    "user-id": props.user.id.toString(),
-  });
-  return `${baseUrl}?${params.toString()}`;
-});
+    username: username.value || '',
+    'user-id': props.user.id.toString(),
+  })
+  return `${baseUrl}?${params.toString()}`
+})
 
 const identifyAnalysis = computed<IdentifyResult | undefined>(() => {
-  return data.value?.analysis;
-});
+  return data.value?.analysis
+})
 
 const score = computed<number | undefined>(() => {
-  return data.value?.analysis.score;
-});
+  return data.value?.analysis.score
+})
 
 const isBountyHunter = computed<boolean>(() => {
-  return !!data.value?.analysis.isBountyHunter;
-});
+  return !!data.value?.analysis.isBountyHunter
+})
 
-const { nearestClassification } = useNearestClassification(score);
+const { nearestClassification } = useNearestClassification(score)
 
 const warnings = computed<string[]>(() => {
-  const list: string[] = [];
+  const list: string[] = []
 
   if (nearestClassification.value) {
-    list.push(`Activity close to ${nearestClassification.value} signals.`);
+    list.push(`Activity close to ${nearestClassification.value} signals.`)
   }
 
   if (isBountyHunter.value) {
-    list.push("Possible bounty activity.");
+    list.push('Possible bounty activity.')
   }
 
-  return list;
-});
+  return list
+})
 
 useSeoAnalysis(identifyAnalysis, {
   hasCommunityFlag,
   hasActivityReport,
-});
+})
 </script>
 
 <template>
   <AnalysisCardSkeleton v-if="status === 'pending'" />
-  <ErrorCardGeneric :error v-else-if="error" />
+  <ErrorCardGeneric v-else-if="error" :error />
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
@@ -172,10 +165,7 @@ useSeoAnalysis(identifyAnalysis, {
         <header class="flex items-center justify-between mb-2">
           <div class="w-full">
             <div class="mb-2 flex flex-col">
-              <div
-                v-if="warnings.length"
-                class="flex items-start gap-2 text-sm text-gh-muted mb-2"
-              >
+              <div v-if="warnings.length" class="flex items-start gap-2 text-sm text-gh-muted mb-2">
                 <span class="i-lucide:megaphone text-xs shrink-0"></span>
                 <ul class="flex flex-col gap-1">
                   <li
@@ -227,13 +217,8 @@ useSeoAnalysis(identifyAnalysis, {
           </p>
         </div>
 
-        <section
-          v-if="verifiedAutomation"
-          class="mt-4 pt-4 border-t border-gh-border-light/40"
-        >
-          <p
-            class="flex gap-2 items-center mb-2 text-gh-muted font-mono text-base"
-          >
+        <section v-if="verifiedAutomation" class="mt-4 pt-4 border-t border-gh-border-light/40">
+          <p class="flex gap-2 items-center mb-2 text-gh-muted font-mono text-base">
             Community reported
           </p>
           <p class="text-gh-text text-sm mb-2">
@@ -256,12 +241,7 @@ useSeoAnalysis(identifyAnalysis, {
           <p class="text-gh-muted text-sm">
             Know something about this account? Help the community.
           </p>
-          <NuxtLink
-            :to="flagAccountUrl"
-            target="_blank"
-            external
-            class="underline inline text-xs"
-          >
+          <NuxtLink :to="flagAccountUrl" target="_blank" external class="underline inline text-xs">
             Add report
           </NuxtLink>
         </section>
