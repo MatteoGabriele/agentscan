@@ -41,7 +41,11 @@ const automatedClosureRateData = computed(() => ({
   dashed: true,
 }))
 
-function composeRawDataset(): VueUiXyDatasetItem[] {
+type VueUiXyDatasetItemWithTrends = VueUiXyDatasetItem & {
+  trends: number[]
+}
+
+function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
   return [
     {
       name: 'Organic',
@@ -111,6 +115,8 @@ const viewBoxPadding = computed(() => {
   }
 })
 
+const tooltipTimeFormat = 'dddd • MMM dd • HH:mm'
+
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
   downsample: {
@@ -152,11 +158,11 @@ const config = computed<VueUiXyConfig>(() => ({
             useUTC: false,
             locale: 'en',
             options: {
-              year: 'dd MMM',
-              month: 'dd MMM',
-              day: 'dddd • MMM dd • HH:mm',
-              minute: 'dd MMM',
-              second: 'dd MMM',
+              year: tooltipTimeFormat,
+              month: tooltipTimeFormat,
+              day: tooltipTimeFormat,
+              minute: tooltipTimeFormat,
+              second: tooltipTimeFormat,
             },
           },
         },
@@ -182,19 +188,13 @@ const config = computed<VueUiXyConfig>(() => ({
 }))
 
 function getTrend({
-  series,
   item,
   index,
 }: {
-  series: VueUiXySeries[]
   item: { slotAbsoluteIndex: number; name: string }
   index: number
 }) {
-  // @todo fix this type definition
-  const seriesItem = series?.[item.slotAbsoluteIndex] as unknown as
-    | { trends?: number[] }
-    | undefined
-  const trend = seriesItem?.trends?.[index]
+  const trend = rawDataset.value[item.slotAbsoluteIndex]?.trends[index]
 
   return {
     formattedValue: formatTrend(trend),
@@ -242,7 +242,6 @@ function getTrend({
                       v-if="dp.slotAbsoluteIndex < series.length - 1"
                       :class="[
                         getTrend({
-                          series,
                           item: dp,
                           index: timeLabel.absoluteIndex,
                         }).color,
@@ -251,7 +250,6 @@ function getTrend({
                       <span
                         :class="[
                           getTrend({
-                            series,
                             item: dp,
                             index: timeLabel.absoluteIndex,
                           }).arrow,
@@ -261,7 +259,6 @@ function getTrend({
                       />
                       {{
                         getTrend({
-                          series,
                           item: dp,
                           index: timeLabel.absoluteIndex,
                         }).formattedValue
