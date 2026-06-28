@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core'
-import {
-  VueUiXy,
-  type VueUiXyDatasetItem,
-  type VueUiXyConfig,
-  type VueUiXySeries,
-} from 'vue-data-ui/vue-ui-xy'
+import { VueUiXy, type VueUiXyDatasetItem, type VueUiXyConfig } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 
 import { useColors } from '~/composables/useColors'
