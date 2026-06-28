@@ -1,5 +1,5 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
 import { App } from 'octokit'
+import { Webhooks } from '@octokit/webhooks'
 import {
   getClassificationDetails,
   identify,
@@ -63,20 +63,6 @@ const DEFAULT_CONFIG: RepoConfig = {
   },
 }
 
-function verifySignature(rawBody: string, signature: string | undefined, secret: string): boolean {
-  if (!signature) {
-    return false
-  }
-  const hmac = createHmac('sha256', secret)
-  hmac.update(rawBody)
-  const expected = `sha256=${hmac.digest('hex')}`
-  try {
-    return timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
-  } catch {
-    return false
-  }
-}
-
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
@@ -89,9 +75,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 503, message: 'Webhook secret not configured' })
   }
 
+  const webhooks = new Webhooks({
+    secret: config.githubWebhookSecret,
+  })
+
   const signature = getHeader(event, 'x-hub-signature-256')
-  if (!verifySignature(rawBody, signature, config.githubWebhookSecret)) {
+
+  if (!signature) {
     throw createError({ statusCode: 401, message: 'Invalid signature' })
+  }
+
+  const isSignatureValid = await webhooks.verify(rawBody, signature)
+
+  if (!isSignatureValid) {
+    throw createError({ statusCode: 401, message: 'Unauthorized' })
   }
 
   const payload = JSON.parse(rawBody)

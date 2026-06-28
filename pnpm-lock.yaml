@@ -17,6 +17,9 @@ importers:
       '@octokit/app':
         specifier: ^16.1.2
         version: 16.1.2
+      '@octokit/webhooks':
+        specifier: ^14.2.0
+        version: 14.2.0
       '@unocss/preset-icons':
         specifier: ^66.6.0
         version: 66.6.7
