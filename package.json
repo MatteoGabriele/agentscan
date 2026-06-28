@@ -16,7 +16,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest"
+    "test": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
@@ -32,6 +33,9 @@
     "vue-data-ui": "^3.22.0",
     "vue-router": "^4.6.4"
   },
+  "lint-staged": {
+    "*.{js,ts,vue,json,css,md}": "prettier --write"
+  },
   "devDependencies": {
     "@github/issue-parser": "^2.0.0",
     "@iconify-json/lucide": "^1.2.111",
@@ -41,6 +45,8 @@
     "@unocss/nuxt": "^66.6.7",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "prettier": "^3.8.5",
     "simple-analytics-vue": "^3.1.0",
     "tsx": "^4.22.4",
