@@ -51,6 +51,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     githubToken: '',
+    githubAppId: '',
+    githubAppPrivateKey: '',
+    githubWebhookSecret: '',
   },
 
   css: ['~/assets/main.css'],
