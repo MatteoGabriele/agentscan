@@ -229,7 +229,9 @@ const keyDates = computed(() => {
   return landmarks
     .map((item) => {
       const index = dateList.indexOf(item.date)
-      if (index === -1) return null
+      if (index === -1) {
+        return null
+      }
       const landmarkDateTime = new Date(item.date).getTime()
 
       return {
