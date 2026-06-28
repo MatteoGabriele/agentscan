@@ -5,6 +5,12 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "version": {
+      "description": "Schema version of this config file. Omit or set to 1 for the current format. Increment if a future AgentScan release introduces breaking changes.",
+      "type": "integer",
+      "minimum": 1,
+      "default": 1
+    },
     "allowed-users": {
       "description": "GitHub usernames to exclude from scanning.",
       "type": "array",
