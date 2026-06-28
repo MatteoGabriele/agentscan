@@ -31,7 +31,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
   labels: {
     'community-flagged': 'agentscan:community-flagged',
     mixed: 'agentscan:mixed-signals',
-    automation: 'agentscan:automated-account',
+    automation: 'agentscan:automation-signals',
   },
   messages: {
     organic: '',

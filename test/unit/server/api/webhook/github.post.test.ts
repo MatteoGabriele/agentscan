@@ -432,7 +432,7 @@ describe('GitHub Webhook Handler', () => {
           owner: 'test-owner',
           repo: 'test-repo',
           issue_number: 123,
-          labels: ['agentscan:automated-account'],
+          labels: ['agentscan:automation-signals'],
         }),
       )
     })
@@ -462,13 +462,13 @@ describe('GitHub Webhook Handler', () => {
       )
     })
 
-    it('adds automated-account label for automation classification', async () => {
+    it('adds automation-signals label for automation classification', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
 
       await handler(MOCK_EVENT)
 
       expect(mockInstallationOctokit.rest.issues.addLabels).toHaveBeenCalledWith(
-        expect.objectContaining({ labels: ['agentscan:automated-account'] }),
+        expect.objectContaining({ labels: ['agentscan:automation-signals'] }),
       )
     })
 
