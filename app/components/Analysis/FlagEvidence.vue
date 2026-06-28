@@ -31,13 +31,22 @@ const PREVIEW_COUNT = 5
 const FAST_THRESHOLD_SECONDS = 300
 
 const fastestConnection = computed(() => {
-  if (!hasConnections.value) return null
+  if (!hasConnections.value) {
+    return null
+  }
+
   const conns = props.flag.connections ?? []
+
   let best: (typeof conns)[0] | null = null
   let minDelta = Infinity
+
   for (const conn of conns) {
-    if (!conn.from.created_at || !conn.to.created_at) continue
+    if (!conn.from.created_at || !conn.to.created_at) {
+      continue
+    }
+
     const delta = Math.abs(getDeltaSeconds(conn.from, conn.to))
+
     if (delta < minDelta) {
       minDelta = delta
       best = conn
@@ -47,12 +56,20 @@ const fastestConnection = computed(() => {
 })
 
 const fastestEventPair = computed(() => {
-  if (hasConnections.value) return null
+  if (hasConnections.value) {
+    return null
+  }
+
   const sorted = sortedEvents.value
-  if (sorted.length < 2) return null
+
+  if (sorted.length < 2) {
+    return null
+  }
+
   let bestA = null
   let bestB = null
   let minDelta = Infinity
+
   for (let i = 0; i < sorted.length - 1; i++) {
     const currValue = sorted[i]
     const nextValue = sorted[i + 1]
