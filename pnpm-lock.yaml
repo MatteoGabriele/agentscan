@@ -14,6 +14,12 @@ importers:
       '@nuxtjs/color-mode':
         specifier: ^4.0.0
         version: 4.0.0(magicast@0.5.2)
+      '@octokit/app':
+        specifier: ^16.1.2
+        version: 16.1.2
+      '@octokit/webhooks':
+        specifier: ^14.2.0
+        version: 14.2.0
       '@unocss/preset-icons':
         specifier: ^66.6.0
         version: 66.6.7
@@ -44,6 +50,9 @@ importers:
       vue-router:
         specifier: ^4.6.4
         version: 4.6.4(vue@3.5.35(typescript@6.0.3))
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
     devDependencies:
       '@github/issue-parser':
         specifier: ^2.0.0
