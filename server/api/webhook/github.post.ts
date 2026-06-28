@@ -83,6 +83,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Empty body' })
   }
 
+  if (!config.githubWebhookSecret) {
+    throw createError({ statusCode: 503, message: 'Webhook secret not configured' })
+  }
+
   const signature = getHeader(event, 'x-hub-signature-256')
   if (!verifySignature(rawBody, signature, config.githubWebhookSecret)) {
     throw createError({ statusCode: 401, message: 'Invalid signature' })
@@ -96,6 +100,10 @@ export default defineEventHandler(async (event) => {
 
   if (!payload.pull_request || !payload.installation) {
     return { ok: true }
+  }
+
+  if (!config.githubAppId || !config.githubAppPrivateKey) {
+    throw createError({ statusCode: 503, message: 'GitHub App not configured' })
   }
 
   const privateKey = Buffer.from(config.githubAppPrivateKey, 'base64').toString('utf-8')
@@ -151,7 +159,7 @@ export default defineEventHandler(async (event) => {
 
   let verified: AutomationListItem[] = []
   try {
-    const { data: verifiedList } = await octokit.rest.repos.getContent({
+    const { data: verifiedList } = await app.octokit.rest.repos.getContent({
       owner: 'matteogabriele',
       repo: 'agentscan',
       path: 'data/verified-automations-list.json',
@@ -205,7 +213,10 @@ export default defineEventHandler(async (event) => {
     description = repoConfig.messages[analysis.classification]
   }
 
+  const MARKER = '<!-- agentscan-bot -->'
+
   const body = [
+    MARKER,
     `### ${indicator} ${details.label}`,
     '',
     description,
@@ -217,7 +228,18 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (repoConfig.agentScanComment) {
-      await octokit.rest.issues.createComment({ owner, repo, issue_number: prNumber, body })
+      const { data: existingComments } = await octokit.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number: prNumber,
+        per_page: 100,
+      })
+      const existing = existingComments.find((c) => c.body?.includes(MARKER))
+      if (existing) {
+        await octokit.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+      } else {
+        await octokit.rest.issues.createComment({ owner, repo, issue_number: prNumber, body })
+      }
     }
 
     const labelsToAdd: string[] = []
@@ -232,6 +254,13 @@ export default defineEventHandler(async (event) => {
     }
 
     if (labelsToAdd.length > 0) {
+      await Promise.all(
+        labelsToAdd.map((name) =>
+          octokit.rest.issues.createLabel({ owner, repo, name, color: 'ededed' }).catch(() => {
+            // label already exists or no create permission — continue to addLabels
+          }),
+        ),
+      )
       await octokit.rest.issues.addLabels({
         owner,
         repo,
