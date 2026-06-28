@@ -15,12 +15,14 @@ type AutomationListItem = {
   issueUrl: string
 }
 
+type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
+
 type RepoConfig = {
   skipMembers: string[]
   autoClose: boolean
   autoCloseClassifications: IdentityClassification[]
-  agentScanComment: boolean
-  skipCommentOnOrganic: boolean
+  mode: ScanMode
+  skipOnOrganic: boolean
   labels: {
     communityFlagged: string
     mixed: string
@@ -38,8 +40,8 @@ type PartialRepoConfig = {
   skipMembers?: string[]
   autoClose?: boolean
   autoCloseClassifications?: IdentityClassification[]
-  agentScanComment?: boolean
-  skipCommentOnOrganic?: boolean
+  mode?: ScanMode
+  skipOnOrganic?: boolean
   labels?: Partial<RepoConfig['labels']>
   messages?: Partial<RepoConfig['messages']>
 }
@@ -48,8 +50,8 @@ const DEFAULT_CONFIG: RepoConfig = {
   skipMembers: [],
   autoClose: false,
   autoCloseClassifications: ['automation'],
-  agentScanComment: true,
-  skipCommentOnOrganic: false,
+  mode: 'full',
+  skipOnOrganic: false,
   labels: {
     communityFlagged: 'agentscan:community-flagged',
     mixed: 'agentscan:mixed-signals',
@@ -183,11 +185,11 @@ export default defineEventHandler(async (event) => {
 
   const isFlagged = hasCommunityFlag || analysis.classification !== 'organic'
 
-  if (
-    repoConfig.skipCommentOnOrganic &&
-    !hasCommunityFlag &&
-    analysis.classification === 'organic'
-  ) {
+  if (repoConfig.skipOnOrganic && !hasCommunityFlag && analysis.classification === 'organic') {
+    return { ok: true }
+  }
+
+  if (repoConfig.mode === 'silent') {
     return { ok: true }
   }
 
@@ -226,7 +228,7 @@ export default defineEventHandler(async (event) => {
   ].join('\n')
 
   try {
-    if (repoConfig.agentScanComment) {
+    if (repoConfig.mode === 'full' || repoConfig.mode === 'comment') {
       const { data: existingComments } = await octokit.rest.issues.listComments({
         owner,
         repo,
@@ -241,31 +243,33 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const labelsToAdd: string[] = []
-    if (hasCommunityFlag) {
-      labelsToAdd.push(repoConfig.labels.communityFlagged)
-    } else if (analysis.classification !== 'organic') {
-      const labelMap: Record<Exclude<IdentityClassification, 'organic'>, string> = {
-        mixed: repoConfig.labels.mixed,
-        automation: repoConfig.labels.automation,
+    if (repoConfig.mode === 'full' || repoConfig.mode === 'labels') {
+      const labelsToAdd: string[] = []
+      if (hasCommunityFlag) {
+        labelsToAdd.push(repoConfig.labels.communityFlagged)
+      } else if (analysis.classification !== 'organic') {
+        const labelMap: Record<Exclude<IdentityClassification, 'organic'>, string> = {
+          mixed: repoConfig.labels.mixed,
+          automation: repoConfig.labels.automation,
+        }
+        labelsToAdd.push(labelMap[analysis.classification])
       }
-      labelsToAdd.push(labelMap[analysis.classification])
-    }
 
-    if (labelsToAdd.length > 0) {
-      await Promise.all(
-        labelsToAdd.map((name) =>
-          octokit.rest.issues.createLabel({ owner, repo, name, color: 'ededed' }).catch(() => {
-            // label already exists or no create permission — continue to addLabels
-          }),
-        ),
-      )
-      await octokit.rest.issues.addLabels({
-        owner,
-        repo,
-        issue_number: prNumber,
-        labels: labelsToAdd,
-      })
+      if (labelsToAdd.length > 0) {
+        await Promise.all(
+          labelsToAdd.map((name) =>
+            octokit.rest.issues.createLabel({ owner, repo, name, color: 'ededed' }).catch(() => {
+              // label already exists or no create permission — continue to addLabels
+            }),
+          ),
+        )
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: prNumber,
+          labels: labelsToAdd,
+        })
+      }
     }
   } catch (err: unknown) {
     if (err instanceof Error && !err.message.includes('Resource not accessible')) {
