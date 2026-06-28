@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { IdentifyResult } from '@unveil/identity'
 import { getClassificationDetails, identify } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
-import handler from '../../../../../server/api/webhook/github.post'
+import handler from '../../../../../server/api/webhook/github/index.post.ts'
 
 // vi.hoisted runs before all module imports — used to stub Nuxt auto-imports
 // and to create shared mock objects referenced in vi.mock() factories below.
@@ -334,7 +334,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Skip Members (via repo config)', () => {
     it('returns { ok: true } without scanning when username is in skipMembers', async () => {
-      mockRepoConfig({ skipMembers: ['test-user', 'other-user'] })
+      mockRepoConfig({ 'skip-members': ['test-user', 'other-user'] })
 
       const result = await handler(MOCK_EVENT)
 
@@ -343,7 +343,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('proceeds with scan when username is not in skipMembers', async () => {
-      mockRepoConfig({ skipMembers: ['other-user'] })
+      mockRepoConfig({ 'skip-members': ['other-user'] })
 
       await handler(MOCK_EVENT)
 
@@ -502,7 +502,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('skipOnOrganic', () => {
     it('returns { ok: true } without comment or labels for organic accounts when enabled', async () => {
-      mockRepoConfig({ skipOnOrganic: true })
+      mockRepoConfig({ 'skip-on-organic': true })
 
       const result = await handler(MOCK_EVENT)
 
@@ -511,7 +511,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('still posts comment for community-flagged accounts even when skipOnOrganic is true', async () => {
-      mockRepoConfig({ skipOnOrganic: true })
+      mockRepoConfig({ 'skip-on-organic': true })
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
@@ -521,7 +521,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('still posts comment for non-organic accounts when skipOnOrganic is true', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
-      mockRepoConfig({ skipOnOrganic: true })
+      mockRepoConfig({ 'skip-on-organic': true })
 
       await handler(MOCK_EVENT)
 
@@ -540,7 +540,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('closes the PR when autoClose is enabled and classification matches', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation'] })
 
       await handler(MOCK_EVENT)
 
@@ -555,7 +555,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('does not close the PR when classification is not in autoCloseClassifications', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'mixed' })
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation'] })
 
       await handler(MOCK_EVENT)
 
@@ -563,7 +563,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('closes community-flagged PRs when autoClose is enabled', async () => {
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation'] })
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
@@ -575,7 +575,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('closes the PR when multiple classifications are in the autoClose list', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'mixed' })
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation', 'mixed'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation', 'mixed'] })
 
       await handler(MOCK_EVENT)
 
