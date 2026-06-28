@@ -84,7 +84,7 @@ function nameOf(repo: string) {
             Repositories observed with active bounty signals, collected twice daily.
           </p>
         </div>
-        <div class="flex items-center gap-3 text-xs shrink-0 flex-wrap">
+        <div class="flex items-center gap-3 text-xs flex-wrap">
           <span
             v-if="!pending"
             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gh-card border border-gh-border font-medium text-gh-text"
