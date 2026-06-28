@@ -488,7 +488,7 @@ describe('GitHub Webhook Handler', () => {
         labels: {
           automation: 'blocked:bot-account',
           mixed: 'review:mixed-signals',
-          communityFlagged: 'security:flagged',
+          ['community-flagged']: 'security:flagged',
         },
       })
 
@@ -598,7 +598,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('uses the custom communityFlagged message for flagged accounts', async () => {
       mockVerifiedList(['test-user'])
-      mockRepoConfig({ messages: { communityFlagged: 'Flagged by our community watchlist.' } })
+      mockRepoConfig({ messages: { 'community-flagged': 'Flagged by our community watchlist.' } })
 
       await handler(MOCK_EVENT)
 

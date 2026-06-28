@@ -87,7 +87,7 @@ export default defineEventHandler(async (event) => {
     // no config file — use defaults
   }
 
-  if (repoConfig.skipMembers.includes(username) || isKnownBot(username)) {
+  if (repoConfig['skip-members'].includes(username) || isKnownBot(username)) {
     return { ok: true }
   }
 
@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
 
   const isFlagged = hasCommunityFlag || analysis.classification !== 'organic'
 
-  if (repoConfig.skipOnOrganic && !hasCommunityFlag && analysis.classification === 'organic') {
+  if (repoConfig['skip-on-organic'] && !hasCommunityFlag && analysis.classification === 'organic') {
     return { ok: true }
   }
 
@@ -150,8 +150,8 @@ export default defineEventHandler(async (event) => {
     : getClassificationDetails(analysis.classification)
 
   let description = details.description
-  if (hasCommunityFlag && repoConfig.messages.communityFlagged) {
-    description = repoConfig.messages.communityFlagged
+  if (hasCommunityFlag && repoConfig.messages['community-flagged']) {
+    description = repoConfig.messages['community-flagged']
   } else if (!hasCommunityFlag && repoConfig.messages[analysis.classification]) {
     description = repoConfig.messages[analysis.classification]
   }
@@ -188,7 +188,7 @@ export default defineEventHandler(async (event) => {
     if (repoConfig.mode === 'full' || repoConfig.mode === 'labels') {
       const labelsToAdd: string[] = []
       if (hasCommunityFlag) {
-        labelsToAdd.push(repoConfig.labels.communityFlagged)
+        labelsToAdd.push(repoConfig.labels['community-flagged'])
       } else if (analysis.classification !== 'organic') {
         const labelMap: Record<Exclude<IdentityClassification, 'organic'>, string> = {
           mixed: repoConfig.labels.mixed,
@@ -219,9 +219,9 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (repoConfig.autoClose) {
+  if (repoConfig['auto-close']) {
     const shouldClose =
-      hasCommunityFlag || repoConfig.autoCloseClassifications.includes(analysis.classification)
+      hasCommunityFlag || repoConfig['auto-close-classifications'].includes(analysis.classification)
 
     if (shouldClose) {
       try {
