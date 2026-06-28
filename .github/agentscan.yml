@@ -4,6 +4,8 @@ skip-members:
   - graphieros
   - huang-julien
 
+skip-on-organic: true
+
 auto-close: true
 auto-close-classifications:
   - automation
