@@ -116,7 +116,9 @@ const eventDays = computed(() => {
   ).sort()
 
   const lastDay = days.at(-1)
-  if (!lastDay) return []
+  if (!lastDay) {
+    return []
+  }
 
   const startDate = new Date(`${lastDay}T00:00:00.000Z`)
   startDate.setUTCDate(startDate.getUTCDate() - dayRangeLimit + 1)
@@ -126,7 +128,9 @@ const eventDays = computed(() => {
 
 const limitedEvents = computed(() => {
   const firstDay = eventDays.value[0]
-  if (!firstDay) return []
+  if (!firstDay) {
+    return []
+  }
   return props.events.filter((event) => {
     return (
       event.created_at &&
@@ -163,7 +167,9 @@ function getCompleteHourRange(events: GitHubEvent[]): string[] {
   const firstTimestamp = timestamps[0]
   const lastTimestamp = timestamps[timestamps.length - 1]
 
-  if (firstTimestamp === undefined || lastTimestamp === undefined) return []
+  if (firstTimestamp === undefined || lastTimestamp === undefined) {
+    return []
+  }
 
   const start = new Date(firstTimestamp)
   const end = new Date(lastTimestamp)
@@ -203,7 +209,9 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
   }
 
   for (const event of events) {
-    if (!event.created_at || !isGitHubEventType(event.type)) continue
+    if (!event.created_at || !isGitHubEventType(event.type)) {
+      continue
+    }
 
     const label = usesHourlyGranularity.value
       ? roundToClosestHour(new Date(event.created_at!)).toISOString().slice(0, 13)
@@ -404,7 +412,9 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
 
 function getSeriesThreshold(seriesName: string): number | null {
   const datasetItem = datasetLine.value.find((item) => item.name === seriesName)
-  if (!datasetItem || !('threshold' in datasetItem)) return null
+  if (!datasetItem || !('threshold' in datasetItem)) {
+    return null
+  }
   return datasetItem.threshold as number | null
 }
 

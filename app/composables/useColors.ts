@@ -28,7 +28,9 @@ function resolveElement(element?: CssVariableSource): HTMLElement | null {
     return null
   }
 
-  if (!element) return document.documentElement
+  if (!element) {
+    return document.documentElement
+  }
 
   const resolved = unref(element)
 
@@ -54,7 +56,9 @@ export function useCssVariables(
     void recomputeToken.value
 
     const element = elementComputed.value
-    if (!element) return {}
+    if (!element) {
+      return {}
+    }
 
     const result: Record<string, string> = {}
 

@@ -26,7 +26,9 @@ export default defineEventHandler(async () => {
 
     dates.forEach((date) => {
       const counts = countsByDate[date]
-      if (!counts) return
+      if (!counts) {
+        return
+      }
 
       automationPercentages.push(counts.automation.percentage)
       mixedPercentages.push(counts.mixed.percentage)

@@ -74,7 +74,9 @@ const dataset = computed<VueUiScatterDatasetItem[]>(() => {
 
 const averageScore = computed(() => {
   const count = (props.data ?? []).length
-  if (count === 0) return 0
+  if (count === 0) {
+    return 0
+  }
   return dataset.value.flatMap((d) => d.values.map((v) => v.x)).reduce((a, b) => a + b, 0) / count
 })
 

@@ -156,7 +156,9 @@ function getLastPlot(serie: SvgSerieItem) {
 
 function getLastPlotTransform(serie: SvgSerieItem) {
   const lastPlot = getLastPlot(serie)
-  if (!lastPlot) return ''
+  if (!lastPlot) {
+    return ''
+  }
   return `translate(${lastPlot.x}px, ${lastPlot.y}px)`
 }
 
@@ -178,7 +180,9 @@ function getTooltipContent(
   const datapoint = series[0] as unknown as XyAugmentedSeries
   const eligible = datapoint?.details?.eligiblePrs?.[index]
   const closed = datapoint?.details?.closedPrs?.[index]
-  if (closed == null || eligible == null) return ''
+  if (closed == null || eligible == null) {
+    return ''
+  }
   const percentage = eligible === 0 ? 100 : Math.round((closed / eligible) * 100)
   return `${closed} / ${eligible} (${percentage}%)`
 }

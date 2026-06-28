@@ -178,7 +178,9 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
   const yName = datapoint?.yAxisName ?? ''
   const weekIndex = weekLabels.value.indexOf(xName)
   const weekKey = weekKeys.value[weekIndex]
-  if (!weekKey) return ''
+  if (!weekKey) {
+    return ''
+  }
   const targetDate = dayjs(weekKey).add(dayIndexes[yName] ?? 0, 'day')
 
   return targetDate.format('DD MMM (ddd)')

@@ -116,7 +116,9 @@ async function fetchReposForQuery(
     )
 
     // Stop early if we've received fewer results than requested
-    if (res.data.items.length < PER_PAGE) break
+    if (res.data.items.length < PER_PAGE) {
+      break
+    }
 
     await new Promise((resolve) => setTimeout(resolve, DELAY_MS))
   }
@@ -126,7 +128,9 @@ async function fetchReposForQuery(
 
 async function main() {
   const token = process.env.GITHUB_TOKEN ?? process.env.NUXT_GITHUB_TOKEN
-  if (!token) throw new Error('GITHUB_TOKEN is not set')
+  if (!token) {
+    throw new Error('GITHUB_TOKEN is not set')
+  }
 
   const octokit = new Octokit({ auth: token })
   const existing = loadBountyRepos()

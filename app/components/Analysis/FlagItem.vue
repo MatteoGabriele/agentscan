@@ -10,7 +10,9 @@ const { parseDataPoint, groupDataPoints } = useFlagDataPoints()
 const isExpanded = ref(false)
 
 function toggleExpanded() {
-  if (props.flag.data.length) isExpanded.value = !isExpanded.value
+  if (props.flag.data.length) {
+    isExpanded.value = !isExpanded.value
+  }
 }
 </script>
 

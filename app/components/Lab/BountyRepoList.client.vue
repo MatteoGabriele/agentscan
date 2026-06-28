@@ -7,7 +7,9 @@ const repos = computed<BountyRepo[]>(() => data.value ?? [])
 
 const filteredRepos = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return repos.value
+  if (!q) {
+    return repos.value
+  }
   return repos.value.filter((r) => r.repo.toLowerCase().includes(q))
 })
 
@@ -16,7 +18,9 @@ const clusters = computed(() => {
   filteredRepos.value.forEach((r) => {
     const name = nameOf(r.repo)
     const key = name.toLowerCase()
-    if (!map[key]) map[key] = { name, entries: [] }
+    if (!map[key]) {
+      map[key] = { name, entries: [] }
+    }
     map[key]!.entries.push(r)
   })
   return Object.values(map).sort((a, b) => b.entries.length - a.entries.length)
@@ -32,7 +36,9 @@ const crossClusterOwners = computed(() => {
   nameClusters.value.forEach((c) => {
     c.entries.forEach((e) => {
       const owner = ownerOf(e.repo)
-      if (!ownerMap[owner]) ownerMap[owner] = []
+      if (!ownerMap[owner]) {
+        ownerMap[owner] = []
+      }
       ownerMap[owner]!.push(c.name)
     })
   })
@@ -46,7 +52,9 @@ const crossClusterOwnerSet = computed(
 )
 
 const lastUpdated = computed(() => {
-  if (!repos.value.length) return null
+  if (!repos.value.length) {
+    return null
+  }
   return repos.value.reduce(
     (latest, r) => (r.last_updated > latest ? r.last_updated : latest),
     repos.value[0]!.last_updated,

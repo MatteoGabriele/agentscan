@@ -102,7 +102,9 @@ export function getClosedPrPercentageByRepo(
   const byRepo = new Map<string, Map<string, EcosystemHealthItem[]>>()
 
   source.forEach((entry) => {
-    if (!entry[repoKey] || !entry[prKey]) return
+    if (!entry[repoKey] || !entry[prKey]) {
+      return
+    }
 
     const repo = String(entry[repoKey])
     const prId = String(entry[prKey])
@@ -112,7 +114,9 @@ export function getClosedPrPercentageByRepo(
     }
 
     const repoMap = byRepo.get(repo)
-    if (!repoMap) return
+    if (!repoMap) {
+      return
+    }
 
     if (!repoMap.has(prId)) {
       repoMap.set(prId, [])
@@ -138,7 +142,9 @@ export function getClosedPrPercentageByRepo(
         )
       })
 
-      if (!entriesInScoreRange.length) return
+      if (!entriesInScoreRange.length) {
+        return
+      }
 
       const hasClosedEntry = entriesInScoreRange.some((entry) => {
         return String(entry[stateKey]).toLowerCase() === closedState
@@ -169,7 +175,9 @@ export function getUniqueDatesFromSource(
       source
         .map((entry) => {
           const rawDate = entry[dateKey]
-          if (rawDate == null) return null
+          if (rawDate == null) {
+            return null
+          }
           return getDayKey(String(rawDate))
         })
         .filter((date): date is string => date !== null),
@@ -254,7 +262,9 @@ export function getClosedPrPercentageEvolutionByRepo(
 
       const repoData = repoMap.get(result.repo)
 
-      if (!repoData) return
+      if (!repoData) {
+        return
+      }
 
       repoData.percentages[dateIndex] = result.percentage
       repoData.eligiblePrs[dateIndex] = result.eligiblePrs
@@ -312,7 +322,9 @@ export function getClosedPrPercentageTotal(
   const results = getClosedPrPercentageByRepo(source, { scoreBounds })
   const totalEligible = results.reduce((s, r) => s + r.eligiblePrs, 0)
   const totalClosed = results.reduce((s, r) => s + r.closedPrs, 0)
-  if (totalEligible === 0) return 100
+  if (totalEligible === 0) {
+    return 100
+  }
   return Math.round((totalClosed / totalEligible) * 100)
 }
 

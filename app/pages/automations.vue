@@ -12,7 +12,9 @@ const fuzzySearch = (query: string, text: string): boolean => {
 
   for (let i = 0; i < queryTrimmed.length; i++) {
     textIndex = text.toLowerCase().indexOf(queryTrimmed[i] ?? '', textIndex)
-    if (textIndex === -1) return false
+    if (textIndex === -1) {
+      return false
+    }
     textIndex++
   }
 
