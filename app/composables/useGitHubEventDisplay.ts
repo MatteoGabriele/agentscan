@@ -90,7 +90,9 @@ export function useGitHubEventDisplay() {
   function getEventUrl(event: GitHubEvent): string | undefined {
     const repo = event.repo?.name
     const payload = event.payload as Record<string, unknown> | undefined
-    if (!repo) return undefined
+    if (!repo) {
+      return undefined
+    }
     const base = `https://github.com/${repo}`
     switch (event.type) {
       case 'PullRequestEvent':
@@ -106,14 +108,18 @@ export function useGitHubEventDisplay() {
       case 'IssueCommentEvent': {
         const issue = payload?.issue as { number?: number } | undefined
         const comment = payload?.comment as { id?: number } | undefined
-        if (!issue?.number) return undefined
+        if (!issue?.number) {
+          return undefined
+        }
         return comment?.id
           ? `${base}/issues/${issue.number}#issuecomment-${comment.id}`
           : `${base}/issues/${issue.number}`
       }
       case 'CommitCommentEvent': {
         const comment = payload?.comment as { commit_id?: string; id?: number } | undefined
-        if (!comment?.commit_id) return undefined
+        if (!comment?.commit_id) {
+          return undefined
+        }
         return comment.id
           ? `${base}/commit/${comment.commit_id}#commitcomment-${comment.id}`
           : `${base}/commit/${comment.commit_id}`
@@ -124,7 +130,9 @@ export function useGitHubEventDisplay() {
   }
 
   function formatEventTime(date: string | null | undefined): string {
-    if (!date) return ''
+    if (!date) {
+      return ''
+    }
     return dayjs(date).format('MMM D, h:mm a')
   }
 
@@ -139,11 +147,15 @@ export function useGitHubEventDisplay() {
   }
 
   function getRapidBurst(evts: GitHubEvent[]): { count: number; spanSeconds: number } | null {
-    if (evts.length < 3) return null
+    if (evts.length < 3) {
+      return null
+    }
     const sorted = sortByTime(evts)
     const first = sorted.at(0)
     const last = sorted.at(-1)
-    if (!first || !last) return null
+    if (!first || !last) {
+      return null
+    }
     const spanSeconds = dayjs(last.created_at ?? 0).diff(dayjs(first.created_at ?? 0), 'second')
     if (spanSeconds / (sorted.length - 1) < 120) {
       return { count: sorted.length, spanSeconds }
@@ -152,7 +164,9 @@ export function useGitHubEventDisplay() {
   }
 
   function formatSpan(seconds: number): string {
-    if (seconds < 60) return `${seconds}s`
+    if (seconds < 60) {
+      return `${seconds}s`
+    }
     const m = Math.floor(seconds / 60)
     const s = seconds % 60
     return s > 0 ? `${m}m ${s}s` : `${m}m`

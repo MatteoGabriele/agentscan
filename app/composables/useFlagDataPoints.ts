@@ -45,7 +45,9 @@ export function useFlagDataPoints() {
 
     const [, cleanLabel, unit] = unitMatch as [string, string, string]
     const withUnit = (val: FlagDataPoint['value']) => {
-      if (typeof val === 'boolean') return String(val)
+      if (typeof val === 'boolean') {
+        return String(val)
+      }
       const n = parseFloat(String(val))
       return !isNaN(n) ? `${val}${unit}` : String(val)
     }

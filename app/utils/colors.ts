@@ -47,7 +47,9 @@ export function interpolateHexColors({
     throw new Error('colors must be an array with at least 2 hex colors')
   }
 
-  if (colors.length === 1) return colors[0]!
+  if (colors.length === 1) {
+    return colors[0]!
+  }
 
   const normalizedRatio = clamp(ratio, 0, 1)
   const rgbColors = colors.map(hexToRgb)

@@ -30,7 +30,9 @@ const lastAvailableDate = computed(
 )
 
 function goToFirstAvailableDate() {
-  if (!firstAvailableDate.value) return
+  if (!firstAvailableDate.value) {
+    return
+  }
   selectedDate.value = firstAvailableDate.value
   lastSelectedDate.value = firstAvailableDate.value
   visibleMonthDate.value = parseDate(firstAvailableDate.value)
@@ -38,7 +40,9 @@ function goToFirstAvailableDate() {
 }
 
 function goToLastAvailableDate() {
-  if (!lastAvailableDate.value) return
+  if (!lastAvailableDate.value) {
+    return
+  }
   selectedDate.value = lastAvailableDate.value
   lastSelectedDate.value = lastAvailableDate.value
   visibleMonthDate.value = parseDate(lastAvailableDate.value)
@@ -141,7 +145,9 @@ function goToNextMonth() {
 }
 
 function selectDate(date: string) {
-  if (!availableDateSet.value.has(date)) return
+  if (!availableDateSet.value.has(date)) {
+    return
+  }
   selectedDate.value = date
   lastSelectedDate.value = date
   emit('select-date', date)

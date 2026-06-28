@@ -66,14 +66,18 @@ export function pack(results: EcosystemHealthItem[]): string {
 
 export function unpack(content: string): EcosystemHealthItem[] {
   const lines = content.split('\n')
-  if (!lines[0]?.startsWith('REPOS:')) return []
+  if (!lines[0]?.startsWith('REPOS:')) {
+    return []
+  }
 
   const repos = lines[0].slice(6).split(',').filter(Boolean)
   const results: EcosystemHealthItem[] = []
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i]
-    if (!line?.trim()) continue
+    if (!line?.trim()) {
+      continue
+    }
 
     const fields = line.split(',')
     const [
@@ -88,7 +92,9 @@ export function unpack(content: string): EcosystemHealthItem[] {
       isBounty,
     ] = fields
 
-    if (fields.length < 8) continue
+    if (fields.length < 8) {
+      continue
+    }
 
     const numCreatedTs = Number(createdTs)
     const numUserCreatedTs = Number(userCreatedTs)
@@ -102,8 +108,9 @@ export function unpack(content: string): EcosystemHealthItem[] {
       !Number.isFinite(numPublicRepos) ||
       !Number.isFinite(numEvents) ||
       !Number.isFinite(numRepoIdx)
-    )
+    ) {
       continue
+    }
 
     results.push({
       created_at: fromUnixSecs(numCreatedTs),

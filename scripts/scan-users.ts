@@ -146,8 +146,12 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = PR_SCAN_AMOUNT
     )
 
     for (const pr of prs.data) {
-      if (prsFromThisRepo >= prsPerRepo) break
-      if (!pr.user?.login) continue
+      if (prsFromThisRepo >= prsPerRepo) {
+        break
+      }
+      if (!pr.user?.login) {
+        continue
+      }
 
       if (isKnownBot(pr.user.login)) {
         console.log(`  ${repoFullName}: skipping known bot`)

@@ -18,14 +18,18 @@ export function formatPercentage(value: number): string {
 }
 
 export function formatTrend(value: number = 0) {
-  if (value > 0) return `+${round(value * 100, 1)}%`
+  if (value > 0) {
+    return `+${round(value * 100, 1)}%`
+  }
   return `${round(value * 100, 1)}%`
 }
 
 export function getHealthStats(
   data: EcosystemHealthItem[] = [],
 ): Record<IdentityClassification, { count: number; percentage: string }> | null {
-  if (!data.length) return null
+  if (!data.length) {
+    return null
+  }
 
   const totalCount = data.length
 
@@ -57,8 +61,12 @@ export function getHealthStats(
 }
 
 export function getTrendArrow(value: number = 0) {
-  if (value > 0) return 'i-lucide:trending-up'
-  if (value < 0) return 'i-lucide:trending-down'
+  if (value > 0) {
+    return 'i-lucide:trending-up'
+  }
+  if (value < 0) {
+    return 'i-lucide:trending-down'
+  }
   return 'i-lucide:trending-up-down'
 }
 
@@ -69,7 +77,11 @@ export function getTrendColor({
   value?: number
   reversed?: boolean
 }) {
-  if (value > 0) return reversed ? 'text-gh-danger-hover' : 'text-gh-green'
-  if (value < 0) return reversed ? 'text-gh-green' : 'text-gh-danger-hover'
+  if (value > 0) {
+    return reversed ? 'text-gh-danger-hover' : 'text-gh-green'
+  }
+  if (value < 0) {
+    return reversed ? 'text-gh-green' : 'text-gh-danger-hover'
+  }
   return 'text-gh-muted'
 }

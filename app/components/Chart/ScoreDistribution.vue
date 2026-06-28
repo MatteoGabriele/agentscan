@@ -20,7 +20,9 @@ const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 
 const uniqueEntries = computed(() => {
-  if (!props.data) return []
+  if (!props.data) {
+    return []
+  }
 
   return [...new Map(props.data.map((item) => [`${item.repo_name}#${item.pr_key}`, item])).values()]
 })
@@ -67,7 +69,9 @@ function distribute(entries: EcosystemHealthItem[]) {
       }),
     )
 
-    if (!matchingRange) return
+    if (!matchingRange) {
+      return
+    }
 
     result[matchingRange.label] = (result[matchingRange.label] ?? 0) + 1
   })
@@ -149,7 +153,9 @@ const config = computed<VueUiXyConfig>(() => ({
       offsetY: -12,
       color: colors.value.text,
       formatter: ({ value }) => {
-        if (!total.value) return '0%'
+        if (!total.value) {
+          return '0%'
+        }
         return `${round((value / total.value) * 100, 1)}%`
       },
     },

@@ -92,7 +92,9 @@ export function getClassificationStatsByDate(
 }
 
 function getTotalClassificationCount(counts: ClassificationStats | undefined): number | null {
-  if (!counts) return null
+  if (!counts) {
+    return null
+  }
   return CLASSIFICATION_CATEGORIES.reduce((total, category) => total + counts[category].count, 0)
 }
 

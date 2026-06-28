@@ -18,7 +18,9 @@ const colors = useColors(rootEl)
 
 const averageScoreOverall = computed(() => {
   const count = (props.data ?? []).length
-  if (count === 0) return 100
+  if (count === 0) {
+    return 100
+  }
   return (
     (props.data?.map((d) => d.score).reduce((a, b) => a + b, 0) ?? 0) / (props.data?.length ?? 1)
   )
@@ -26,13 +28,17 @@ const averageScoreOverall = computed(() => {
 
 const averageScoreCurrentDay = computed(() => {
   const data = props.data ?? []
-  if (data.length === 0) return 100
+  if (data.length === 0) {
+    return 100
+  }
   const latestTimestamp = Math.max(...data.map((d) => new Date(d.created_at).getTime()))
   const latestDate = new Date(latestTimestamp).toISOString().slice(0, 10)
   const latestEntries = data.filter(
     (d) => new Date(d.created_at).toISOString().slice(0, 10) === latestDate,
   )
-  if (latestEntries.length === 0) return 100
+  if (latestEntries.length === 0) {
+    return 100
+  }
   const total = latestEntries.reduce((sum, d) => sum + d.score, 0)
   return total / latestEntries.length
 })

@@ -30,7 +30,9 @@ async function main() {
 
   dates.forEach((date) => {
     const counts = countsByDate[date]
-    if (!counts) return
+    if (!counts) {
+      return
+    }
     automation.push(counts.automation.percentage)
     mixed.push(counts.mixed.percentage)
     organic.push(counts.organic.percentage)
@@ -50,7 +52,9 @@ async function main() {
   }
 
   function statLabel(value: number | null, suffix = ''): string {
-    if (value == null || !isFinite(value)) return 'N/A'
+    if (value == null || !isFinite(value)) {
+      return 'N/A'
+    }
     const arrow = value > 0 ? '↑' : value < 0 ? '↓' : '→'
     const sign = value > 0 ? '+' : ''
     return `${arrow} ${sign}${value}${suffix}`
