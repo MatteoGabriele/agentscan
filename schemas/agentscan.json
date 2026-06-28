@@ -11,6 +11,23 @@
       "minimum": 1,
       "default": 1
     },
+    "scan": {
+      "description": "Controls which event types AgentScan analyses.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pull-requests": {
+          "description": "Analyse pull requests. Enabled by default.",
+          "type": "boolean",
+          "default": true
+        },
+        "issues": {
+          "description": "Analyse issues. Disabled by default.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
     "allowed-users": {
       "description": "GitHub usernames to exclude from scanning.",
       "type": "array",

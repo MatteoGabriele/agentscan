@@ -12,6 +12,10 @@ export type RepoConfig = {
   'auto-close-classifications': IdentityClassification[]
   mode: ScanMode
   'silent-on-organic': boolean
+  scan: {
+    'pull-requests': boolean
+    issues: boolean
+  }
   labels: {
     'community-flagged': string
     mixed: string
@@ -32,6 +36,10 @@ export const DEFAULT_CONFIG: RepoConfig = {
   'auto-close-classifications': ['automation'],
   mode: 'full',
   'silent-on-organic': false,
+  scan: {
+    'pull-requests': true,
+    issues: false,
+  },
   labels: {
     'community-flagged': 'agentscan:community-flagged',
     mixed: 'agentscan:mixed-signals',
@@ -65,6 +73,7 @@ export function parseRepoConfig(yamlContent: string): RepoConfig {
     ...DEFAULT_CONFIG,
     ...raw,
     version,
+    scan: { ...DEFAULT_CONFIG.scan, ...raw.scan },
     labels: { ...DEFAULT_CONFIG.labels, ...raw.labels },
     messages: { ...DEFAULT_CONFIG.messages, ...raw.messages },
   }

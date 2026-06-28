@@ -54,6 +54,9 @@ export default defineEventHandler(async (event) => {
     return { ok: true }
   }
 
+  const isPR = !!payload.pull_request
+  const isIssue = !!payload.issue
+
   const targetNumber: number | undefined = payload.pull_request?.number ?? payload.issue?.number
   const username: string | undefined =
     payload.pull_request?.user?.login ?? payload.issue?.user?.login
@@ -91,6 +94,14 @@ export default defineEventHandler(async (event) => {
     }
   } catch {
     // no config file — use defaults
+  }
+
+  if (isPR && !repoConfig.scan['pull-requests']) {
+    return { ok: true }
+  }
+
+  if (isIssue && !repoConfig.scan.issues) {
+    return { ok: true }
   }
 
   if (repoConfig['allowed-users'].includes(username) || isKnownBot(username)) {
