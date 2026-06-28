@@ -125,7 +125,7 @@ export function useGitHubEventDisplay() {
 
   function formatEventTime(date: string | null | undefined): string {
     if (!date) return ''
-    return dayjs(date).format('MMM D, h:mma')
+    return dayjs(date).format('MMM D, h:mm a')
   }
 
   function getDeltaSeconds(a: GitHubEvent, b: GitHubEvent): number {
