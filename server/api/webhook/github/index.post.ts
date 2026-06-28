@@ -50,7 +50,15 @@ export default defineEventHandler(async (event) => {
     return { ok: true }
   }
 
-  if (!payload.pull_request || !payload.installation) {
+  if (!payload.installation) {
+    return { ok: true }
+  }
+
+  const targetNumber: number | undefined = payload.pull_request?.number ?? payload.issue?.number
+  const username: string | undefined =
+    payload.pull_request?.user?.login ?? payload.issue?.user?.login
+
+  if (!targetNumber || !username) {
     return { ok: true }
   }
 
@@ -70,8 +78,6 @@ export default defineEventHandler(async (event) => {
 
   const owner: string = payload.repository.owner.login
   const repo: string = payload.repository.name
-  const username: string = payload.pull_request.user.login
-  const prNumber: number = payload.pull_request.number
 
   let repoConfig: RepoConfig = DEFAULT_CONFIG
   try {
@@ -174,14 +180,14 @@ export default defineEventHandler(async (event) => {
       const { data: existingComments } = await octokit.rest.issues.listComments({
         owner,
         repo,
-        issue_number: prNumber,
+        issue_number: targetNumber,
         per_page: 100,
       })
       const existing = existingComments.find((c) => c.body?.includes(MARKER))
       if (existing) {
         await octokit.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
       } else {
-        await octokit.rest.issues.createComment({ owner, repo, issue_number: prNumber, body })
+        await octokit.rest.issues.createComment({ owner, repo, issue_number: targetNumber, body })
       }
     }
 
@@ -208,7 +214,7 @@ export default defineEventHandler(async (event) => {
         await octokit.rest.issues.addLabels({
           owner,
           repo,
-          issue_number: prNumber,
+          issue_number: targetNumber,
           labels: labelsToAdd,
         })
       }
@@ -228,7 +234,7 @@ export default defineEventHandler(async (event) => {
         await octokit.rest.issues.update({
           owner,
           repo,
-          issue_number: prNumber,
+          issue_number: targetNumber,
           state: 'closed',
           state_reason: 'not_planned',
         })
