@@ -64,7 +64,9 @@ const DEFAULT_CONFIG: RepoConfig = {
 }
 
 function verifySignature(rawBody: string, signature: string | undefined, secret: string): boolean {
-  if (!signature) return false
+  if (!signature) {
+    return false
+  }
   const hmac = createHmac('sha256', secret)
   hmac.update(rawBody)
   const expected = `sha256=${hmac.digest('hex')}`
