@@ -1,95 +1,91 @@
-import {
-  getClassificationDetails,
-  type GitHubUser,
-  type IdentifyResult,
-} from "@unveil/identity";
+import { getClassificationDetails, type GitHubUser, type IdentifyResult } from '@unveil/identity'
 
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
   const ogTitle = computed<string | undefined>(() => {
-    const userValue = toValue(user);
+    const userValue = toValue(user)
 
     if (!userValue) {
-      return;
+      return
     }
 
-    const name = userValue.name || userValue.login;
+    const name = userValue.name || userValue.login
 
-    return `${name} | AgentScan`;
-  });
+    return `${name} | AgentScan`
+  })
 
   const ogImage = computed<string | undefined>(() => {
-    const userValue = toValue(user);
+    const userValue = toValue(user)
     if (!userValue) {
-      return;
+      return
     }
 
-    return userValue.avatar_url;
-  });
+    return userValue.avatar_url
+  })
 
   useHead({
     title: ogTitle,
     meta: () => {
-      const metas = [{ property: "og:type", content: "website" }];
+      const metas = [{ property: 'og:type', content: 'website' }]
 
       if (ogImage.value) {
-        metas.push({ property: "og:image", content: ogImage.value });
+        metas.push({ property: 'og:image', content: ogImage.value })
       }
 
       if (ogTitle.value) {
-        metas.push({ property: "og:title", content: ogTitle.value });
+        metas.push({ property: 'og:title', content: ogTitle.value })
       }
 
-      return metas;
+      return metas
     },
-  });
+  })
 }
 
 export type UseSeoAnalysisOptions = {
-  hasCommunityFlag?: MaybeRefOrGetter<boolean>;
-  hasActivityReport?: MaybeRefOrGetter<boolean>;
-};
+  hasCommunityFlag?: MaybeRefOrGetter<boolean>
+  hasActivityReport?: MaybeRefOrGetter<boolean>
+}
 
 export function useSeoAnalysis(
   analysis: MaybeRefOrGetter<IdentifyResult | undefined>,
   options?: UseSeoAnalysisOptions,
 ) {
   const ogDescription = computed(() => {
-    const analysisValue = toValue(analysis);
+    const analysisValue = toValue(analysis)
 
     if (!analysisValue) {
-      return;
+      return
     }
 
-    const flagsCounter = analysisValue.flags.length;
-    let descriptions = [];
+    const flagsCounter = analysisValue.flags.length
+    const descriptions = []
 
     if (toValue(options?.hasCommunityFlag)) {
-      descriptions.push(`Reported by community`);
+      descriptions.push(`Reported by community`)
     } else {
-      const details = getClassificationDetails(analysisValue.classification);
-      descriptions.push(details.label);
+      const details = getClassificationDetails(analysisValue.classification)
+      descriptions.push(details.label)
     }
 
     if (flagsCounter > 0) {
-      descriptions.push(`${flagsCounter} flag${flagsCounter === 1 ? "" : "s"}`);
+      descriptions.push(`${flagsCounter} flag${flagsCounter === 1 ? '' : 's'}`)
     }
 
     if (toValue(options?.hasActivityReport)) {
-      descriptions.push("Suspiscious activity reported");
+      descriptions.push('Suspiscious activity reported')
     }
 
     if (descriptions.length === 0) {
-      return;
+      return
     }
 
-    return descriptions.join(" | ");
-  });
+    return descriptions.join(' | ')
+  })
 
   useHead({
     meta: () => {
       return ogDescription.value
-        ? [{ property: "og:description", content: ogDescription.value }]
-        : [];
+        ? [{ property: 'og:description', content: ogDescription.value }]
+        : []
     },
-  });
+  })
 }

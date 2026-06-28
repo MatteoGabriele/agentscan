@@ -6,7 +6,7 @@
   padding: 0;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   --bg: #0b0b0b;
   --card: #161616;
   --border: #575757;
@@ -46,7 +46,7 @@
   --chart-dot: #c084fc;
 }
 
-:root[data-theme="light"] {
+:root[data-theme='light'] {
   --bg: #f6f8fa;
   --card: #ffffff;
   --border: #b7b7b7;

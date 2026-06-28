@@ -1,8 +1,8 @@
 export const githubEventTypes = [
-  "PullRequestEvent",
-  "CreateEvent",
-  "ForkEvent",
-  "IssueCommentEvent",
-] as const;
+  'PullRequestEvent',
+  'CreateEvent',
+  'ForkEvent',
+  'IssueCommentEvent',
+] as const
 
-export type GitHubEventType = (typeof githubEventTypes)[number];
+export type GitHubEventType = (typeof githubEventTypes)[number]

@@ -1,7 +1,7 @@
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
-dayjs.extend(utc);
+dayjs.extend(utc)
 
 // Replica of the cron schedules in .github/workflows/scan-users.yml
 const SCAN_SCHEDULE: Record<number, { hour: number; minute: number }> = {
@@ -36,105 +36,105 @@ const SCAN_SCHEDULE: Record<number, { hour: number; minute: number }> = {
   29: { hour: 0, minute: 0 },
   30: { hour: 3, minute: 26 },
   31: { hour: 6, minute: 51 },
-};
+}
 
 // Buffer to account for GitHub workflow delays + scan time
-const SCAN_TIME_BUFFER_MINUTES = 30;
+const SCAN_TIME_BUFFER_MINUTES = 30
 
 function getNextScanTime(currentDate: Date = new Date()): Date {
-  const now = dayjs.utc(currentDate);
-  const currentDay = now.date();
+  const now = dayjs.utc(currentDate)
+  const currentDay = now.date()
 
-  const todaySchedule = SCAN_SCHEDULE[currentDay];
+  const todaySchedule = SCAN_SCHEDULE[currentDay]
   if (todaySchedule) {
     const scanTimeToday = now
       .hour(todaySchedule.hour)
       .minute(todaySchedule.minute)
       .second(0)
       .millisecond(0)
-      .add(SCAN_TIME_BUFFER_MINUTES, "minute");
+      .add(SCAN_TIME_BUFFER_MINUTES, 'minute')
 
     if (scanTimeToday.isAfter(now)) {
-      return scanTimeToday.toDate();
+      return scanTimeToday.toDate()
     }
   }
 
-  let nextDay = currentDay + 1;
-  const daysInMonth = now.daysInMonth();
-  let nextDate;
+  let nextDay = currentDay + 1
+  const daysInMonth = now.daysInMonth()
+  let nextDate
 
   if (nextDay > daysInMonth) {
-    nextDay = 1;
-    nextDate = now.add(1, "month").date(1);
+    nextDay = 1
+    nextDate = now.add(1, 'month').date(1)
   } else {
-    nextDate = now.add(1, "day");
+    nextDate = now.add(1, 'day')
   }
 
-  const nextSchedule = SCAN_SCHEDULE[nextDay]!;
+  const nextSchedule = SCAN_SCHEDULE[nextDay]!
   const nextScanDate = nextDate
     .hour(nextSchedule.hour)
     .minute(nextSchedule.minute)
     .second(0)
     .millisecond(0)
-    .add(SCAN_TIME_BUFFER_MINUTES, "minute");
+    .add(SCAN_TIME_BUFFER_MINUTES, 'minute')
 
-  return nextScanDate.toDate();
+  return nextScanDate.toDate()
 }
 
 function formatNextScanTime(nextScanDate: Date): string {
-  const now = dayjs.utc();
-  const scanTime = dayjs.utc(nextScanDate);
+  const now = dayjs.utc()
+  const scanTime = dayjs.utc(nextScanDate)
 
-  const diffMs = scanTime.diff(now);
+  const diffMs = scanTime.diff(now)
 
   if (diffMs < 0) {
-    return "Scan in progress";
+    return 'Scan in progress'
   }
 
-  const diffDays = scanTime.diff(now, "day");
-  const diffHours = scanTime.diff(now, "hour");
-  const diffMinutes = scanTime.diff(now, "minute");
+  const diffDays = scanTime.diff(now, 'day')
+  const diffHours = scanTime.diff(now, 'hour')
+  const diffMinutes = scanTime.diff(now, 'minute')
 
   if (diffHours === 0) {
-    return `Next scan in ${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""}`;
+    return `Next scan in ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`
   }
 
   if (diffDays === 0) {
-    const remainingMinutes = diffMinutes % 60;
-    return `Next scan in ${diffHours} hour${diffHours !== 1 ? "s" : ""} and ${remainingMinutes} minute${remainingMinutes !== 1 ? "s" : ""}`;
+    const remainingMinutes = diffMinutes % 60
+    return `Next scan in ${diffHours} hour${diffHours !== 1 ? 's' : ''} and ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`
   }
 
-  const scanTimeUtc = scanTime.format("HH:mm");
-  return `Next scan in ${diffDays} day${diffDays !== 1 ? "s" : ""} at ${scanTimeUtc} UTC`;
+  const scanTimeUtc = scanTime.format('HH:mm')
+  return `Next scan in ${diffDays} day${diffDays !== 1 ? 's' : ''} at ${scanTimeUtc} UTC`
 }
 
 export function useNextScanTime() {
-  const now = ref(new Date());
-  let intervalId: ReturnType<typeof setInterval> | null = null;
+  const now = ref(new Date())
+  let intervalId: ReturnType<typeof setInterval> | null = null
 
   const nextScanTime = computed(() => {
-    return getNextScanTime(now.value);
-  });
+    return getNextScanTime(now.value)
+  })
 
   const formattedNextScanTime = computed(() => {
-    return formatNextScanTime(nextScanTime.value);
-  });
+    return formatNextScanTime(nextScanTime.value)
+  })
 
   onMounted(() => {
     // Update every minute to keep the display fresh
     intervalId = setInterval(() => {
-      now.value = new Date();
-    }, 60000);
-  });
+      now.value = new Date()
+    }, 60000)
+  })
 
   onBeforeUnmount(() => {
     if (intervalId) {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
     }
-  });
+  })
 
   return {
     nextScanTime,
     formattedNextScanTime,
-  };
+  }
 }

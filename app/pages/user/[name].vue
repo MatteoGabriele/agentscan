@@ -1,33 +1,30 @@
 <script setup lang="ts">
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
 const username = computed(() => {
   if (!route.params.name) {
-    return "";
+    return ''
   }
 
-  if (typeof route.params.name === "string") {
-    return route.params.name;
+  if (typeof route.params.name === 'string') {
+    return route.params.name
   }
 
-  return route.params.name[0] ?? "";
-});
+  return route.params.name[0] ?? ''
+})
 
-const accountKey = computed<string>(() => `account:${username.value}`);
-const { data: user, error } = await useFetch(
-  () => `/api/account/${username.value}`,
-  {
-    key: accountKey,
-    watch: [username],
-  },
-);
+const accountKey = computed<string>(() => `account:${username.value}`)
+const { data: user, error } = await useFetch(() => `/api/account/${username.value}`, {
+  key: accountKey,
+  watch: [username],
+})
 
 async function handleSubmit(name: string) {
-  await router.push({ name: "user-name", params: { name } });
+  await router.push({ name: 'user-name', params: { name } })
 }
 
-useSeoUser(user);
+useSeoUser(user)
 </script>
 
 <template>

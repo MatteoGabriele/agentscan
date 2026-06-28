@@ -2,12 +2,13 @@ name: Bounty Repo Scan
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Every day at 00:00 UTC
-    - cron: "0 12 * * *" # Every day at 12:00 UTC
+    - cron: '0 0 * * *' # Every day at 00:00 UTC
+    - cron: '0 12 * * *' # Every day at 12:00 UTC
   workflow_dispatch: # Allow manual trigger
 
 jobs:
   scan:
+    if: github.repository == 'MatteoGabriele/agentscan'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: '24'
 
       - name: Enable corepack
         run: corepack enable

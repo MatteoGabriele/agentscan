@@ -1,18 +1,17 @@
 <script setup lang="ts">
 const props = defineProps<{
-  items: IntegrationItem[];
-}>();
+  items: IntegrationItem[]
+}>()
 
-const isDisclosureOpen = ref<boolean>(false);
+const isDisclosureOpen = ref<boolean>(false)
 const counter = computed<number>(() => {
-  return props.items.length;
-});
+  return props.items.length
+})
 </script>
 
 <template>
   <section>
     <button
-      @click="isDisclosureOpen = !isDisclosureOpen"
       :aria-expanded="isDisclosureOpen"
       aria-controls="disclosure-external-analysis"
       class="w-full bg-gh-amber/10 text-gh-amber rounded-lg border-gh-amber/40 border px-3 py-2 text-left transition-colors"
@@ -20,6 +19,7 @@ const counter = computed<number>(() => {
         'border-b-none rounded-b-none': isDisclosureOpen,
         'hover:border-gh-amber': !isDisclosureOpen,
       }"
+      @click="isDisclosureOpen = !isDisclosureOpen"
     >
       <div class="flex items-center justify-between">
         <h3 class="flex items-center gap-2 text-sm">
@@ -27,9 +27,7 @@ const counter = computed<number>(() => {
           <span>Suspicious Activity Reported</span>
         </h3>
         <div class="flex items-center gap-3">
-          <span
-            class="bg-gh-amber/20 text-gh-amber text-xs font-semibold px-2 py-1 rounded"
-          >
+          <span class="bg-gh-amber/20 text-gh-amber text-xs font-semibold px-2 py-1 rounded">
             {{ counter }}
           </span>
           <span
@@ -47,11 +45,7 @@ const counter = computed<number>(() => {
       id="disclosure-external-analysis"
       class="bg-gh-amber/5 border border-t-gh-amber/30 rounded-b-md border-gh-amber/40 p-4 space-y-4"
     >
-      <li
-        v-for="item in items"
-        :key="`${item.username}-${item.link}`"
-        class="p-3 space-y-2"
-      >
+      <li v-for="item in items" :key="`${item.username}-${item.link}`" class="p-3 space-y-2">
         <h4 class="text-gh-text/90 text-sm">{{ item.label }}</h4>
         <p class="text-gh-text/70 text-sm">
           {{ item.reason }}

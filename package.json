@@ -12,13 +12,20 @@
     "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
     "scan:users": "pnpm exec tsx --env-file=.env scripts/scan-users.ts",
     "scan:bounty": "pnpm exec tsx --env-file=.env scripts/scan-bounty-repos.ts",
-    "test": "vitest"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/color-mode": "^4.0.0",
+    "@octokit/app": "^16.1.2",
+    "@octokit/webhooks": "^14.2.0",
     "@unocss/preset-icons": "^66.6.0",
-    "@unveil/identity": "^1.10.0",
+    "@unveil/identity": "1.12.0",
     "@vueuse/core": "^14.2.1",
     "dayjs": "^1.11.19",
     "nuxt": "^4.4.6",
@@ -26,16 +33,27 @@
     "valibot": "^1.2.0",
     "vue": "^3.5.28",
     "vue-data-ui": "^3.22.0",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "yaml": "^2.9.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,json,css,md}": "prettier --write"
   },
   "devDependencies": {
     "@github/issue-parser": "^2.0.0",
     "@iconify-json/lucide": "^1.2.111",
+    "@nuxt/eslint": "^1.16.0",
     "@octokit/types": "^16.0.0",
     "@types/node": "^26.0.0",
     "@unocss/nuxt": "^66.6.7",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.8.5",
     "simple-analytics-vue": "^3.1.0",
     "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
     "unocss": "^66.6.0",
     "vitest": "^4.1.8"
   }

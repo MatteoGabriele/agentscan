@@ -1,52 +1,49 @@
 <script setup lang="ts">
-import type { VueUiStacklineDatasetItem } from "vue-data-ui/vue-ui-stackline";
+import type { VueUiStacklineDatasetItem } from 'vue-data-ui/vue-ui-stackline'
 
 definePageMeta({
-  layout: "default",
-});
+  layout: 'default',
+})
 
-const rootEl = shallowRef<HTMLElement | null>(null);
-const colors = useColors(rootEl);
+const rootEl = shallowRef<HTMLElement | null>(null)
+const colors = useColors(rootEl)
 
-const { data } = await useEcosystemHealth();
-const dates = computed(() => data.value?.dates ?? []);
+const { data } = await useEcosystemHealth()
+const dates = computed(() => data.value?.dates ?? [])
 
 function createChartDataset(): {
-  categories: string[];
-  dataset: VueUiStacklineDatasetItem[];
+  categories: string[]
+  dataset: VueUiStacklineDatasetItem[]
 } {
   return {
     categories: dates.value,
     dataset: [
       {
-        name: "Organic",
+        name: 'Organic',
         series: dates.value.map(
           (date) => data.value?.countsByDate?.[date]?.organic.percentage ?? 0,
         ),
         color: colors.value.greenLine,
       },
       {
-        name: "Mixed",
-        series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.mixed.percentage ?? 0,
-        ),
+        name: 'Mixed',
+        series: dates.value.map((date) => data.value?.countsByDate?.[date]?.mixed.percentage ?? 0),
         color: colors.value.amber,
       },
       {
-        name: "Automation",
+        name: 'Automation',
         series: dates.value.map(
-          (date) =>
-            data.value?.countsByDate?.[date]?.automation.percentage ?? 0,
+          (date) => data.value?.countsByDate?.[date]?.automation.percentage ?? 0,
         ),
         color: colors.value.dangerHover,
       },
     ],
-  };
+  }
 }
 
-const stacklineData = computed(() => createChartDataset());
+const stacklineData = computed(() => createChartDataset())
 
-const dataset = computed(() => stacklineData.value.dataset);
+const dataset = computed(() => stacklineData.value.dataset)
 </script>
 
 <template>
@@ -67,10 +64,9 @@ const dataset = computed(() => stacklineData.value.dataset);
             <span class="i-lucide:triangle-alert"></span>
           </div>
           <p class="text-sm text-gh-text leading-relaxed">
-            This page is a sandbox where we test new ideas and features. Things
-            here may break, data might be inaccurate, or features could
-            disappear entirely. Take everything on this page with a grain of
-            salt and treat it as early-stage exploration, not production-ready
+            This page is a sandbox where we test new ideas and features. Things here may break, data
+            might be inaccurate, or features could disappear entirely. Take everything on this page
+            with a grain of salt and treat it as early-stage exploration, not production-ready
             tools.
           </p>
         </div>

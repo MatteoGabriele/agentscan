@@ -1,14 +1,14 @@
 <script setup lang="ts">
 defineProps<{
-  label: string;
-  to: string;
-}>();
+  label: string
+  to: string
+}>()
 </script>
 
 <template>
   <NuxtLink
-    :to
     v-slot="{ isActive }"
+    :to
     class="inline-flex items-center text-gh-muted hover:text-gh-text transition-colors text-sm"
   >
     <span

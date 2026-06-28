@@ -1,48 +1,48 @@
 <script setup lang="ts">
-import { usePreferredDark } from "@vueuse/core";
+import { usePreferredDark } from '@vueuse/core'
 
-const darkMode = usePreferredDark();
-const colorMode = useColorMode();
+const darkMode = usePreferredDark()
+const colorMode = useColorMode()
 const colorScheme = computed(() => {
   return {
-    system: darkMode ? "dark light" : "light dark",
-    light: "only light",
-    dark: "only dark",
-  }[colorMode.preference];
-});
+    system: darkMode ? 'dark light' : 'light dark',
+    light: 'only light',
+    dark: 'only dark',
+  }[colorMode.preference]
+})
 
 useHead({
-  title: "AgentScan - GitHub Automation Detector",
+  title: 'AgentScan - GitHub Automation Detector',
   meta: [
     {
-      property: "og:title",
-      content: "AgentScan - GitHub Automation Detector",
+      property: 'og:title',
+      content: 'AgentScan - GitHub Automation Detector',
     },
     {
-      property: "og:description",
-      content: "An open experiment in detecting automation patterns on GitHub",
+      property: 'og:description',
+      content: 'An open experiment in detecting automation patterns on GitHub',
     },
-    { property: "og:type", content: "website" },
-    { name: "color-scheme", content: colorScheme },
+    { property: 'og:type', content: 'website' },
+    { name: 'color-scheme', content: colorScheme },
   ],
   link: [
     {
-      rel: "icon",
-      href: "/favicon.ico",
-      type: "image/x-icon",
-      media: "(prefers-color-scheme: dark)",
+      rel: 'icon',
+      href: '/favicon.ico',
+      type: 'image/x-icon',
+      media: '(prefers-color-scheme: dark)',
     },
     {
-      rel: "icon",
-      href: "/favicon-dark.ico",
-      type: "image/x-icon",
-      media: "(prefers-color-scheme: light)",
+      rel: 'icon',
+      href: '/favicon-dark.ico',
+      type: 'image/x-icon',
+      media: '(prefers-color-scheme: light)',
     },
   ],
-});
+})
 
-const route = useRoute();
-const isHomePage = computed<boolean>(() => route.name === "index");
+const route = useRoute()
+const isHomePage = computed<boolean>(() => route.name === 'index')
 </script>
 
 <template>
@@ -57,7 +57,7 @@ const isHomePage = computed<boolean>(() => route.name === "index");
           class="max-w-screen-md mx-auto px-4 @container w-full"
           :class="{ 'py-20': !isHomePage }"
         >
-          <MainBrand class="mb-4" v-if="isHomePage" />
+          <MainBrand v-if="isHomePage" class="mb-4" />
           <slot />
         </main>
       </div>

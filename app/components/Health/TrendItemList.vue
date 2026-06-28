@@ -1,25 +1,22 @@
 <script setup lang="ts">
-import type { IdentityClassification } from "@unveil/identity";
+import type { IdentityClassification } from '@unveil/identity'
 
-type ClassificationStats = Record<
-  IdentityClassification,
-  { count: number; percentage: string }
->;
+type ClassificationStats = Record<IdentityClassification, { count: number; percentage: string }>
 
-const { data: ecosystemHealth } = await useEcosystemHealth();
-const data = computed(() => ecosystemHealth.value?.results);
+const { data: ecosystemHealth } = await useEcosystemHealth()
+const data = computed(() => ecosystemHealth.value?.results)
 
 const categoryProgression = computed(() => {
-  return ecosystemHealth.value?.categoryProgression;
-});
+  return ecosystemHealth.value?.categoryProgression
+})
 
 const latestDayStats = computed<ClassificationStats | null>(() => {
-  return getHealthStats(data.value);
-});
+  return getHealthStats(data.value)
+})
 
 const percentageClosureRate = computed<string | undefined>(() => {
-  return getClosedPrPercentageTotal(data.value, [0, 50])?.toString();
-});
+  return getClosedPrPercentageTotal(data.value, [0, 50])?.toString()
+})
 </script>
 
 <template>

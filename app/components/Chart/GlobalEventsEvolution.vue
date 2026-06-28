@@ -1,109 +1,88 @@
 <script setup lang="ts">
-import { useElementSize } from "@vueuse/core";
+import { useElementSize } from '@vueuse/core'
 import {
   VueUiXy,
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
-} from "vue-data-ui/vue-ui-xy";
-import { useTooltipPosition } from "vue-data-ui/composables";
+  type VueUiXySeries,
+} from 'vue-data-ui/vue-ui-xy'
+import { useTooltipPosition } from 'vue-data-ui/composables'
 
-import { useColors } from "~/composables/useColors";
-import { getClosedPrPercentageEvolutionTotal } from "~~/shared/utils/charts";
-import { identityConfig } from "@unveil/identity";
-import { round } from "~~/shared/utils/numbers";
+import { useColors } from '~/composables/useColors'
+import { getClosedPrPercentageEvolutionTotal } from '~~/shared/utils/charts'
+import { identityConfig } from '@unveil/identity'
+import { round } from '~~/shared/utils/numbers'
 
-import "vue-data-ui/style.css";
-const { data: ecosystemHealth } = await useEcosystemHealth();
-const data = computed(() => ecosystemHealth.value?.results ?? []);
-const dates = computed(() => ecosystemHealth.value?.dates);
-const countsByDate = computed(() => ecosystemHealth.value?.countsByDate);
+import 'vue-data-ui/style.css'
+const { data: ecosystemHealth } = await useEcosystemHealth()
+const data = computed(() => ecosystemHealth.value?.results ?? [])
+const dates = computed(() => ecosystemHealth.value?.dates)
+const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
-const chartContainer = useTemplateRef<HTMLElement>("chartContainer");
-const { width, height } = useElementSize(chartContainer);
+const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
+const { width, height } = useElementSize(chartContainer)
 
-const hasStableChartDimensions = computed(
-  () => width.value > 0 && height.value > 0,
-);
+const hasStableChartDimensions = computed(() => width.value > 0 && height.value > 0)
 
-const rootEl = shallowRef<HTMLElement | null>(null);
-const chartRef = useTemplateRef("chartRef");
+const rootEl = shallowRef<HTMLElement | null>(null)
+const chartRef = useTemplateRef('chartRef')
 
 onMounted(() => {
-  rootEl.value = document.documentElement;
-});
+  rootEl.value = document.documentElement
+})
 
-const colors = useColors(rootEl);
+const colors = useColors(rootEl)
 
 const automatedClosureRateData = computed(() => ({
-  ...getClosedPrPercentageEvolutionTotal(data.value, [
-    0,
-    identityConfig.THRESHOLD_SUSPICIOUS,
-  ]),
+  ...getClosedPrPercentageEvolutionTotal(data.value, [0, identityConfig.THRESHOLD_SUSPICIOUS]),
   scaleMin: 0,
   scaleMax: 100,
-  color: "grey",
+  color: 'grey',
   dashed: true,
-}));
+}))
 
 function composeRawDataset(): VueUiXyDatasetItem[] {
   return [
     {
-      name: "Organic",
-      series:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.organic.percentage ?? 0,
-        ) ?? [],
-      trends:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.organic.trend ?? 0,
-        ) ?? [],
+      name: 'Organic',
+      series: dates.value?.map((date) => countsByDate.value?.[date]?.organic.percentage ?? 0) ?? [],
+      trends: dates.value?.map((date) => countsByDate.value?.[date]?.organic.trend ?? 0) ?? [],
       color: colors.value.greenLine,
-      type: "line",
+      type: 'line',
       smooth: true,
       useArea: true,
     },
     {
-      name: "Mixed",
-      series:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.mixed.percentage ?? 0,
-        ) ?? [],
-      trends:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.mixed.trend ?? 0,
-        ) ?? [],
+      name: 'Mixed',
+      series: dates.value?.map((date) => countsByDate.value?.[date]?.mixed.percentage ?? 0) ?? [],
+      trends: dates.value?.map((date) => countsByDate.value?.[date]?.mixed.trend ?? 0) ?? [],
       color: colors.value.amber,
-      type: "line",
+      type: 'line',
       smooth: true,
       useArea: true,
     },
     {
-      name: "Automation",
+      name: 'Automation',
       series:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.automation.percentage ?? 0,
-        ) ?? [],
-      trends:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.automation.trend ?? 0,
-        ) ?? [],
+        dates.value?.map((date) => countsByDate.value?.[date]?.automation.percentage ?? 0) ?? [],
+      trends: dates.value?.map((date) => countsByDate.value?.[date]?.automation.trend ?? 0) ?? [],
       color: colors.value.dangerHover,
-      type: "line",
+      type: 'line',
       smooth: true,
       useArea: true,
     },
-  ];
+  ]
 }
 
-const rawDataset = computed(() => composeRawDataset());
+const rawDataset = computed(() => composeRawDataset())
 
 const max = computed(() => {
   const values = rawDataset.value.flatMap((datasetItem) =>
     (datasetItem.series as Array<number | null>).map((point) => point ?? 0),
-  );
+  )
 
-  return values.length > 0 ? Math.max(...values) : 0;
-});
+  return values.length > 0 ? Math.max(...values) : 0
+})
 
 const dataset = computed<VueUiXyDatasetItem[]>(() => [
   ...rawDataset.value.map((datasetItem) => ({
@@ -111,26 +90,26 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
     scaleMax: max.value,
   })),
   automatedClosureRateData.value,
-]);
+])
 
-const tooltipPosition = useTooltipPosition(chartRef);
+const tooltipPosition = useTooltipPosition(chartRef)
 
-const progressionLabelOffsetX = 6;
+const progressionLabelOffsetX = 6
 
 const viewBoxPadding = computed(() => {
-  const maxSeries = dates.value?.length ?? 0;
+  const maxSeries = dates.value?.length ?? 0
 
   if (maxSeries <= 1 || width.value <= 0) {
-    return { left: 0, right: 0 };
+    return { left: 0, right: 0 }
   }
 
-  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1));
+  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1))
 
   return {
     left: -halfVueUiXyDatapointStep,
     right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
-  };
-});
+  }
+})
 
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
@@ -157,8 +136,8 @@ const config = computed<VueUiXyConfig>(() => ({
       right: viewBoxPadding.value.right,
     },
     grid: {
-      position: "middle",
-      stroke: "transparent",
+      position: 'middle',
+      stroke: 'transparent',
       labels: {
         show: false,
         yAxis: {
@@ -171,13 +150,13 @@ const config = computed<VueUiXyConfig>(() => ({
           datetimeFormatter: {
             enable: true,
             useUTC: false,
-            locale: "en",
+            locale: 'en',
             options: {
-              year: "dd MMM",
-              month: "dd MMM",
-              day: "dddd • MMM dd • HH:mm",
-              minute: "dd MMM",
-              second: "dd MMM",
+              year: 'dd MMM',
+              month: 'dd MMM',
+              day: 'dddd • MMM dd • HH:mm',
+              minute: 'dd MMM',
+              second: 'dd MMM',
             },
           },
         },
@@ -200,16 +179,28 @@ const config = computed<VueUiXyConfig>(() => ({
     },
     zoom: { show: false },
   },
-}));
+}))
 
-function getTrend({ series, item, index }: any) {
-  const trend = series?.[item.slotAbsoluteIndex]?.trends?.[index];
+function getTrend({
+  series,
+  item,
+  index,
+}: {
+  series: VueUiXySeries[]
+  item: { slotAbsoluteIndex: number; name: string }
+  index: number
+}) {
+  // @todo fix this type definition
+  const seriesItem = series?.[item.slotAbsoluteIndex] as unknown as
+    | { trends?: number[] }
+    | undefined
+  const trend = seriesItem?.trends?.[index]
 
   return {
     formattedValue: formatTrend(trend),
-    color: getTrendColor({ value: trend, reversed: item.name !== "Organic" }),
+    color: getTrendColor({ value: trend, reversed: item.name !== 'Organic' }),
     arrow: getTrendArrow(trend),
-  };
+  }
 }
 
 /**
@@ -219,56 +210,51 @@ function getTrend({ series, item, index }: any) {
  */
 const landmarks = [
   {
-    date: "2026-06-12", // FIXME: for prod, replace with 2026-07-01
-    name: "Sample update",
-    description: "13 repositories added to the dataset",
+    date: '2026-06-12', // FIXME: for prod, replace with 2026-07-01
+    name: 'Sample update',
+    description: '13 repositories added to the dataset',
   },
-];
+]
 
 const keyDates = computed(() => {
-  const dateList = dates.value ?? [];
-  const lastDate = dateList.at(-1);
-  if (!lastDate) return [];
+  const dateList = dates.value ?? []
+  const lastDate = dateList.at(-1)
+  if (!lastDate) return []
 
-  const millisecondsInOneWeek = 7 * 24 * 60 * 60 * 1000;
-  const lastDateTime = new Date(lastDate).getTime();
+  const millisecondsInOneWeek = 7 * 24 * 60 * 60 * 1000
+  const lastDateTime = new Date(lastDate).getTime()
 
   return landmarks
     .map((item) => {
-      const index = dateList.indexOf(item.date);
-      if (index === -1) return null;
-      const landmarkDateTime = new Date(item.date).getTime();
+      const index = dateList.indexOf(item.date)
+      if (index === -1) return null
+      const landmarkDateTime = new Date(item.date).getTime()
 
       return {
         ...item,
         index,
         visible: lastDateTime - landmarkDateTime >= millisecondsInOneWeek,
-      };
+      }
     })
-    .filter(Boolean);
-});
+    .filter(Boolean)
+})
 
 const visibleLandmarkByIndex = computed(() => {
-  const landmarkMap = new Map<number, (typeof keyDates.value)[number]>();
+  const landmarkMap = new Map<number, (typeof keyDates.value)[number]>()
   keyDates.value.forEach((landmark) => {
     if (landmark?.visible) {
-      landmarkMap.set(landmark.index, landmark);
+      landmarkMap.set(landmark.index, landmark)
     }
-  });
-  return landmarkMap;
-});
+  })
+  return landmarkMap
+})
 </script>
 <template>
   <div class="relative h-full w-full flex flex-col">
-    <div class="flex-1 h-full no-chart-transition" ref="chartContainer">
+    <div ref="chartContainer" class="flex-1 h-full no-chart-transition">
       <ClientOnly>
         <Transition name="chart-fade" appear>
-          <VueUiXy
-            v-if="hasStableChartDimensions"
-            ref="chartRef"
-            :dataset
-            :config
-          >
+          <VueUiXy v-if="hasStableChartDimensions" ref="chartRef" :dataset :config>
             <template #svg="{ svg }">
               <!-- LANDMARKS -->
               <g
@@ -280,13 +266,7 @@ const visibleLandmarkByIndex = computed(() => {
                   v-for="(landmark, j) in keyDates"
                   :key="`${landmark?.date}-${landmark?.name}-${j}`"
                 >
-                  <g
-                    v-if="
-                      landmark &&
-                      landmark.index === i + svg.slicer.start &&
-                      landmark.visible
-                    "
-                  >
+                  <g v-if="landmark && landmark.index === i + svg.slicer.start && landmark.visible">
                     <!-- Landmark vertical line-->
                     <line
                       :x1="plot.x"
@@ -320,11 +300,7 @@ const visibleLandmarkByIndex = computed(() => {
 
             <template #area-gradient="{ series, id }">
               <linearGradient :id x1="0" x2="0" y1="0" y2="1">
-                <stop
-                  offset="0%"
-                  :stop-color="series.color"
-                  stop-opacity="0.3"
-                />
+                <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
                 <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
               </linearGradient>
             </template>
@@ -335,9 +311,9 @@ const visibleLandmarkByIndex = computed(() => {
                   {{ timeLabel.text }}
                 </div>
                 <div
-                  class="flex flex-row gap-2 place-items-center"
                   v-for="dp in datapoint"
                   :key="`${dp.name}-${dp.absoluteIndex}`"
+                  class="flex flex-row gap-2 place-items-center"
                 >
                   <div class="h-2 w-2">
                     <svg viewBox="0 0 2 2" class="w-full h-full">
@@ -346,7 +322,7 @@ const visibleLandmarkByIndex = computed(() => {
                   </div>
                   <span :style="{ color: colors.text }">{{ dp.name }}</span>
                   <span :style="{ color: colors.textMuted }">
-                    {{ round(dp.value ?? 0, 1) + "%" }}
+                    {{ round(dp.value ?? 0, 1) + '%' }}
                   </span>
 
                   <!-- No trend is possible on the first datapoint -->
@@ -391,15 +367,9 @@ const visibleLandmarkByIndex = computed(() => {
                   <div class="flex flex-row gap-2 max-w-[200px]">
                     <span class="i-lucide:info w-6" />
                     <span
-                      >{{
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.name
-                      }}
+                      >{{ visibleLandmarkByIndex.get(timeLabel.absoluteIndex)?.name }}
                       :
-                      {{
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.description
-                      }}</span
+                      {{ visibleLandmarkByIndex.get(timeLabel.absoluteIndex)?.description }}</span
                     >
                   </div>
                 </div>
