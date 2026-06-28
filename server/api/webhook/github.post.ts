@@ -7,6 +7,7 @@ import {
   type IdentityClassification,
 } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
+import { isKnownBot } from '~~/shared/cicd-known-bots'
 
 type AutomationListItem = {
   username: string
@@ -145,7 +146,7 @@ export default defineEventHandler(async (event) => {
     // no config file — use defaults
   }
 
-  if (repoConfig.skipMembers.includes(username)) {
+  if (repoConfig.skipMembers.includes(username) || isKnownBot(username)) {
     return { ok: true }
   }
 

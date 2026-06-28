@@ -306,6 +306,32 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
+  describe('Known Bots', () => {
+    it('returns { ok: true } without scanning when username is a known CI/CD bot', async () => {
+      setupEvent({ pull_request: { number: 123, user: { login: 'dependabot[bot]' } } })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+    })
+
+    it('returns { ok: true } without scanning for usernames ending with [bot]', async () => {
+      setupEvent({ pull_request: { number: 123, user: { login: 'some-custom-tool[bot]' } } })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+    })
+
+    it('proceeds with scan for regular user accounts', async () => {
+      await handler(MOCK_EVENT)
+
+      expect(identify).toHaveBeenCalled()
+    })
+  })
+
   describe('Skip Members (via repo config)', () => {
     it('returns { ok: true } without scanning when username is in skipMembers', async () => {
       mockRepoConfig({ skipMembers: ['test-user', 'other-user'] })
