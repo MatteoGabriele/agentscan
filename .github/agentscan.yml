@@ -4,7 +4,7 @@ allowed-users:
   - graphieros
   - huang-julien
 
-skip-on-organic: true
+silent-on-organic: true
 
 auto-close: true
 auto-close-classifications:

@@ -500,9 +500,9 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
-  describe('skipOnOrganic', () => {
+  describe('silentOnOrganic', () => {
     it('returns { ok: true } without comment or labels for organic accounts when enabled', async () => {
-      mockRepoConfig({ 'skip-on-organic': true })
+      mockRepoConfig({ 'silent-on-organic': true })
 
       const result = await handler(MOCK_EVENT)
 
@@ -510,8 +510,8 @@ describe('GitHub Webhook Handler', () => {
       expect(mockInstallationOctokit.rest.issues.createComment).not.toHaveBeenCalled()
     })
 
-    it('still posts comment for community-flagged accounts even when skipOnOrganic is true', async () => {
-      mockRepoConfig({ 'skip-on-organic': true })
+    it('still posts comment for community-flagged accounts even when silentOnOrganic is true', async () => {
+      mockRepoConfig({ 'silent-on-organic': true })
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
@@ -519,9 +519,9 @@ describe('GitHub Webhook Handler', () => {
       expect(mockInstallationOctokit.rest.issues.createComment).toHaveBeenCalled()
     })
 
-    it('still posts comment for non-organic accounts when skipOnOrganic is true', async () => {
+    it('still posts comment for non-organic accounts when silentOnOrganic is true', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
-      mockRepoConfig({ 'skip-on-organic': true })
+      mockRepoConfig({ 'silent-on-organic': true })
 
       await handler(MOCK_EVENT)
 

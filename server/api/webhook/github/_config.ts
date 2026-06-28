@@ -8,7 +8,7 @@ export type RepoConfig = {
   'auto-close': boolean
   'auto-close-classifications': IdentityClassification[]
   mode: ScanMode
-  'skip-on-organic': boolean
+  'silent-on-organic': boolean
   labels: {
     'community-flagged': string
     mixed: string
@@ -27,7 +27,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
   'auto-close': false,
   'auto-close-classifications': ['automation'],
   mode: 'full',
-  'skip-on-organic': false,
+  'silent-on-organic': false,
   labels: {
     'community-flagged': 'agentscan:community-flagged',
     mixed: 'agentscan:mixed-signals',

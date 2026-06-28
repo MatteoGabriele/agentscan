@@ -133,7 +133,11 @@ export default defineEventHandler(async (event) => {
 
   const isFlagged = hasCommunityFlag || analysis.classification !== 'organic'
 
-  if (repoConfig['skip-on-organic'] && !hasCommunityFlag && analysis.classification === 'organic') {
+  if (
+    repoConfig['silent-on-organic'] &&
+    !hasCommunityFlag &&
+    analysis.classification === 'organic'
+  ) {
     return { ok: true }
   }
 

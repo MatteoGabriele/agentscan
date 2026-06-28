@@ -13,7 +13,7 @@
       },
       "examples": [["dependabot[bot]", "renovate[bot]"]]
     },
-    "skip-on-organic": {
+    "silent-on-organic": {
       "description": "Skip posting a comment when the analysis result is 'organic'.",
       "type": "boolean",
       "default": false
