@@ -214,7 +214,7 @@ export default defineEventHandler(async (event) => {
     description = repoConfig.messages[analysis.classification]
   }
 
-  const MARKER = '<!-- agentscan-bot -->'
+  const MARKER = '<!-- agentscanapp-bot -->'
 
   const body = [
     MARKER,

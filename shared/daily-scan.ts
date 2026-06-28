@@ -35,6 +35,7 @@ export const libraries = [
 ] as const
 
 export const cicdBots = [
+  'agentscanapp',
   'copilot',
   'dependabot',
   'renovate',
