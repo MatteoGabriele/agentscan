@@ -33,25 +33,3 @@ export const libraries = [
   // "tanstack/query",
   // "ohmyzsh/ohmyzsh",
 ] as const
-
-export const cicdBots = [
-  'agentscanapp',
-  'copilot',
-  'dependabot',
-  'renovate',
-  'greenkeeper',
-  'github-actions',
-  'stale',
-  'snyk',
-  'codecov',
-  'coveralls',
-  'travis',
-  'circle',
-  'appveyor',
-  'azure-pipelines',
-  'netlify',
-  'vercel',
-  'heroku',
-  'aws-amplify',
-  'eslintbot',
-]

@@ -6,63 +6,14 @@ import {
   type IdentifyResult,
   type IdentityClassification,
 } from '@unveil/identity'
-import { parse as parseYaml } from 'yaml'
+import { isKnownBot } from '~~/shared/cicd-known-bots'
+import { DEFAULT_CONFIG, parseRepoConfig, type RepoConfig } from './_config'
 
 type AutomationListItem = {
   username: string
   reason: string
   createdAt: string
   issueUrl: string
-}
-
-type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
-
-type RepoConfig = {
-  skipMembers: string[]
-  autoClose: boolean
-  autoCloseClassifications: IdentityClassification[]
-  mode: ScanMode
-  skipOnOrganic: boolean
-  labels: {
-    communityFlagged: string
-    mixed: string
-    automation: string
-  }
-  messages: {
-    organic: string
-    mixed: string
-    automation: string
-    communityFlagged: string
-  }
-}
-
-type PartialRepoConfig = {
-  skipMembers?: string[]
-  autoClose?: boolean
-  autoCloseClassifications?: IdentityClassification[]
-  mode?: ScanMode
-  skipOnOrganic?: boolean
-  labels?: Partial<RepoConfig['labels']>
-  messages?: Partial<RepoConfig['messages']>
-}
-
-const DEFAULT_CONFIG: RepoConfig = {
-  skipMembers: [],
-  autoClose: false,
-  autoCloseClassifications: ['automation'],
-  mode: 'full',
-  skipOnOrganic: false,
-  labels: {
-    communityFlagged: 'agentscan:community-flagged',
-    mixed: 'agentscan:mixed-signals',
-    automation: 'agentscan:automated-account',
-  },
-  messages: {
-    organic: '',
-    mixed: '',
-    automation: '',
-    communityFlagged: '',
-  },
 }
 
 export default defineEventHandler(async (event) => {
@@ -122,7 +73,6 @@ export default defineEventHandler(async (event) => {
   const username: string = payload.pull_request.user.login
   const prNumber: number = payload.pull_request.number
 
-  // Read optional .github/agentscan.yml from the target repo
   let repoConfig: RepoConfig = DEFAULT_CONFIG
   try {
     const { data } = await octokit.rest.repos.getContent({
@@ -131,21 +81,13 @@ export default defineEventHandler(async (event) => {
       path: '.github/agentscan.yml',
     })
     if ('content' in data) {
-      const parsed = parseYaml(
-        Buffer.from(data.content, 'base64').toString('utf-8'),
-      ) as PartialRepoConfig
-      repoConfig = {
-        ...DEFAULT_CONFIG,
-        ...parsed,
-        labels: { ...DEFAULT_CONFIG.labels, ...parsed.labels },
-        messages: { ...DEFAULT_CONFIG.messages, ...parsed.messages },
-      }
+      repoConfig = parseRepoConfig(Buffer.from(data.content, 'base64').toString('utf-8'))
     }
   } catch {
     // no config file — use defaults
   }
 
-  if (repoConfig.skipMembers.includes(username)) {
+  if (repoConfig['skip-members'].includes(username) || isKnownBot(username)) {
     return { ok: true }
   }
 
@@ -185,7 +127,7 @@ export default defineEventHandler(async (event) => {
 
   const isFlagged = hasCommunityFlag || analysis.classification !== 'organic'
 
-  if (repoConfig.skipOnOrganic && !hasCommunityFlag && analysis.classification === 'organic') {
+  if (repoConfig['skip-on-organic'] && !hasCommunityFlag && analysis.classification === 'organic') {
     return { ok: true }
   }
 
@@ -208,8 +150,8 @@ export default defineEventHandler(async (event) => {
     : getClassificationDetails(analysis.classification)
 
   let description = details.description
-  if (hasCommunityFlag && repoConfig.messages.communityFlagged) {
-    description = repoConfig.messages.communityFlagged
+  if (hasCommunityFlag && repoConfig.messages['community-flagged']) {
+    description = repoConfig.messages['community-flagged']
   } else if (!hasCommunityFlag && repoConfig.messages[analysis.classification]) {
     description = repoConfig.messages[analysis.classification]
   }
@@ -246,7 +188,7 @@ export default defineEventHandler(async (event) => {
     if (repoConfig.mode === 'full' || repoConfig.mode === 'labels') {
       const labelsToAdd: string[] = []
       if (hasCommunityFlag) {
-        labelsToAdd.push(repoConfig.labels.communityFlagged)
+        labelsToAdd.push(repoConfig.labels['community-flagged'])
       } else if (analysis.classification !== 'organic') {
         const labelMap: Record<Exclude<IdentityClassification, 'organic'>, string> = {
           mixed: repoConfig.labels.mixed,
@@ -277,9 +219,9 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (repoConfig.autoClose) {
+  if (repoConfig['auto-close']) {
     const shouldClose =
-      hasCommunityFlag || repoConfig.autoCloseClassifications.includes(analysis.classification)
+      hasCommunityFlag || repoConfig['auto-close-classifications'].includes(analysis.classification)
 
     if (shouldClose) {
       try {
