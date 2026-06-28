@@ -219,7 +219,9 @@ const landmarks = [
 const keyDates = computed(() => {
   const dateList = dates.value ?? []
   const lastDate = dateList.at(-1)
-  if (!lastDate) return []
+  if (!lastDate) {
+    return []
+  }
 
   const millisecondsInOneWeek = 7 * 24 * 60 * 60 * 1000
   const lastDateTime = new Date(lastDate).getTime()
