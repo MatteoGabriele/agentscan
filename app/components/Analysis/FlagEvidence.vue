@@ -57,7 +57,7 @@ const fastestEventPair = computed(() => {
     const currValue = sorted[i]
     const nextValue = sorted[i + 1]
 
-    if (currValue === undefined || nextValue === undefined) {
+    if (!currValue?.created_at || !nextValue?.created_at) {
       continue
     }
 
