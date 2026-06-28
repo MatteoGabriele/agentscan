@@ -4,7 +4,7 @@ import { parse as parseYaml } from 'yaml'
 export type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
 
 export type RepoConfig = {
-  'skip-members': string[]
+  'allowed-users': string[]
   'auto-close': boolean
   'auto-close-classifications': IdentityClassification[]
   mode: ScanMode
@@ -23,7 +23,7 @@ export type RepoConfig = {
 }
 
 export const DEFAULT_CONFIG: RepoConfig = {
-  'skip-members': [],
+  'allowed-users': [],
   'auto-close': false,
   'auto-close-classifications': ['automation'],
   mode: 'full',

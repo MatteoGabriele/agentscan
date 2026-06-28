@@ -332,9 +332,9 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
-  describe('Skip Members (via repo config)', () => {
-    it('returns { ok: true } without scanning when username is in skipMembers', async () => {
-      mockRepoConfig({ 'skip-members': ['test-user', 'other-user'] })
+  describe('Allowed Users (via repo config)', () => {
+    it('returns { ok: true } without scanning when username is in allowedUsers', async () => {
+      mockRepoConfig({ 'allowed-users': ['test-user', 'other-user'] })
 
       const result = await handler(MOCK_EVENT)
 
@@ -342,8 +342,8 @@ describe('GitHub Webhook Handler', () => {
       expect(identify).not.toHaveBeenCalled()
     })
 
-    it('proceeds with scan when username is not in skipMembers', async () => {
-      mockRepoConfig({ 'skip-members': ['other-user'] })
+    it('proceeds with scan when username is not in allowedUsers', async () => {
+      mockRepoConfig({ 'allowed-users': ['other-user'] })
 
       await handler(MOCK_EVENT)
 

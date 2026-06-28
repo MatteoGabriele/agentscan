@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../schemas/agentscan.json
-skip-members:
+allowed-users:
   - MatteoGabriele
   - graphieros
   - huang-julien

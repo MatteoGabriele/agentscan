@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
     // no config file — use defaults
   }
 
-  if (repoConfig['skip-members'].includes(username) || isKnownBot(username)) {
+  if (repoConfig['allowed-users'].includes(username) || isKnownBot(username)) {
     return { ok: true }
   }
 

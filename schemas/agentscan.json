@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "skip-members": {
+    "allowed-users": {
       "description": "GitHub usernames to exclude from scanning.",
       "type": "array",
       "items": {
