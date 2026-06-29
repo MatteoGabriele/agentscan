@@ -59,11 +59,13 @@ const eventConfig = computed(() => {
 
   const color = palette[classification]
 
+  const hourlyThresholdRatio = computed(() => (usesHourlyGranularity.value ? 3 : 1))
+
   return {
     ForkEvent: {
       name: 'Forks',
       color: color.fork,
-      threshold: identityConfig.FORKS_EXTREME,
+      threshold: Math.round(identityConfig.FORKS_EXTREME / hourlyThresholdRatio.value),
       visible: selectedLegendItems.value.includes('Forks'),
       labelOffsetY: 40,
     },
@@ -77,7 +79,7 @@ const eventConfig = computed(() => {
     PullRequestEvent: {
       name: 'Pull requests',
       color: color.pr,
-      threshold: identityConfig.PRS_TODAY_EXTREME,
+      threshold: Math.round(identityConfig.PRS_TODAY_EXTREME / hourlyThresholdRatio.value),
       visible: selectedLegendItems.value.includes('Pull requests'),
       labelOffsetY: 6,
     },
