@@ -2,6 +2,7 @@ import { Octokit } from 'octokit'
 import type { IdentityClassification } from '@unveil/identity'
 import { identify } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
+import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 
 const MAX_AUTHORS = 20
 const PER_PAGE = 50
@@ -12,17 +13,6 @@ const CLASSIFICATION_ORDER: Record<IdentityClassification, number> = {
   automation: 0,
   mixed: 1,
   organic: 2,
-}
-
-function parseRepoSlug(input: string): { owner: string; repo: string } | null {
-  const cleaned = input.trim().replace(/\/$/, '')
-
-  const slugMatch = cleaned.match(/^([^/\s]+)\/([^/\s]+)$/)
-  if (slugMatch?.[1] && slugMatch[2]) {
-    return { owner: slugMatch[1], repo: slugMatch[2] }
-  }
-
-  return null
 }
 
 export default defineCachedEventHandler(

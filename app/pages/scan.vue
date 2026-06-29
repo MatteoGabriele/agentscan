@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import type { GitHubUser, IdentifyResult } from '@unveil/identity'
+import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 
-type RepoScanAuthor = { user: GitHubUser; analysis: IdentifyResult; eventsCount: number }
-type RepoScanResult = { authors: RepoScanAuthor[]; repo: string }
+type RepoScanAuthor = {
+  user: GitHubUser
+  analysis: IdentifyResult
+  eventsCount: number
+}
+
+type RepoScanResult = {
+  authors: RepoScanAuthor[]
+  repo: string
+}
 
 const CACHE_TTL_MS = 2 * 60 * 60 * 1000 // 2 hours
 
@@ -21,35 +30,20 @@ useHead({
 const route = useRoute()
 const router = useRouter()
 
-// Persists across client-side navigations (useState survives remounts)
 const cache = useState<Record<string, { result: RepoScanResult; cachedAt: number }>>(
   'scan-cache',
   () => ({}),
 )
 
-// URL query is the source of truth
 const repoQuery = computed<string>(() => {
   const q = route.query.repo
   return typeof q === 'string' ? q.trim() : ''
 })
 
-// Input tracks the URL but lets the user type freely before submitting
 const repoInput = ref(repoQuery.value)
 watch(repoQuery, (val) => {
   repoInput.value = val
 })
-
-function parseRepoSlug(input: string): string | null {
-  const cleaned = input.trim().replace(/\/$/, '')
-  const urlMatch = cleaned.match(/github\.com\/([^/?#\s]+)\/([^/?#\s]+)/)
-  if (urlMatch) {
-    return `${urlMatch[1]}/${urlMatch[2]}`
-  }
-  if (/^[^/\s]+\/[^/\s]+$/.test(cleaned)) {
-    return cleaned
-  }
-  return null
-}
 
 function getCached(repo: string): RepoScanResult | null {
   const entry = cache.value[repo]
@@ -104,10 +98,16 @@ watch(
 
 async function handleSubmit() {
   const slug = parseRepoSlug(repoInput.value)
+
   if (!slug) {
     return
   }
-  await router.push({ query: { repo: slug } })
+
+  await router.push({
+    query: {
+      repo: `${slug.owner}/${slug.repo}`,
+    },
+  })
 }
 
 const inputRef = useTemplateRef('inputRef')
