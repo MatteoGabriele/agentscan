@@ -1,5 +1,4 @@
 import { Octokit } from 'octokit'
-import type { IdentityClassification } from '@unveil/identity'
 import { identify } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
@@ -8,12 +7,6 @@ const MAX_AUTHORS = 20
 const PER_PAGE = 50
 const MAX_PAGES = 10
 const EVENT_PAGES = 3
-
-const CLASSIFICATION_ORDER: Record<IdentityClassification, number> = {
-  automation: 0,
-  mixed: 1,
-  organic: 2,
-}
 
 export default defineCachedEventHandler(
   async (event) => {
@@ -44,7 +37,7 @@ export default defineCachedEventHandler(
         const { data: prs } = await octokit.rest.pulls.list({
           owner,
           repo,
-          state: 'all',
+          state: 'open',
           sort: 'created',
           direction: 'desc',
           per_page: PER_PAGE,
@@ -101,14 +94,16 @@ export default defineCachedEventHandler(
             events,
           })
 
-          return { user, analysis, eventsCount: events.length }
+          return {
+            user,
+            analysis,
+            eventsCount: events.length,
+          }
         }),
       )
 
       results.sort((a, b) => {
-        const aOrder = CLASSIFICATION_ORDER[a.analysis.classification] ?? 3
-        const bOrder = CLASSIFICATION_ORDER[b.analysis.classification] ?? 3
-        return aOrder - bOrder
+        return a.analysis.score - b.analysis.score
       })
 
       return { authors: results, repo: `${owner}/${repo}` }

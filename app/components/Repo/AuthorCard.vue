@@ -7,63 +7,62 @@ const props = defineProps<{
 }>()
 
 const classification = computed(() => props.analysis.classification)
-const score = computed(() => props.analysis.score)
+
+const { data: verifiedAutomations } = useVerifiedAutomations()
+
+const hasCommunityFlag = computed(() => {
+  return !!verifiedAutomations.value?.find((account) => {
+    return (
+      account.username.toLowerCase() === props.user.login.toLowerCase() ||
+      account.id === props.user.id
+    )
+  })
+})
 
 const classificationLabel = computed(() => {
-  const c = classification.value
-  if (!c) {
-    return '—'
+  if (hasCommunityFlag.value) {
+    return 'Flagged'
   }
-  return c.charAt(0).toUpperCase() + c.slice(1)
+  const value = classification.value
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : '-'
 })
 
-const classificationColor = computed(() => {
-  if (classification.value === 'automation') {
-    return 'text-gh-danger-hover'
-  }
-  if (classification.value === 'mixed') {
-    return 'text-amber-500'
-  }
-  return 'text-green-500'
-})
-
-const dotColor = computed(() => {
-  if (classification.value === 'automation') {
-    return 'bg-gh-danger-hover'
-  }
-  if (classification.value === 'mixed') {
-    return 'bg-amber-500'
-  }
-  return 'bg-green-500'
-})
+const { scoreStyle } = useScoreStyle(
+  classification,
+  computed(() => ({ hasCommunityFlag: hasCommunityFlag.value })),
+)
 </script>
 
 <template>
-  <article class="flex items-center gap-4 py-4 border-b border-gh-border-light last:border-0">
-    <img
-      :src="user.avatar_url"
-      :alt="`${user.login} avatar`"
-      class="size-9 rounded-full shrink-0"
-      loading="lazy"
-    />
+  <li>
+    <NuxtLink
+      :to="`/user/${user.login}`"
+      class="flex flex-col items-center gap-4 p-6 rounded-xl bg-gh-card border border-solid border-gh-border-light/30 hover:border-gh-border-light transition-colors group h-full"
+    >
+      <img
+        :src="user.avatar_url"
+        :alt="`${user.login} avatar`"
+        class="size-14 rounded-full shrink-0"
+        loading="lazy"
+      />
 
-    <div class="flex-1 min-w-0">
-      <NuxtLink
-        :to="`/user/${user.login}`"
-        class="font-mono text-gh-text hover:underline truncate block"
+      <p
+        class="font-mono text-sm text-gh-muted group-hover:text-gh-text transition-colors truncate w-full text-center"
       >
         {{ user.login }}
-      </NuxtLink>
-    </div>
+      </p>
 
-    <div class="flex items-center gap-3 shrink-0">
-      <span class="size-2 rounded-full shrink-0" :class="dotColor" aria-hidden="true" />
-      <span class="text-sm font-mono w-20 text-right" :class="classificationColor">
-        {{ classificationLabel }}
-      </span>
-      <span class="text-xs text-gh-muted font-mono w-10 text-right tabular-nums">
-        {{ score.toFixed(1) }}
-      </span>
-    </div>
-  </article>
+      <div
+        class="flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gh-border-light/20 w-full text-center"
+      >
+        <p class="text-[10px] uppercase tracking-widest text-gh-muted/50 font-mono">
+          Classification
+        </p>
+        <p class="text-xs font-mono text-gh-muted">
+          {{ classificationLabel }}
+        </p>
+        <span class="size-1.5 rounded-full shrink-0" :class="scoreStyle.background" />
+      </div>
+    </NuxtLink>
+  </li>
 </template>

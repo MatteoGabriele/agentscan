@@ -1,9 +1,20 @@
-export function parseRepoSlug(input: string): { owner: string; repo: string } | null {
-  const cleaned = input.trim().replace(/\/$/, '')
+type ParseRepoSlugReturn = {
+  owner: string
+  repo: string
+  path: string
+} | null
 
-  const slugMatch = cleaned.match(/^([^/\s]+)\/([^/\s]+)$/)
-  if (slugMatch?.[1] && slugMatch[2]) {
-    return { owner: slugMatch[1], repo: slugMatch[2] }
+export function parseRepoSlug(input: string): ParseRepoSlugReturn {
+  const slugMatch = input.trim().split('/')
+  const owner = slugMatch?.[slugMatch.length - 2]
+  const repo = slugMatch?.[slugMatch.length - 1]
+
+  if (owner && repo) {
+    return {
+      owner,
+      repo,
+      path: `${owner}/${repo}`,
+    }
   }
 
   return null

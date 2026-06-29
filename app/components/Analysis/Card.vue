@@ -55,46 +55,10 @@ const classification = computed<IdentityClassification | undefined>(() => {
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
-
-type ScoreStyle = {
-  text: string
-  border: string
-}
-
-const scoreStyle = computed<ScoreStyle>(() => {
-  if (hasCommunityFlag.value) {
-    return {
-      text: 'text-gh-danger-hover',
-      border: 'border-gh-danger-hover',
-    }
-  }
-
-  if (!classification.value) {
-    return {
-      text: 'text-gray-500',
-      border: 'border-gray-500',
-    }
-  }
-
-  if (classification.value === 'automation') {
-    return {
-      text: 'text-gh-danger-hover',
-      border: 'border-gh-danger-hover',
-    }
-  }
-
-  if (classification.value === 'mixed' || hasActivityReport.value) {
-    return {
-      text: 'text-amber-500',
-      border: 'border-amber-500',
-    }
-  }
-
-  return {
-    text: 'text-green-500',
-    border: 'border-green-500',
-  }
-})
+const { scoreStyle } = useScoreStyle(
+  classification,
+  computed(() => ({ hasCommunityFlag: hasCommunityFlag.value })),
+)
 
 const classificationIcon = computed<string>(() => {
   if (classification.value === 'organic') {
