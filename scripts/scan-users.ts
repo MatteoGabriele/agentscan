@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import type { VerifiedAutomation } from '../shared/types/automation'
-import { cicdBots, libraries } from '../shared/daily-scan'
+import { libraries } from '../shared/daily-scan'
+import { isKnownBot } from '../shared/cicd-known-bots'
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { Octokit } from 'octokit'
@@ -109,12 +110,6 @@ async function scanUser(
   } finally {
     clearTimeout(timeoutId)
   }
-}
-
-function isKnownBot(username: string): boolean {
-  const lowerUsername = username.toLowerCase()
-
-  return cicdBots.some((name) => lowerUsername.includes(name)) || lowerUsername.endsWith('[bot]')
 }
 
 async function searchUsers(octokit: Octokit, prsPerRepo: number = PR_SCAN_AMOUNT) {

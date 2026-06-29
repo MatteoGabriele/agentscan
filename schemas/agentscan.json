@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentScan Configuration",
+  "description": "Configuration file for the AgentScan GitHub App (.github/agentscan.yml)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "description": "Schema version of this config file. Omit or set to 1 for the current format. Increment if a future AgentScan release introduces breaking changes.",
+      "type": "integer",
+      "minimum": 1,
+      "default": 1
+    },
+    "scan": {
+      "description": "Controls which event types AgentScan analyses.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pull-requests": {
+          "description": "Analyse pull requests. Enabled by default.",
+          "type": "boolean",
+          "default": true
+        },
+        "issues": {
+          "description": "Analyse issues. Disabled by default.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "allowed-users": {
+      "description": "GitHub usernames to exclude from scanning.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["dependabot[bot]", "renovate[bot]"]]
+    },
+    "silent-on-organic": {
+      "description": "Skip posting a comment when the analysis result is 'organic'.",
+      "type": "boolean",
+      "default": false
+    },
+    "auto-close": {
+      "description": "Automatically close PRs/issues opened by flagged accounts.",
+      "type": "boolean",
+      "default": false
+    },
+    "auto-close-classifications": {
+      "description": "Classifications that trigger auto-close. Requires auto-close to be true.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["organic", "mixed", "automation"]
+      },
+      "default": ["automation"],
+      "examples": [["automation"], ["automation", "mixed"]]
+    },
+    "mode": {
+      "description": "Controls what actions AgentScan takes on each PR/issue.\n- full: post a comment and apply labels (default)\n- comment: post a comment only\n- labels: apply labels only\n- silent: run analysis but take no visible action",
+      "type": "string",
+      "enum": ["full", "comment", "labels", "silent"],
+      "default": "full"
+    },
+    "labels": {
+      "description": "Custom label names to apply to flagged PRs/issues.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "community-flagged": {
+          "description": "Label applied when the account is on the community-verified automations list.",
+          "type": "string",
+          "default": "agentscan:community-flagged"
+        },
+        "mixed": {
+          "description": "Label applied when the account has mixed automation signals.",
+          "type": "string",
+          "default": "agentscan:mixed-signals"
+        },
+        "automation": {
+          "description": "Label applied when the account is classified as automated.",
+          "type": "string",
+          "default": "agentscan:automated-account"
+        }
+      }
+    },
+    "messages": {
+      "description": "Custom comment messages for each classification result. Supports Markdown.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "organic": {
+          "description": "Message posted when the account is classified as organic (human).",
+          "type": "string"
+        },
+        "mixed": {
+          "description": "Message posted when the account has mixed automation signals.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Message posted when the account is classified as automated.",
+          "type": "string"
+        },
+        "community-flagged": {
+          "description": "Message posted when the account is on the community-verified automations list.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

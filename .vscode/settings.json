@@ -4,5 +4,8 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
+  },
+  "yaml.schemas": {
+    "./schemas/agentscan.json": ".github/agentscan.yml"
   }
 }

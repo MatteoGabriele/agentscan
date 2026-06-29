@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { IdentifyResult } from '@unveil/identity'
 import { getClassificationDetails, identify } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
-import handler from '../../../../../server/api/webhook/github.post'
+import handler from '../../../../../server/api/webhook/github/index.post.ts'
 
 // vi.hoisted runs before all module imports — used to stub Nuxt auto-imports
 // and to create shared mock objects referenced in vi.mock() factories below.
@@ -306,9 +306,9 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
-  describe('Skip Members (via repo config)', () => {
-    it('returns { ok: true } without scanning when username is in skipMembers', async () => {
-      mockRepoConfig({ skipMembers: ['test-user', 'other-user'] })
+  describe('Known Bots', () => {
+    it('returns { ok: true } without scanning when username is a known CI/CD bot', async () => {
+      setupEvent({ pull_request: { number: 123, user: { login: 'dependabot[bot]' } } })
 
       const result = await handler(MOCK_EVENT)
 
@@ -316,8 +316,34 @@ describe('GitHub Webhook Handler', () => {
       expect(identify).not.toHaveBeenCalled()
     })
 
-    it('proceeds with scan when username is not in skipMembers', async () => {
-      mockRepoConfig({ skipMembers: ['other-user'] })
+    it('returns { ok: true } without scanning for usernames ending with [bot]', async () => {
+      setupEvent({ pull_request: { number: 123, user: { login: 'some-custom-tool[bot]' } } })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+    })
+
+    it('proceeds with scan for regular user accounts', async () => {
+      await handler(MOCK_EVENT)
+
+      expect(identify).toHaveBeenCalled()
+    })
+  })
+
+  describe('Allowed Users (via repo config)', () => {
+    it('returns { ok: true } without scanning when username is in allowedUsers', async () => {
+      mockRepoConfig({ 'allowed-users': ['test-user', 'other-user'] })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+    })
+
+    it('proceeds with scan when username is not in allowedUsers', async () => {
+      mockRepoConfig({ 'allowed-users': ['other-user'] })
 
       await handler(MOCK_EVENT)
 
@@ -406,7 +432,7 @@ describe('GitHub Webhook Handler', () => {
           owner: 'test-owner',
           repo: 'test-repo',
           issue_number: 123,
-          labels: ['agentscan:automated-account'],
+          labels: ['agentscan:automation-signals'],
         }),
       )
     })
@@ -436,13 +462,13 @@ describe('GitHub Webhook Handler', () => {
       )
     })
 
-    it('adds automated-account label for automation classification', async () => {
+    it('adds automation-signals label for automation classification', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
 
       await handler(MOCK_EVENT)
 
       expect(mockInstallationOctokit.rest.issues.addLabels).toHaveBeenCalledWith(
-        expect.objectContaining({ labels: ['agentscan:automated-account'] }),
+        expect.objectContaining({ labels: ['agentscan:automation-signals'] }),
       )
     })
 
@@ -462,7 +488,7 @@ describe('GitHub Webhook Handler', () => {
         labels: {
           automation: 'blocked:bot-account',
           mixed: 'review:mixed-signals',
-          communityFlagged: 'security:flagged',
+          ['community-flagged']: 'security:flagged',
         },
       })
 
@@ -474,9 +500,9 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
-  describe('skipOnOrganic', () => {
+  describe('silentOnOrganic', () => {
     it('returns { ok: true } without comment or labels for organic accounts when enabled', async () => {
-      mockRepoConfig({ skipOnOrganic: true })
+      mockRepoConfig({ 'silent-on-organic': true })
 
       const result = await handler(MOCK_EVENT)
 
@@ -484,8 +510,8 @@ describe('GitHub Webhook Handler', () => {
       expect(mockInstallationOctokit.rest.issues.createComment).not.toHaveBeenCalled()
     })
 
-    it('still posts comment for community-flagged accounts even when skipOnOrganic is true', async () => {
-      mockRepoConfig({ skipOnOrganic: true })
+    it('still posts comment for community-flagged accounts even when silentOnOrganic is true', async () => {
+      mockRepoConfig({ 'silent-on-organic': true })
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
@@ -493,9 +519,9 @@ describe('GitHub Webhook Handler', () => {
       expect(mockInstallationOctokit.rest.issues.createComment).toHaveBeenCalled()
     })
 
-    it('still posts comment for non-organic accounts when skipOnOrganic is true', async () => {
+    it('still posts comment for non-organic accounts when silentOnOrganic is true', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
-      mockRepoConfig({ skipOnOrganic: true })
+      mockRepoConfig({ 'silent-on-organic': true })
 
       await handler(MOCK_EVENT)
 
@@ -514,7 +540,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('closes the PR when autoClose is enabled and classification matches', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'automation' })
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation'] })
 
       await handler(MOCK_EVENT)
 
@@ -529,7 +555,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('does not close the PR when classification is not in autoCloseClassifications', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'mixed' })
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation'] })
 
       await handler(MOCK_EVENT)
 
@@ -537,7 +563,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('closes community-flagged PRs when autoClose is enabled', async () => {
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation'] })
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
@@ -549,7 +575,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('closes the PR when multiple classifications are in the autoClose list', async () => {
       vi.mocked(identify).mockReturnValue({ ...MOCK_ANALYSIS, classification: 'mixed' })
-      mockRepoConfig({ autoClose: true, autoCloseClassifications: ['automation', 'mixed'] })
+      mockRepoConfig({ 'auto-close': true, 'auto-close-classifications': ['automation', 'mixed'] })
 
       await handler(MOCK_EVENT)
 
@@ -572,7 +598,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('uses the custom communityFlagged message for flagged accounts', async () => {
       mockVerifiedList(['test-user'])
-      mockRepoConfig({ messages: { communityFlagged: 'Flagged by our community watchlist.' } })
+      mockRepoConfig({ messages: { 'community-flagged': 'Flagged by our community watchlist.' } })
 
       await handler(MOCK_EVENT)
 
