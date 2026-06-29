@@ -23,7 +23,7 @@ const router = useRouter()
 
 // Persists across client-side navigations (useState survives remounts)
 const cache = useState<Record<string, { result: RepoScanResult; cachedAt: number }>>(
-  'repo-scan-cache',
+  'scan-cache',
   () => ({}),
 )
 
@@ -89,7 +89,7 @@ watch(
     error.value = null
 
     try {
-      const result = await $fetch<RepoScanResult>(`/api/repo-scan?repo=${encodeURIComponent(val)}`)
+      const result = await $fetch<RepoScanResult>(`/api/scan?repo=${encodeURIComponent(val)}`)
       data.value = result
       status.value = 'success'
       cache.value[val] = { result, cachedAt: Date.now() }

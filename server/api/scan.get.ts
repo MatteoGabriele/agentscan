@@ -144,7 +144,7 @@ export default defineCachedEventHandler(
     maxAge: 60 * 60 * 2,
     getKey: (event) => {
       const repo = String(getQuery(event).repo ?? '')
-      return `repo-scan:${repo}`
+      return `scan:${repo}`
     },
   },
 )
