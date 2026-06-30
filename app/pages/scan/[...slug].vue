@@ -18,13 +18,17 @@ const repo = computed<string>(() => {
   return slug
 })
 
-const { data } = await useAsyncData(`scan-${repo.value}`, () => {
-  return $fetch(`/api/scan`, {
-    query: {
-      repo: repo.value,
-    },
-  })
-})
+const { data, status } = useAsyncData(
+  `scan-${repo.value}`,
+  () => {
+    return $fetch(`/api/scan`, {
+      query: {
+        repo: repo.value,
+      },
+    })
+  },
+  { lazy: true, server: false },
+)
 
 const repoInput = ref(repo.value)
 
@@ -42,7 +46,13 @@ async function handleSubmit(value: string) {
 <template>
   <RepoForm v-model="repoInput" class="mb-8" @submit="handleSubmit" />
 
-  <div v-if="data">
+  <div v-if="status === 'pending'">
+    <ul class="mt-8 flex flex-col gap-4">
+      <RepoAuthorCardSkeleton v-for="n in 20" :key="n" />
+    </ul>
+  </div>
+
+  <div v-else-if="data">
     <div class="flex items-baseline justify-between mb-2 text-sm text-gh-muted">
       <p>
         {{ data.authors.length }} unique PR authors in
