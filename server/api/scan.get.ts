@@ -2,10 +2,10 @@ import { Octokit } from 'octokit'
 import { identify } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
+import { MAX_PR_USER_COUNT } from '~~/shared/scan'
 
-const MAX_AUTHORS = 20
 const PER_PAGE = 50
-const MAX_PAGES = 10
+const MAX_PAGES = 5
 const EVENT_PAGES = 3
 
 type Entry = {
@@ -38,7 +38,7 @@ export default defineCachedEventHandler(
     const entries: Entry[] = []
 
     try {
-      for (let page = 1; page <= MAX_PAGES && entries.length < MAX_AUTHORS; page++) {
+      for (let page = 1; page <= MAX_PAGES && entries.length < MAX_PR_USER_COUNT; page++) {
         const { data: prs } = await octokit.rest.pulls.list({
           owner,
           repo,
@@ -50,7 +50,7 @@ export default defineCachedEventHandler(
         })
 
         for (const pr of prs) {
-          if (entries.length >= MAX_AUTHORS) {
+          if (entries.length >= MAX_PR_USER_COUNT) {
             break
           }
           if (!pr.user?.login) {

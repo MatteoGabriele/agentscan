@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
+import { MAX_PR_USER_COUNT } from '~~/shared/scan'
 
 const route = useRoute()
 const router = useRouter()
@@ -52,7 +53,7 @@ async function handleSubmit(value: string) {
     </div>
 
     <ul class="mt-8 flex flex-col gap-4">
-      <RepoAuthorCardSkeleton v-for="n in 20" :key="n" />
+      <RepoAuthorCardSkeleton v-for="n in MAX_PR_USER_COUNT" :key="n" />
     </ul>
   </div>
 
