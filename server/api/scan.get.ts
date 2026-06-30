@@ -68,7 +68,7 @@ export default defineCachedEventHandler(
           seenEntries.add(lower)
           entries.push({
             login: lower,
-            prUrl: pr.url,
+            prUrl: pr.html_url,
           })
         }
 
