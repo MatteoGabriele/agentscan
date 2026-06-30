@@ -68,7 +68,7 @@ async function handleSubmit(value: string) {
     </ul>
 
     <p
-      class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
+      class="mt-8 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
     >
       Results are based on pattern analysis and should be interpreted as possible signals, not
       conclusions. Always verify findings with additional context.

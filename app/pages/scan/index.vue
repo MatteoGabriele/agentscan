@@ -47,7 +47,7 @@ async function handleSubmit(value: string) {
 
   <RepoForm v-model="repoInput" @submit="handleSubmit" />
 
-  <p class="mt-4 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center">
+  <p class="mt-4 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center">
     Results are based on pattern analysis and should be interpreted as possible signals, not
     conclusions. Always verify findings with additional context.
   </p>
