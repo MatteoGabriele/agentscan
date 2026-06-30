@@ -26,20 +26,14 @@ watch(repoQuery, (val) => {
   repoInput.value = val
 })
 
-async function handleSubmit() {
-  const slug = parseRepoSlug(repoInput.value)
+async function handleSubmit(value: string) {
+  const slug = parseRepoSlug(value)
 
   if (!slug) {
     return
   }
 
   await router.push(`/scan/${slug.path}`)
-}
-
-const inputRef = useTemplateRef('inputRef')
-function clear() {
-  repoInput.value = ''
-  inputRef.value?.focus()
 }
 </script>
 
@@ -52,43 +46,5 @@ function clear() {
     </p>
   </header>
 
-  <form
-    class="flex items-center gap-2 border border-gh-border/60 relative rounded-full pl-6 pr-4 py-3 focus-within:border-gh-border-light"
-    @submit.prevent="handleSubmit"
-  >
-    <label class="flex-1" for="repoUrl">
-      <span class="sr-only">Enter repository URL or owner/repo</span>
-      <input
-        id="repoUrl"
-        ref="inputRef"
-        v-model="repoInput"
-        class="outline-none w-full"
-        autocomplete="off"
-        autocorrect="off"
-        spellcheck="false"
-        autocapitalize="none"
-        placeholder="github.com/owner/repo"
-      />
-    </label>
-
-    <div class="flex items-center gap-2">
-      <button
-        v-if="repoInput"
-        type="button"
-        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all"
-        @click="clear"
-      >
-        <span class="i-lucide:x" />
-        <span class="sr-only">Clear input field</span>
-      </button>
-
-      <button
-        type="submit"
-        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        <span class="i-lucide:scan-search" aria-hidden="true" />
-        <span class="sr-only">Scan repository</span>
-      </button>
-    </div>
-  </form>
+  <RepoForm v-model="repoInput" @submit="handleSubmit" />
 </template>
