@@ -66,7 +66,7 @@ async function handleSubmit(value: string) {
   </div>
 
   <div v-else-if="data">
-    <div class="flex items-baseline justify-between mb-2 text-sm text-gh-muted">
+    <div class="flex items-baseline justify-between mb-2 ml-6 text-sm text-gh-muted">
       <p>
         {{ data.authors.length }} unique authors with open PRs in
         <NuxtLink
