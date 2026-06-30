@@ -39,11 +39,12 @@ const { data } = await useAsyncData(`scan-${repo.value}`, () => {
       </p>
     </div>
 
-    <ul class="mt-8 grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
+    <ul class="mt-8 flex flex-col gap-4">
       <RepoAuthorCard
         v-for="author in data.authors"
         :key="author.user.login"
         :user="author.user"
+        :pr-url="author.prUrl"
         :analysis="author.analysis"
       />
     </ul>

@@ -3,8 +3,16 @@ import type { GitHubUser, IdentifyResult } from '@unveil/identity'
 
 const props = defineProps<{
   user: GitHubUser
+  prUrl: string
   analysis: IdentifyResult
 }>()
+
+const prLabel = computed<string>(() => {
+  const seg = props.prUrl.split('/')
+  const prNumber = seg[seg.length - 1] ?? ''
+
+  return `#${prNumber}`
+})
 
 const classification = computed(() => props.analysis.classification)
 
@@ -34,35 +42,57 @@ const { scoreStyle } = useScoreStyle(
 </script>
 
 <template>
-  <li>
-    <NuxtLink
-      :to="`/user/${user.login}`"
-      class="flex flex-col items-center gap-4 p-6 rounded-xl bg-gh-card border border-solid border-gh-border-light/30 hover:border-gh-border-light transition-colors group h-full"
-    >
-      <img
-        :src="user.avatar_url"
-        :alt="`${user.login} avatar`"
-        class="size-14 rounded-full shrink-0"
-        loading="lazy"
-      />
-
-      <p
-        class="font-mono text-sm text-gh-muted group-hover:text-gh-text transition-colors truncate w-full text-center"
-      >
-        {{ user.login }}
-      </p>
-
-      <div
-        class="flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gh-border-light/20 w-full text-center"
-      >
-        <p class="text-[10px] uppercase tracking-widest text-gh-muted/50 font-mono">
-          Classification
-        </p>
-        <p class="text-xs font-mono text-gh-muted">
-          {{ classificationLabel }}
-        </p>
-        <span class="size-1.5 rounded-full shrink-0" :class="scoreStyle.background" />
+  <li class="p-4 rounded-lg bg-gh-card">
+    <div class="flex gap-4 flex-col">
+      <div class="flex items-center gap-2">
+        <span :class="['flex size-2 rounded-full', scoreStyle.background]"></span>
+        <p class="text-sm text-gh-text line-height-none">{{ analysis.classification }}</p>
       </div>
-    </NuxtLink>
+
+      <div class="flex items-center gap-4">
+        <div
+          v-if="user.avatar_url"
+          class="size-12 rounded-full overflow-hidden bg-gh-card shrink-0"
+        >
+          <img :src="user.avatar_url" :alt="`Avatar of ${user.login}`" />
+        </div>
+
+        <div class="w-full">
+          <h3 class="text-gh-text text-lg font-mono line-height-none">
+            {{ user.name || user.login }}
+          </h3>
+          <NuxtLink
+            :external="true"
+            target="_blank"
+            :to="`https://github.com/${user.login}`"
+            class="text-gh-muted underline text-sm inline-flex"
+          >
+            @{{ user.login }}
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex gap-4 items-center justify-between">
+      <div class="text-sm flex items-center gap-1">
+        <span class="text-gh-muted">Opened PR</span>
+        <NuxtLink
+          class="text-gh-text/80 underline hover:text-gh-text"
+          target="_blank"
+          :to="prUrl"
+          external
+        >
+          {{ prLabel }}
+        </NuxtLink>
+      </div>
+
+      <NuxtLink
+        class="text-xs text-gh-text/80 hover:text-gh-text"
+        target="_blank"
+        :to="`/user/${user.login}`"
+      >
+        Full analysis
+      </NuxtLink>
+    </div>
   </li>
 </template>

@@ -8,6 +8,11 @@ const PER_PAGE = 50
 const MAX_PAGES = 10
 const EVENT_PAGES = 3
 
+type Entry = {
+  login: string
+  prUrl: string
+}
+
 export default defineCachedEventHandler(
   async (event) => {
     const config = useRuntimeConfig()
@@ -29,11 +34,11 @@ export default defineCachedEventHandler(
     const { owner, repo } = parsed
     const octokit = new Octokit({ auth: config.githubToken })
 
-    const seenLogins = new Set<string>()
-    const logins: string[] = []
+    const seenEntries = new Set<string>()
+    const entries: Entry[] = []
 
     try {
-      for (let page = 1; page <= MAX_PAGES && logins.length < MAX_AUTHORS; page++) {
+      for (let page = 1; page <= MAX_PAGES && entries.length < MAX_AUTHORS; page++) {
         const { data: prs } = await octokit.rest.pulls.list({
           owner,
           repo,
@@ -45,7 +50,7 @@ export default defineCachedEventHandler(
         })
 
         for (const pr of prs) {
-          if (logins.length >= MAX_AUTHORS) {
+          if (entries.length >= MAX_AUTHORS) {
             break
           }
           if (!pr.user?.login) {
@@ -56,12 +61,15 @@ export default defineCachedEventHandler(
           }
 
           const lower = pr.user.login.toLowerCase()
-          if (seenLogins.has(lower)) {
+          if (seenEntries.has(lower)) {
             continue
           }
 
-          seenLogins.add(lower)
-          logins.push(pr.user.login)
+          seenEntries.add(lower)
+          entries.push({
+            login: lower,
+            prUrl: pr.url,
+          })
         }
 
         if (prs.length < PER_PAGE) {
@@ -70,13 +78,13 @@ export default defineCachedEventHandler(
       }
 
       const results = await Promise.all(
-        logins.map(async (login) => {
+        entries.map(async (entry) => {
           const [profileRes, eventResponses] = await Promise.all([
-            octokit.rest.users.getByUsername({ username: login }),
+            octokit.rest.users.getByUsername({ username: entry.login }),
             Promise.all(
               Array.from({ length: EVENT_PAGES }, (_, i) =>
                 octokit.rest.activity.listPublicEventsForUser({
-                  username: login,
+                  username: entry.login,
                   per_page: 100,
                   page: i + 1,
                 }),
@@ -88,7 +96,7 @@ export default defineCachedEventHandler(
           const events = eventResponses.flatMap((r) => r.data)
 
           const analysis = identify({
-            accountName: login,
+            accountName: entry.login,
             reposCount: user.public_repos,
             createdAt: user.created_at,
             events,
@@ -97,6 +105,7 @@ export default defineCachedEventHandler(
           return {
             user,
             analysis,
+            prUrl: entry.prUrl,
             eventsCount: events.length,
           }
         }),
