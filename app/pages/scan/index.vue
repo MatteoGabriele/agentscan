@@ -38,13 +38,17 @@ async function handleSubmit(value: string) {
 </script>
 
 <template>
-  <header class="text-center md:text-left mb-8">
+  <header class="text-center mb-8 max-w-lg mx-auto">
     <h1 class="text-2xl font-semibold">Repository scan</h1>
-    <p class="text-gh-muted mt-2">
-      Analyze the most recent PR authors of any public GitHub repository, skipping bots and
-      duplicate contributors.
+    <p class="text-gh-muted mt-2 text-pretty">
+      Analyze the most recent PR authors of any public GitHub repository.
     </p>
   </header>
 
   <RepoForm v-model="repoInput" @submit="handleSubmit" />
+
+  <p class="mt-4 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center">
+    Results are based on pattern analysis and should be interpreted as possible signals, not
+    conclusions. Always verify findings with additional context.
+  </p>
 </template>

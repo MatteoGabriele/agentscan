@@ -222,5 +222,12 @@ useSeoAnalysis(identifyAnalysis, {
       :classification="data.analysis.classification"
       :events="data.events"
     />
+
+    <p
+      class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
+    >
+      Results are based on pattern analysis and should be interpreted as possible signals, not
+      conclusions. Always verify findings with additional context.
+    </p>
   </template>
 </template>

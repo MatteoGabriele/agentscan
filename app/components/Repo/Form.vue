@@ -7,6 +7,17 @@ const repoInput = defineModel<string>({
   default: '',
 })
 
+const examples = [
+  'nuxt/nuxt',
+  'vuejs/core',
+  'vitejs/vite',
+  'facebook/react',
+  'microsoft/typescript',
+  'sveltejs/svelte',
+]
+const example = examples[Math.floor(Math.random() * examples.length)]
+const placeholder = `e.g. https://github.com/${example} or ${example}`
+
 function handleSubmit() {
   if (!repoInput.value) {
     return
@@ -33,12 +44,12 @@ function clear() {
         id="repoUrl"
         ref="inputRef"
         v-model="repoInput"
-        class="outline-none w-full"
+        class="outline-none w-full placeholder:text-gh-muted/60"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
         autocapitalize="none"
-        placeholder="github.com/owner/repo"
+        :placeholder="placeholder"
       />
     </label>
 
