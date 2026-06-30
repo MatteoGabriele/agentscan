@@ -47,6 +47,10 @@ async function handleSubmit(value: string) {
   <RepoForm v-model="repoInput" class="mb-8" @submit="handleSubmit" />
 
   <div v-if="status === 'pending'">
+    <div class="flex items-baseline justify-between mb-2 text-sm">
+      <p><Skeleton width="w-56" height="h-5" /></p>
+    </div>
+
     <ul class="mt-8 flex flex-col gap-4">
       <RepoAuthorCardSkeleton v-for="n in 20" :key="n" />
     </ul>
