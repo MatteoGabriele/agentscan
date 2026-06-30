@@ -19,7 +19,7 @@ const repo = computed<string>(() => {
   return slug
 })
 
-const { data, status } = useAsyncData(
+const { data, status, error } = useAsyncData(
   () => `scan-${repo.value}`,
   () => {
     return $fetch(`/api/scan`, {
@@ -57,10 +57,18 @@ async function handleSubmit(value: string) {
     </ul>
   </div>
 
+  <div v-else-if="error" class="text-center py-12 text-gh-muted">
+    <p v-if="error.status === 404" class="text-sm">
+      Repository <span class="text-gh-text font-medium">{{ repo }}</span> was not found. Check the
+      name and try again.
+    </p>
+    <p v-else class="text-sm">{{ error.message }}</p>
+  </div>
+
   <div v-else-if="data">
     <div class="flex items-baseline justify-between mb-2 text-sm text-gh-muted">
       <p>
-        {{ data.authors.length }} unique PR authors in
+        {{ data.authors.length }} unique authors with open PRs in
         <NuxtLink
           :to="`https://github.com/${data.repo}`"
           external
