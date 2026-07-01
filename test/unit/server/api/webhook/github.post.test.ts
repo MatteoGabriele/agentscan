@@ -50,6 +50,7 @@ const {
   vi.stubGlobal('readRawBody', readRawBodyMock)
   vi.stubGlobal('useRuntimeConfig', useRuntimeConfigMock)
   vi.stubGlobal('getHeader', getHeaderMock)
+  vi.stubGlobal('TrackedOctokit', vi.fn())
   vi.stubGlobal(
     'createError',
     ({ statusCode, message }: { statusCode: number; message: string }) => {
