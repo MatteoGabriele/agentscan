@@ -31,5 +31,4 @@ export const libraries = [
   'yairm210/Unciv',
   'microsoft/playwright',
   'tanstack/query',
-  'ohmyzsh/ohmyzsh',
 ] as const
