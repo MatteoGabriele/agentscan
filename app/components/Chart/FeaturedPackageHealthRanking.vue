@@ -3,41 +3,41 @@ import {
   VueUiHorizontalBar,
   type VueUiHorizontalBarDatasetItem,
   type VueUiHorizontalBarConfig,
-} from "vue-data-ui/vue-ui-horizontal-bar";
-import { interpolateHexColors } from "~/utils/colors";
-import("vue-data-ui/style.css");
+} from 'vue-data-ui/vue-ui-horizontal-bar'
+import { interpolateHexColors } from '~/utils/colors'
+import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealth();
+const { data } = useEcosystemHealth()
 
-const rootEl = shallowRef<HTMLElement | null>(null);
-const colors = useColors(rootEl);
+const rootEl = shallowRef<HTMLElement | null>(null)
+const colors = useColors(rootEl)
 
-const selectedDate = shallowRef<string | null>(null);
+const selectedDate = shallowRef<string | null>(null)
 
 function setSelectedDate(date: string | null) {
-  selectedDate.value = date;
+  selectedDate.value = date
 }
 
-const healthData = computed(() => data.value?.results ?? []);
+const healthData = computed(() => data.value?.results ?? [])
 
 const source = computed(() => {
-  return convertToHorizontalBarDataset(healthData.value, selectedDate.value);
-});
+  return convertToHorizontalBarDataset(healthData.value, selectedDate.value)
+})
 
 const config = computed<VueUiHorizontalBarConfig>(() => {
   return {
     useCssAnimation: false,
     style: {
       chart: {
-        backgroundColor: "transparent",
-        color: "#1A1A1Aff",
+        backgroundColor: 'transparent',
+        color: '#1A1A1Aff',
         width: 512,
         height: 316,
         layout: {
           bars: {
-            rowColor: "#FFFFFF00",
+            rowColor: '#FFFFFF00',
             rowRadius: 4,
-            sort: "desc",
+            sort: 'desc',
             useStroke: false,
             strokeWidth: 2,
             height: 32,
@@ -48,7 +48,7 @@ const config = computed<VueUiHorizontalBarConfig>(() => {
             useGradient: false,
             gradientIntensity: 20,
             fillOpacity: 100,
-            underlayerColor: "#FFFFFF",
+            underlayerColor: '#FFFFFF',
             dataLabels: {
               color: colors.value.textMuted,
               bold: true,
@@ -56,8 +56,8 @@ const config = computed<VueUiHorizontalBarConfig>(() => {
               value: {
                 show: true,
                 roundingValue: 1,
-                prefix: "",
-                suffix: "%",
+                prefix: '',
+                suffix: '%',
                 formatter: null,
               },
               percentage: {
@@ -89,10 +89,10 @@ const config = computed<VueUiHorizontalBarConfig>(() => {
     userOptions: {
       show: false,
     },
-  };
-});
+  }
+})
 
-const max = computed(() => Math.max(...source.value.map((d) => d.value ?? 0)));
+const max = computed(() => Math.max(...source.value.map((d) => d.value ?? 0)))
 
 const dataset = computed<VueUiHorizontalBarDatasetItem[]>(() => {
   return source.value.map((d) => ({
@@ -102,8 +102,8 @@ const dataset = computed<VueUiHorizontalBarDatasetItem[]>(() => {
       ratio: (d.value ?? 0) / (max.value || 1),
     }),
     value: d.value,
-  }));
-});
+  }))
+})
 </script>
 <template>
   <div class="mb-5">

@@ -1,68 +1,65 @@
 <script setup lang="ts">
-import {
-  VueUiGauge,
-  type VueUiGaugeDataset,
-  type VueUiGaugeConfig,
-} from "vue-data-ui/vue-ui-gauge";
+import { VueUiGauge, type VueUiGaugeDataset, type VueUiGaugeConfig } from 'vue-data-ui/vue-ui-gauge'
 
-import "vue-data-ui/style.css";
-import { useColors } from "~/composables/useColors";
+import 'vue-data-ui/style.css'
+import { useColors } from '~/composables/useColors'
 
 const props = defineProps<{
-  data: Scan[] | undefined;
-}>();
+  data: Scan[] | undefined
+}>()
 
-const rootEl = shallowRef<HTMLElement | null>(null);
+const rootEl = shallowRef<HTMLElement | null>(null)
 
 onMounted(async () => {
-  rootEl.value = document.documentElement;
-});
+  rootEl.value = document.documentElement
+})
 
-const colors = useColors(rootEl);
+const colors = useColors(rootEl)
 
 const averageScoreOverall = computed(() => {
-  const count = (props.data ?? []).length;
-  if (count === 0) return 100;
+  const count = (props.data ?? []).length
+  if (count === 0) {
+    return 100
+  }
   return (
-    (props.data?.map((d) => d.score).reduce((a, b) => a + b, 0) ?? 0) /
-    (props.data?.length ?? 1)
-  );
-});
+    (props.data?.map((d) => d.score).reduce((a, b) => a + b, 0) ?? 0) / (props.data?.length ?? 1)
+  )
+})
 
 const averageScoreCurrentDay = computed(() => {
-  const data = props.data ?? [];
-  if (data.length === 0) return 100;
-  const latestTimestamp = Math.max(
-    ...data.map((d) => new Date(d.created_at).getTime()),
-  );
-  const latestDate = new Date(latestTimestamp).toISOString().slice(0, 10);
+  const data = props.data ?? []
+  if (data.length === 0) {
+    return 100
+  }
+  const latestTimestamp = Math.max(...data.map((d) => new Date(d.created_at).getTime()))
+  const latestDate = new Date(latestTimestamp).toISOString().slice(0, 10)
   const latestEntries = data.filter(
     (d) => new Date(d.created_at).toISOString().slice(0, 10) === latestDate,
-  );
-  if (latestEntries.length === 0) return 100;
-  const total = latestEntries.reduce((sum, d) => sum + d.score, 0);
-  return total / latestEntries.length;
-});
+  )
+  if (latestEntries.length === 0) {
+    return 100
+  }
+  const total = latestEntries.reduce((sum, d) => sum + d.score, 0)
+  return total / latestEntries.length
+})
 
-const onlyCurrentDay = shallowRef(true);
+const onlyCurrentDay = shallowRef(true)
 
 const dataset = computed<VueUiGaugeDataset>(() => ({
-  value: onlyCurrentDay.value
-    ? averageScoreCurrentDay.value
-    : averageScoreOverall.value,
+  value: onlyCurrentDay.value ? averageScoreCurrentDay.value : averageScoreOverall.value,
   base: props.data?.length,
   series: [
-    { from: 0, to: 50, color: colors.value.red, name: "automated" },
-    { from: 50, to: 70, color: colors.value.dangerHover, name: "mixed" },
-    { from: 70, to: 100, color: colors.value.green, name: "organic" },
+    { from: 0, to: 50, color: colors.value.red, name: 'automated' },
+    { from: 50, to: 70, color: colors.value.dangerHover, name: 'mixed' },
+    { from: 70, to: 100, color: colors.value.green, name: 'organic' },
   ],
-}));
+}))
 
 const config = computed<VueUiGaugeConfig>(() => ({
   userOptions: { show: false },
   style: {
     chart: {
-      backgroundColor: "transparent",
+      backgroundColor: 'transparent',
       animation: { use: true },
       layout: {
         markers: {
@@ -81,7 +78,7 @@ const config = computed<VueUiGaugeConfig>(() => ({
           stroke: colors.value.bg,
         },
         pointer: {
-          type: "pointy",
+          type: 'pointy',
           size: 1.1,
           stroke: colors.value.bg,
           circle: {
@@ -107,13 +104,13 @@ const config = computed<VueUiGaugeConfig>(() => ({
       },
     },
   },
-}));
+}))
 </script>
 
 <template>
   <label>
     Score for current day
-    <input type="checkbox" v-model="onlyCurrentDay" />
+    <input v-model="onlyCurrentDay" type="checkbox" />
   </label>
   <ClientOnly>
     <VueUiGauge :dataset :config />

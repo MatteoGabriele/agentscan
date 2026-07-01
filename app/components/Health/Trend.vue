@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import type { IdentityClassification } from "@unveil/identity";
+import type { IdentityClassification } from '@unveil/identity'
 
 const props = defineProps<{
-  label: string;
-  percentage: string | undefined;
-  classification?: IdentityClassification;
-  trend?: number;
-}>();
+  label: string
+  percentage: string | undefined
+  classification?: IdentityClassification
+  trend?: number
+}>()
 
 // @todo: should be globally available to avoid repetition and inconsistencies
 const color = computed(() => {
-  if (props.classification === "organic") {
-    return "bg-green-500";
-  } else if (props.classification === "automation") {
-    return "bg-gh-danger-hover";
-  } else if (props.classification === "mixed") {
-    return "bg-gh-amber";
+  if (props.classification === 'organic') {
+    return 'bg-green-500'
+  } else if (props.classification === 'automation') {
+    return 'bg-gh-danger-hover'
+  } else if (props.classification === 'mixed') {
+    return 'bg-gh-amber'
   } else {
-    return "bg-gray-500";
+    return 'bg-gray-500'
   }
-});
+})
 
 const trendColor = computed(() => {
   return getTrendColor({
     value: props.trend,
-    reversed: props.classification !== "organic",
-  });
-});
+    reversed: props.classification !== 'organic',
+  })
+})
 
-const trendIcon = computed(() => getTrendArrow(props.trend));
-const trendLabel = computed(() => formatTrend(props.trend));
+const trendIcon = computed(() => getTrendArrow(props.trend))
+const trendLabel = computed(() => formatTrend(props.trend))
 </script>
 
 <template>

@@ -1,24 +1,20 @@
 <script setup lang="ts">
-const { data, pending } = useVerifiedAutomations();
+const { data, pending } = useVerifiedAutomations()
 
-const MAX_VISIBLE_ITEMS = 4;
-const items = computed<VerifiedAutomation[]>(
-  () => data.value?.toReversed() ?? [],
-);
+const MAX_VISIBLE_ITEMS = 4
+const items = computed<VerifiedAutomation[]>(() => data.value?.toReversed() ?? [])
 
 const recentItems = computed<VerifiedAutomation[]>(() => {
-  return items.value.slice(0, MAX_VISIBLE_ITEMS);
-});
+  return items.value.slice(0, MAX_VISIBLE_ITEMS)
+})
 const restItemsCount = computed<number>(() => {
-  return items.value.slice(MAX_VISIBLE_ITEMS).length;
-});
+  return items.value.slice(MAX_VISIBLE_ITEMS).length
+})
 </script>
 
 <template>
   <div>
-    <p
-      class="text-xs text-gh-muted/80 tracking-wider font-medium text-center mb-3"
-    >
+    <p class="text-xs text-gh-muted/80 tracking-wider font-medium text-center mb-3">
       Latest flagged by the community
     </p>
 

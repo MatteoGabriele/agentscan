@@ -1,78 +1,74 @@
 <script setup lang="ts">
-import { computed, shallowRef } from "vue";
+import { computed, shallowRef } from 'vue'
 import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXySeries,
   type VueUiXyTooltipSlotProps,
-} from "vue-data-ui/vue-ui-xy";
-import { identityConfig } from "@unveil/identity";
-import { useTimeoutFn } from "@vueuse/core";
+} from 'vue-data-ui/vue-ui-xy'
+import { identityConfig } from '@unveil/identity'
+import { useTimeoutFn } from '@vueuse/core'
 
-import("vue-data-ui/style.css");
+import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealth();
-const dates = computed(() => data.value?.dates);
+const { data } = useEcosystemHealth()
+const dates = computed(() => data.value?.dates)
 
-const rootEl = shallowRef<HTMLElement | null>(null);
-const colors = useColors(rootEl);
+const rootEl = shallowRef<HTMLElement | null>(null)
+const colors = useColors(rootEl)
 
-const loaded = shallowRef(false);
+const loaded = shallowRef(false)
 
 const { start } = useTimeoutFn(
   () => {
-    loaded.value = true;
+    loaded.value = true
   },
   250,
   { immediate: false },
-);
+)
 
-onMounted(start);
+onMounted(start)
 
-const scoreBounds = shallowRef<ScoreBounds>([
-  0,
-  identityConfig.THRESHOLD_SUSPICIOUS,
-]);
+const scoreBounds = shallowRef<ScoreBounds>([0, identityConfig.THRESHOLD_SUSPICIOUS])
 
 const selectedRangeColor = computed(() => {
-  const [minScore, maxScore] = scoreBounds.value;
+  const [minScore, maxScore] = scoreBounds.value
   if (minScore === 0 && maxScore === identityConfig.THRESHOLD_SUSPICIOUS) {
-    return colors.value.danger;
+    return colors.value.danger
   }
   if (
     minScore === identityConfig.THRESHOLD_SUSPICIOUS &&
     maxScore === identityConfig.THRESHOLD_HUMAN
   ) {
-    return colors.value.amber;
+    return colors.value.amber
   }
-  return colors.value.green;
-});
+  return colors.value.green
+})
 
 const sparklines = computed(() => {
-  return getClosedPrPercentageEvolutionByRepo(
-    data.value?.results ?? [],
-    scoreBounds.value,
-  ).map((dataset) => {
-    return dataset.map((datapoint) => ({
-      ...datapoint,
-      color: colors.value.textTransparent,
-      dataLabels: false,
-      suffix: "%",
-    }));
-  });
-});
+  return getClosedPrPercentageEvolutionByRepo(data.value?.results ?? [], scoreBounds.value).map(
+    (dataset) => {
+      return dataset.map((datapoint) => ({
+        ...datapoint,
+        color: colors.value.textTransparent,
+        dataLabels: false,
+        suffix: '%',
+      }))
+    },
+  )
+})
 
-const selectedIndex = shallowRef<number | undefined>(undefined);
-const selectedChartIndex = shallowRef<number | undefined>(undefined);
+const selectedIndex = shallowRef<number | undefined>(undefined)
+const selectedChartIndex = shallowRef<number | undefined>(undefined)
 
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
   events: {
     datapointEnter: ({ seriesIndex }) => {
-      selectedIndex.value = seriesIndex;
+      selectedIndex.value = seriesIndex
     },
     datapointLeave: () => {
-      selectedIndex.value = undefined;
+      selectedIndex.value = undefined
     },
   },
   chart: {
@@ -84,10 +80,10 @@ const config = computed<VueUiXyConfig>(() => ({
     },
     tooltip: {
       show: true,
-      teleportTo: "#sparklines",
+      teleportTo: '#sparklines',
       backgroundOpacity: 0,
       color: colors.value.text,
-      borderColor: "transparent",
+      borderColor: 'transparent',
     },
     highlighter: {
       opacity: 0,
@@ -105,8 +101,8 @@ const config = computed<VueUiXyConfig>(() => ({
     height: 100,
     width: 450,
     grid: {
-      position: "start",
-      stroke: "transparent",
+      position: 'start',
+      stroke: 'transparent',
       labels: {
         show: false,
         xAxisLabels: {
@@ -115,13 +111,13 @@ const config = computed<VueUiXyConfig>(() => ({
           datetimeFormatter: {
             enable: true,
             useUTC: true,
-            locale: "en",
+            locale: 'en',
             options: {
-              year: "dd MMM",
-              month: "dd MMM",
-              day: "dd MMM",
-              minute: "dd MMM",
-              second: "dd MMM",
+              year: 'dd MMM',
+              month: 'dd MMM',
+              day: 'dd MMM',
+              minute: 'dd MMM',
+              second: 'dd MMM',
             },
           },
         },
@@ -147,60 +143,66 @@ const config = computed<VueUiXyConfig>(() => ({
       offsetY: -12,
     },
   },
-}));
+}))
 
-function getLastPlot(serie: Record<string, any>) {
-  return Array.isArray(serie?.plots) ? serie.plots.at(-1) : null;
+type SvgSerieItem = {
+  id?: string
+  plots?: Array<{ x: number; y: number; value: number }>
 }
 
-function getLastPlotTransform(serie: Record<string, any>) {
-  const lastPlot = getLastPlot(serie);
-  if (!lastPlot) return "";
-  return `translate(${lastPlot.x}px, ${lastPlot.y}px)`;
+function getLastPlot(serie: SvgSerieItem) {
+  return Array.isArray(serie?.plots) ? serie.plots.at(-1) : null
 }
 
-function getLastPlotLabel(serie: Record<string, any>) {
-  const lastPlot = getLastPlot(serie);
-  const value = Number(lastPlot?.value ?? 0);
-  return `${value.toFixed(0)}%`;
+function getLastPlotTransform(serie: SvgSerieItem) {
+  const lastPlot = getLastPlot(serie)
+  if (!lastPlot) {
+    return ''
+  }
+  return `translate(${lastPlot.x}px, ${lastPlot.y}px)`
+}
+
+function getLastPlotLabel(serie: SvgSerieItem) {
+  const lastPlot = getLastPlot(serie)
+  const value = Number(lastPlot?.value ?? 0)
+  return `${value.toFixed(0)}%`
 }
 
 type XyAugmentedSeries = VueUiXySeries[number] & {
-  details: { eligiblePrs: number[]; closedPrs: number[] };
-};
+  details: { eligiblePrs: number[]; closedPrs: number[] }
+}
 
 function getTooltipContent(
-  series: VueUiXyTooltipSlotProps["series"],
-  timeLabel: VueUiXyTooltipSlotProps["timeLabel"],
+  series: VueUiXyTooltipSlotProps['series'],
+  timeLabel: VueUiXyTooltipSlotProps['timeLabel'],
 ) {
-  const { absoluteIndex: index } = timeLabel;
-  const datapoint = series[0] as unknown as XyAugmentedSeries;
-  const eligible = datapoint?.details?.eligiblePrs?.[index];
-  const closed = datapoint?.details?.closedPrs?.[index];
-  if (closed == null || eligible == null) return "";
-  const percentage =
-    eligible === 0 ? 100 : Math.round((closed / eligible) * 100);
-  return `${closed} / ${eligible} (${percentage}%)`;
+  const { absoluteIndex: index } = timeLabel
+  const datapoint = series[0] as unknown as XyAugmentedSeries
+  const eligible = datapoint?.details?.eligiblePrs?.[index]
+  const closed = datapoint?.details?.closedPrs?.[index]
+  if (closed == null || eligible == null) {
+    return ''
+  }
+  const percentage = eligible === 0 ? 100 : Math.round((closed / eligible) * 100)
+  return `${closed} / ${eligible} (${percentage}%)`
 }
 
 function hideDataLabel(chartIndex: number) {
   return (
     selectedChartIndex.value === chartIndex ||
-    (selectedIndex.value !== undefined &&
-      selectedIndex.value === (dates.value?.length ?? 0) - 1)
-  );
+    (selectedIndex.value !== undefined && selectedIndex.value === (dates.value?.length ?? 0) - 1)
+  )
 }
 </script>
 
 <template>
   <div class="mb-5">
     <h2 class="text-center">
-      Evolution of pull request closure rates by repository for PRs in a given
-      score range.
+      Evolution of pull request closure rates by repository for PRs in a given score range.
     </h2>
     <p class="text-sm text-gh-muted text-center">
-      Closure rates are based on daily snapshots, not cumulative history, so
-      counts may change from one day to the next.
+      Closure rates are based on daily snapshots, not cumulative history, so counts may change from
+      one day to the next.
     </p>
   </div>
 
@@ -221,17 +223,10 @@ function hideDataLabel(chartIndex: number) {
       <input
         v-model="scoreBounds"
         type="radio"
-        :value="[
-          identityConfig.THRESHOLD_SUSPICIOUS,
-          identityConfig.THRESHOLD_HUMAN,
-        ]"
+        :value="[identityConfig.THRESHOLD_SUSPICIOUS, identityConfig.THRESHOLD_HUMAN]"
         class="accent-amber"
       />
-      <span
-        >{{ identityConfig.THRESHOLD_SUSPICIOUS }}-{{
-          identityConfig.THRESHOLD_HUMAN
-        }}</span
-      >
+      <span>{{ identityConfig.THRESHOLD_SUSPICIOUS }}-{{ identityConfig.THRESHOLD_HUMAN }}</span>
     </label>
 
     <label class="flex items-center gap-2 cursor-pointer">
@@ -245,21 +240,17 @@ function hideDataLabel(chartIndex: number) {
     </label>
   </div>
 
-  <div
-    class="grid grid-cols-2 gap-4 max-w-[600px] mx-auto"
-    id="sparklines"
-    :data-loaded="loaded"
-  >
+  <div id="sparklines" class="grid grid-cols-2 gap-4 max-w-[600px] mx-auto" :data-loaded="loaded">
     <ClientOnly v-for="(chart, chartIndex) in sparklines" :key="chart[0]?.name">
       <div class="flex flex-col">
         <div class="text-sm mb-1">
-          <span class="text-gh-muted">{{ chart[0]?.name.split("/")[0] }}/</span>
-          <span>{{ chart[0]?.name.split("/")[1] }}</span>
+          <span class="text-gh-muted">{{ chart[0]?.name.split('/')[0] }}/</span>
+          <span>{{ chart[0]?.name.split('/')[1] }}</span>
         </div>
 
         <div
-          class="w-full h-full border-gh-border border-l-0.5 border-b-0.5 rounded-bl overflow-hidden"
           v-if="chart[0]?.hasData"
+          class="w-full h-full border-gh-border border-l-0.5 border-b-0.5 rounded-bl overflow-hidden"
           :data-hide-label="hideDataLabel(chartIndex)"
         >
           <VueUiXy
@@ -310,8 +301,8 @@ function hideDataLabel(chartIndex: number) {
           </VueUiXy>
         </div>
         <div
-          class="w-full h-full border-gh-border border-l-0.5 border-b-0.5 rounded-bl flex justify-center place-items-center"
           v-else
+          class="w-full h-full border-gh-border border-l-0.5 border-b-0.5 rounded-bl flex justify-center place-items-center"
         >
           <span class="text-xs text-gh-muted">No data to display</span>
         </div>
@@ -325,17 +316,17 @@ function hideDataLabel(chartIndex: number) {
   --super-ease-out: cubic-bezier(0.15, 0.75, 0.35, 1);
 }
 
-[data-loaded="true"] :deep(.vue-data-ui-component path),
-[data-loaded="true"] :deep(.last-datapoint),
-[data-loaded="true"] :deep(.value-label),
-[data-loaded="true"] :deep(.value-plot) {
+[data-loaded='true'] :deep(.vue-data-ui-component path),
+[data-loaded='true'] :deep(.last-datapoint),
+[data-loaded='true'] :deep(.value-label),
+[data-loaded='true'] :deep(.value-plot) {
   transition: all 0.5s var(--super-ease-out) !important;
 }
 
-[data-loaded="false"] :deep(.vue-data-ui-component path),
-[data-loaded="false"] :deep(.last-datapoint),
-[data-loaded="false"] :deep(.value-label),
-[data-loaded="false"] :deep(.value-plot) {
+[data-loaded='false'] :deep(.vue-data-ui-component path),
+[data-loaded='false'] :deep(.last-datapoint),
+[data-loaded='false'] :deep(.value-label),
+[data-loaded='false'] :deep(.value-plot) {
   transition: none !important;
 }
 :deep(.vue-data-ui-component circle) {
@@ -355,7 +346,7 @@ function hideDataLabel(chartIndex: number) {
   }
 }
 
-:deep([data-hide-label="true"] svg text:not(.value-label)) {
+:deep([data-hide-label='true'] svg text:not(.value-label)) {
   display: none;
 }
 :deep(div:has(.vue-data-ui-xy-svg)) {

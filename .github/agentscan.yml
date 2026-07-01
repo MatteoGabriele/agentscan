@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../schemas/agentscan.json
+version: 1
+
+scan:
+  pull-requests: true
+  issues: false
+
+allowed-users:
+  - MatteoGabriele
+  - graphieros
+  - huang-julien
+
+silent-on-organic: true
+
+auto-close: true
+auto-close-classifications:
+  - automation
+  - mixed
+
+messages:
+  automation: "Your account has been detected as possibly automated and this PR has been automatically closed.\nThis is an automation-free zone — no droids allowed.\n\n![](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGhoOHVidmo4cmxlNmp6enY3Y2NkZWduNHZzYXM1bmpxbTFtOWhheSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT9DPr4VjeCgeiLoMo/giphy.gif)"
+  mixed: "Your account has been detected as possibly automated and this PR has been automatically closed.\nThis is an automation-free zone — no droids allowed.\n\n![](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGhoOHVidmo4cmxlNmp6enY3Y2NkZWduNHZzYXM1bmpxbTFtOWhheSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT9DPr4VjeCgeiLoMo/giphy.gif)"

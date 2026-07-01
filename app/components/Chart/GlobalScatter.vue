@@ -1,38 +1,36 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue'
 import {
   VueUiScatter,
   type VueUiScatterDatasetItem,
   type VueUiScatterConfig,
-} from "vue-data-ui/vue-ui-scatter";
+} from 'vue-data-ui/vue-ui-scatter'
 
-import "vue-data-ui/style.css";
-import { useColors } from "~/composables/useColors";
+import 'vue-data-ui/style.css'
+import { useColors } from '~/composables/useColors'
 
 const props = defineProps<{
-  data: Scan[] | undefined;
-}>();
+  data: Scan[] | undefined
+}>()
 
-const rootEl = shallowRef<HTMLElement | null>(null);
+const rootEl = shallowRef<HTMLElement | null>(null)
 
 onMounted(async () => {
-  rootEl.value = document.documentElement;
-});
+  rootEl.value = document.documentElement
+})
 
-const colors = useColors(rootEl);
+const colors = useColors(rootEl)
 
 type ScatterClusterParams = {
-  dataset: Scan[];
-  min: number;
-  max: number;
-  color: string;
-  name: string;
-};
+  dataset: Scan[]
+  min: number
+  max: number
+  color: string
+  name: string
+}
 
-function convertToScatterCluster(
-  args: ScatterClusterParams,
-): VueUiScatterDatasetItem[] {
-  const { dataset, min, max, color, name } = args;
+function convertToScatterCluster(args: ScatterClusterParams): VueUiScatterDatasetItem[] {
+  const { dataset, min, max, color, name } = args
   return [
     {
       name,
@@ -41,11 +39,11 @@ function convertToScatterCluster(
         .map((item) => ({
           x: item.score,
           y: item.events_count,
-          name: "",
+          name: '',
         }))
         .filter((item) => item.x >= min && item.x <= max),
     },
-  ];
+  ]
 }
 
 const dataset = computed<VueUiScatterDatasetItem[]>(() => {
@@ -55,34 +53,32 @@ const dataset = computed<VueUiScatterDatasetItem[]>(() => {
       min: 0,
       max: 50,
       color: colors.value.redHover!,
-      name: "automated",
+      name: 'automated',
     }),
     ...convertToScatterCluster({
       dataset: props.data ?? [],
       min: 51,
       max: 70,
       color: colors.value.dangerHover!,
-      name: "mixed",
+      name: 'mixed',
     }),
     ...convertToScatterCluster({
       dataset: props.data ?? [],
       min: 71,
       max: 101,
       color: colors.value.greenHover!,
-      name: "organic",
+      name: 'organic',
     }),
-  ];
-});
+  ]
+})
 
 const averageScore = computed(() => {
-  const count = (props.data ?? []).length;
-  if (count === 0) return 0;
-  return (
-    dataset.value
-      .flatMap((d) => d.values.map((v) => v.x))
-      .reduce((a, b) => a + b, 0) / count
-  );
-});
+  const count = (props.data ?? []).length
+  if (count === 0) {
+    return 0
+  }
+  return dataset.value.flatMap((d) => d.values.map((v) => v.x)).reduce((a, b) => a + b, 0) / count
+})
 
 const config = computed<VueUiScatterConfig>(() => {
   return {
@@ -91,20 +87,20 @@ const config = computed<VueUiScatterConfig>(() => {
       useCursorPointer: true,
     },
     style: {
-      backgroundColor: "transparent",
+      backgroundColor: 'transparent',
       legend: {
         show: true,
-        backgroundColor: "transparent",
+        backgroundColor: 'transparent',
         color: colors.value.textMuted,
       },
       chart: {
         lines: {
           path: {
             useSerieColor: true, // new
-            stroke: "#FFFFFF", // new
+            stroke: '#FFFFFF', // new
           },
           dot: {
-            stroke: "#FFFFFF", // new
+            stroke: '#FFFFFF', // new
           },
         },
       },
@@ -143,7 +139,7 @@ const config = computed<VueUiScatterConfig>(() => {
           xAxis: {
             offsetY: -20,
             showValue: false,
-            name: "score",
+            name: 'score',
             color: colors.value.textMuted,
             scales: {
               show: true,
@@ -154,7 +150,7 @@ const config = computed<VueUiScatterConfig>(() => {
             },
           },
           yAxis: {
-            name: "event count",
+            name: 'event count',
             offsetX: 28,
             showValue: false,
             color: colors.value.textMuted,
@@ -169,8 +165,8 @@ const config = computed<VueUiScatterConfig>(() => {
         },
       },
     },
-  };
-});
+  }
+})
 </script>
 
 <template>

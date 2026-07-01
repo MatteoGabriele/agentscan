@@ -1,48 +1,46 @@
-import type { VerifiedAutomation } from "~~/shared/types/automation";
+import type { VerifiedAutomation } from '~~/shared/types/automation'
 
 export default defineEventHandler(async (event) => {
   try {
     // Fetch the verified automations list
-    const automations: VerifiedAutomation[] = await $fetch(
-      "/api/verified-automations",
-    );
+    const automations: VerifiedAutomation[] = await $fetch('/api/verified-automations')
 
     // Sort by createdAt in descending order (newest first)
     const sortedAutomations = [...automations].sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
 
     // Generate RSS feed
-    const rss = generateRSSFeed(sortedAutomations);
+    const rss = generateRSSFeed(sortedAutomations)
 
     // Set proper content-type header
-    setHeader(event, "Content-Type", "application/rss+xml");
-    setHeader(event, "Cache-Control", "public, max-age=3600");
+    setHeader(event, 'Content-Type', 'application/rss+xml')
+    setHeader(event, 'Cache-Control', 'public, max-age=3600')
 
-    return rss;
+    return rss
   } catch (error) {
-    console.error("Error generating RSS feed:", error);
+    console.error('Error generating RSS feed:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to generate RSS feed",
-    });
+      statusMessage: 'Failed to generate RSS feed',
+    })
   }
-});
+})
 
 function generateRSSFeed(automations: VerifiedAutomation[]): string {
-  const baseUrl = "https://agentscan.tools";
-  const lastBuildDate = new Date().toUTCString();
+  const baseUrl = 'https://agentscan.tools'
+  const lastBuildDate = new Date().toUTCString()
   const feedLastUpdate = automations[0]
     ? new Date(automations[0].createdAt).toUTCString()
-    : lastBuildDate;
+    : lastBuildDate
 
   const itemsXML = automations
     .map((automation) => {
-      const guid = `${baseUrl}/user/${automation.username}`;
-      const link = guid;
-      const pubDate = new Date(automation.createdAt).toUTCString();
-      const description = escapeXML(automation.reason);
-      const title = escapeXML(automation.username);
+      const guid = `${baseUrl}/user/${automation.username}`
+      const link = guid
+      const pubDate = new Date(automation.createdAt).toUTCString()
+      const description = escapeXML(automation.reason)
+      const title = escapeXML(automation.username)
 
       return `    <item>
       <title>${title}</title>
@@ -52,9 +50,9 @@ function generateRSSFeed(automations: VerifiedAutomation[]): string {
       <description>${description}</description>
       <author>AgentScan</author>
       <category>Automation</category>
-    </item>`;
+    </item>`
     })
-    .join("\n");
+    .join('\n')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -74,14 +72,14 @@ function generateRSSFeed(automations: VerifiedAutomation[]): string {
     <docs>http://www.rssboard.org/rss-specification</docs>
 ${itemsXML}
   </channel>
-</rss>`;
+</rss>`
 }
 
 function escapeXML(text: string): string {
   return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
 }

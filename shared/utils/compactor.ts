@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import type { EcosystemHealthItem } from "../types/ecosystem-health";
+import type { EcosystemHealthItem } from '../types/ecosystem-health'
 
 // Compact CSV format for scan results — ~72% smaller than pretty-printed JSON.
 //
@@ -13,37 +13,37 @@ import type { EcosystemHealthItem } from "../types/ecosystem-health";
 //   repo_idx             : index into the REPOS header
 //   is_bounty            : 1 = bounty hunter | 0 = not
 
-const STATUS_ENCODE: Record<string, string> = { open: "o", closed: "c" };
-const STATUS_DECODE: Record<string, string> = { o: "open", c: "closed" };
+const STATUS_ENCODE: Record<string, string> = { open: 'o', closed: 'c' }
+const STATUS_DECODE: Record<string, string> = { o: 'open', c: 'closed' }
 
 function hexToBase64Url(hex: string): string {
-  return Buffer.from(hex, "hex").toString("base64url");
+  return Buffer.from(hex, 'hex').toString('base64url')
 }
 
 function base64UrlToHex(b64: string): string {
-  return Buffer.from(b64, "base64url").toString("hex");
+  return Buffer.from(b64, 'base64url').toString('hex')
 }
 
 function toUnixSecs(isoDate: string): number {
-  return Math.floor(new Date(isoDate).getTime() / 1000);
+  return Math.floor(new Date(isoDate).getTime() / 1000)
 }
 
 function fromUnixSecs(secs: number): string {
-  return new Date(secs * 1000).toISOString();
+  return new Date(secs * 1000).toISOString()
 }
 
 export function pack(results: EcosystemHealthItem[]): string {
-  const repoList: string[] = [];
-  const repoIndex = new Map<string, number>();
+  const repoList: string[] = []
+  const repoIndex = new Map<string, number>()
 
   for (const r of results) {
     if (!repoIndex.has(r.repo_name)) {
-      repoIndex.set(r.repo_name, repoList.length);
-      repoList.push(r.repo_name);
+      repoIndex.set(r.repo_name, repoList.length)
+      repoList.push(r.repo_name)
     }
   }
 
-  const lines: string[] = [`REPOS:${repoList.join(",")}`];
+  const lines: string[] = [`REPOS:${repoList.join(',')}`]
 
   for (const r of results) {
     lines.push(
@@ -57,25 +57,29 @@ export function pack(results: EcosystemHealthItem[]): string {
         r.events_count,
         repoIndex.get(r.repo_name),
         r.is_bounty ? 1 : 0,
-      ].join(","),
-    );
+      ].join(','),
+    )
   }
 
-  return lines.join("\n");
+  return lines.join('\n')
 }
 
 export function unpack(content: string): EcosystemHealthItem[] {
-  const lines = content.split("\n");
-  if (!lines[0]?.startsWith("REPOS:")) return [];
+  const lines = content.split('\n')
+  if (!lines[0]?.startsWith('REPOS:')) {
+    return []
+  }
 
-  const repos = lines[0].slice(6).split(",").filter(Boolean);
-  const results: EcosystemHealthItem[] = [];
+  const repos = lines[0].slice(6).split(',').filter(Boolean)
+  const results: EcosystemHealthItem[] = []
 
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line?.trim()) continue;
+    const line = lines[i]
+    if (!line?.trim()) {
+      continue
+    }
 
-    const fields = line.split(",");
+    const fields = line.split(',')
     const [
       createdTs,
       score,
@@ -86,15 +90,17 @@ export function unpack(content: string): EcosystemHealthItem[] {
       events,
       repoIdx,
       isBounty,
-    ] = fields;
+    ] = fields
 
-    if (fields.length < 8) continue;
+    if (fields.length < 8) {
+      continue
+    }
 
-    const numCreatedTs = Number(createdTs);
-    const numUserCreatedTs = Number(userCreatedTs);
-    const numPublicRepos = Number(publicRepos);
-    const numEvents = Number(events);
-    const numRepoIdx = Number(repoIdx);
+    const numCreatedTs = Number(createdTs)
+    const numUserCreatedTs = Number(userCreatedTs)
+    const numPublicRepos = Number(publicRepos)
+    const numEvents = Number(events)
+    const numRepoIdx = Number(repoIdx)
 
     if (
       !Number.isFinite(numCreatedTs) ||
@@ -102,7 +108,9 @@ export function unpack(content: string): EcosystemHealthItem[] {
       !Number.isFinite(numPublicRepos) ||
       !Number.isFinite(numEvents) ||
       !Number.isFinite(numRepoIdx)
-    ) continue;
+    ) {
+      continue
+    }
 
     results.push({
       created_at: fromUnixSecs(numCreatedTs),
@@ -112,10 +120,10 @@ export function unpack(content: string): EcosystemHealthItem[] {
       user_created_at: fromUnixSecs(numUserCreatedTs),
       user_public_repos_count: numPublicRepos,
       events_count: numEvents,
-      repo_name: repos[numRepoIdx] ?? "",
-      is_bounty: isBounty === "1",
-    });
+      repo_name: repos[numRepoIdx] ?? '',
+      is_bounty: isBounty === '1',
+    })
   }
 
-  return results;
+  return results
 }
