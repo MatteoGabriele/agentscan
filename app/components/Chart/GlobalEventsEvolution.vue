@@ -273,18 +273,6 @@ const visibleLandmarkByIndex = computed(() => {
                   :key="`${landmark?.date}-${landmark?.name}-${j}`"
                 >
                   <g v-if="landmark && landmark.index === i + svg.slicer.start && landmark.visible">
-                    <!-- Landmark vertical line-->
-                    <line
-                      :x1="plot.x"
-                      :x2="plot.x"
-                      :y1="svg.drawingArea.top"
-                      :y2="svg.drawingArea.bottom"
-                      :stroke="colors.border"
-                      stroke-linecap="round"
-                      stroke-width="1"
-                      opacity="0.5"
-                    />
-
                     <!-- Landmark label -->
                     <text
                       :fill="colors.textMuted"
