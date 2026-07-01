@@ -248,6 +248,8 @@ const keyDates = computed(() => {
     .filter(Boolean);
 });
 
+const isChartHovered = shallowRef(false);
+
 const visibleLandmarkByIndex = computed(() => {
   const landmarkMap = new Map<number, (typeof keyDates.value)[number]>();
   keyDates.value.forEach((landmark) => {
@@ -260,7 +262,12 @@ const visibleLandmarkByIndex = computed(() => {
 </script>
 <template>
   <div class="relative h-full w-full flex flex-col">
-    <div class="flex-1 h-full no-chart-transition" ref="chartContainer">
+    <div
+      class="flex-1 h-full no-chart-transition"
+      ref="chartContainer"
+      @mouseenter="isChartHovered = true"
+      @mouseleave="isChartHovered = false"
+    >
       <ClientOnly>
         <Transition name="chart-fade" appear>
           <VueUiXy
@@ -287,32 +294,57 @@ const visibleLandmarkByIndex = computed(() => {
                       landmark.visible
                     "
                   >
-                    <!-- Landmark vertical line-->
-                    <line
-                      :x1="plot.x"
-                      :x2="plot.x"
-                      :y1="svg.drawingArea.top"
-                      :y2="svg.drawingArea.bottom"
-                      :stroke="colors.border"
-                      stroke-linecap="round"
-                      stroke-width="1"
-                      opacity="0.5"
-                    />
                     <!-- Landmark label -->
                     <text
                       :fill="colors.textMuted"
                       :stroke="colors.bg"
+                      :opacity="isChartHovered ? 0.6 : 0"
                       stroke-width="3"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      font-size="12"
-                      :transform="`translate(${plot.x + 14}, ${svg.drawingArea.bottom}) rotate(-90)`"
-                      text-anchor="start"
+                      font-size="11"
+                      :x="plot.x"
+                      :y="svg.drawingArea.bottom - 4"
+                      text-anchor="middle"
                       dominant-baseline="middle"
                       paint-order="stroke fill"
+                      class="landmark-label"
+                      style="pointer-events: none"
                     >
                       {{ landmark.name }}
                     </text>
+                    <!-- Landmark icon -->
+                    <g
+                      :transform="`translate(${plot.x}, ${svg.drawingArea.bottom - 22})`"
+                      style="pointer-events: all; cursor: default"
+                      opacity="1"
+                    >
+                      <title>{{ landmark.name }}</title>
+                      <g transform="translate(-7.68, -7.68) scale(0.64)">
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          :stroke="colors.border"
+                          stroke-width="2"
+                          fill="none"
+                        />
+                        <path
+                          d="M12 16v-4"
+                          :stroke="colors.border"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          fill="none"
+                        />
+                        <path
+                          d="M12 8h.01"
+                          :stroke="colors.border"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          fill="none"
+                        />
+                      </g>
+                    </g>
                   </g>
                 </template>
               </g>
@@ -429,5 +461,9 @@ const visibleLandmarkByIndex = computed(() => {
 .no-chart-transition circle {
   transition: none !important;
   animation: none !important;
+}
+
+.landmark-label {
+  transition: all 250ms ease !important;
 }
 </style>
