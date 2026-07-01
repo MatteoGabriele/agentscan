@@ -287,7 +287,7 @@ const visibleLandmarkByIndex = computed(() => {
                       text-anchor="middle"
                       dominant-baseline="middle"
                       paint-order="stroke fill"
-                      class="landmark-label"
+                      class="landmark-label hidden md:block"
                       style="pointer-events: none"
                     >
                       {{ landmark.name }}
