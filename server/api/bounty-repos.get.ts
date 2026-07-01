@@ -1,9 +1,8 @@
-import { Octokit } from 'octokit'
 import type { BountyRepo } from '~~/shared/types/bounty'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
-  const octokit = new Octokit({ auth: config.githubToken })
+  const octokit = createOctokit(config.githubToken)
 
   try {
     const { data } = await octokit.rest.repos.getContent({

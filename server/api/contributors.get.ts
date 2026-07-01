@@ -1,10 +1,8 @@
-import { Octokit } from 'octokit'
-
 const cibotList = ['actions-user']
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
-  const octokit = new Octokit({ auth: config.githubToken })
+  const octokit = createOctokit(config.githubToken)
 
   try {
     const { data: app } = await octokit.rest.repos.listContributors({

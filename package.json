@@ -16,6 +16,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check": "eslint . --fix && prettier --write .",
     "test": "vitest",
     "prepare": "husky"
   },
@@ -23,6 +24,7 @@
     "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@octokit/app": "^16.1.2",
+    "@octokit/request-error": "^7.1.0",
     "@octokit/webhooks": "^14.2.0",
     "@unocss/preset-icons": "^66.6.0",
     "@unveil/identity": "1.12.0",

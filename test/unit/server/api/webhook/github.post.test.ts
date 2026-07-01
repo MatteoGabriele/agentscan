@@ -50,6 +50,7 @@ const {
   vi.stubGlobal('readRawBody', readRawBodyMock)
   vi.stubGlobal('useRuntimeConfig', useRuntimeConfigMock)
   vi.stubGlobal('getHeader', getHeaderMock)
+  vi.stubGlobal('TrackedOctokit', vi.fn())
   vi.stubGlobal(
     'createError',
     ({ statusCode, message }: { statusCode: number; message: string }) => {
@@ -74,6 +75,9 @@ vi.mock('octokit', () => ({
   App: vi.fn().mockImplementation(function () {
     return mockApp
   }),
+  Octokit: {
+    plugin: vi.fn().mockReturnValue(vi.fn()),
+  },
 }))
 vi.mock('@octokit/webhooks', () => ({
   Webhooks: vi.fn().mockImplementation(function () {

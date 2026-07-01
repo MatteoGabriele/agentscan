@@ -17,6 +17,9 @@ importers:
       '@octokit/app':
         specifier: ^16.1.2
         version: 16.1.2
+      '@octokit/request-error':
+        specifier: ^7.1.0
+        version: 7.1.0
       '@octokit/webhooks':
         specifier: ^14.2.0
         version: 14.2.0

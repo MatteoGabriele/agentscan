@@ -1,6 +1,3 @@
-import { Octokit } from 'octokit'
-import { formatUsername } from '~~/server/utils/format-username'
-
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const username = getRouterParam(event, 'username')
@@ -12,7 +9,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const octokit = new Octokit({ auth: config.githubToken })
+  const octokit = createOctokit(config.githubToken)
 
   try {
     const formattedUsername = formatUsername(username)
