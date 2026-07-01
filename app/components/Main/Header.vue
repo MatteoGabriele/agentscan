@@ -13,6 +13,7 @@
         <li><MainMenuItem to="/" label="Search" /></li>
         <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
         <li><MainMenuItem to="/lab" label="The lab" /></li>
+        <li><MainMenuItem to="/scan" label="Repository scan" /></li>
         <li><MainMenuItem to="/automations" label="Community reports" /></li>
       </ul>
     </div>

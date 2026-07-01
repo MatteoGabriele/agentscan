@@ -207,8 +207,8 @@ const hiddenCount = computed(() => {
                 {{ getEventDescription(conn.from) }}
               </p>
               <p class="text-xs text-gh-muted">
-                {{ conn.from.repo?.name?.split('/')[1] }} ·
-                {{ formatEventTime(conn.from.created_at) }}
+                {{ formatEventTime(conn.from.created_at) }} ·
+                {{ conn.from.repo?.name?.split('/')[1] }}
               </p>
             </div>
           </div>
@@ -234,8 +234,8 @@ const hiddenCount = computed(() => {
                 {{ getEventDescription(conn.to) }}
               </p>
               <p class="text-xs text-gh-muted">
-                {{ conn.to.repo?.name?.split('/')[1] }} ·
-                {{ formatEventTime(conn.to.created_at) }}
+                {{ formatEventTime(conn.to.created_at) }} ·
+                {{ conn.to.repo?.name?.split('/')[1] }}
               </p>
             </div>
           </div>
@@ -279,7 +279,7 @@ const hiddenCount = computed(() => {
               </a>
               <p v-else class="text-sm text-gh-text">{{ getEventDescription(ev) }}</p>
               <p class="text-xs text-gh-muted">
-                {{ ev.repo?.name?.split('/')[1] }} · {{ formatEventTime(ev.created_at) }}
+                {{ formatEventTime(ev.created_at) }} · {{ ev.repo?.name?.split('/')[1] }}
               </p>
             </div>
           </div>
@@ -308,8 +308,7 @@ const hiddenCount = computed(() => {
                 {{ getEventDescription(ev) }}
               </p>
               <p class="text-xs text-gh-muted">
-                {{ ev.repo?.name?.split('/')[1] }} ·
-                {{ formatEventTime(ev.created_at) }}
+                {{ formatEventTime(ev.created_at) }} · {{ ev.repo?.name?.split('/')[1] }}
               </p>
             </div>
           </div>
@@ -351,8 +350,8 @@ const hiddenCount = computed(() => {
               </a>
               <span v-else class="text-gh-text text-sm">{{ getEventDescription(ev) }}</span>
               <div class="flex gap-2 text-gh-muted text-xs">
-                <span>{{ ev.repo?.name }}</span>
                 <span>{{ formatEventTime(ev.created_at) }}</span>
+                <span>{{ ev.repo?.name }}</span>
               </div>
             </div>
           </div>
@@ -387,8 +386,8 @@ const hiddenCount = computed(() => {
               {{ getEventDescription(ev) }}
             </span>
             <div class="flex gap-2 text-gh-muted text-xs">
-              <span>{{ ev.repo?.name }}</span>
               <span>{{ formatEventTime(ev.created_at) }}</span>
+              <span>{{ ev.repo?.name }}</span>
             </div>
           </div>
         </div>

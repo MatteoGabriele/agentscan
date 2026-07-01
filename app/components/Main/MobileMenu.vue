@@ -48,6 +48,7 @@ onBeforeUnmount(() => {
           <MainMenuItem class="text-xl" to="/health" label="Ecosystem health" />
         </li>
         <li><MainMenuItem class="text-xl" to="/lab" label="The lab" /></li>
+        <li><MainMenuItem class="text-xl" to="/scan" label="Repository scan" /></li>
         <li>
           <MainMenuItem class="text-xl" to="/automations" label="Community reports" />
         </li>
