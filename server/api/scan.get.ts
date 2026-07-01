@@ -10,6 +10,7 @@ const EVENT_PAGES = 3
 type Entry = {
   login: string
   prUrl: string
+  authorAssociation: string
 }
 
 export default defineCachedEventHandler(
@@ -73,6 +74,7 @@ export default defineCachedEventHandler(
           entries.push({
             login: lower,
             prUrl: pr.html_url,
+            authorAssociation: pr.author_association,
           })
         }
 
@@ -110,6 +112,7 @@ export default defineCachedEventHandler(
             user,
             analysis,
             prUrl: entry.prUrl,
+            authorAssociation: entry.authorAssociation,
             eventsCount: events.length,
           }
         }),
