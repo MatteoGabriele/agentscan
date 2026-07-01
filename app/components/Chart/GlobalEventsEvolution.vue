@@ -295,6 +295,7 @@ const visibleLandmarkByIndex = computed(() => {
                     <!-- Landmark icon -->
                     <g
                       :transform="`translate(${plot.x}, ${svg.drawingArea.bottom - 22})`"
+                      class="hidden md:block"
                       style="pointer-events: all; cursor: default"
                       opacity="1"
                     >
