@@ -7,7 +7,6 @@ import {
   type IdentityClassification,
 } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
-import { TrackedOctokit } from '~~/server/utils/github-client'
 import { DEFAULT_CONFIG, parseRepoConfig, type RepoConfig } from './_config'
 
 type AutomationListItem = {

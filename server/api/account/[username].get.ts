@@ -1,6 +1,3 @@
-import { formatUsername } from '~~/server/utils/format-username'
-import { createOctokit } from '~~/server/utils/github-client'
-
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const username = getRouterParam(event, 'username')

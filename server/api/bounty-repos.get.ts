@@ -1,5 +1,4 @@
 import type { BountyRepo } from '~~/shared/types/bounty'
-import { createOctokit } from '~~/server/utils/github-client'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()

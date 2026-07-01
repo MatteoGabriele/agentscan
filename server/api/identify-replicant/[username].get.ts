@@ -1,7 +1,5 @@
 import { identify } from '@unveil/identity'
 import * as v from 'valibot'
-import { formatUsername } from '~~/server/utils/format-username'
-import { createOctokit } from '~~/server/utils/github-client'
 
 const MIN_PAGES = 1
 const MAX_PAGES = 3

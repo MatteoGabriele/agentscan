@@ -1,5 +1,3 @@
-import { createOctokit } from '~~/server/utils/github-client'
-
 const cibotList = ['actions-user']
 
 export default defineEventHandler(async () => {

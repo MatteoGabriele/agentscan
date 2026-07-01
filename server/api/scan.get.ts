@@ -2,7 +2,6 @@ import { identify } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_USER_COUNT } from '~~/shared/scan'
-import { createOctokit } from '~~/server/utils/github-client'
 
 const PER_PAGE = 50
 const MAX_PAGES = 5

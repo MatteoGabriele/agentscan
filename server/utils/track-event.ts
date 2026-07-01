@@ -1,6 +1,7 @@
 const SA_EVENTS_URL = 'https://queue.simpleanalyticscdn.com/events'
 const SA_HOSTNAME = 'agentscan.tools'
 const SA_USER_AGENT = 'AgentScanServer/1.0 (+https://agentscan.tools)'
+const SA_REQUEST_TIMEOUT_MS = 5000
 
 export async function trackServerEvent(
   name: string,
@@ -24,6 +25,7 @@ export async function trackServerEvent(
         ua: SA_USER_AGENT,
         metadata,
       }),
+      signal: AbortSignal.timeout(SA_REQUEST_TIMEOUT_MS),
     })
   } catch {
     // best-effort tracking, ignore delivery failures

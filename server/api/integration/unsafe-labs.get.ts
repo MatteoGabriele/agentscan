@@ -1,6 +1,4 @@
 import dayjs from 'dayjs'
-import type { IntegrationItem } from '~~/shared/types/integrations'
-import { createOctokit } from '~~/server/utils/github-client'
 
 export type IntegrationUsafeLab = {
   username: string

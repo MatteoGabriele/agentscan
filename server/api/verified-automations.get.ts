@@ -1,5 +1,4 @@
 import type { VerifiedAutomation } from '~~/shared/types/automation'
-import { createOctokit } from '~~/server/utils/github-client'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
