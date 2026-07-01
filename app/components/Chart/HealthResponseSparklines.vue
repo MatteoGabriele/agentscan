@@ -29,7 +29,10 @@ const { start } = useTimeoutFn(
 
 onMounted(start)
 
-const scoreBounds = shallowRef<ScoreBounds>([0, identityConfig.THRESHOLD_SUSPICIOUS])
+const scoreBounds = shallowRef<ScoreBounds>([
+  0,
+  identityConfig.THRESHOLD_SUSPICIOUS,
+])
 
 const selectedRangeColor = computed(() => {
   const [minScore, maxScore] = scoreBounds.value
@@ -46,16 +49,17 @@ const selectedRangeColor = computed(() => {
 })
 
 const sparklines = computed(() => {
-  return getClosedPrPercentageEvolutionByRepo(data.value?.results ?? [], scoreBounds.value).map(
-    (dataset) => {
-      return dataset.map((datapoint) => ({
-        ...datapoint,
-        color: colors.value.textTransparent,
-        dataLabels: false,
-        suffix: '%',
-      }))
-    },
-  )
+  return getClosedPrPercentageEvolutionByRepo(
+    data.value?.results ?? [],
+    scoreBounds.value,
+  ).map((dataset) => {
+    return dataset.map((datapoint) => ({
+      ...datapoint,
+      color: colors.value.textTransparent,
+      dataLabels: false,
+      suffix: '%',
+    }))
+  })
 })
 
 const selectedIndex = shallowRef<number | undefined>(undefined)
@@ -183,14 +187,16 @@ function getTooltipContent(
   if (closed == null || eligible == null) {
     return ''
   }
-  const percentage = eligible === 0 ? 100 : Math.round((closed / eligible) * 100)
+  const percentage =
+    eligible === 0 ? 100 : Math.round((closed / eligible) * 100)
   return `${closed} / ${eligible} (${percentage}%)`
 }
 
 function hideDataLabel(chartIndex: number) {
   return (
     selectedChartIndex.value === chartIndex ||
-    (selectedIndex.value !== undefined && selectedIndex.value === (dates.value?.length ?? 0) - 1)
+    (selectedIndex.value !== undefined &&
+      selectedIndex.value === (dates.value?.length ?? 0) - 1)
   )
 }
 </script>
@@ -198,11 +204,12 @@ function hideDataLabel(chartIndex: number) {
 <template>
   <div class="mb-5">
     <h2 class="text-center">
-      Evolution of pull request closure rates by repository for PRs in a given score range.
+      Evolution of pull request closure rates by repository for PRs in a given
+      score range.
     </h2>
     <p class="text-sm text-gh-muted text-center">
-      Closure rates are based on daily snapshots, not cumulative history, so counts may change from
-      one day to the next.
+      Closure rates are based on daily snapshots, not cumulative history, so
+      counts may change from one day to the next.
     </p>
   </div>
 
@@ -223,10 +230,17 @@ function hideDataLabel(chartIndex: number) {
       <input
         v-model="scoreBounds"
         type="radio"
-        :value="[identityConfig.THRESHOLD_SUSPICIOUS, identityConfig.THRESHOLD_HUMAN]"
+        :value="[
+          identityConfig.THRESHOLD_SUSPICIOUS,
+          identityConfig.THRESHOLD_HUMAN,
+        ]"
         class="accent-amber"
       />
-      <span>{{ identityConfig.THRESHOLD_SUSPICIOUS }}-{{ identityConfig.THRESHOLD_HUMAN }}</span>
+      <span
+        >{{ identityConfig.THRESHOLD_SUSPICIOUS }}-{{
+          identityConfig.THRESHOLD_HUMAN
+        }}</span
+      >
     </label>
 
     <label class="flex items-center gap-2 cursor-pointer">
@@ -240,7 +254,11 @@ function hideDataLabel(chartIndex: number) {
     </label>
   </div>
 
-  <div id="sparklines" class="grid grid-cols-2 gap-4 max-w-[600px] mx-auto" :data-loaded="loaded">
+  <div
+    id="sparklines"
+    class="grid grid-cols-2 gap-4 max-w-[600px] mx-auto"
+    :data-loaded="loaded"
+  >
     <ClientOnly v-for="(chart, chartIndex) in sparklines" :key="chart[0]?.name">
       <div class="flex flex-col">
         <div class="text-sm mb-1">

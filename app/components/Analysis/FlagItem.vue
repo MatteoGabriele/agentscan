@@ -19,7 +19,10 @@ function toggleExpanded() {
 <template>
   <li class="not-last:border-b border-gh-border-light/40 py-4">
     <!-- Flag header -->
-    <button class="flex text-left items-center gap-2 mb-1 flex-wrap" @click="toggleExpanded">
+    <button
+      class="flex text-left items-center gap-2 mb-1 flex-wrap"
+      @click="toggleExpanded"
+    >
       <h4 class="font-mono">{{ flag.label }}</h4>
       <span
         v-if="flag.data.length"
@@ -30,7 +33,10 @@ function toggleExpanded() {
     <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
 
     <template v-if="flag.data.length">
-      <div v-if="isExpanded" class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2">
+      <div
+        v-if="isExpanded"
+        class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2"
+      >
         <!-- Data points -->
         <div
           v-for="(group, i) in groupDataPoints(flag.data)"
@@ -42,13 +48,19 @@ function toggleExpanded() {
             class="text-xs text-gh-muted shrink-0 sticky top-4 self-start mt-1"
           />
           <div class="flex-1 space-y-3">
-            <div v-for="point in group.points" :key="point.label" class="flex flex-col gap-0.5">
+            <div
+              v-for="point in group.points"
+              :key="point.label"
+              class="flex flex-col gap-0.5"
+            >
               <span class="text-sm">{{ parseDataPoint(point).label }}</span>
               <div class="flex items-center gap-1">
                 <template v-if="typeof point.value === 'boolean'">
                   <span
                     :class="
-                      point.value ? 'i-lucide:check text-green-500' : 'i-lucide:x text-gh-muted'
+                      point.value
+                        ? 'i-lucide:check text-green-500'
+                        : 'i-lucide:x text-gh-muted'
                     "
                     class="text-xs"
                   />

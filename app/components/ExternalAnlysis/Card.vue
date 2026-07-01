@@ -27,7 +27,9 @@ const counter = computed<number>(() => {
           <span>Suspicious Activity Reported</span>
         </h3>
         <div class="flex items-center gap-3">
-          <span class="bg-gh-amber/20 text-gh-amber text-xs font-semibold px-2 py-1 rounded">
+          <span
+            class="bg-gh-amber/20 text-gh-amber text-xs font-semibold px-2 py-1 rounded"
+          >
             {{ counter }}
           </span>
           <span
@@ -45,7 +47,11 @@ const counter = computed<number>(() => {
       id="disclosure-external-analysis"
       class="bg-gh-amber/5 border border-t-gh-amber/30 rounded-b-md border-gh-amber/40 p-4 space-y-4"
     >
-      <li v-for="item in items" :key="`${item.username}-${item.link}`" class="p-3 space-y-2">
+      <li
+        v-for="item in items"
+        :key="`${item.username}-${item.link}`"
+        class="p-3 space-y-2"
+      >
         <h4 class="text-gh-text/90 text-sm">{{ item.label }}</h4>
         <p class="text-gh-text/70 text-sm">
           {{ item.reason }}

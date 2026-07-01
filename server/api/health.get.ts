@@ -34,7 +34,9 @@ export default defineEventHandler(async () => {
       mixedPercentages.push(counts.mixed.percentage)
       organicPercentages.push(counts.organic.percentage)
 
-      counts.automation.trend = calcLinearProgression(automationPercentages).trend
+      counts.automation.trend = calcLinearProgression(
+        automationPercentages,
+      ).trend
       counts.mixed.trend = calcLinearProgression(mixedPercentages).trend
       counts.organic.trend = calcLinearProgression(organicPercentages).trend
     })
@@ -45,7 +47,9 @@ export default defineEventHandler(async () => {
       organic: calcLinearProgression(organicPercentages),
     }
 
-    const scanTimes = dates.map((date) => countsByDate[date]?.createdAt ?? `${date}T00:00:00.000Z`)
+    const scanTimes = dates.map(
+      (date) => countsByDate[date]?.createdAt ?? `${date}T00:00:00.000Z`,
+    )
 
     return {
       results,

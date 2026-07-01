@@ -57,7 +57,9 @@ const heatmapSeries = computed(() => [
 const weekKeys = computed(() =>
   [
     ...new Set(
-      props.timestamps.map((timestamp) => dayjs(timestamp).startOf('isoWeek').format('YYYY-MM-DD')),
+      props.timestamps.map((timestamp) =>
+        dayjs(timestamp).startOf('isoWeek').format('YYYY-MM-DD'),
+      ),
     ),
   ].sort(),
 )
@@ -76,7 +78,9 @@ function createHeatmapDataset(
   timestamps: string[],
   seriesName: string,
 ): VueUiHeatmapDatasetItem[] {
-  const selectedSeries = dataset.find((seriesItem) => seriesItem.name === seriesName)
+  const selectedSeries = dataset.find(
+    (seriesItem) => seriesItem.name === seriesName,
+  )
 
   if (!selectedSeries) {
     return daysOfWeek.map((dayName) => ({
@@ -102,7 +106,9 @@ function createHeatmapDataset(
 
   return daysOfWeek.map((dayName, dayIndex) => ({
     name: dayName,
-    values: weekKeys.value.map((weekKey) => valuesByWeekAndDay.get(weekKey)?.[dayIndex] ?? 0),
+    values: weekKeys.value.map(
+      (weekKey) => valuesByWeekAndDay.get(weekKey)?.[dayIndex] ?? 0,
+    ),
   }))
 }
 
@@ -168,7 +174,11 @@ const heatmaps = computed(() =>
   heatmapSeries.value.map((seriesItem) => ({
     name: seriesItem.name,
     color: seriesItem.color,
-    dataset: createHeatmapDataset(props.data, props.timestamps, seriesItem.name),
+    dataset: createHeatmapDataset(
+      props.data,
+      props.timestamps,
+      seriesItem.name,
+    ),
     config: createHeatmapConfig(seriesItem.color!),
   })),
 )
@@ -188,7 +198,9 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 </script>
 
 <template>
-  <div class="flex flex-col px-12 md:flex-row md:px-0 items-center gap-6 w-full">
+  <div
+    class="flex flex-col px-12 md:flex-row md:px-0 items-center gap-6 w-full"
+  >
     <ClientOnly>
       <VueUiHeatmap
         v-for="heatmap in heatmaps"

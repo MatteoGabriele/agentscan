@@ -52,7 +52,9 @@ const fastestConnection = computed(() => {
       best = conn
     }
   }
-  return best && minDelta < FAST_THRESHOLD_SECONDS ? { conn: best, delta: minDelta } : null
+  return best && minDelta < FAST_THRESHOLD_SECONDS
+    ? { conn: best, delta: minDelta }
+    : null
 })
 
 const fastestEventPair = computed(() => {
@@ -97,12 +99,16 @@ const visibleConnections = computed(() => {
 })
 
 const visibleSortedEvents = computed(() => {
-  return showAllEvidence.value ? sortedEvents.value : sortedEvents.value.slice(0, PREVIEW_COUNT)
+  return showAllEvidence.value
+    ? sortedEvents.value
+    : sortedEvents.value.slice(0, PREVIEW_COUNT)
 })
 
 const hiddenCount = computed(() => {
   if (hasConnections.value) {
-    return (props.flag.connections?.length ?? 0) - visibleConnections.value.length
+    return (
+      (props.flag.connections?.length ?? 0) - visibleConnections.value.length
+    )
   }
 
   return sortedEvents.value.length - visibleSortedEvents.value.length
@@ -185,7 +191,10 @@ const hiddenCount = computed(() => {
           <!-- from event -->
           <div class="flex gap-3">
             <div class="flex flex-col items-center shrink-0">
-              <span :class="getEventIcon(conn.from)" class="text-xs text-gh-muted" />
+              <span
+                :class="getEventIcon(conn.from)"
+                class="text-xs text-gh-muted"
+              />
               <!-- vertical connector line -->
               <div class="w-px flex-1 bg-gh-border-light/40 my-1" />
             </div>
@@ -215,7 +224,10 @@ const hiddenCount = computed(() => {
 
           <!-- to event -->
           <div class="flex gap-3">
-            <span :class="getEventIcon(conn.to)" class="text-xs text-gh-muted shrink-0" />
+            <span
+              :class="getEventIcon(conn.to)"
+              class="text-xs text-gh-muted shrink-0"
+            />
             <div class="min-w-0">
               <a
                 v-if="getEventUrl(conn.to)"
@@ -255,14 +267,20 @@ const hiddenCount = computed(() => {
     <template v-else-if="isMixedTypes">
       <!-- fastest event pair callout -->
 
-      <AnalysisFlagEvidenceFast v-if="fastestEventPair" :time="formatSpan(fastestEventPair.delta)">
+      <AnalysisFlagEvidenceFast
+        v-if="fastestEventPair"
+        :time="formatSpan(fastestEventPair.delta)"
+      >
         <div class="space-y-1">
           <div
             v-for="ev in [fastestEventPair.a, fastestEventPair.b]"
             :key="ev.id"
             class="flex gap-2.5"
           >
-            <span :class="getEventIcon(ev)" class="text-xs text-gh-muted shrink-0 mt-0.5" />
+            <span
+              :class="getEventIcon(ev)"
+              class="text-xs text-gh-muted shrink-0 mt-0.5"
+            />
             <div class="min-w-0">
               <a
                 v-if="getEventUrl(ev)"
@@ -277,9 +295,12 @@ const hiddenCount = computed(() => {
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">{{ getEventDescription(ev) }}</p>
+              <p v-else class="text-sm text-gh-text">
+                {{ getEventDescription(ev) }}
+              </p>
               <p class="text-xs text-gh-muted">
-                {{ formatEventTime(ev.created_at) }} · {{ ev.repo?.name?.split('/')[1] }}
+                {{ formatEventTime(ev.created_at) }} ·
+                {{ ev.repo?.name?.split('/')[1] }}
               </p>
             </div>
           </div>
@@ -288,8 +309,15 @@ const hiddenCount = computed(() => {
 
       <div class="rounded-lg border border-gh-border-light/30 overflow-hidden">
         <div class="divide-y divide-gh-border-light/15">
-          <div v-for="(ev, i) in visibleSortedEvents" :key="i" class="flex gap-2.5 px-3 py-2">
-            <span :class="getEventIcon(ev)" class="text-xs text-gh-muted shrink-0 mt-0.5" />
+          <div
+            v-for="(ev, i) in visibleSortedEvents"
+            :key="i"
+            class="flex gap-2.5 px-3 py-2"
+          >
+            <span
+              :class="getEventIcon(ev)"
+              class="text-xs text-gh-muted shrink-0 mt-0.5"
+            />
             <div class="min-w-0 flex-1">
               <a
                 v-if="getEventUrl(ev)"
@@ -308,7 +336,8 @@ const hiddenCount = computed(() => {
                 {{ getEventDescription(ev) }}
               </p>
               <p class="text-xs text-gh-muted">
-                {{ formatEventTime(ev.created_at) }} · {{ ev.repo?.name?.split('/')[1] }}
+                {{ formatEventTime(ev.created_at) }} ·
+                {{ ev.repo?.name?.split('/')[1] }}
               </p>
             </div>
           </div>
@@ -326,14 +355,20 @@ const hiddenCount = computed(() => {
 
     <!-- ── ORIGINAL icon+sticky list (single event type) ── -->
     <template v-else>
-      <AnalysisFlagEvidenceFast v-if="fastestEventPair" :time="formatSpan(fastestEventPair.delta)">
+      <AnalysisFlagEvidenceFast
+        v-if="fastestEventPair"
+        :time="formatSpan(fastestEventPair.delta)"
+      >
         <div class="space-y-1">
           <div
             v-for="ev in [fastestEventPair.a, fastestEventPair.b]"
             :key="ev.id"
             class="flex gap-2"
           >
-            <span :class="getEventIcon(ev)" class="text-xs text-gh-muted shrink-0 mt-0.5" />
+            <span
+              :class="getEventIcon(ev)"
+              class="text-xs text-gh-muted shrink-0 mt-0.5"
+            />
             <div class="flex-1 flex flex-col gap-0.5">
               <a
                 v-if="getEventUrl(ev)"
@@ -348,7 +383,9 @@ const hiddenCount = computed(() => {
                   style="font-size: 0.6rem"
                 />
               </a>
-              <span v-else class="text-gh-text text-sm">{{ getEventDescription(ev) }}</span>
+              <span v-else class="text-gh-text text-sm">{{
+                getEventDescription(ev)
+              }}</span>
               <div class="flex gap-2 text-gh-muted text-xs">
                 <span>{{ formatEventTime(ev.created_at) }}</span>
                 <span>{{ ev.repo?.name }}</span>
@@ -368,7 +405,11 @@ const hiddenCount = computed(() => {
           class="text-xs text-gh-muted shrink-0 sticky top-4 self-start mt-1"
         />
         <div class="flex-1 space-y-3">
-          <div v-for="(ev, j) in group.events" :key="j" class="flex flex-col gap-0.5">
+          <div
+            v-for="(ev, j) in group.events"
+            :key="j"
+            class="flex flex-col gap-0.5"
+          >
             <a
               v-if="getEventUrl(ev)"
               :href="getEventUrl(ev)"

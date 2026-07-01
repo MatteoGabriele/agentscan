@@ -26,7 +26,10 @@ export function formatTrend(value: number = 0) {
 
 export function getHealthStats(
   data: EcosystemHealthItem[] = [],
-): Record<IdentityClassification, { count: number; percentage: string }> | null {
+): Record<
+  IdentityClassification,
+  { count: number; percentage: string }
+> | null {
   if (!data.length) {
     return null
   }

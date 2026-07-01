@@ -54,7 +54,10 @@ const { scoreStyle } = useScoreStyle(
 <template>
   <li class="p-4 rounded-lg bg-gh-card border border-gh-border/50">
     <div class="flex items-center gap-4">
-      <div v-if="user.avatar_url" class="size-12 rounded-full overflow-hidden bg-gh-card shrink-0">
+      <div
+        v-if="user.avatar_url"
+        class="size-12 rounded-full overflow-hidden bg-gh-card shrink-0"
+      >
         <img :src="user.avatar_url" :alt="`Avatar of ${user.login}`" />
       </div>
 
@@ -74,7 +77,9 @@ const { scoreStyle } = useScoreStyle(
 
       <span class="flex items-center gap-1.5 shrink-0" :class="scoreStyle.text">
         <span :class="classificationIcon" class="text-base shrink-0" />
-        <p class="text-sm font-mono line-height-none">{{ classificationLabel }}</p>
+        <p class="text-sm font-mono line-height-none">
+          {{ classificationLabel }}
+        </p>
       </span>
     </div>
 

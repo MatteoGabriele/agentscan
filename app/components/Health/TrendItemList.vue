@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { IdentityClassification } from '@unveil/identity'
 
-type ClassificationStats = Record<IdentityClassification, { count: number; percentage: string }>
+type ClassificationStats = Record<
+  IdentityClassification,
+  { count: number; percentage: string }
+>
 
 const { data: ecosystemHealth } = await useEcosystemHealth()
 const data = computed(() => ecosystemHealth.value?.results)

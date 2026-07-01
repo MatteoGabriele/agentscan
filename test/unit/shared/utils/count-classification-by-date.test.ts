@@ -12,7 +12,10 @@ import {
 } from '../../../../shared/utils/count-classification-by-date'
 import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
 
-function createEcosystemHealthItem(created_at: string, score: number): EcosystemHealthItem {
+function createEcosystemHealthItem(
+  created_at: string,
+  score: number,
+): EcosystemHealthItem {
   return {
     created_at,
     score,
@@ -636,7 +639,10 @@ describe('getWeeklyClassification', () => {
   ]
 
   it('uses a rolling 7 day window by default', () => {
-    const result = getWeeklyClassification(rollingWindowData, '2026-06-18T18:30:00.000Z')
+    const result = getWeeklyClassification(
+      rollingWindowData,
+      '2026-06-18T18:30:00.000Z',
+    )
 
     expectClassificationCounts(result, {
       organic: {
@@ -663,7 +669,11 @@ describe('getWeeklyClassification', () => {
   })
 
   it('uses a rolling 7 day window when rolling is true', () => {
-    const result = getWeeklyClassification(rollingWindowData, '2026-06-18T18:30:00.000Z', true)
+    const result = getWeeklyClassification(
+      rollingWindowData,
+      '2026-06-18T18:30:00.000Z',
+      true,
+    )
 
     expectClassificationCounts(result, {
       organic: {

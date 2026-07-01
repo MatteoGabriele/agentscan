@@ -4,7 +4,11 @@ import type { ResponseHeaders } from '@octokit/types'
 
 type RequestOptions = { method: string; url: string }
 
-function trackGithubRequest(options: RequestOptions, headers: ResponseHeaders, status: number) {
+function trackGithubRequest(
+  options: RequestOptions,
+  headers: ResponseHeaders,
+  status: number,
+) {
   return trackServerEvent('github_api_request', {
     endpoint: `${options.method} ${options.url}`,
     status,
@@ -20,7 +24,11 @@ export const TrackedOctokit = Octokit.plugin((octokit) => {
 
   octokit.hook.error('request', (error, options) => {
     const requestError = error as RequestError
-    trackGithubRequest(options, requestError.response?.headers ?? {}, requestError.status ?? 0)
+    trackGithubRequest(
+      options,
+      requestError.response?.headers ?? {},
+      requestError.status ?? 0,
+    )
     throw error
   })
 })

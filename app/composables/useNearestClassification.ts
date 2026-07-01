@@ -9,31 +9,33 @@ const CLASSIFICATION_PROXIMITY_THRESHOLD = 15
 export function useNearestClassification(
   score: MaybeRefOrGetter<number | undefined>,
 ): UseNearestClassificationReturn {
-  const nearestClassification = computed<IdentityClassification | undefined>(() => {
-    const scoreValue = toValue(score)
+  const nearestClassification = computed<IdentityClassification | undefined>(
+    () => {
+      const scoreValue = toValue(score)
 
-    if (scoreValue === undefined) {
-      return
-    }
-
-    if (scoreValue >= identityConfig.THRESHOLD_HUMAN) {
-      const dist = scoreValue - identityConfig.THRESHOLD_HUMAN
-
-      if (dist <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-        return 'mixed'
+      if (scoreValue === undefined) {
+        return
       }
 
-      return
-    }
+      if (scoreValue >= identityConfig.THRESHOLD_HUMAN) {
+        const dist = scoreValue - identityConfig.THRESHOLD_HUMAN
 
-    if (scoreValue >= identityConfig.THRESHOLD_SUSPICIOUS) {
-      const dist = scoreValue - identityConfig.THRESHOLD_SUSPICIOUS
+        if (dist <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
+          return 'mixed'
+        }
 
-      if (dist <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
-        return 'automation'
+        return
       }
-    }
-  })
+
+      if (scoreValue >= identityConfig.THRESHOLD_SUSPICIOUS) {
+        const dist = scoreValue - identityConfig.THRESHOLD_SUSPICIOUS
+
+        if (dist <= CLASSIFICATION_PROXIMITY_THRESHOLD) {
+          return 'automation'
+        }
+      }
+    },
+  )
 
   return {
     nearestClassification,

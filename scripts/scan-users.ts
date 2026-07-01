@@ -56,7 +56,9 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
 function loadVerifiedAutomations(): Set<number> {
   const filePath = join(process.cwd(), 'data', 'verified-automations-list.json')
   try {
-    const data: VerifiedAutomation[] = JSON.parse(readFileSync(filePath, 'utf-8'))
+    const data: VerifiedAutomation[] = JSON.parse(
+      readFileSync(filePath, 'utf-8'),
+    )
     return new Set(data.map((item) => item.id))
   } catch {
     return new Set()
@@ -112,7 +114,10 @@ async function scanUser(
   }
 }
 
-async function searchUsers(octokit: Octokit, prsPerRepo: number = PR_SCAN_AMOUNT) {
+async function searchUsers(
+  octokit: Octokit,
+  prsPerRepo: number = PR_SCAN_AMOUNT,
+) {
   const users: Array<{
     id: number
     login: string
@@ -171,7 +176,9 @@ async function searchUsers(octokit: Octokit, prsPerRepo: number = PR_SCAN_AMOUNT
       prsFromThisRepo++
       console.log(`  ${repoFullName}: ${prsFromThisRepo}/${prsPerRepo}`)
 
-      await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS))
+      await new Promise((resolve) =>
+        setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
+      )
     }
 
     if (prsFromThisRepo < prsPerRepo) {
@@ -207,7 +214,9 @@ export async function main(options: ScanOptions = {}) {
   const repoScores: Map<string, number> = new Map()
 
   for (const user of users) {
-    console.log(`Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`)
+    console.log(
+      `Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`,
+    )
 
     const scanData = await withRetry(
       () => scanUser(user.login, user.created_at, user.public_repos),
@@ -244,7 +253,9 @@ export async function main(options: ScanOptions = {}) {
   // Only reached if every repo and every user scan succeeded
   saveScanResults(scanResults, dryRun)
 
-  const sortedRepos = Array.from(repoScores.entries()).sort((a, b) => b[1] - a[1])
+  const sortedRepos = Array.from(repoScores.entries()).sort(
+    (a, b) => b[1] - a[1],
+  )
   for (const [repo, totalScore] of sortedRepos) {
     console.log(`${repo}: ${totalScore.toFixed(2)}`)
   }

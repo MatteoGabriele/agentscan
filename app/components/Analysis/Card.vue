@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { GitHubUser, IdentityClassification, IdentifyResult } from '@unveil/identity'
+import type {
+  GitHubUser,
+  IdentityClassification,
+  IdentifyResult,
+} from '@unveil/identity'
 import dayjs from 'dayjs'
 
 const props = defineProps<{
@@ -9,17 +13,20 @@ const props = defineProps<{
 const username = computed<string | undefined | null>(() => props.user.login)
 
 const analysisKey = computed<string>(() => `analysis:${username.value}`)
-const { data, status, error } = useFetch(() => `/api/identify-replicant/${username.value}`, {
-  query: {
-    created_at: props.user.created_at,
-    repos_count: props.user.public_repos,
-    pages: 3,
-    show_events: true,
+const { data, status, error } = useFetch(
+  () => `/api/identify-replicant/${username.value}`,
+  {
+    query: {
+      created_at: props.user.created_at,
+      repos_count: props.user.public_repos,
+      pages: 3,
+      show_events: true,
+    },
+    key: analysisKey,
+    watch: [username],
+    lazy: true,
   },
-  key: analysisKey,
-  watch: [username],
-  lazy: true,
-})
+)
 
 const { data: verifiedAutomations } = useVerifiedAutomations()
 
@@ -129,7 +136,10 @@ useSeoAnalysis(identifyAnalysis, {
         <header class="flex items-center justify-between mb-2">
           <div class="w-full">
             <div class="mb-2 flex flex-col">
-              <div v-if="warnings.length" class="flex items-start gap-2 text-sm text-gh-muted mb-2">
+              <div
+                v-if="warnings.length"
+                class="flex items-start gap-2 text-sm text-gh-muted mb-2"
+              >
                 <span class="i-lucide:megaphone text-xs shrink-0"></span>
                 <ul class="flex flex-col gap-1">
                   <li
@@ -181,8 +191,13 @@ useSeoAnalysis(identifyAnalysis, {
           </p>
         </div>
 
-        <section v-if="verifiedAutomation" class="mt-4 pt-4 border-t border-gh-border-light/40">
-          <p class="flex gap-2 items-center mb-2 text-gh-muted font-mono text-base">
+        <section
+          v-if="verifiedAutomation"
+          class="mt-4 pt-4 border-t border-gh-border-light/40"
+        >
+          <p
+            class="flex gap-2 items-center mb-2 text-gh-muted font-mono text-base"
+          >
             Community reported
           </p>
           <p class="text-gh-text text-sm mb-2">
@@ -205,7 +220,12 @@ useSeoAnalysis(identifyAnalysis, {
           <p class="text-gh-muted text-sm">
             Know something about this account? Help the community.
           </p>
-          <NuxtLink :to="flagAccountUrl" target="_blank" external class="underline inline text-xs">
+          <NuxtLink
+            :to="flagAccountUrl"
+            target="_blank"
+            external
+            class="underline inline text-xs"
+          >
             Add report
           </NuxtLink>
         </section>
@@ -226,8 +246,9 @@ useSeoAnalysis(identifyAnalysis, {
     <p
       class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
     >
-      Results are based on pattern analysis and should be interpreted as possible signals, not
-      conclusions. Always verify findings with additional context.
+      Results are based on pattern analysis and should be interpreted as
+      possible signals, not conclusions. Always verify findings with additional
+      context.
     </p>
   </template>
 </template>

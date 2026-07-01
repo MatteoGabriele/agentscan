@@ -127,7 +127,9 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
                   <circle :cx="1" :cy="1" :r="1" :fill="item.color" />
                 </svg>
               </div>
-              <div :class="`text-gh-muted text-sm ${item.isSegregated ? 'line-through' : ''}`">
+              <div
+                :class="`text-gh-muted text-sm ${item.isSegregated ? 'line-through' : ''}`"
+              >
                 {{ item.name }}
               </div>
             </button>

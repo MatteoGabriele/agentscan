@@ -8,23 +8,25 @@ export default defineEventHandler(async () => {
     const { data: app } = await octokit.rest.repos.listContributors({
       owner: 'MatteoGabriele',
       repo: 'agentscan',
-      page_page: 30,
+      per_page: 30,
     })
 
     const { data: action } = await octokit.rest.repos.listContributors({
       owner: 'MatteoGabriele',
       repo: 'agentscan-action',
-      page_page: 30,
+      per_page: 30,
     })
 
     const { data: core } = await octokit.rest.repos.listContributors({
       owner: 'unveil-project',
       repo: 'identity',
-      page_page: 30,
+      per_page: 30,
     })
 
     const contributors = [
-      ...new Map([...core, ...app, ...action].map((account) => [account.login, account])).values(),
+      ...new Map(
+        [...core, ...app, ...action].map((account) => [account.login, account]),
+      ).values(),
     ]
 
     return contributors

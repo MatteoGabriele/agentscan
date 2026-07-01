@@ -39,7 +39,10 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <div v-if="isMenuOpen" class="flex items-center flex-col gap-6 justify-center h-full">
+    <div
+      v-if="isMenuOpen"
+      class="flex items-center flex-col gap-6 justify-center h-full"
+    >
       <ul class="flex flex-col items-center gap-4">
         <li>
           <MainMenuItem class="text-xl" to="/" label="Search" />
@@ -48,9 +51,15 @@ onBeforeUnmount(() => {
           <MainMenuItem class="text-xl" to="/health" label="Ecosystem health" />
         </li>
         <li><MainMenuItem class="text-xl" to="/lab" label="The lab" /></li>
-        <li><MainMenuItem class="text-xl" to="/scan" label="Repository scan" /></li>
         <li>
-          <MainMenuItem class="text-xl" to="/automations" label="Community reports" />
+          <MainMenuItem class="text-xl" to="/scan" label="Repository scan" />
+        </li>
+        <li>
+          <MainMenuItem
+            class="text-xl"
+            to="/automations"
+            label="Community reports"
+          />
         </li>
       </ul>
 

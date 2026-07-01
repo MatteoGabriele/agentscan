@@ -59,14 +59,16 @@ async function handleSubmit(value: string) {
 
   <div v-else-if="error" class="text-center py-12 text-gh-muted">
     <p v-if="error.status === 404" class="text-sm">
-      Repository <span class="text-gh-text font-medium">{{ repo }}</span> was not found. Check the
-      name and try again.
+      Repository <span class="text-gh-text font-medium">{{ repo }}</span> was
+      not found. Check the name and try again.
     </p>
     <p v-else class="text-sm">{{ error.message }}</p>
   </div>
 
   <div v-else-if="data">
-    <div class="flex items-baseline justify-between mb-2 ml-6 text-sm text-gh-muted">
+    <div
+      class="flex items-baseline justify-between mb-2 ml-6 text-sm text-gh-muted"
+    >
       <p>
         {{ data.authors.length }} unique authors with open PRs in
         <NuxtLink
@@ -93,8 +95,9 @@ async function handleSubmit(value: string) {
     <p
       class="mt-8 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
     >
-      Results are based on pattern analysis and should be interpreted as possible signals, not
-      conclusions. Always verify findings with additional context.
+      Results are based on pattern analysis and should be interpreted as
+      possible signals, not conclusions. Always verify findings with additional
+      context.
     </p>
   </div>
 </template>

@@ -17,7 +17,11 @@ export type ClassificationStats = {
 
 type getClassificationStatsByDateResults = Record<string, ClassificationStats>
 
-export const CLASSIFICATION_CATEGORIES = ['organic', 'mixed', 'automation'] as const
+export const CLASSIFICATION_CATEGORIES = [
+  'organic',
+  'mixed',
+  'automation',
+] as const
 
 type CategoryPercentageComparison = {
   category: IdentityClassification
@@ -32,7 +36,10 @@ type CategoryPercentageComparison = {
   percentagePointDifference: number | null
 }
 
-type CategoryPercentageComparisons = Record<IdentityClassification, CategoryPercentageComparison>
+type CategoryPercentageComparisons = Record<
+  IdentityClassification,
+  CategoryPercentageComparison
+>
 
 function getDateKey(date: string): string {
   return new Date(date).toISOString().slice(0, 10)
@@ -53,7 +60,9 @@ export function getClassificationStatsByDate(
 ): getClassificationStatsByDateResults {
   const result: getClassificationStatsByDateResults = {}
 
-  const dates = [...new Set(data.map((item) => getDateKey(item.created_at)))].sort()
+  const dates = [
+    ...new Set(data.map((item) => getDateKey(item.created_at))),
+  ].sort()
 
   dates.forEach((date) => {
     result[date] = createEmptyClassificationStats()
@@ -79,23 +88,34 @@ export function getClassificationStatsByDate(
       dateCounts.automation.count += 1
     }
     dateCounts.total.count =
-      dateCounts.automation.count + dateCounts.mixed.count + dateCounts.organic.count
+      dateCounts.automation.count +
+      dateCounts.mixed.count +
+      dateCounts.organic.count
 
     dateCounts.automation.percentage = round(
       (dateCounts.automation.count / dateCounts.total.count) * 100,
     )
-    dateCounts.mixed.percentage = round((dateCounts.mixed.count / dateCounts.total.count) * 100)
-    dateCounts.organic.percentage = round((dateCounts.organic.count / dateCounts.total.count) * 100)
+    dateCounts.mixed.percentage = round(
+      (dateCounts.mixed.count / dateCounts.total.count) * 100,
+    )
+    dateCounts.organic.percentage = round(
+      (dateCounts.organic.count / dateCounts.total.count) * 100,
+    )
   })
 
   return result
 }
 
-function getTotalClassificationCount(counts: ClassificationStats | undefined): number | null {
+function getTotalClassificationCount(
+  counts: ClassificationStats | undefined,
+): number | null {
   if (!counts) {
     return null
   }
-  return CLASSIFICATION_CATEGORIES.reduce((total, category) => total + counts[category].count, 0)
+  return CLASSIFICATION_CATEGORIES.reduce(
+    (total, category) => total + counts[category].count,
+    0,
+  )
 }
 
 function getCategoryPercentage(
@@ -146,7 +166,9 @@ function getCategoryPercentageComparison({
   }
 }
 
-export function getCategoryDeltas(results: EcosystemHealthItem[]): CategoryPercentageComparisons {
+export function getCategoryDeltas(
+  results: EcosystemHealthItem[],
+): CategoryPercentageComparisons {
   const countsByDate = getClassificationStatsByDate(results)
   const dates = Object.keys(countsByDate).sort()
   const previousDate = dates.at(-2)
@@ -176,19 +198,29 @@ function getPreviousDays({
 
   return new Set(
     Array.from({ length }, (_, dayOffset) => {
-      const currentDate = new Date(endDate.getTime() - (dayOffset + offset) * millisecondsPerDay)
+      const currentDate = new Date(
+        endDate.getTime() - (dayOffset + offset) * millisecondsPerDay,
+      )
 
       return getDateKey(currentDate.toISOString())
     }),
   )
 }
 
-function getNextDays({ date, length }: { date: string; length: number }): Set<string> {
+function getNextDays({
+  date,
+  length,
+}: {
+  date: string
+  length: number
+}): Set<string> {
   const millisecondsPerDay = 24 * 60 * 60 * 1000
   const startDate = new Date(`${getDateKey(date)}T00:00:00.000Z`)
   return new Set(
     Array.from({ length }, (_, dayOffset) => {
-      const currentDate = new Date(startDate.getTime() + dayOffset * millisecondsPerDay)
+      const currentDate = new Date(
+        startDate.getTime() + dayOffset * millisecondsPerDay,
+      )
       return getDateKey(currentDate.toISOString())
     }),
   )
@@ -199,7 +231,9 @@ function getMondayDateKey(date: string): string {
   const currentDate = new Date(`${getDateKey(date)}T00:00:00.000Z`)
   const dayOfWeek = currentDate.getUTCDay()
   const daysSinceMonday = (dayOfWeek + 6) % 7
-  const monday = new Date(currentDate.getTime() - daysSinceMonday * millisecondsPerDay)
+  const monday = new Date(
+    currentDate.getTime() - daysSinceMonday * millisecondsPerDay,
+  )
 
   return getDateKey(monday.toISOString())
 }
@@ -207,7 +241,9 @@ function getMondayDateKey(date: string): string {
 function getPreviousMondayDateKey(date: string): string {
   const millisecondsPerDay = 24 * 60 * 60 * 1000
   const monday = new Date(`${getMondayDateKey(date)}T00:00:00.000Z`)
-  return getDateKey(new Date(monday.getTime() - 7 * millisecondsPerDay).toISOString())
+  return getDateKey(
+    new Date(monday.getTime() - 7 * millisecondsPerDay).toISOString(),
+  )
 }
 
 function applyClassificationCountTrends({
@@ -217,14 +253,17 @@ function applyClassificationCountTrends({
   currentCounts: ClassificationStats
   previousCounts: ClassificationStats
 }): ClassificationStats {
-  const currentCountsWithPercentages = applyClassificationPercentages(currentCounts)
-  const previousCountsWithPercentages = applyClassificationPercentages(previousCounts)
+  const currentCountsWithPercentages =
+    applyClassificationPercentages(currentCounts)
+  const previousCountsWithPercentages =
+    applyClassificationPercentages(previousCounts)
 
   CLASSIFICATION_CATEGORIES.forEach((category) => {
-    currentCountsWithPercentages[category].trend = getClassificationPercentageTrend({
-      currentPercentage: currentCountsWithPercentages[category].percentage,
-      previousPercentage: previousCountsWithPercentages[category].percentage,
-    })
+    currentCountsWithPercentages[category].trend =
+      getClassificationPercentageTrend({
+        currentPercentage: currentCountsWithPercentages[category].percentage,
+        previousPercentage: previousCountsWithPercentages[category].percentage,
+      })
   })
 
   return currentCountsWithPercentages
@@ -254,7 +293,9 @@ function sumClassificationCountsByDates({
   return applyClassificationPercentages(result)
 }
 
-function applyClassificationPercentages(counts: ClassificationStats): ClassificationStats {
+function applyClassificationPercentages(
+  counts: ClassificationStats,
+): ClassificationStats {
   const total = CLASSIFICATION_CATEGORIES.reduce((total, category) => {
     return total + counts[category].count
   }, 0)
@@ -263,7 +304,8 @@ function applyClassificationPercentages(counts: ClassificationStats): Classifica
   counts.total.percentage = total === 0 ? 0 : 100
 
   CLASSIFICATION_CATEGORIES.forEach((category) => {
-    counts[category].percentage = total === 0 ? 0 : round((counts[category].count / total) * 100)
+    counts[category].percentage =
+      total === 0 ? 0 : round((counts[category].count / total) * 100)
   })
 
   return counts
@@ -280,7 +322,10 @@ function getClassificationPercentageTrend({
     return currentPercentage === 0 ? 0 : 100
   }
 
-  return round(((currentPercentage - previousPercentage) / previousPercentage) * 100, 1)
+  return round(
+    ((currentPercentage - previousPercentage) / previousPercentage) * 100,
+    1,
+  )
 }
 
 export function getClassificationForPreviousDays({
@@ -377,7 +422,9 @@ function getSundayDateKey(date: string): string {
   const millisecondsPerDay = 24 * 60 * 60 * 1000
   const monday = new Date(`${getMondayDateKey(date)}T00:00:00.000Z`)
 
-  return getDateKey(new Date(monday.getTime() + 6 * millisecondsPerDay).toISOString())
+  return getDateKey(
+    new Date(monday.getTime() + 6 * millisecondsPerDay).toISOString(),
+  )
 }
 
 function getCalendarWeekStartDates(dates: string[]): string[] {
@@ -443,24 +490,30 @@ export function getClassificationByDateChunks({
 
   const sortedDates = [...dates].sort()
 
-  return Array.from({ length: Math.ceil(sortedDates.length / days) }, (_, chunkIndex) => {
-    const chunk = sortedDates.slice(chunkIndex * days, chunkIndex * days + days)
-    const startDate = chunk.at(0)
-    const endDate = chunk.at(-1)
+  return Array.from(
+    { length: Math.ceil(sortedDates.length / days) },
+    (_, chunkIndex) => {
+      const chunk = sortedDates.slice(
+        chunkIndex * days,
+        chunkIndex * days + days,
+      )
+      const startDate = chunk.at(0)
+      const endDate = chunk.at(-1)
 
-    if (!startDate || !endDate) {
-      return null
-    }
+      if (!startDate || !endDate) {
+        return null
+      }
 
-    return {
-      startDate,
-      endDate,
-      days: chunk.length,
-      classification: getClassificationForPreviousDays({
-        data,
-        date: endDate,
+      return {
+        startDate,
+        endDate,
         days: chunk.length,
-      }),
-    }
-  }).filter((chunk): chunk is ClassificationChunk => Boolean(chunk))
+        classification: getClassificationForPreviousDays({
+          data,
+          date: endDate,
+          days: chunk.length,
+        }),
+      }
+    },
+  ).filter((chunk): chunk is ClassificationChunk => Boolean(chunk))
 }

@@ -9,7 +9,11 @@ import {
 } from 'vue'
 import { usePreferredDark } from '@vueuse/core'
 
-type CssVariableSource = HTMLElement | null | undefined | Ref<HTMLElement | null | undefined>
+type CssVariableSource =
+  | HTMLElement
+  | null
+  | undefined
+  | Ref<HTMLElement | null | undefined>
 
 type UseCssVariableOptions = {
   element?: CssVariableSource
@@ -20,7 +24,9 @@ function readCssVariable(element: HTMLElement, variableName: string): string {
 }
 
 function toCamelCase(cssVariable: string): string {
-  return cssVariable.replace(/^--/, '').replace(/-([a-z0-9])/gi, (_, c) => c.toUpperCase())
+  return cssVariable
+    .replace(/^--/, '')
+    .replace(/-([a-z0-9])/gi, (_, c) => c.toUpperCase())
 }
 
 function resolveElement(element?: CssVariableSource): HTMLElement | null {
@@ -72,7 +78,9 @@ export function useCssVariables(
   return { colors }
 }
 
-export function useColors(element: ShallowRef<HTMLElement | null, HTMLElement | null>) {
+export function useColors(
+  element: ShallowRef<HTMLElement | null, HTMLElement | null>,
+) {
   const { colors } = useCssVariables(
     [
       '--bg',

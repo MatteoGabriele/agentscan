@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { formatTrend, getHealthStats } from '../../../../shared/utils/health-stats'
+import {
+  formatTrend,
+  getHealthStats,
+} from '../../../../shared/utils/health-stats'
 import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from '../../mocks/ecosystemHealthItems'
 
 describe('formatTrend', () => {

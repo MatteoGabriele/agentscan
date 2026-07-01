@@ -3,7 +3,11 @@
 <template>
   <header class="h-12 flex justify-between items-center px-4 lg:px-6 py-4">
     <div class="flex-1">
-      <NuxtLink class="flex gap-2 items-center text-gh-text" to="/" aria-label="Homepage">
+      <NuxtLink
+        class="flex gap-2 items-center text-gh-text"
+        to="/"
+        aria-label="Homepage"
+      >
         <MainLogo size="xs" />
         AgentScan
       </NuxtLink>

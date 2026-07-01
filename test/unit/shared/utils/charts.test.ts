@@ -43,13 +43,15 @@ describe('getDayKey', () => {
 
 describe('convertToHorizontalBarDataset', () => {
   it('creates a dataset for the complete ecosystem data source', () => {
-    expect(convertToHorizontalBarDataset(MOCK_ECOSYSTEM_HEALTH_ITEMS)).toHaveLength(
-      EXPECTED_NB_UNIQUE_REPOS,
-    )
+    expect(
+      convertToHorizontalBarDataset(MOCK_ECOSYSTEM_HEALTH_ITEMS),
+    ).toHaveLength(EXPECTED_NB_UNIQUE_REPOS)
   })
 
   it('creates a filtered dataset for a given date', () => {
-    expect(convertToHorizontalBarDataset(MOCK_ECOSYSTEM_HEALTH_ITEMS, '2026-05-25')).toHaveLength(1)
+    expect(
+      convertToHorizontalBarDataset(MOCK_ECOSYSTEM_HEALTH_ITEMS, '2026-05-25'),
+    ).toHaveLength(1)
   })
 
   it('creates a dataset for VueUiHorizontalBar', () => {
@@ -146,7 +148,9 @@ describe('getUniqueDatesFromSource', () => {
 
 describe('getClosedPrPercentageEvolutionByRepo', () => {
   it('generates a dataset for VueUiXy to graph PR closure rate for a given score range', () => {
-    const result = getClosedPrPercentageEvolutionByRepo(MOCK_ECOSYSTEM_HEALTH_ITEMS)
+    const result = getClosedPrPercentageEvolutionByRepo(
+      MOCK_ECOSYSTEM_HEALTH_ITEMS,
+    )
 
     expect(result).toHaveLength(EXPECTED_NB_UNIQUE_REPOS)
     const flatResult = result.flat()
@@ -168,17 +172,25 @@ describe('getClosedPrPercentageEvolutionByRepo', () => {
       )
 
       expect(item.series.every((value) => typeof value === 'number')).toBe(true)
-      expect(item.details.eligiblePrs.every((value: unknown) => typeof value === 'number')).toBe(
-        true,
-      )
-      expect(item.details.closedPrs.every((value: unknown) => typeof value === 'number')).toBe(true)
+      expect(
+        item.details.eligiblePrs.every(
+          (value: unknown) => typeof value === 'number',
+        ),
+      ).toBe(true)
+      expect(
+        item.details.closedPrs.every(
+          (value: unknown) => typeof value === 'number',
+        ),
+      ).toBe(true)
     })
   })
 })
 
 describe('getClosedPrPercentageEvolutionTotal', () => {
   it('generates a VueUiXyDatasetItem for closed PR percentage', () => {
-    const result = getClosedPrPercentageEvolutionTotal(MOCK_ECOSYSTEM_HEALTH_ITEMS)
+    const result = getClosedPrPercentageEvolutionTotal(
+      MOCK_ECOSYSTEM_HEALTH_ITEMS,
+    )
     expect(result).toEqual(
       expect.objectContaining({
         name: 'Automation PR closure rate',
@@ -220,9 +232,27 @@ describe('getClosedPrDelta', () => {
   it('returns closed PR percentage snapshots for the previous and last dates', () => {
     const result = getClosedPrDelta([
       createEcosystemHealthItem(lastDate, 'some/repo', 'pr-1', 'closed', 25),
-      createEcosystemHealthItem(lastDate, 'someother/repo', 'pr-2', 'closed', 25),
-      createEcosystemHealthItem(previousDate, 'some/repo', 'pr-1', 'closed', 25),
-      createEcosystemHealthItem(previousDate, 'someother/repo', 'pr-2', 'open', 25),
+      createEcosystemHealthItem(
+        lastDate,
+        'someother/repo',
+        'pr-2',
+        'closed',
+        25,
+      ),
+      createEcosystemHealthItem(
+        previousDate,
+        'some/repo',
+        'pr-1',
+        'closed',
+        25,
+      ),
+      createEcosystemHealthItem(
+        previousDate,
+        'someother/repo',
+        'pr-2',
+        'open',
+        25,
+      ),
     ])
 
     expect(result).toEqual({
@@ -245,9 +275,27 @@ describe('getClosedPrDelta', () => {
   it('calculates accurate closed PR percentages and point difference', () => {
     const result = getClosedPrDelta([
       createEcosystemHealthItem(lastDate, 'some/repo', 'pr-1', 'closed', 25),
-      createEcosystemHealthItem(lastDate, 'someother/repo', 'pr-2', 'closed', 25),
-      createEcosystemHealthItem(previousDate, 'some/repo', 'pr-1', 'closed', 25),
-      createEcosystemHealthItem(previousDate, 'someother/repo', 'pr-2', 'open', 25),
+      createEcosystemHealthItem(
+        lastDate,
+        'someother/repo',
+        'pr-2',
+        'closed',
+        25,
+      ),
+      createEcosystemHealthItem(
+        previousDate,
+        'some/repo',
+        'pr-1',
+        'closed',
+        25,
+      ),
+      createEcosystemHealthItem(
+        previousDate,
+        'someother/repo',
+        'pr-2',
+        'open',
+        25,
+      ),
     ])
 
     expect(result.previousSnapshot).toEqual({

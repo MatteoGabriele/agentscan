@@ -69,7 +69,11 @@ describe('calcLinearProgression', () => {
   })
 
   it('treats missing values as zero', () => {
-    const result = calcLinearProgression([10, undefined as unknown as number, 30])
+    const result = calcLinearProgression([
+      10,
+      undefined as unknown as number,
+      30,
+    ])
 
     expect(result.x1).toBe(0)
     expect(result.x2).toBe(2)

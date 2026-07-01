@@ -5,7 +5,9 @@ const unveilIdentityVersion = unveilIdentityPackage.version
 </script>
 
 <template>
-  <footer class="border-t border-gh-border bg-gradient-to-b from-transparent to-gh-bg-subtle">
+  <footer
+    class="border-t border-gh-border bg-gradient-to-b from-transparent to-gh-bg-subtle"
+  >
     <div class="max-w-screen-lg mx-auto px-4 py-12">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
@@ -14,7 +16,8 @@ const unveilIdentityVersion = unveilIdentityPackage.version
           <div>
             <h3 class="text-sm font-semibold text-gh-text mb-3">AgentScan</h3>
             <p class="text-xs text-gh-muted/80 leading-relaxed">
-              An experimental tool for analyzing GitHub activity patterns and behavioral signals.
+              An experimental tool for analyzing GitHub activity patterns and
+              behavioral signals.
             </p>
           </div>
         </div>
@@ -23,17 +26,22 @@ const unveilIdentityVersion = unveilIdentityPackage.version
           class="border border-gh-border/50 rounded-lg bg-white/1 p-6 hover:border-gh-border transition-colors"
         >
           <div class="flex-1">
-            <h4 class="text-xs font-semibold text-gh-text mb-3 uppercase tracking-wider">
+            <h4
+              class="text-xs font-semibold text-gh-text mb-3 uppercase tracking-wider"
+            >
               Disclaimer
             </h4>
             <p class="text-xs text-gh-muted/80 leading-relaxed mb-3">
               Results are based on pattern analysis and should be interpreted as
-              <span class="font-medium">possible signals</span>, not conclusions.
+              <span class="font-medium">possible signals</span>, not
+              conclusions.
             </p>
             <p class="text-xs text-gh-muted/70 mb-3">
               Always verify findings with additional context.
             </p>
-            <p class="text-xs text-gh-muted/70">GitHub has no association with this website.</p>
+            <p class="text-xs text-gh-muted/70">
+              GitHub has no association with this website.
+            </p>
           </div>
         </div>
 
@@ -41,7 +49,11 @@ const unveilIdentityVersion = unveilIdentityPackage.version
           class="border border-gh-border/50 rounded-lg bg-white/1 p-6 hover:border-gh-border transition-colors"
         >
           <div class="flex-1">
-            <h4 class="text-xs font-semibold text-gh-text mb-4 uppercase tracking-wider">Links</h4>
+            <h4
+              class="text-xs font-semibold text-gh-text mb-4 uppercase tracking-wider"
+            >
+              Links
+            </h4>
             <ul class="flex flex-col">
               <li>
                 <NuxtLink

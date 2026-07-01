@@ -15,6 +15,10 @@ defineProps<{
       <AnalysisFlagItem v-for="flag in flags" :key="flag.label" :flag="flag" />
     </ul>
 
-    <ExternalAnlysisCard v-if="activityReport" :items="[activityReport]" class="mt-4" />
+    <ExternalAnlysisCard
+      v-if="activityReport"
+      :items="[activityReport]"
+      class="mt-4"
+    />
   </div>
 </template>

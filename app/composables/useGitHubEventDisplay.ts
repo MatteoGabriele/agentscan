@@ -11,7 +11,10 @@ const EVENT_ICONS: [string[], string][] = [
   [['DeleteEvent'], 'i-lucide:trash-2'],
   [['ForkEvent'], 'i-lucide:git-fork'],
   [['WatchEvent'], 'i-lucide:star'],
-  [['IssueCommentEvent', 'PullRequestReviewCommentEvent'], 'i-lucide:message-square'],
+  [
+    ['IssueCommentEvent', 'PullRequestReviewCommentEvent'],
+    'i-lucide:message-square',
+  ],
   [['IssuesEvent'], 'i-lucide:circle-dot'],
   [['PullRequestReviewEvent'], 'i-lucide:eye'],
   [['ReleaseEvent'], 'i-lucide:tag'],
@@ -22,7 +25,8 @@ const EVENT_ICONS: [string[], string][] = [
 export function useGitHubEventDisplay() {
   function getEventIcon(event: GitHubEvent): string {
     return (
-      EVENT_ICONS.find(([types]) => types.includes(event.type ?? ''))?.[1] ?? 'i-lucide:activity'
+      EVENT_ICONS.find(([types]) => types.includes(event.type ?? ''))?.[1] ??
+      'i-lucide:activity'
     )
   }
 
@@ -37,7 +41,10 @@ export function useGitHubEventDisplay() {
           : `Pull request ${action ?? ''}`.trim()
       }
       case 'PushEvent': {
-        const commits = (payload?.size as number) ?? (payload?.commits as unknown[])?.length ?? 0
+        const commits =
+          (payload?.size as number) ??
+          (payload?.commits as unknown[])?.length ??
+          0
         const ref = (payload?.ref as string)?.replace('refs/heads/', '') ?? ''
         return ref
           ? `${commits} commit${commits !== 1 ? 's' : ''} → ${ref}`
@@ -46,12 +53,16 @@ export function useGitHubEventDisplay() {
       case 'CreateEvent': {
         const refType = payload?.ref_type as string | undefined
         const ref = payload?.ref as string | undefined
-        return ref ? `${refType} created: ${ref}` : `${refType ?? 'ref'} created`
+        return ref
+          ? `${refType} created: ${ref}`
+          : `${refType ?? 'ref'} created`
       }
       case 'DeleteEvent': {
         const refType = payload?.ref_type as string | undefined
         const ref = payload?.ref as string | undefined
-        return ref ? `${refType} deleted: ${ref}` : `${refType ?? 'ref'} deleted`
+        return ref
+          ? `${refType} deleted: ${ref}`
+          : `${refType ?? 'ref'} deleted`
       }
       case 'ForkEvent': {
         const forkee = payload?.forkee as { full_name?: string } | undefined
@@ -116,7 +127,9 @@ export function useGitHubEventDisplay() {
           : `${base}/issues/${issue.number}`
       }
       case 'CommitCommentEvent': {
-        const comment = payload?.comment as { commit_id?: string; id?: number } | undefined
+        const comment = payload?.comment as
+          | { commit_id?: string; id?: number }
+          | undefined
         if (!comment?.commit_id) {
           return undefined
         }
@@ -142,11 +155,14 @@ export function useGitHubEventDisplay() {
 
   function sortByTime(evts: GitHubEvent[]): GitHubEvent[] {
     return [...evts].sort(
-      (a, b) => dayjs(a.created_at ?? 0).valueOf() - dayjs(b.created_at ?? 0).valueOf(),
+      (a, b) =>
+        dayjs(a.created_at ?? 0).valueOf() - dayjs(b.created_at ?? 0).valueOf(),
     )
   }
 
-  function getRapidBurst(evts: GitHubEvent[]): { count: number; spanSeconds: number } | null {
+  function getRapidBurst(
+    evts: GitHubEvent[],
+  ): { count: number; spanSeconds: number } | null {
     if (evts.length < 3) {
       return null
     }
@@ -156,7 +172,10 @@ export function useGitHubEventDisplay() {
     if (!first || !last) {
       return null
     }
-    const spanSeconds = dayjs(last.created_at ?? 0).diff(dayjs(first.created_at ?? 0), 'second')
+    const spanSeconds = dayjs(last.created_at ?? 0).diff(
+      dayjs(first.created_at ?? 0),
+      'second',
+    )
     if (spanSeconds / (sorted.length - 1) < 120) {
       return { count: sorted.length, spanSeconds }
     }
@@ -172,7 +191,9 @@ export function useGitHubEventDisplay() {
     return s > 0 ? `${m}m ${s}s` : `${m}m`
   }
 
-  function groupEvents(events: GitHubEvent[]): { icon: string; events: GitHubEvent[] }[] {
+  function groupEvents(
+    events: GitHubEvent[],
+  ): { icon: string; events: GitHubEvent[] }[] {
     const groups: { icon: string; events: GitHubEvent[] }[] = []
     for (const ev of events) {
       const icon = getEventIcon(ev)

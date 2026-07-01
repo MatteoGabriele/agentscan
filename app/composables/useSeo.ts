@@ -1,4 +1,8 @@
-import { getClassificationDetails, type GitHubUser, type IdentifyResult } from '@unveil/identity'
+import {
+  getClassificationDetails,
+  type GitHubUser,
+  type IdentifyResult,
+} from '@unveil/identity'
 
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
   const ogTitle = computed<string | undefined>(() => {

@@ -76,7 +76,9 @@ function loadBountyRepos(): Map<string, BountyRepo> {
 
 function saveBountyRepos(repos: Map<string, BountyRepo>): void {
   const filePath = join(process.cwd(), 'data', 'bounty-repos.json')
-  const sorted = Array.from(repos.values()).sort((a, b) => a.repo.localeCompare(b.repo))
+  const sorted = Array.from(repos.values()).sort((a, b) =>
+    a.repo.localeCompare(b.repo),
+  )
   writeFileSync(filePath, JSON.stringify(sorted, null, 2))
 }
 

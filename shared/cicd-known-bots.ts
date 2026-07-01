@@ -22,5 +22,7 @@ export const knownBots = [
 
 export function isKnownBot(username: string): boolean {
   const lower = username.toLowerCase()
-  return knownBots.some((name) => lower.includes(name)) || lower.endsWith('[bot]')
+  return (
+    knownBots.some((name) => lower.includes(name)) || lower.endsWith('[bot]')
+  )
 }

@@ -63,5 +63,6 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
   },
 ]
 
-export const EXPECTED_NB_UNIQUE_REPOS = new Set(MOCK_ECOSYSTEM_HEALTH_ITEMS.map((s) => s.repo_name))
-  .size
+export const EXPECTED_NB_UNIQUE_REPOS = new Set(
+  MOCK_ECOSYSTEM_HEALTH_ITEMS.map((s) => s.repo_name),
+).size

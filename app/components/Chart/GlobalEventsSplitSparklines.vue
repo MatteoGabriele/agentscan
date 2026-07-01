@@ -65,7 +65,8 @@ const configs = computed(() => {
     const dashIndices = unit.dashIndices
 
     // Ensure we loop through available palette colours when the series count is higher than the available palette
-    const fallbackColor = palette[i] ?? palette[i % palette.length] ?? palette[0]!
+    const fallbackColor =
+      palette[i] ?? palette[i % palette.length] ?? palette[0]!
     const seriesColor = unit.color ?? fallbackColor
 
     return {
@@ -124,7 +125,11 @@ const configs = computed(() => {
 <template>
   <div class="grid gap-8 sm:grid-cols-3 sm:px-16 mb-4">
     <ClientOnly v-for="(config, i) in configs" :key="`config_${i}`">
-      <div class="w-full max-w-[400px] mx-auto" @mouseleave="resetHover" @keydown.esc="resetHover">
+      <div
+        class="w-full max-w-[400px] mx-auto"
+        @mouseleave="resetHover"
+        @keydown.esc="resetHover"
+      >
         <VueUiSparkline
           v-if="datasets[i]"
           :key="`${i}_${step}`"

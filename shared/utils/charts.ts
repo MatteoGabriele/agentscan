@@ -40,7 +40,9 @@ export function convertToHorizontalBarDataset(
 ): VueUiHorizontalBarDatasetItem[] {
   const targetDay = date ? getDayKey(date) : null
 
-  const grouped = source.reduce<Record<string, { total: number; count: number }>>((acc, item) => {
+  const grouped = source.reduce<
+    Record<string, { total: number; count: number }>
+  >((acc, item) => {
     const createdDay = getDayKey(item.created_at)
 
     if (targetDay && createdDay !== targetDay) {
@@ -161,7 +163,9 @@ export function getClosedPrPercentageByRepo(
       repo,
       eligiblePrs,
       closedPrs,
-      percentage: eligiblePrs ? Number(((closedPrs / eligiblePrs) * 100).toFixed(2)) : 100,
+      percentage: eligiblePrs
+        ? Number(((closedPrs / eligiblePrs) * 100).toFixed(2))
+        : 100,
     }
   })
 }
@@ -300,9 +304,15 @@ export function getClosedPrPercentageEvolutionTotal(
       dateKey,
     })
 
-    const totalEligible = results.reduce((sum, result) => sum + result.eligiblePrs, 0)
+    const totalEligible = results.reduce(
+      (sum, result) => sum + result.eligiblePrs,
+      0,
+    )
 
-    const totalClosed = results.reduce((sum, result) => sum + result.closedPrs, 0)
+    const totalClosed = results.reduce(
+      (sum, result) => sum + result.closedPrs,
+      0,
+    )
 
     return totalEligible > 0 ? (totalClosed / totalEligible) * 100 : 100
   })
@@ -361,16 +371,23 @@ export function getClosedPrSnapshot(
     dateKey,
   })
 
-  const eligiblePrs = results.reduce((total, result) => total + result.eligiblePrs, 0)
+  const eligiblePrs = results.reduce(
+    (total, result) => total + result.eligiblePrs,
+    0,
+  )
 
-  const closedPrs = results.reduce((total, result) => total + result.closedPrs, 0)
+  const closedPrs = results.reduce(
+    (total, result) => total + result.closedPrs,
+    0,
+  )
 
   return {
     date: getDayKey(date),
     eligiblePrs,
     closedPrs,
     // no eligible PRs = 100% closure rate
-    percentage: eligiblePrs === 0 ? 100 : Math.round((closedPrs / eligiblePrs) * 100),
+    percentage:
+      eligiblePrs === 0 ? 100 : Math.round((closedPrs / eligiblePrs) * 100),
   }
 }
 
@@ -384,9 +401,19 @@ export function getClosedPrDelta(
   const previousDate = dates.at(-2)
   const lastDate = dates.at(-1)
 
-  const previousSnapshot = getClosedPrSnapshot(source, previousDate, scoreBounds, dateKey)
+  const previousSnapshot = getClosedPrSnapshot(
+    source,
+    previousDate,
+    scoreBounds,
+    dateKey,
+  )
 
-  const lastSnapshot = getClosedPrSnapshot(source, lastDate, scoreBounds, dateKey)
+  const lastSnapshot = getClosedPrSnapshot(
+    source,
+    lastDate,
+    scoreBounds,
+    dateKey,
+  )
 
   return {
     previousSnapshot,
@@ -394,6 +421,8 @@ export function getClosedPrDelta(
     percentagePointDifference:
       previousSnapshot.percentage == null || lastSnapshot.percentage == null
         ? null
-        : Math.round((lastSnapshot.percentage - previousSnapshot.percentage) * 10) / 10,
+        : Math.round(
+            (lastSnapshot.percentage - previousSnapshot.percentage) * 10,
+          ) / 10,
   }
 }

@@ -25,7 +25,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (!config.githubWebhookSecret) {
-    throw createError({ statusCode: 503, message: 'Webhook secret not configured' })
+    throw createError({
+      statusCode: 503,
+      message: 'Webhook secret not configured',
+    })
   }
 
   const webhooks = new Webhooks({
@@ -57,7 +60,8 @@ export default defineEventHandler(async (event) => {
   const isPR = !!payload.pull_request
   const isIssue = !!payload.issue
 
-  const targetNumber: number | undefined = payload.pull_request?.number ?? payload.issue?.number
+  const targetNumber: number | undefined =
+    payload.pull_request?.number ?? payload.issue?.number
   const username: string | undefined =
     payload.pull_request?.user?.login ?? payload.issue?.user?.login
 
@@ -69,7 +73,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 503, message: 'GitHub App not configured' })
   }
 
-  const privateKey = Buffer.from(config.githubAppPrivateKey, 'base64').toString('utf-8')
+  const privateKey = Buffer.from(config.githubAppPrivateKey, 'base64').toString(
+    'utf-8',
+  )
 
   const app = new App({
     appId: config.githubAppId,
@@ -91,7 +97,9 @@ export default defineEventHandler(async (event) => {
       path: '.github/agentscan.yml',
     })
     if ('content' in data) {
-      repoConfig = parseRepoConfig(Buffer.from(data.content, 'base64').toString('utf-8'))
+      repoConfig = parseRepoConfig(
+        Buffer.from(data.content, 'base64').toString('utf-8'),
+      )
     }
   } catch {
     // no config file — use defaults
@@ -113,7 +121,11 @@ export default defineEventHandler(async (event) => {
 
   const responses = await Promise.all(
     Array.from({ length: 3 }, (_, index) =>
-      octokit.rest.activity.listPublicEventsForUser({ username, per_page: 100, page: index + 1 }),
+      octokit.rest.activity.listPublicEventsForUser({
+        username,
+        per_page: 100,
+        page: index + 1,
+      }),
     ),
   )
   const events = responses.flatMap((r) => r.data)
@@ -163,18 +175,24 @@ export default defineEventHandler(async (event) => {
     automation: '❌',
   }
 
-  const indicator = hasCommunityFlag ? '🚩' : statusIndicators[analysis.classification]
+  const indicator = hasCommunityFlag
+    ? '🚩'
+    : statusIndicators[analysis.classification]
   const details = hasCommunityFlag
     ? {
         label: 'Flagged by community',
-        description: 'This account has been flagged as potentially automated by the community.',
+        description:
+          'This account has been flagged as potentially automated by the community.',
       }
     : getClassificationDetails(analysis.classification)
 
   let description = details.description
   if (hasCommunityFlag && repoConfig.messages['community-flagged']) {
     description = repoConfig.messages['community-flagged']
-  } else if (!hasCommunityFlag && repoConfig.messages[analysis.classification]) {
+  } else if (
+    !hasCommunityFlag &&
+    repoConfig.messages[analysis.classification]
+  ) {
     description = repoConfig.messages[analysis.classification]
   }
 
@@ -193,17 +211,29 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (repoConfig.mode === 'full' || repoConfig.mode === 'comment') {
-      const { data: existingComments } = await octokit.rest.issues.listComments({
-        owner,
-        repo,
-        issue_number: targetNumber,
-        per_page: 100,
-      })
+      const { data: existingComments } = await octokit.rest.issues.listComments(
+        {
+          owner,
+          repo,
+          issue_number: targetNumber,
+          per_page: 100,
+        },
+      )
       const existing = existingComments.find((c) => c.body?.includes(MARKER))
       if (existing) {
-        await octokit.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+        await octokit.rest.issues.updateComment({
+          owner,
+          repo,
+          comment_id: existing.id,
+          body,
+        })
       } else {
-        await octokit.rest.issues.createComment({ owner, repo, issue_number: targetNumber, body })
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: targetNumber,
+          body,
+        })
       }
     }
 
@@ -212,7 +242,10 @@ export default defineEventHandler(async (event) => {
       if (hasCommunityFlag) {
         labelsToAdd.push(repoConfig.labels['community-flagged'])
       } else if (analysis.classification !== 'organic') {
-        const labelMap: Record<Exclude<IdentityClassification, 'organic'>, string> = {
+        const labelMap: Record<
+          Exclude<IdentityClassification, 'organic'>,
+          string
+        > = {
           mixed: repoConfig.labels.mixed,
           automation: repoConfig.labels.automation,
         }
@@ -222,9 +255,11 @@ export default defineEventHandler(async (event) => {
       if (labelsToAdd.length > 0) {
         await Promise.all(
           labelsToAdd.map((name) =>
-            octokit.rest.issues.createLabel({ owner, repo, name, color: 'ededed' }).catch(() => {
-              // label already exists or no create permission — continue to addLabels
-            }),
+            octokit.rest.issues
+              .createLabel({ owner, repo, name, color: 'ededed' })
+              .catch(() => {
+                // label already exists or no create permission — continue to addLabels
+              }),
           ),
         )
         await octokit.rest.issues.addLabels({
@@ -236,14 +271,18 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (err: unknown) {
-    if (err instanceof Error && !err.message.includes('Resource not accessible')) {
+    if (
+      err instanceof Error &&
+      !err.message.includes('Resource not accessible')
+    ) {
       throw err
     }
   }
 
   if (repoConfig['auto-close']) {
     const shouldClose =
-      hasCommunityFlag || repoConfig['auto-close-classifications'].includes(analysis.classification)
+      hasCommunityFlag ||
+      repoConfig['auto-close-classifications'].includes(analysis.classification)
 
     if (shouldClose) {
       try {
@@ -255,7 +294,10 @@ export default defineEventHandler(async (event) => {
           state_reason: 'not_planned',
         })
       } catch (err: unknown) {
-        if (err instanceof Error && !err.message.includes('Resource not accessible')) {
+        if (
+          err instanceof Error &&
+          !err.message.includes('Resource not accessible')
+        ) {
           throw err
         }
       }

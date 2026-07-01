@@ -67,7 +67,9 @@ describe('rgbToHex', () => {
 
 describe('interpolate', () => {
   it('interpolates a color object in a color range from a given ratio', () => {
-    expect(interpolate({ r: 100, g: 100, b: 100 }, { r: 200, g: 200, b: 200 }, 0.5)).toStrictEqual({
+    expect(
+      interpolate({ r: 100, g: 100, b: 100 }, { r: 200, g: 200, b: 200 }, 0.5),
+    ).toStrictEqual({
       r: 150,
       g: 150,
       b: 150,
@@ -77,8 +79,8 @@ describe('interpolate', () => {
 
 describe('interpolateHexColors', () => {
   it('interpolates a color from a HEX tuple and a given ratio', () => {
-    expect(interpolateHexColors({ colors: ['#FF0000', '#0000FF'], ratio: 0.5 })).toStrictEqual(
-      '#800080',
-    )
+    expect(
+      interpolateHexColors({ colors: ['#FF0000', '#0000FF'], ratio: 0.5 }),
+    ).toStrictEqual('#800080')
   })
 })

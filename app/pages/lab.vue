@@ -27,13 +27,16 @@ function createChartDataset(): {
       },
       {
         name: 'Mixed',
-        series: dates.value.map((date) => data.value?.countsByDate?.[date]?.mixed.percentage ?? 0),
+        series: dates.value.map(
+          (date) => data.value?.countsByDate?.[date]?.mixed.percentage ?? 0,
+        ),
         color: colors.value.amber,
       },
       {
         name: 'Automation',
         series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.automation.percentage ?? 0,
+          (date) =>
+            data.value?.countsByDate?.[date]?.automation.percentage ?? 0,
         ),
         color: colors.value.dangerHover,
       },
@@ -64,9 +67,10 @@ const dataset = computed(() => stacklineData.value.dataset)
             <span class="i-lucide:triangle-alert"></span>
           </div>
           <p class="text-sm text-gh-text leading-relaxed">
-            This page is a sandbox where we test new ideas and features. Things here may break, data
-            might be inaccurate, or features could disappear entirely. Take everything on this page
-            with a grain of salt and treat it as early-stage exploration, not production-ready
+            This page is a sandbox where we test new ideas and features. Things
+            here may break, data might be inaccurate, or features could
+            disappear entirely. Take everything on this page with a grain of
+            salt and treat it as early-stage exploration, not production-ready
             tools.
           </p>
         </div>

@@ -7,7 +7,8 @@ useHead({
     { property: 'og:title', content: 'Repository scan | AgentScan' },
     {
       property: 'og:description',
-      content: 'Scan the most recent PR authors of any public GitHub repository',
+      content:
+        'Scan the most recent PR authors of any public GitHub repository',
     },
     { property: 'og:type', content: 'website' },
   ],
@@ -47,8 +48,10 @@ async function handleSubmit(value: string) {
 
   <RepoForm v-model="repoInput" @submit="handleSubmit" />
 
-  <p class="mt-4 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center">
-    Results are based on pattern analysis and should be interpreted as possible signals, not
-    conclusions. Always verify findings with additional context.
+  <p
+    class="mt-4 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
+  >
+    Results are based on pattern analysis and should be interpreted as possible
+    signals, not conclusions. Always verify findings with additional context.
   </p>
 </template>

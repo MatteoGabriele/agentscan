@@ -15,7 +15,10 @@ const ICON_RULES: [string[], string][] = [
   [['ratio', '%'], 'i-lucide:percent'],
   [['entropy', 'diversity', 'types'], 'i-lucide:layers'],
   [['age', 'date'], 'i-lucide:calendar'],
-  [['hour', 'interval', 'gap', 'window', 'span', '(s)', '(min)'], 'i-lucide:timer'],
+  [
+    ['hour', 'interval', 'gap', 'window', 'span', '(s)', '(min)'],
+    'i-lucide:timer',
+  ],
   [['consecutive', 'rapid', 'burst'], 'i-lucide:zap'],
   [['event', 'activity'], 'i-lucide:activity'],
 ]
@@ -24,8 +27,9 @@ export function useFlagDataPoints() {
   function getDataPointIcon(label: string): string {
     const l = label.toLowerCase()
     return (
-      ICON_RULES.find(([keywords]) => keywords.some((k) => l.includes(k)))?.[1] ??
-      'i-lucide:bar-chart-2'
+      ICON_RULES.find(([keywords]) =>
+        keywords.some((k) => l.includes(k)),
+      )?.[1] ?? 'i-lucide:bar-chart-2'
     )
   }
 
@@ -39,7 +43,8 @@ export function useFlagDataPoints() {
       return {
         label: point.label,
         displayValue: String(point.value),
-        displayThreshold: point.threshold !== undefined ? String(point.threshold) : undefined,
+        displayThreshold:
+          point.threshold !== undefined ? String(point.threshold) : undefined,
       }
     }
 
@@ -55,11 +60,14 @@ export function useFlagDataPoints() {
     return {
       label: cleanLabel,
       displayValue: withUnit(point.value),
-      displayThreshold: point.threshold !== undefined ? withUnit(point.threshold) : undefined,
+      displayThreshold:
+        point.threshold !== undefined ? withUnit(point.threshold) : undefined,
     }
   }
 
-  function groupDataPoints(data: FlagDataPoint[]): { icon: string; points: FlagDataPoint[] }[] {
+  function groupDataPoints(
+    data: FlagDataPoint[],
+  ): { icon: string; points: FlagDataPoint[] }[] {
     const groups: { icon: string; points: FlagDataPoint[] }[] = []
 
     for (const point of data) {

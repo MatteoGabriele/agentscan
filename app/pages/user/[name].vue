@@ -15,10 +15,13 @@ const username = computed(() => {
 })
 
 const accountKey = computed<string>(() => `account:${username.value}`)
-const { data: user, error } = await useFetch(() => `/api/account/${username.value}`, {
-  key: accountKey,
-  watch: [username],
-})
+const { data: user, error } = await useFetch(
+  () => `/api/account/${username.value}`,
+  {
+    key: accountKey,
+    watch: [username],
+  },
+)
 
 async function handleSubmit(name: string) {
   await router.push({ name: 'user-name', params: { name } })

@@ -75,7 +75,9 @@ describe('User Hash Anonymization', () => {
 
     // All attempts should fail
     reverseAttempts.forEach(({ name, result }) => {
-      expect(result, `Reversal attempt "${name}" should fail but did not`).toBe(false)
+      expect(result, `Reversal attempt "${name}" should fail but did not`).toBe(
+        false,
+      )
     })
   })
 

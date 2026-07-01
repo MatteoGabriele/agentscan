@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
-import { VueUiXy, type VueUiXyConfig, type VueUiXyDatasetItem } from 'vue-data-ui/vue-ui-xy'
+import {
+  VueUiXy,
+  type VueUiXyConfig,
+  type VueUiXyDatasetItem,
+} from 'vue-data-ui/vue-ui-xy'
 import { round } from '~~/shared/utils/numbers'
 
 import('vue-data-ui/style.css')
@@ -24,10 +28,22 @@ const uniqueEntries = computed(() => {
     return []
   }
 
-  return [...new Map(props.data.map((item) => [`${item.repo_name}#${item.pr_key}`, item])).values()]
+  return [
+    ...new Map(
+      props.data.map((item) => [`${item.repo_name}#${item.pr_key}`, item]),
+    ).values(),
+  ]
 })
 
-function isBetween({ value, start, end }: { value: number; start: number; end: number }) {
+function isBetween({
+  value,
+  start,
+  end,
+}: {
+  value: number
+  start: number
+  end: number
+}) {
   return value >= start && value <= end
 }
 
@@ -124,7 +140,10 @@ const config = computed<VueUiXyConfig>(() => ({
           color: colors.value.textMuted,
           values: [
             dataset.value
-              .map((d) => `${space(8)}${d.name.replace('0-', `${space(5)} 0-`)}${space(10)}`)
+              .map(
+                (d) =>
+                  `${space(8)}${d.name.replace('0-', `${space(5)} 0-`)}${space(10)}`,
+              )
               .join(' '),
           ],
         },

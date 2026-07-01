@@ -7,5 +7,6 @@
   },
   "yaml.schemas": {
     "./schemas/agentscan.json": ".github/agentscan.yml"
-  }
+  },
+  "editor.rulers": [80]
 }

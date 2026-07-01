@@ -1,7 +1,10 @@
 /// <reference types="node" />
 import { readFileSync } from 'node:fs'
 import { formatTrend } from '../shared/utils/health-stats'
-import { getClosedPrPercentageTotal, getClosedPrDelta } from '../shared/utils/charts'
+import {
+  getClosedPrPercentageTotal,
+  getClosedPrDelta,
+} from '../shared/utils/charts'
 import { calcLinearProgression } from '../shared/utils/calc-linear-progression'
 import {
   getClassificationStatsByDate,
@@ -18,7 +21,10 @@ async function main() {
     return
   }
 
-  const closedAutomationPrPercentage = getClosedPrPercentageTotal(results, [0, 50])
+  const closedAutomationPrPercentage = getClosedPrPercentageTotal(
+    results,
+    [0, 50],
+  )
   const closedAutomationPrDelta = getClosedPrDelta(results, [0, 50])
 
   const automation: number[] = []

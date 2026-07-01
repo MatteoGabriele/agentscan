@@ -3,7 +3,9 @@ import type { VerifiedAutomation } from '~~/shared/types/automation'
 export default defineEventHandler(async (event) => {
   try {
     // Fetch the verified automations list
-    const automations: VerifiedAutomation[] = await $fetch('/api/verified-automations')
+    const automations: VerifiedAutomation[] = await $fetch(
+      '/api/verified-automations',
+    )
 
     // Sort by createdAt in descending order (newest first)
     const sortedAutomations = [...automations].sort((a, b) => {

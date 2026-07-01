@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core'
-import { VueUiXy, type VueUiXyDatasetItem, type VueUiXyConfig } from 'vue-data-ui/vue-ui-xy'
+import {
+  VueUiXy,
+  type VueUiXyDatasetItem,
+  type VueUiXyConfig,
+} from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
 import { getClosedPrPercentageEvolutionTotal } from '~~/shared/utils/charts'
@@ -16,7 +20,9 @@ const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
 
-const hasStableChartDimensions = computed(() => width.value > 0 && height.value > 0)
+const hasStableChartDimensions = computed(
+  () => width.value > 0 && height.value > 0,
+)
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const chartRef = useTemplateRef('chartRef')
@@ -28,7 +34,10 @@ onMounted(() => {
 const colors = useColors(rootEl)
 
 const automatedClosureRateData = computed(() => ({
-  ...getClosedPrPercentageEvolutionTotal(data.value, [0, identityConfig.THRESHOLD_SUSPICIOUS]),
+  ...getClosedPrPercentageEvolutionTotal(data.value, [
+    0,
+    identityConfig.THRESHOLD_SUSPICIOUS,
+  ]),
   scaleMin: 0,
   scaleMax: 100,
   color: 'grey',
@@ -43,8 +52,14 @@ function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
   return [
     {
       name: 'Organic',
-      series: dates.value?.map((date) => countsByDate.value?.[date]?.organic.percentage ?? 0) ?? [],
-      trends: dates.value?.map((date) => countsByDate.value?.[date]?.organic.trend ?? 0) ?? [],
+      series:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.organic.percentage ?? 0,
+        ) ?? [],
+      trends:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.organic.trend ?? 0,
+        ) ?? [],
       color: colors.value.greenLine,
       type: 'line',
       smooth: true,
@@ -52,8 +67,14 @@ function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
     },
     {
       name: 'Mixed',
-      series: dates.value?.map((date) => countsByDate.value?.[date]?.mixed.percentage ?? 0) ?? [],
-      trends: dates.value?.map((date) => countsByDate.value?.[date]?.mixed.trend ?? 0) ?? [],
+      series:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.mixed.percentage ?? 0,
+        ) ?? [],
+      trends:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.mixed.trend ?? 0,
+        ) ?? [],
       color: colors.value.amber,
       type: 'line',
       smooth: true,
@@ -62,8 +83,13 @@ function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
     {
       name: 'Automation',
       series:
-        dates.value?.map((date) => countsByDate.value?.[date]?.automation.percentage ?? 0) ?? [],
-      trends: dates.value?.map((date) => countsByDate.value?.[date]?.automation.trend ?? 0) ?? [],
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.automation.percentage ?? 0,
+        ) ?? [],
+      trends:
+        dates.value?.map(
+          (date) => countsByDate.value?.[date]?.automation.trend ?? 0,
+        ) ?? [],
       color: colors.value.dangerHover,
       type: 'line',
       smooth: true,
@@ -259,7 +285,12 @@ const visibleLandmarkByIndex = computed(() => {
     >
       <ClientOnly>
         <Transition name="chart-fade" appear>
-          <VueUiXy v-if="hasStableChartDimensions" ref="chartRef" :dataset :config>
+          <VueUiXy
+            v-if="hasStableChartDimensions"
+            ref="chartRef"
+            :dataset
+            :config
+          >
             <template #svg="{ svg }">
               <!-- LANDMARKS -->
               <g
@@ -271,7 +302,13 @@ const visibleLandmarkByIndex = computed(() => {
                   v-for="(landmark, j) in keyDates"
                   :key="`${landmark?.date}-${landmark?.name}-${j}`"
                 >
-                  <g v-if="landmark && landmark.index === i + svg.slicer.start && landmark.visible">
+                  <g
+                    v-if="
+                      landmark &&
+                      landmark.index === i + svg.slicer.start &&
+                      landmark.visible
+                    "
+                  >
                     <!-- Landmark label -->
                     <text
                       :fill="colors.textMuted"
@@ -331,7 +368,11 @@ const visibleLandmarkByIndex = computed(() => {
 
             <template #area-gradient="{ series, id }">
               <linearGradient :id x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
+                <stop
+                  offset="0%"
+                  :stop-color="series.color"
+                  stop-opacity="0.3"
+                />
                 <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
               </linearGradient>
             </template>
@@ -395,9 +436,15 @@ const visibleLandmarkByIndex = computed(() => {
                   <div class="flex flex-row gap-2 max-w-[200px]">
                     <span class="i-lucide:info w-6" />
                     <span
-                      >{{ visibleLandmarkByIndex.get(timeLabel.absoluteIndex)?.name }}
+                      >{{
+                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
+                          ?.name
+                      }}
                       :
-                      {{ visibleLandmarkByIndex.get(timeLabel.absoluteIndex)?.description }}</span
+                      {{
+                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
+                          ?.description
+                      }}</span
                     >
                   </div>
                 </div>

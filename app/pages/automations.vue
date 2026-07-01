@@ -37,7 +37,8 @@ useHead({
     { property: 'og:title', content: 'Community reports | AgentScan' },
     {
       property: 'og:description',
-      content: 'Accounts reported by the community as showing automation signals',
+      content:
+        'Accounts reported by the community as showing automation signals',
     },
     { property: 'og:type', content: 'website' },
   ],
@@ -48,8 +49,8 @@ useHead({
   <header class="text-center md:text-left">
     <h1 class="text-2xl font-semibold">Community reports</h1>
     <p class="text-gh-muted mt-2">
-      Accounts reported by the community as showing automation signals. These are not definitive
-      verdicts: if something looks wrong,
+      Accounts reported by the community as showing automation signals. These
+      are not definitive verdicts: if something looks wrong,
       <NuxtLink
         to="https://github.com/MatteoGabriele/agentscan/issues"
         target="_blank"
@@ -79,7 +80,11 @@ useHead({
 
   <div v-if="status === 'pending'" class="mt-12">
     <ul class="flex flex-col gap-4 w-full">
-      <li v-for="item in 3" :key="item" class="not-last:border-b border-gh-border-light pb-6 mb-2">
+      <li
+        v-for="item in 3"
+        :key="item"
+        class="not-last:border-b border-gh-border-light pb-6 mb-2"
+      >
         <article>
           <div class="w-full animate-pulse">
             <div class="mb-4">
@@ -90,7 +95,9 @@ useHead({
               <div class="h-3 bg-gh-border rounded w-4/6" />
             </div>
           </div>
-          <footer class="flex items-baseline justify-between mt-4 animate-pulse">
+          <footer
+            class="flex items-baseline justify-between mt-4 animate-pulse"
+          >
             <div class="h-3 bg-gh-border rounded w-20" />
             <div class="h-3 bg-gh-border rounded w-20" />
           </footer>
@@ -103,7 +110,9 @@ useHead({
   </div>
   <div v-else-if="data" class="mt-12">
     <ul class="flex flex-col gap-4">
-      <li v-if="filteredItems.length === 0">No account has been found under "{{ search }}"</li>
+      <li v-if="filteredItems.length === 0">
+        No account has been found under "{{ search }}"
+      </li>
       <li
         v-for="item in filteredItems"
         :key="item.username"

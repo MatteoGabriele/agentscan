@@ -18,7 +18,9 @@ const visibleMonthDate = shallowRef(new Date())
 
 const availableDates = computed(() => {
   return Array.from(
-    new Set(props.source.map((item) => item.created_at.slice(0, 10)).filter(Boolean)),
+    new Set(
+      props.source.map((item) => item.created_at.slice(0, 10)).filter(Boolean),
+    ),
   ).sort()
 })
 
@@ -119,7 +121,10 @@ function toggleCumulatedDates() {
     return
   }
 
-  if (!lastSelectedDate.value || !availableDateSet.value.has(lastSelectedDate.value)) {
+  if (
+    !lastSelectedDate.value ||
+    !availableDateSet.value.has(lastSelectedDate.value)
+  ) {
     return
   }
 
@@ -182,17 +187,35 @@ function parseDate(date: string) {
     </label>
 
     <div class="flex items-center justify-between gap-2">
-      <button type="button" aria-label="Go to previous month" @click="goToPreviousMonth">
-        <span class="i-lucide-chevron-left w-3 h-3 text-gh-text-muted" aria-hidden="true" />
+      <button
+        type="button"
+        aria-label="Go to previous month"
+        @click="goToPreviousMonth"
+      >
+        <span
+          class="i-lucide-chevron-left w-3 h-3 text-gh-text-muted"
+          aria-hidden="true"
+        />
       </button>
       <strong>{{ visibleMonthLabel }}</strong>
-      <button type="button" aria-label="Go to next month" @click="goToNextMonth">
-        <span class="i-lucide-chevron-right w-3 h-3 text-gh-text-muted" aria-hidden="true" />
+      <button
+        type="button"
+        aria-label="Go to next month"
+        @click="goToNextMonth"
+      >
+        <span
+          class="i-lucide-chevron-right w-3 h-3 text-gh-text-muted"
+          aria-hidden="true"
+        />
       </button>
     </div>
 
     <div class="grid grid-cols-7 gap-1">
-      <span v-for="day in WEEK_DAYS" :key="day" class="text-center text-xs opacity-60">
+      <span
+        v-for="day in WEEK_DAYS"
+        :key="day"
+        class="text-center text-xs opacity-60"
+      >
         {{ day }}
       </span>
 
@@ -205,7 +228,9 @@ function parseDate(date: string) {
           :disabled="!date.isAvailable"
           class="h-6.5 px-2 rounded border disabled:opacity-25 disabled:cursor-not-allowed relative"
           :class="
-            date.isSelected ? 'font-bold border-gh-border-light bg-gh-card' : 'border-transparent'
+            date.isSelected
+              ? 'font-bold border-gh-border-light bg-gh-card'
+              : 'border-transparent'
           "
           @click="selectDate(date.value)"
         >
@@ -220,7 +245,8 @@ function parseDate(date: string) {
         :disabled="!firstAvailableDate"
         class="flex-1 rounded px-3 py-1 text-xs border border-gh-border disabled:opacity-35 disabled:cursor-not-allowed hover:bg-gh-card flex flex-row justify-center items-center gap-1"
         :class="{
-          'bg-gh-card text-white border-gh-border-light': selectedDate === firstAvailableDate,
+          'bg-gh-card text-white border-gh-border-light':
+            selectedDate === firstAvailableDate,
         }"
         @click="goToFirstAvailableDate"
       >
@@ -237,7 +263,8 @@ function parseDate(date: string) {
         :disabled="!lastAvailableDate"
         class="flex-1 rounded px-3 py-1 text-xs border border-gh-border disabled:opacity-35 disabled:cursor-not-allowed hover:bg-gh-card flex flex-row justify-center items-center gap-1"
         :class="{
-          'bg-gh-card text-white border-gh-border-light': selectedDate === lastAvailableDate,
+          'bg-gh-card text-white border-gh-border-light':
+            selectedDate === lastAvailableDate,
         }"
         @click="goToLastAvailableDate"
       >

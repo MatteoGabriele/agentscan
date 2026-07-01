@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { VueUiXy, type VueUiXyDatasetItem, type VueUiXyConfig } from 'vue-data-ui'
+import {
+  VueUiXy,
+  type VueUiXyDatasetItem,
+  type VueUiXyConfig,
+} from 'vue-data-ui'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { getCompleteDayRange } from '~~/shared/utils/charts'
 import type { GitHubEventType } from '~~/shared/types/identity'
 import { githubEventTypes } from '~~/shared/types/identity'
 import { useColors } from '~/composables/useColors'
-import { identityConfig, type IdentityClassification, type GitHubEvent } from '@unveil/identity'
+import {
+  identityConfig,
+  type IdentityClassification,
+  type GitHubEvent,
+} from '@unveil/identity'
 import type { VueUiXyDatasetLineItem } from 'vue-data-ui/vue-ui-xy'
 
 import('vue-data-ui/style.css')
@@ -59,13 +67,17 @@ const eventConfig = computed(() => {
 
   const color = palette[classification]
 
-  const hourlyThresholdRatio = computed(() => (usesHourlyGranularity.value ? 3 : 1))
+  const hourlyThresholdRatio = computed(() =>
+    usesHourlyGranularity.value ? 3 : 1,
+  )
 
   return {
     ForkEvent: {
       name: 'Forks',
       color: color.fork,
-      threshold: Math.round(identityConfig.FORKS_EXTREME / hourlyThresholdRatio.value),
+      threshold: Math.round(
+        identityConfig.FORKS_EXTREME / hourlyThresholdRatio.value,
+      ),
       visible: selectedLegendItems.value.includes('Forks'),
       labelOffsetY: 40,
     },
@@ -79,7 +91,9 @@ const eventConfig = computed(() => {
     PullRequestEvent: {
       name: 'Pull requests',
       color: color.pr,
-      threshold: Math.round(identityConfig.PRS_TODAY_EXTREME / hourlyThresholdRatio.value),
+      threshold: Math.round(
+        identityConfig.PRS_TODAY_EXTREME / hourlyThresholdRatio.value,
+      ),
       visible: selectedLegendItems.value.includes('Pull requests'),
       labelOffsetY: 6,
     },
@@ -100,7 +114,9 @@ const activeGitHubEventTypes = [
 
 type ActiveGitHubEventType = Exclude<GitHubEventType, 'IssueCommentEvent'>
 
-function isActiveGitHubEventType(type: GitHubEventType): type is ActiveGitHubEventType {
+function isActiveGitHubEventType(
+  type: GitHubEventType,
+): type is ActiveGitHubEventType {
   return activeGitHubEventTypes.includes(type as ActiveGitHubEventType)
 }
 
@@ -110,7 +126,9 @@ const eventDays = computed(() => {
       props.events
         .filter((event) => {
           return (
-            event.created_at && isGitHubEventType(event.type) && isActiveGitHubEventType(event.type)
+            event.created_at &&
+            isGitHubEventType(event.type) &&
+            isActiveGitHubEventType(event.type)
           )
         })
         .map((event) => event.created_at!.slice(0, 10)),
@@ -199,7 +217,9 @@ const hasEnoughHours = computed<boolean>(() => {
 })
 
 const hasEnoughDataPoints = computed<boolean>(() => {
-  return usesHourlyGranularity.value ? hasEnoughHours.value : hasEnoughDays.value
+  return usesHourlyGranularity.value
+    ? hasEnoughHours.value
+    : hasEnoughDays.value
 })
 
 function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
@@ -216,24 +236,28 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
     }
 
     const label = usesHourlyGranularity.value
-      ? roundToClosestHour(new Date(event.created_at!)).toISOString().slice(0, 13)
+      ? roundToClosestHour(new Date(event.created_at!))
+          .toISOString()
+          .slice(0, 13)
       : event.created_at.slice(0, 10)
 
     counts[event.type][label] = (counts[event.type][label] || 0) + 1
   }
 
-  const individualEvents: VueUiXyDatasetItem[] = activeGitHubEventTypes.map((eventType) => {
-    const config = eventConfig.value[eventType]
-    return {
-      type: 'line',
-      useArea: true,
-      smooth: true,
-      name: config.name,
-      color: config.color,
-      threshold: config.threshold,
-      series: timeLabels.value.map((label) => counts[eventType][label] || 0),
-    }
-  })
+  const individualEvents: VueUiXyDatasetItem[] = activeGitHubEventTypes.map(
+    (eventType) => {
+      const config = eventConfig.value[eventType]
+      return {
+        type: 'line',
+        useArea: true,
+        smooth: true,
+        name: config.name,
+        color: config.color,
+        threshold: config.threshold,
+        series: timeLabels.value.map((label) => counts[eventType][label] || 0),
+      }
+    },
+  )
 
   const totalEvents: VueUiXyDatasetItem = {
     type: 'line',
@@ -277,7 +301,9 @@ const timestamps = computed<number[]>(() => {
 
 const xAxisLabelValues = computed<string[]>(() => {
   const dates = timeLabels.value.map((label) => {
-    return usesHourlyGranularity.value ? new Date(`${label}:00:00.000Z`) : new Date(label)
+    return usesHourlyGranularity.value
+      ? new Date(`${label}:00:00.000Z`)
+      : new Date(label)
   })
 
   const hasMidnight = dates.some((date) => {
@@ -420,9 +446,14 @@ function getSeriesThreshold(seriesName: string): number | null {
   return datasetItem.threshold as number | null
 }
 
-function isTooltipAlert(series: { name: string; value: number | null }): boolean {
+function isTooltipAlert(series: {
+  name: string
+  value: number | null
+}): boolean {
   const threshold = getSeriesThreshold(series.name)
-  return threshold !== null && series.value !== null && series.value >= threshold
+  return (
+    threshold !== null && series.value !== null && series.value >= threshold
+  )
 }
 
 const tooltipTimeLabels = computed<string[]>(() => {
@@ -492,7 +523,11 @@ function getZapIconPath({ x, y }: { x: number; y: number }) {
               class="w-5 h-5"
               aria-hidden="true"
             >
-              <path :d="getZapIconPath({ x: 2, y: 30 })" :fill="colors.amber" :stroke="colors.bg" />
+              <path
+                :d="getZapIconPath({ x: 2, y: 30 })"
+                :fill="colors.amber"
+                :stroke="colors.bg"
+              />
             </svg>
           </div>
         </div>
@@ -551,7 +586,9 @@ function getZapIconPath({ x, y }: { x: number; y: number }) {
         <span class="i-lucide:circle-dashed text-gh-muted"></span>
         <div class="flex flex-col items-center">
           <p class="text-gh-muted text-base">Insufficient activity data</p>
-          <p class="text-gh-muted/50 text-sm">Not enough events to display a timeline</p>
+          <p class="text-gh-muted/50 text-sm">
+            Not enough events to display a timeline
+          </p>
         </div>
       </div>
     </div>

@@ -24,7 +24,10 @@ export function hexToRgb(hex: string) {
 
 export function rgbToHex({ r, g, b }: RGB) {
   return (
-    '#' + [r, g, b].map((channel) => Math.round(channel).toString(16).padStart(2, '0')).join('')
+    '#' +
+    [r, g, b]
+      .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
+      .join('')
   )
 }
 

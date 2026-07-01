@@ -28,7 +28,9 @@ export function parseIssueBody(body: string): Partial<AutomationEntry> {
   const username = parsed['GitHub Username']?.toString().trim()
   const idStr = parsed['GitHub User ID']?.toString().trim()
   const id = idStr ? parseInt(idStr, 10) : undefined
-  const reasonRaw = parsed['Why do you believe this is an automated account?']?.toString().trim()
+  const reasonRaw = parsed['Why do you believe this is an automated account?']
+    ?.toString()
+    .trim()
 
   // Clean up reason - take first paragraph and normalize whitespace
   let reason = reasonRaw
@@ -46,7 +48,9 @@ export function parseIssueBody(body: string): Partial<AutomationEntry> {
   }
 }
 
-export function validateEntry(entry: Partial<AutomationEntry>): entry is AutomationEntry {
+export function validateEntry(
+  entry: Partial<AutomationEntry>,
+): entry is AutomationEntry {
   if (!entry.username || typeof entry.username !== 'string') {
     console.error('✗ Missing or invalid username')
     return false
@@ -81,14 +85,19 @@ export function generateEntry(
 }
 
 function addEntryToJson(entry: AutomationEntry): void {
-  const jsonPath = path.join(process.cwd(), 'data/verified-automations-list.json')
+  const jsonPath = path.join(
+    process.cwd(),
+    'data/verified-automations-list.json',
+  )
 
   if (!fs.existsSync(jsonPath)) {
     console.error('✗ JSON file not found:', jsonPath)
     process.exit(1)
   }
 
-  const data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as AutomationEntry[]
+  const data = JSON.parse(
+    fs.readFileSync(jsonPath, 'utf-8'),
+  ) as AutomationEntry[]
 
   // Check if username already exists
   if (data.some((item) => item.username === entry.username)) {
@@ -116,7 +125,9 @@ async function fetchIssueFromGitHub(
     return {
       body: issue.body || '',
       issueUrl: issue.html_url,
-      createdAt: issue.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+      createdAt:
+        issue.created_at?.split('T')[0] ||
+        new Date().toISOString().split('T')[0],
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -138,7 +149,9 @@ async function main() {
   const thirdArg = process.argv[4]
 
   if (!firstArg) {
-    console.error('Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>')
+    console.error(
+      'Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>',
+    )
     console.error(
       '  or: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] [created-at] (legacy)',
     )

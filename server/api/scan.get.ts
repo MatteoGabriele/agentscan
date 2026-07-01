@@ -26,7 +26,8 @@ export default defineCachedEventHandler(
     if (!parsed) {
       throw createError({
         statusCode: 400,
-        message: 'Invalid repository. Expected format: owner/repo or https://github.com/owner/repo',
+        message:
+          'Invalid repository. Expected format: owner/repo or https://github.com/owner/repo',
       })
     }
 
@@ -37,7 +38,11 @@ export default defineCachedEventHandler(
     const entries: Entry[] = []
 
     try {
-      for (let page = 1; page <= MAX_PAGES && entries.length < MAX_PR_USER_COUNT; page++) {
+      for (
+        let page = 1;
+        page <= MAX_PAGES && entries.length < MAX_PR_USER_COUNT;
+        page++
+      ) {
         const { data: prs } = await octokit.rest.pulls.list({
           owner,
           repo,
@@ -130,7 +135,10 @@ export default defineCachedEventHandler(
         throw createError({ statusCode: 404, message: 'Repository not found' })
       }
 
-      throw createError({ statusCode: 500, message: 'Failed to fetch repository data from GitHub' })
+      throw createError({
+        statusCode: 500,
+        message: 'Failed to fetch repository data from GitHub',
+      })
     }
   },
   {

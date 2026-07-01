@@ -160,7 +160,11 @@ describe('generateEntry', () => {
   })
 
   it('should use provided createdAt date', () => {
-    const entry = generateEntry(parsedData, 'https://github.com/test/issue/1', '2024-01-15')
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      '2024-01-15',
+    )
     expect(entry.createdAt).toBe('2024-01-15')
   })
 

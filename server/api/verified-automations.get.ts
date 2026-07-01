@@ -12,7 +12,9 @@ export default defineEventHandler(async () => {
     })
 
     if ('content' in verifiedList) {
-      const content = Buffer.from(verifiedList.content, 'base64').toString('utf-8')
+      const content = Buffer.from(verifiedList.content, 'base64').toString(
+        'utf-8',
+      )
       const verified = JSON.parse(content) as VerifiedAutomation[]
       return verified
     }

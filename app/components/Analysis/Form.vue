@@ -53,7 +53,10 @@ function clear() {
         <span class="sr-only">Clear input field</span>
       </button>
 
-      <button type="submit" class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all">
+      <button
+        type="submit"
+        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all"
+      >
         <span class="i-lucide-search" aria-hidden="true" />
         <span class="sr-only">Analyze</span>
       </button>

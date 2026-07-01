@@ -48,7 +48,9 @@ export default defineEventHandler(async (event) => {
   const parsedQuery = v.safeParse(QuerySchema, {
     created_at: query.created_at,
     pages: query.pages ? parseInt(String(query.pages), 10) : 1,
-    repos_count: query.repos_count ? parseInt(String(query.repos_count), 10) : 0,
+    repos_count: query.repos_count
+      ? parseInt(String(query.repos_count), 10)
+      : 0,
     show_events: query.show_events ? String(query.show_events) : 'false',
   })
 
