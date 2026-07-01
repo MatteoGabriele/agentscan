@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { adaptColorToBackground } from 'vue-data-ui/utils'
 import {
   VueUiHorizontalBar,
   type VueUiHorizontalBarDatasetItem,
@@ -29,30 +30,28 @@ const config = computed<VueUiHorizontalBarConfig>(() => {
     useCssAnimation: false,
     style: {
       chart: {
-        backgroundColor: 'transparent',
+        backgroundColor: colors.value.bg,
         color: '#1A1A1Aff',
         width: 512,
-        height: 316,
+        height: 450,
         layout: {
           bars: {
             rowColor: '#FFFFFF00',
             rowRadius: 4,
-            sort: 'desc',
+            sort: 'asc',
             useStroke: false,
             strokeWidth: 2,
-            height: 32,
             gap: 1,
             borderRadius: 2,
             offsetX: 12,
             paddingRight: 0,
             useGradient: false,
-            gradientIntensity: 20,
             fillOpacity: 100,
             underlayerColor: '#FFFFFF',
             dataLabels: {
               color: colors.value.textMuted,
               bold: true,
-              fontSize: 12,
+              fontSize: 8,
               value: {
                 show: true,
                 roundingValue: 1,
@@ -70,19 +69,22 @@ const config = computed<VueUiHorizontalBarConfig>(() => {
               show: true,
               color: colors.value.textMuted,
               bold: false,
-              fontSize: 12,
+              fontSize: 8,
               offsetX: 0,
             },
           },
           highlighter: {
             color: colors.value.text,
-            opacity: 0,
+            opacity: 5,
           },
           separators: { show: false },
         },
         legend: { show: false },
         tooltip: {
-          show: false,
+          backgroundColor: colors.value.bg,
+          color: colors.value.text,
+          borderColor: colors.value.border,
+          backgroundOpacity: 30,
         },
       },
     },
@@ -105,6 +107,7 @@ const dataset = computed<VueUiHorizontalBarDatasetItem[]>(() => {
   }))
 })
 </script>
+
 <template>
   <div class="mb-5">
     <h2 class="text-center">Score breakdown per featured repository</h2>
@@ -113,7 +116,22 @@ const dataset = computed<VueUiHorizontalBarDatasetItem[]>(() => {
     <!-- FIXME: that crappy date selector would need some love -->
     <CommonDateSelector :source="healthData" @select-date="setSelectedDate" />
     <ClientOnly>
-      <VueUiHorizontalBar :config="config" :dataset="dataset" />
+      <VueUiHorizontalBar :config="config" :dataset="dataset">
+        <template #tooltip="{ datapoint }">
+          <div class="flex flex-row gap-2 items-center justify-between">
+            <div>{{ datapoint.name }}</div>
+            <div
+              :style="{
+                background: datapoint.color,
+                color: adaptColorToBackground(datapoint.color),
+              }"
+              class="py-0.5 px-2 rounded-xs"
+            >
+              {{ Math.round(datapoint.value * 10) / 10 }}%
+            </div>
+          </div>
+        </template>
+      </VueUiHorizontalBar>
     </ClientOnly>
   </div>
 </template>
