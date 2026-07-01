@@ -217,7 +217,7 @@ const keyDates = computed(() => {
     return []
   }
 
-  const millisecondsInOneWeek = 7 * 24 * 60 * 60 * 1000
+  const millisecondsInADay = 1 * 24 * 60 * 60 * 1000
   const lastDateTime = new Date(lastDate).getTime()
 
   return landmarks
@@ -231,7 +231,7 @@ const keyDates = computed(() => {
       return {
         ...item,
         index,
-        visible: lastDateTime - landmarkDateTime >= millisecondsInOneWeek,
+        visible: lastDateTime - landmarkDateTime >= millisecondsInADay,
       }
     })
     .filter(Boolean)
