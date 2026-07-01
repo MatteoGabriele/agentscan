@@ -1,5 +1,5 @@
-import { Octokit } from 'octokit'
 import { formatUsername } from '~~/server/utils/format-username'
+import { createOctokit } from '~~/server/utils/github-client'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const octokit = new Octokit({ auth: config.githubToken })
+  const octokit = createOctokit(config.githubToken)
 
   try {
     const formattedUsername = formatUsername(username)

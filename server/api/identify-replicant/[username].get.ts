@@ -1,7 +1,7 @@
 import { identify } from '@unveil/identity'
-import { Octokit } from 'octokit'
 import * as v from 'valibot'
 import { formatUsername } from '~~/server/utils/format-username'
+import { createOctokit } from '~~/server/utils/github-client'
 
 const MIN_PAGES = 1
 const MAX_PAGES = 3
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const octokit = new Octokit({ auth: config.githubToken })
+    const octokit = createOctokit(config.githubToken)
     const formattedUsername = formatUsername(username)
 
     const validatedPages = Math.min(parsedQuery.output.pages, MAX_PAGES)

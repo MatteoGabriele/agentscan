@@ -74,6 +74,9 @@ vi.mock('octokit', () => ({
   App: vi.fn().mockImplementation(function () {
     return mockApp
   }),
+  Octokit: {
+    plugin: vi.fn().mockReturnValue(vi.fn()),
+  },
 }))
 vi.mock('@octokit/webhooks', () => ({
   Webhooks: vi.fn().mockImplementation(function () {

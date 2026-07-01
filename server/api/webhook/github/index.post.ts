@@ -7,6 +7,7 @@ import {
   type IdentityClassification,
 } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
+import { TrackedOctokit } from '~~/server/utils/github-client'
 import { DEFAULT_CONFIG, parseRepoConfig, type RepoConfig } from './_config'
 
 type AutomationListItem = {
@@ -75,6 +76,7 @@ export default defineEventHandler(async (event) => {
     appId: config.githubAppId,
     privateKey,
     webhooks: { secret: config.githubWebhookSecret },
+    Octokit: TrackedOctokit,
   })
 
   const octokit = await app.getInstallationOctokit(payload.installation.id)

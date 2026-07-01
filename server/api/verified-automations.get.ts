@@ -1,9 +1,9 @@
-import { Octokit } from 'octokit'
 import type { VerifiedAutomation } from '~~/shared/types/automation'
+import { createOctokit } from '~~/server/utils/github-client'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
-  const octokit = new Octokit({ auth: config.githubToken })
+  const octokit = createOctokit(config.githubToken)
 
   try {
     const { data: verifiedList } = await octokit.rest.repos.getContent({

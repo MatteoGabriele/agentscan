@@ -1,6 +1,6 @@
-import { Octokit } from 'octokit'
 import dayjs from 'dayjs'
 import type { IntegrationItem } from '~~/shared/types/integrations'
+import { createOctokit } from '~~/server/utils/github-client'
 
 export type IntegrationUsafeLab = {
   username: string
@@ -11,7 +11,7 @@ export type IntegrationUsafeLab = {
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
-  const octokit = new Octokit({ auth: config.githubToken })
+  const octokit = createOctokit(config.githubToken)
 
   try {
     const { data } = await octokit.rest.repos.getContent({
