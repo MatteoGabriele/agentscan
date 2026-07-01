@@ -56,9 +56,7 @@ useHead({
         <ChartGlobalEventsEvolution />
       </div>
 
-      <div
-        class="absolute -bottom-4 text-center md:text-right w-full md:bottom-2 right-0 md:right-6"
-      >
+      <div class="absolute -bottom-4 text-center md:text-left w-full md:bottom-2 pl-4">
         <p class="text-xs text-gh-text/40 mt-3">
           {{ formattedNextScanTime }}
         </p>
