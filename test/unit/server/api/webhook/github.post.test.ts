@@ -407,7 +407,7 @@ describe('GitHub Webhook Handler', () => {
           author_association: 'OWNER',
         },
       })
-      mockRepoConfig({ 'trusted-author-associations': ['OWNER', 'MEMBER'] })
+      mockRepoConfig({ 'trusted-author-associations': ['owner', 'member'] })
 
       const result = await handler(MOCK_EVENT)
 
@@ -423,7 +423,7 @@ describe('GitHub Webhook Handler', () => {
           author_association: 'CONTRIBUTOR',
         },
       })
-      mockRepoConfig({ 'trusted-author-associations': ['OWNER', 'MEMBER'] })
+      mockRepoConfig({ 'trusted-author-associations': ['owner', 'member'] })
 
       await handler(MOCK_EVENT)
 

@@ -69,9 +69,12 @@ export default defineEventHandler(async (event) => {
     payload.pull_request?.number ?? payload.issue?.number
   const username: string | undefined =
     payload.pull_request?.user?.login ?? payload.issue?.user?.login
-  const authorAssociation: AuthorAssociation | undefined =
+  const rawAuthorAssociation: string | undefined =
     payload.pull_request?.author_association ??
     payload.issue?.author_association
+  const authorAssociation = rawAuthorAssociation?.toLowerCase() as
+    | AuthorAssociation
+    | undefined
 
   if (!targetNumber || !username) {
     return { ok: true }

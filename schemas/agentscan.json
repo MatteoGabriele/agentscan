@@ -42,15 +42,15 @@
       "items": {
         "type": "string",
         "enum": [
-          "COLLABORATOR",
-          "CONTRIBUTOR",
-          "FIRST_TIMER",
-          "FIRST_TIME_CONTRIBUTOR",
-          "MEMBER",
-          "OWNER"
+          "collaborator",
+          "contributor",
+          "first_timer",
+          "first_time_contributor",
+          "member",
+          "owner"
         ]
       },
-      "examples": [["OWNER", "MEMBER", "COLLABORATOR"]]
+      "examples": [["owner", "member", "collaborator"]]
     },
     "silent-on-organic": {
       "description": "Skip posting a comment when the analysis result is 'organic'.",

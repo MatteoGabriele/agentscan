@@ -4,12 +4,12 @@ import { parse as parseYaml } from 'yaml'
 export type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
 
 export type AuthorAssociation =
-  | 'COLLABORATOR'
-  | 'CONTRIBUTOR'
-  | 'FIRST_TIMER'
-  | 'FIRST_TIME_CONTRIBUTOR'
-  | 'MEMBER'
-  | 'OWNER'
+  | 'collaborator'
+  | 'contributor'
+  | 'first_timer'
+  | 'first_time_contributor'
+  | 'member'
+  | 'owner'
 
 export const SUPPORTED_CONFIG_VERSION = 1
 
