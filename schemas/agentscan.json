@@ -36,6 +36,22 @@
       },
       "examples": [["dependabot[bot]", "renovate[bot]"]]
     },
+    "trusted-author-associations": {
+      "description": "Author associations to exclude from scanning (e.g. trusted maintainers opening their own PRs/issues).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "COLLABORATOR",
+          "CONTRIBUTOR",
+          "FIRST_TIMER",
+          "FIRST_TIME_CONTRIBUTOR",
+          "MEMBER",
+          "OWNER"
+        ]
+      },
+      "examples": [["OWNER", "MEMBER", "COLLABORATOR"]]
+    },
     "silent-on-organic": {
       "description": "Skip posting a comment when the analysis result is 'organic'.",
       "type": "boolean",

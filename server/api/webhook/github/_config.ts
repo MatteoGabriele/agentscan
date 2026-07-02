@@ -3,11 +3,20 @@ import { parse as parseYaml } from 'yaml'
 
 export type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
 
+export type AuthorAssociation =
+  | 'COLLABORATOR'
+  | 'CONTRIBUTOR'
+  | 'FIRST_TIMER'
+  | 'FIRST_TIME_CONTRIBUTOR'
+  | 'MEMBER'
+  | 'OWNER'
+
 export const SUPPORTED_CONFIG_VERSION = 1
 
 export type RepoConfig = {
   version: number
   'allowed-users': string[]
+  'trusted-author-associations': AuthorAssociation[]
   'auto-close': boolean
   'auto-close-classifications': IdentityClassification[]
   mode: ScanMode
@@ -32,6 +41,7 @@ export type RepoConfig = {
 export const DEFAULT_CONFIG: RepoConfig = {
   version: SUPPORTED_CONFIG_VERSION,
   'allowed-users': [],
+  'trusted-author-associations': [],
   'auto-close': false,
   'auto-close-classifications': ['automation'],
   mode: 'full',

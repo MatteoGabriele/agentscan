@@ -7,7 +7,12 @@ import {
   type IdentityClassification,
 } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
-import { DEFAULT_CONFIG, parseRepoConfig, type RepoConfig } from './_config'
+import {
+  DEFAULT_CONFIG,
+  parseRepoConfig,
+  type AuthorAssociation,
+  type RepoConfig,
+} from './_config'
 
 type AutomationListItem = {
   username: string
@@ -64,6 +69,9 @@ export default defineEventHandler(async (event) => {
     payload.pull_request?.number ?? payload.issue?.number
   const username: string | undefined =
     payload.pull_request?.user?.login ?? payload.issue?.user?.login
+  const authorAssociation: AuthorAssociation | undefined =
+    payload.pull_request?.author_association ??
+    payload.issue?.author_association
 
   if (!targetNumber || !username) {
     return { ok: true }
@@ -113,7 +121,12 @@ export default defineEventHandler(async (event) => {
     return { ok: true }
   }
 
-  if (repoConfig['allowed-users'].includes(username) || isKnownBot(username)) {
+  if (
+    repoConfig['allowed-users'].includes(username) ||
+    isKnownBot(username) ||
+    (authorAssociation &&
+      repoConfig['trusted-author-associations'].includes(authorAssociation))
+  ) {
     return { ok: true }
   }
 
