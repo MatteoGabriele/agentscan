@@ -11,7 +11,7 @@ useHead({
     {
       property: 'og:description',
       content:
-        'Install the AgentScan GitHub App for zero-config automation detection on every pull request.',
+        'Install the AgentScan GitHub App, built for maintainers dealing with automated accounts on GitHub. Zero config.',
     },
     { property: 'og:type', content: 'website' },
   ],
@@ -24,8 +24,11 @@ useHead({
 
     <div>
       <h1 class="text-2xl font-semibold">AgentScan GitHub App</h1>
+      <p class="mt-1 mb-6 text-gh-text/80">
+        Built for maintainers dealing with automated accounts on GitHub
+      </p>
       <p class="text-gh-muted mt-2 max-w-md mx-auto text-pretty">
-        Zero config. Works instantly. No workflow files required. Install it on
+        Zero config. Works instantly. Fully open-source. <br />Install it on
         your repositories and start scanning now.
       </p>
     </div>
