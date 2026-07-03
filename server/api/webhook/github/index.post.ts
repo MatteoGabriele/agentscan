@@ -270,6 +270,25 @@ export default defineEventHandler(async (event) => {
       ? 'action_required'
       : 'success'
 
+    if (shouldAutoClose) {
+      try {
+        await octokit.rest.issues.update({
+          owner,
+          repo,
+          issue_number: targetNumber,
+          state: 'closed',
+          state_reason: 'not_planned',
+        })
+      } catch (err: unknown) {
+        if (
+          err instanceof Error &&
+          !err.message.includes('Resource not accessible')
+        ) {
+          throw err
+        }
+      }
+    }
+
     if (
       !repoConfig['comment-on-organic'] &&
       !hasCommunityFlag &&
@@ -280,11 +299,15 @@ export default defineEventHandler(async (event) => {
     }
 
     if (repoConfig.mode === 'silent') {
-      await completeCheckRun(
-        'success',
-        'Analysis skipped',
-        'AgentScan is configured in silent mode for this repository.',
-      )
+      if (shouldAutoClose) {
+        await completeCheckRun(checkConclusion, details.label, description)
+      } else {
+        await completeCheckRun(
+          'success',
+          'Analysis skipped',
+          'AgentScan is configured in silent mode for this repository.',
+        )
+      }
       return { ok: true }
     }
 
@@ -370,25 +393,6 @@ export default defineEventHandler(async (event) => {
         !err.message.includes('Resource not accessible')
       ) {
         throw err
-      }
-    }
-
-    if (shouldAutoClose) {
-      try {
-        await octokit.rest.issues.update({
-          owner,
-          repo,
-          issue_number: targetNumber,
-          state: 'closed',
-          state_reason: 'not_planned',
-        })
-      } catch (err: unknown) {
-        if (
-          err instanceof Error &&
-          !err.message.includes('Resource not accessible')
-        ) {
-          throw err
-        }
       }
     }
 

@@ -815,6 +815,52 @@ describe('GitHub Webhook Handler', () => {
 
       expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalled()
     })
+
+    it('closes organic PRs when auto-close-classifications includes organic, even though comment-on-organic is disabled by default', async () => {
+      mockRepoConfig({
+        'auto-close': true,
+        'auto-close-classifications': ['organic'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          state: 'closed',
+          state_reason: 'not_planned',
+        }),
+      )
+      expect(
+        mockInstallationOctokit.rest.issues.createComment,
+      ).not.toHaveBeenCalled()
+    })
+
+    it('closes the PR when autoClose matches even though mode is silent', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+      mockRepoConfig({
+        mode: 'silent',
+        'auto-close': true,
+        'auto-close-classifications': ['automation'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          state: 'closed',
+          state_reason: 'not_planned',
+        }),
+      )
+      expect(
+        mockInstallationOctokit.rest.issues.createComment,
+      ).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'action_required' }),
+      )
+    })
   })
 
   describe('Custom Messages (via repo config)', () => {
