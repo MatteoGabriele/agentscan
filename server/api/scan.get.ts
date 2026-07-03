@@ -2,15 +2,24 @@ import { identify } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_USER_COUNT } from '~~/shared/scan'
+import type { Endpoints } from '@octokit/types'
+
+export type AuthorAssociation =
+  Endpoints['GET /repos/{owner}/{repo}/pulls/{pull_number}']['response']['data']['author_association']
 
 const PER_PAGE = 50
 const MAX_PAGES = 5
 const EVENT_PAGES = 3
 
+const TRUSTED_ASSOCIATIONS: AuthorAssociation[] = [
+  'OWNER',
+  'MEMBER',
+  'COLLABORATOR',
+] as const
+
 type Entry = {
   login: string
   prUrl: string
-  authorAssociation: string
 }
 
 export default defineCachedEventHandler(
@@ -58,14 +67,21 @@ export default defineCachedEventHandler(
           if (entries.length >= MAX_PR_USER_COUNT) {
             break
           }
+
           if (!pr.user?.login) {
             continue
           }
+
           if (isKnownBot(pr.user.login)) {
             continue
           }
 
+          if (TRUSTED_ASSOCIATIONS.includes(pr.author_association)) {
+            continue
+          }
+
           const lower = pr.user.login.toLowerCase()
+
           if (seenEntries.has(lower)) {
             continue
           }
@@ -74,7 +90,6 @@ export default defineCachedEventHandler(
           entries.push({
             login: lower,
             prUrl: pr.html_url,
-            authorAssociation: pr.author_association,
           })
         }
 
@@ -112,7 +127,6 @@ export default defineCachedEventHandler(
             user,
             analysis,
             prUrl: entry.prUrl,
-            authorAssociation: entry.authorAssociation,
             eventsCount: events.length,
           }
         }),

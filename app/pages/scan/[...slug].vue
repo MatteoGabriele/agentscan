@@ -66,9 +66,7 @@ async function handleSubmit(value: string) {
   </div>
 
   <div v-else-if="data">
-    <div
-      class="flex items-baseline justify-between mb-2 ml-6 text-sm text-gh-muted"
-    >
+    <div class="flex flex-col justify-between mb-2 ml-2 text-sm text-gh-muted">
       <p>
         {{ data.authors.length }} unique authors with open PRs in
         <NuxtLink
@@ -79,6 +77,10 @@ async function handleSubmit(value: string) {
         >
           {{ data.repo }}
         </NuxtLink>
+      </p>
+      <p class="text-xs text-gh-muted/80 mt-1">
+        Members, collaborators, and owners are excluded from the scan, as
+        they're trusted by default.
       </p>
     </div>
 
