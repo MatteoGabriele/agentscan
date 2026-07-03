@@ -475,7 +475,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
       key: repoName,
       owner: owner!,
       repo,
-      color: getRepoColor(repoName)! ?? colors.value.border,
+      color: getRepoColor(repoName) ?? colors.value.border ?? 'currentColor',
       value: Number.isFinite(percentage) ? `${percentage.toFixed(0)}%` : '-',
       detail:
         closed == null || eligible == null
@@ -602,9 +602,10 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
 
       <div class="min-w-0 max-w-[740px] overflow-hidden">
         <ClientOnly>
-          <VueUiXy :dataset="dataset" :config="config" ref="chartLineRef">
+          <VueUiXy ref="chartLineRef" :dataset="dataset" :config="config">
             <template #svg="{ svg }">
               <!-- LAST VALUE LABEL -->
+              <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component, vue/no-v-html -->
               <g v-html="drawLastDatapointLabel(svg)" />
 
               <!-- LAST DATAPOINT CIRCLE -->

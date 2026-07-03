@@ -464,7 +464,9 @@ export function createLastDatapointLabelsSvg({
   const labels = series
     .map((serie) => {
       const lastPlot = Array.isArray(serie.plots) ? serie.plots.at(-1) : null
-      if (!lastPlot) return null
+      if (!lastPlot) {
+        return null
+      }
 
       const value = Number(lastPlot.value ?? 0)
       const safeValue = Number.isFinite(value) ? value : 0
@@ -481,11 +483,15 @@ export function createLastDatapointLabelsSvg({
     })
     .filter(isLastDatapointLabel)
 
-  if (!labels.length) return ''
+  if (!labels.length) {
+    return ''
+  }
 
   const hasCollision = labels.some((label, labelIndex) =>
     labels.some((otherLabel, otherLabelIndex) => {
-      if (labelIndex === otherLabelIndex) return false
+      if (labelIndex === otherLabelIndex) {
+        return false
+      }
 
       return (
         label.x + labelOffset < otherLabel.x + labelOffset + otherLabel.width &&
@@ -533,14 +539,18 @@ export function createLastDatapointLabelsSvg({
   for (let index = 1; index < positionedLabels.length; index += 1) {
     const previousLabel = positionedLabels[index - 1]
     const currentLabel = positionedLabels[index]
-    if (!previousLabel || !currentLabel) continue
+    if (!previousLabel || !currentLabel) {
+      continue
+    }
     if (currentLabel.labelY - previousLabel.labelY < labelHeight) {
       currentLabel.labelY = previousLabel.labelY + labelHeight
     }
   }
 
   const lastLabel = positionedLabels.at(-1)
-  if (!lastLabel) return ''
+  if (!lastLabel) {
+    return ''
+  }
   const overflow = lastLabel.labelY - maximumLabelY
 
   if (overflow > 0) {
