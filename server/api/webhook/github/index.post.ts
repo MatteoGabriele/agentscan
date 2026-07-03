@@ -116,25 +116,8 @@ export default defineEventHandler(async (event) => {
     // no config file — use defaults
   }
 
-  if (isPR && !repoConfig.scan['pull-requests']) {
-    return { ok: true }
-  }
-
-  if (isIssue && !repoConfig.scan.issues) {
-    return { ok: true }
-  }
-
-  if (
-    repoConfig['allowed-users'].includes(username) ||
-    isKnownBot(username) ||
-    (authorAssociation &&
-      repoConfig['trusted-author-associations'].includes(authorAssociation))
-  ) {
-    return { ok: true }
-  }
-
   let checkRunId: number | undefined
-  if (isPR && repoConfig.mode !== 'silent') {
+  if (isPR) {
     try {
       const { data: checkRun } = await octokit.rest.checks.create({
         owner,
@@ -178,6 +161,33 @@ export default defineEventHandler(async (event) => {
       .catch(() => {
         // check run update failed — nothing further we can do
       })
+  }
+
+  if (isPR && !repoConfig.scan['pull-requests']) {
+    await completeCheckRun(
+      'success',
+      'Analysis skipped',
+      'PR scanning is disabled for this repository.',
+    )
+    return { ok: true }
+  }
+
+  if (isIssue && !repoConfig.scan.issues) {
+    return { ok: true }
+  }
+
+  if (
+    repoConfig['allowed-users'].includes(username) ||
+    isKnownBot(username) ||
+    (authorAssociation &&
+      repoConfig['trusted-author-associations'].includes(authorAssociation))
+  ) {
+    await completeCheckRun(
+      'success',
+      'Analysis skipped',
+      'This contributor is exempt from analysis (allow-listed, a known automation, or a trusted author association).',
+    )
+    return { ok: true }
   }
 
   try {
@@ -270,6 +280,11 @@ export default defineEventHandler(async (event) => {
     }
 
     if (repoConfig.mode === 'silent') {
+      await completeCheckRun(
+        'success',
+        'Analysis skipped',
+        'AgentScan is configured in silent mode for this repository.',
+      )
       return { ok: true }
     }
 

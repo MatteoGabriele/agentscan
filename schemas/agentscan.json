@@ -73,7 +73,7 @@
       "examples": [["automation"], ["automation", "mixed"]]
     },
     "mode": {
-      "description": "Controls what actions AgentScan takes on each PR/issue.\n- full: post a comment and apply labels (default)\n- comment: post a comment only\n- labels: apply labels only\n- silent: run analysis but take no visible action",
+      "description": "Controls what actions AgentScan takes on each PR/issue.\n- full: post a comment and apply labels (default)\n- comment: post a comment only\n- labels: apply labels only\n- silent: run analysis but post no comment or labels (still reports a passing \"Analysis skipped\" check on PRs)",
       "type": "string",
       "enum": ["full", "comment", "labels", "silent"],
       "default": "full"

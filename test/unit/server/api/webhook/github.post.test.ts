@@ -367,13 +367,23 @@ describe('GitHub Webhook Handler', () => {
   describe('Known Bots', () => {
     it('returns { ok: true } without scanning when username is a known CI/CD bot', async () => {
       setupEvent({
-        pull_request: { number: 123, user: { login: 'dependabot[bot]' } },
+        pull_request: {
+          number: 123,
+          user: { login: 'dependabot[bot]' },
+          head: { sha: 'abc123' },
+        },
       })
 
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
       expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('returns { ok: true } without scanning for usernames ending with [bot]', async () => {
@@ -402,6 +412,12 @@ describe('GitHub Webhook Handler', () => {
 
       expect(result).toEqual({ ok: true })
       expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('proceeds with scan when username is not in allowedUsers', async () => {
@@ -420,6 +436,7 @@ describe('GitHub Webhook Handler', () => {
           number: 123,
           user: { login: 'test-user' },
           author_association: 'OWNER',
+          head: { sha: 'abc123' },
         },
       })
       mockRepoConfig({ 'trusted-author-associations': ['owner', 'member'] })
@@ -428,6 +445,12 @@ describe('GitHub Webhook Handler', () => {
 
       expect(result).toEqual({ ok: true })
       expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('proceeds with scan when author_association is not in trusted-author-associations', async () => {
@@ -942,12 +965,22 @@ describe('GitHub Webhook Handler', () => {
       )
     })
 
-    it('does not create a check run when repo config mode is silent', async () => {
+    it('completes the check run with "Analysis skipped" when repo config mode is silent', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'mixed',
+      })
       mockRepoConfig({ mode: 'silent' })
 
       await handler(MOCK_EVENT)
 
-      expect(mockInstallationOctokit.rest.checks.create).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.create).toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('completes the check run even when organic silence short-circuits feedback', async () => {
@@ -955,6 +988,21 @@ describe('GitHub Webhook Handler', () => {
 
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({ conclusion: 'success' }),
+      )
+    })
+
+    it('completes the check run with "Analysis skipped" when PR scanning is disabled for the repo', async () => {
+      mockRepoConfig({ scan: { 'pull-requests': false } })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
       )
     })
 
