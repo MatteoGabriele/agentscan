@@ -1,17 +1,61 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { usePreferredDark } from '@vueuse/core'
+
+const darkMode = usePreferredDark()
+const colorMode = useColorMode()
+const colorScheme = computed(() => {
+  return {
+    system: darkMode ? 'dark light' : 'light dark',
+    light: 'only light',
+    dark: 'only dark',
+  }[colorMode.preference]
+})
+
+useHead({
+  title: 'AgentScan - GitHub Automation Detector',
+  meta: [
+    {
+      property: 'og:title',
+      content: 'AgentScan - GitHub Automation Detector',
+    },
+    {
+      property: 'og:description',
+      content: 'An open experiment in detecting automation patterns on GitHub',
+    },
+    { property: 'og:type', content: 'website' },
+    { name: 'color-scheme', content: colorScheme },
+  ],
+  link: [
+    {
+      rel: 'icon',
+      href: '/favicon.ico',
+      type: 'image/x-icon',
+      media: '(prefers-color-scheme: dark)',
+    },
+    {
+      rel: 'icon',
+      href: '/favicon-dark.ico',
+      type: 'image/x-icon',
+      media: '(prefers-color-scheme: light)',
+    },
+  ],
+})
+</script>
 
 <template>
-  <div class="mx-auto max-w-2xl p-6 pb-12 w-full">
-    <button
-      class="text-gh-muted hover:text-gh-text transition-colors flex items-center gap-2"
-      @click="$router.back()"
-    >
-      <span class="text-lg i-lucide:arrow-left"></span>
-      Go back
-    </button>
+  <NuxtLoadingIndicator />
 
-    <div class="mt-8">
-      <slot />
+  <div class="flex flex-col">
+    <div class="min-h-svh flex flex-col relative">
+      <MainHeader only-logo />
+
+      <div class="flex flex-1 items-center justify-center">
+        <main class="max-w-screen-md mx-auto px-4 @container w-full py-20">
+          <slot />
+        </main>
+      </div>
     </div>
+
+    <MainFooter />
   </div>
 </template>

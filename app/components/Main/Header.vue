@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{
+  onlyLogo?: boolean
+}>()
+</script>
 
 <template>
   <header class="h-12 flex justify-between items-center px-4 lg:px-6 py-4">
@@ -12,7 +16,7 @@
         AgentScan
       </NuxtLink>
     </div>
-    <div class="hidden lg:block">
+    <div v-if="!onlyLogo" class="hidden lg:block">
       <ul class="flex items-center gap-4">
         <li><MainMenuItem to="/" label="Search" /></li>
         <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
@@ -22,7 +26,7 @@
       </ul>
     </div>
 
-    <div class="flex-1 flex items-center gap-4 justify-end">
+    <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
       <NuxtLink
         external
         target="_blank"
