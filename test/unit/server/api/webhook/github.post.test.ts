@@ -398,6 +398,53 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
+  describe('Trusted Author Associations (via repo config)', () => {
+    it('returns { ok: true } without scanning when author_association is in trusted-author-associations', async () => {
+      setupEvent({
+        pull_request: {
+          number: 123,
+          user: { login: 'test-user' },
+          author_association: 'OWNER',
+        },
+      })
+      mockRepoConfig({ 'trusted-author-associations': ['owner', 'member'] })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+    })
+
+    it('proceeds with scan when author_association is not in trusted-author-associations', async () => {
+      setupEvent({
+        pull_request: {
+          number: 123,
+          user: { login: 'test-user' },
+          author_association: 'CONTRIBUTOR',
+        },
+      })
+      mockRepoConfig({ 'trusted-author-associations': ['owner', 'member'] })
+
+      await handler(MOCK_EVENT)
+
+      expect(identify).toHaveBeenCalled()
+    })
+
+    it('proceeds with scan when trusted-author-associations is not configured', async () => {
+      setupEvent({
+        pull_request: {
+          number: 123,
+          user: { login: 'test-user' },
+          author_association: 'OWNER',
+        },
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(identify).toHaveBeenCalled()
+    })
+  })
+
   describe('Scan Mode: silent', () => {
     it('returns { ok: true } without posting a comment or adding labels', async () => {
       vi.mocked(identify).mockReturnValue({
