@@ -25,8 +25,8 @@ useHead({
     <div>
       <h1 class="text-2xl font-semibold">AgentScan GitHub App</h1>
       <p class="text-gh-muted mt-2 max-w-md mx-auto text-pretty">
-        Zero config. Install it on your repositories and it starts working
-        immediately, no workflow files required.
+        Zero config. Works instantly. No workflow files required. Install it on
+        your repositories and start scanning now.
       </p>
     </div>
 
@@ -40,7 +40,7 @@ useHead({
     </NuxtLink>
 
     <p class="text-xs text-gh-muted/70">
-      Prefer more control? Use the
+      Prefer running it in CI? Try the
       <NuxtLink
         external
         target="_blank"
