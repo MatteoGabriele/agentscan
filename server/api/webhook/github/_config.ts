@@ -20,7 +20,7 @@ export type RepoConfig = {
   'auto-close': boolean
   'auto-close-classifications': IdentityClassification[]
   mode: ScanMode
-  'silent-on-organic': boolean
+  'comment-on-organic': boolean
   scan: {
     'pull-requests': boolean
     issues: boolean
@@ -45,7 +45,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
   'auto-close': false,
   'auto-close-classifications': ['automation'],
   mode: 'full',
-  'silent-on-organic': false,
+  'comment-on-organic': false,
   scan: {
     'pull-requests': true,
     issues: false,

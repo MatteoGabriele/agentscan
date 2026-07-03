@@ -10,8 +10,6 @@ allowed-users:
   - graphieros
   - huang-julien
 
-silent-on-organic: true
-
 auto-close: true
 auto-close-classifications:
   - automation

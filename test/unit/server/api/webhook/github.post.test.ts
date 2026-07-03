@@ -30,6 +30,10 @@ const {
         createLabel: vi.fn(),
         update: vi.fn(),
       },
+      checks: {
+        create: vi.fn(),
+        update: vi.fn(),
+      },
     },
   }
 
@@ -97,7 +101,11 @@ const RUNTIME_CONFIG = {
 
 const BASE_PAYLOAD = {
   action: 'opened',
-  pull_request: { number: 123, user: { login: 'test-user' } },
+  pull_request: {
+    number: 123,
+    user: { login: 'test-user' },
+    head: { sha: 'abc123' },
+  },
   installation: { id: 42 },
   repository: { owner: { login: 'test-owner' }, name: 'test-repo' },
 }
@@ -181,6 +189,10 @@ describe('GitHub Webhook Handler', () => {
     mockInstallationOctokit.rest.issues.addLabels.mockResolvedValue({})
     mockInstallationOctokit.rest.issues.createLabel.mockResolvedValue({})
     mockInstallationOctokit.rest.issues.update.mockResolvedValue({})
+    mockInstallationOctokit.rest.checks.create.mockResolvedValue({
+      data: { id: 555 },
+    })
+    mockInstallationOctokit.rest.checks.update.mockResolvedValue({})
     mockAppOctokit.rest.repos.getContent.mockRejectedValue(
       new Error('Not Found'),
     )
@@ -273,6 +285,7 @@ describe('GitHub Webhook Handler', () => {
 
     it('returns { ok: true } for reopened PRs', async () => {
       setupEvent({ action: 'reopened' })
+      mockRepoConfig({ 'comment-on-organic': true })
 
       const result = await handler(MOCK_EVENT)
 
@@ -339,6 +352,8 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('returns flagged: false for organic accounts', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
+
       const result = await handler(MOCK_EVENT)
 
       expect(result).toMatchObject({
@@ -352,13 +367,23 @@ describe('GitHub Webhook Handler', () => {
   describe('Known Bots', () => {
     it('returns { ok: true } without scanning when username is a known CI/CD bot', async () => {
       setupEvent({
-        pull_request: { number: 123, user: { login: 'dependabot[bot]' } },
+        pull_request: {
+          number: 123,
+          user: { login: 'dependabot[bot]' },
+          head: { sha: 'abc123' },
+        },
       })
 
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
       expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('returns { ok: true } without scanning for usernames ending with [bot]', async () => {
@@ -387,6 +412,12 @@ describe('GitHub Webhook Handler', () => {
 
       expect(result).toEqual({ ok: true })
       expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('proceeds with scan when username is not in allowedUsers', async () => {
@@ -405,6 +436,7 @@ describe('GitHub Webhook Handler', () => {
           number: 123,
           user: { login: 'test-user' },
           author_association: 'OWNER',
+          head: { sha: 'abc123' },
         },
       })
       mockRepoConfig({ 'trusted-author-associations': ['owner', 'member'] })
@@ -413,6 +445,12 @@ describe('GitHub Webhook Handler', () => {
 
       expect(result).toEqual({ ok: true })
       expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
     })
 
     it('proceeds with scan when author_association is not in trusted-author-associations', async () => {
@@ -511,7 +549,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('updates an existing agentscan comment instead of creating a new one', async () => {
-      mockRepoConfig({ mode: 'comment' })
+      mockRepoConfig({ mode: 'comment', 'comment-on-organic': true })
       mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
         data: [
           {
@@ -566,7 +604,9 @@ describe('GitHub Webhook Handler', () => {
       )
     })
 
-    it('posts a comment but no labels for organic accounts', async () => {
+    it('posts a comment but no labels for organic accounts when comment-on-organic is enabled', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
+
       await handler(MOCK_EVENT)
 
       expect(
@@ -652,10 +692,8 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
-  describe('silentOnOrganic', () => {
-    it('returns { ok: true } without comment or labels for organic accounts when enabled', async () => {
-      mockRepoConfig({ 'silent-on-organic': true })
-
+  describe('commentOnOrganic', () => {
+    it('returns { ok: true } without comment or labels for organic accounts by default', async () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
@@ -664,8 +702,17 @@ describe('GitHub Webhook Handler', () => {
       ).not.toHaveBeenCalled()
     })
 
-    it('still posts comment for community-flagged accounts even when silentOnOrganic is true', async () => {
-      mockRepoConfig({ 'silent-on-organic': true })
+    it('posts a comment for organic accounts when comment-on-organic is enabled', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
+
+      await handler(MOCK_EVENT)
+
+      expect(
+        mockInstallationOctokit.rest.issues.createComment,
+      ).toHaveBeenCalled()
+    })
+
+    it('still posts comment for community-flagged accounts even when comment-on-organic is disabled', async () => {
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
@@ -675,12 +722,11 @@ describe('GitHub Webhook Handler', () => {
       ).toHaveBeenCalled()
     })
 
-    it('still posts comment for non-organic accounts when silentOnOrganic is true', async () => {
+    it('still posts comment for non-organic accounts when comment-on-organic is disabled', async () => {
       vi.mocked(identify).mockReturnValue({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
-      mockRepoConfig({ 'silent-on-organic': true })
 
       await handler(MOCK_EVENT)
 
@@ -769,6 +815,52 @@ describe('GitHub Webhook Handler', () => {
 
       expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalled()
     })
+
+    it('closes organic PRs when auto-close-classifications includes organic, even though comment-on-organic is disabled by default', async () => {
+      mockRepoConfig({
+        'auto-close': true,
+        'auto-close-classifications': ['organic'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          state: 'closed',
+          state_reason: 'not_planned',
+        }),
+      )
+      expect(
+        mockInstallationOctokit.rest.issues.createComment,
+      ).not.toHaveBeenCalled()
+    })
+
+    it('closes the PR when autoClose matches even though mode is silent', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+      mockRepoConfig({
+        mode: 'silent',
+        'auto-close': true,
+        'auto-close-classifications': ['automation'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          state: 'closed',
+          state_reason: 'not_planned',
+        }),
+      )
+      expect(
+        mockInstallationOctokit.rest.issues.createComment,
+      ).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'action_required' }),
+      )
+    })
   })
 
   describe('Custom Messages (via repo config)', () => {
@@ -805,6 +897,194 @@ describe('GitHub Webhook Handler', () => {
       const commentCall =
         mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
       expect(commentCall.body).toContain('Flagged by our community watchlist.')
+    })
+  })
+
+  describe('GitHub Checks', () => {
+    it('creates an in-progress check run on the PR head SHA before scanning', async () => {
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          owner: 'test-owner',
+          repo: 'test-repo',
+          name: 'AgentScan',
+          head_sha: 'abc123',
+          status: 'in_progress',
+        }),
+      )
+    })
+
+    it('completes the check run with a success conclusion for organic accounts', async () => {
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555,
+          status: 'completed',
+          conclusion: 'success',
+        }),
+      )
+    })
+
+    it('completes the check run with a success conclusion for mixed accounts when auto-close is disabled', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'mixed',
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'success' }),
+      )
+    })
+
+    it('completes the check run with a success conclusion for automation accounts when auto-close is disabled', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'success' }),
+      )
+    })
+
+    it('completes the check run with a success conclusion for community-flagged accounts when auto-close is disabled', async () => {
+      mockVerifiedList(['test-user'])
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'success' }),
+      )
+    })
+
+    it('completes the check run with an action_required conclusion when auto-close triggers on a matching classification', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+      mockRepoConfig({
+        'auto-close': true,
+        'auto-close-classifications': ['automation'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'action_required' }),
+      )
+    })
+
+    it('completes the check run with a success conclusion when auto-close is enabled but the classification does not match', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'mixed',
+      })
+      mockRepoConfig({
+        'auto-close': true,
+        'auto-close-classifications': ['automation'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'success' }),
+      )
+    })
+
+    it('completes the check run with an action_required conclusion when auto-close triggers on a community-flagged account', async () => {
+      mockVerifiedList(['test-user'])
+      mockRepoConfig({
+        'auto-close': true,
+        'auto-close-classifications': ['automation'],
+      })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'action_required' }),
+      )
+    })
+
+    it('completes the check run with "Analysis skipped" when repo config mode is silent', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'mixed',
+      })
+      mockRepoConfig({ mode: 'silent' })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.create).toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
+    })
+
+    it('completes the check run even when organic silence short-circuits feedback', async () => {
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'success' }),
+      )
+    })
+
+    it('completes the check run with "Analysis skipped" when PR scanning is disabled for the repo', async () => {
+      mockRepoConfig({ scan: { 'pull-requests': false } })
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(identify).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conclusion: 'success',
+          output: expect.objectContaining({ title: 'Analysis skipped' }),
+        }),
+      )
+    })
+
+    it('does not create a check run for issue events', async () => {
+      setupEvent({
+        pull_request: undefined,
+        issue: { number: 123, user: { login: 'test-user' } },
+      })
+      mockRepoConfig({ scan: { issues: true } })
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.create).not.toHaveBeenCalled()
+    })
+
+    it('completes the check run with a failure conclusion and rethrows when scanning errors', async () => {
+      mockInstallationOctokit.rest.users.getByUsername.mockRejectedValue(
+        new Error('boom'),
+      )
+
+      await expect(handler(MOCK_EVENT)).rejects.toThrow('boom')
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'failure' }),
+      )
+    })
+
+    it('continues without a check run when checks.create fails (e.g. missing permission)', async () => {
+      mockInstallationOctokit.rest.checks.create.mockRejectedValue(
+        new Error('Resource not accessible by integration'),
+      )
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toMatchObject({ ok: true })
+      expect(mockInstallationOctokit.rest.checks.update).not.toHaveBeenCalled()
     })
   })
 })
