@@ -73,11 +73,14 @@ function scrollToConfig() {
           >
             <button
               type="button"
-              class="cursor-pointer text-sm text-gh-muted hover:text-gh-text transition-colors flex items-center justify-center gap-1.5 mt-4"
+              class="text-sm text-gh-muted hover:text-gh-text transition-colors flex items-center justify-center gap-2.5 mt-4 flex-col"
               @click="scrollToConfig"
             >
-              <span class="i-lucide:chevron-down" aria-hidden="true" />
-              Customize configuration (optional)
+              <span
+                class="i-lucide:chevrons-down animate-scroll-hint"
+                aria-hidden="true"
+              />
+              Customize configuration
             </button>
           </div>
         </div>
