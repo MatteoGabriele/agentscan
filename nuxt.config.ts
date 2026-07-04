@@ -126,5 +126,11 @@ export default defineNuxtConfig({
         maxAge: 60 * 60,
       },
     },
+    '/schemas/**': {
+      headers: {
+        'cache-control':
+          'public, max-age=86400, stale-while-revalidate=2592000',
+      },
+    },
   },
 })
