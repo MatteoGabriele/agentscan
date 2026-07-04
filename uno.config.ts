@@ -49,15 +49,20 @@ export default defineConfig({
     animation: {
       keyframes: {
         spin: '{ from { transform: rotate(0deg) } to { transform: rotate(360deg) } }',
+        'chevron-float':
+          '{ 0%, 100% { transform: translateY(0); opacity: 0.35 } 50% { transform: translateY(7px); opacity: 1 } }',
       },
       durations: {
         spin: '1s',
+        'chevron-float': '1.8s',
       },
       timingFns: {
         spin: 'linear',
+        'chevron-float': 'ease-in-out',
       },
       counts: {
         spin: 'infinite',
+        'chevron-float': 'infinite',
       },
     },
   },
