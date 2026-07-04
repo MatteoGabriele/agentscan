@@ -56,6 +56,22 @@ useHead({
       instead.
     </p>
 
+    <details class="w-full max-w-2xl text-left mt-4 group">
+      <summary
+        class="cursor-pointer text-sm text-gh-muted hover:text-gh-text transition-colors list-none marker:content-none [&::-webkit-details-marker]:hidden flex items-center justify-center gap-1.5"
+      >
+        <span
+          class="i-lucide:chevron-down transition-transform group-open:rotate-180"
+          aria-hidden="true"
+        />
+        Customize configuration (optional)
+      </summary>
+
+      <div class="mt-6">
+        <AppConfigGenerator />
+      </div>
+    </details>
+
     <ContributorsList
       class="absolute w-full px-4 bottom-4 left-1/2 -translate-x-1/2 flex"
     />
