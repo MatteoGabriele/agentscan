@@ -174,25 +174,37 @@ const { copy, copied } = useClipboard({ source: yaml })
 
 <template>
   <div class="flex flex-col gap-8">
-    <form class="flex flex-col gap-6" @submit.prevent>
-      <fieldset class="flex flex-col gap-2">
-        <legend class="font-semibold text-gh-text">Mode</legend>
+    <form class="flex flex-col gap-5" @submit.prevent>
+      <fieldset
+        class="flex flex-col gap-3 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Mode</legend>
         <p class="text-xs text-gh-muted">
           Controls what actions AgentScan takes on each PR/issue.
         </p>
-        <select
-          v-model="mode"
-          class="mt-1 px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text focus:outline-none focus:border-gh-border-light"
-        >
-          <option v-for="item in MODES" :key="item.value" :value="item.value">
-            {{ item.label }}
-          </option>
-        </select>
+        <div class="relative">
+          <select
+            v-model="mode"
+            class="w-full appearance-none px-3 py-2 pr-9 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text focus:outline-none focus:border-gh-border-light"
+          >
+            <option v-for="item in MODES" :key="item.value" :value="item.value">
+              {{ item.label }}
+            </option>
+          </select>
+          <span
+            class="i-lucide:chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gh-muted pointer-events-none"
+            aria-hidden="true"
+          />
+        </div>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-2">
-        <legend class="font-semibold text-gh-text">Scan triggers</legend>
-        <label class="flex items-center gap-2 text-sm">
+      <fieldset
+        class="flex flex-col gap-3 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Scan triggers</legend>
+        <label
+          class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+        >
           <input
             v-model="scanPullRequests"
             type="checkbox"
@@ -200,14 +212,18 @@ const { copy, copied } = useClipboard({ source: yaml })
           />
           Pull requests
         </label>
-        <label class="flex items-center gap-2 text-sm">
+        <label
+          class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+        >
           <input v-model="scanIssues" type="checkbox" class="accent-gh-green" />
           Issues
         </label>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-2">
-        <legend class="font-semibold text-gh-text">Allowed users</legend>
+      <fieldset
+        class="flex flex-col gap-3 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Allowed users</legend>
         <p class="text-xs text-gh-muted">
           GitHub usernames to exclude from scanning. Press Enter or comma to
           add.
@@ -243,31 +259,39 @@ const { copy, copied } = useClipboard({ source: yaml })
         </div>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-2">
-        <legend class="font-semibold text-gh-text">
+      <fieldset
+        class="flex flex-col gap-3 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">
           Trusted author associations
         </legend>
         <p class="text-xs text-gh-muted">
           Author associations to exclude from scanning.
         </p>
-        <label
-          v-for="item in AUTHOR_ASSOCIATIONS"
-          :key="item.value"
-          class="flex items-center gap-2 text-sm"
-        >
-          <input
-            v-model="trustedAuthorAssociations"
-            type="checkbox"
-            :value="item.value"
-            class="accent-gh-green"
-          />
-          {{ item.label }}
-        </label>
+        <div class="flex flex-col gap-2">
+          <label
+            v-for="item in AUTHOR_ASSOCIATIONS"
+            :key="item.value"
+            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+          >
+            <input
+              v-model="trustedAuthorAssociations"
+              type="checkbox"
+              :value="item.value"
+              class="accent-gh-green"
+            />
+            {{ item.label }}
+          </label>
+        </div>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-2">
-        <legend class="font-semibold text-gh-text">Comments</legend>
-        <label class="flex items-center gap-2 text-sm">
+      <fieldset
+        class="flex flex-col gap-3 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Comments</legend>
+        <label
+          class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+        >
           <input
             v-model="commentOnOrganic"
             type="checkbox"
@@ -277,18 +301,25 @@ const { copy, copied } = useClipboard({ source: yaml })
         </label>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-2">
-        <legend class="font-semibold text-gh-text">Auto-close</legend>
-        <label class="flex items-center gap-2 text-sm">
+      <fieldset
+        class="flex flex-col gap-3 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Auto-close</legend>
+        <label
+          class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+        >
           <input v-model="autoClose" type="checkbox" class="accent-gh-green" />
           Automatically close PRs/issues opened by flagged accounts
         </label>
 
-        <div v-if="autoClose" class="flex flex-col gap-2 mt-2 pl-6">
+        <div
+          v-if="autoClose"
+          class="flex flex-col gap-2 mt-1 pl-6 border-l border-gh-border/40"
+        >
           <label
             v-for="item in CLASSIFICATIONS"
             :key="item.value"
-            class="flex items-center gap-2 text-sm"
+            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90 pl-3"
           >
             <input
               v-model="autoCloseClassifications"
@@ -301,9 +332,11 @@ const { copy, copied } = useClipboard({ source: yaml })
         </div>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-3">
-        <legend class="font-semibold text-gh-text">Labels</legend>
-        <label class="flex flex-col gap-1 text-sm">
+      <fieldset
+        class="flex flex-col gap-4 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Labels</legend>
+        <label class="flex flex-col gap-1.5 text-sm">
           Community-flagged
           <input
             v-model="labelCommunityFlagged"
@@ -311,7 +344,7 @@ const { copy, copied } = useClipboard({ source: yaml })
             class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-border-light"
           />
         </label>
-        <label class="flex flex-col gap-1 text-sm">
+        <label class="flex flex-col gap-1.5 text-sm">
           Mixed signals
           <input
             v-model="labelMixed"
@@ -319,7 +352,7 @@ const { copy, copied } = useClipboard({ source: yaml })
             class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-border-light"
           />
         </label>
-        <label class="flex flex-col gap-1 text-sm">
+        <label class="flex flex-col gap-1.5 text-sm">
           Automated account
           <input
             v-model="labelAutomation"
@@ -329,44 +362,42 @@ const { copy, copied } = useClipboard({ source: yaml })
         </label>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-3">
-        <legend class="font-semibold text-gh-text">Messages</legend>
-        <p class="text-xs text-gh-muted">
+      <fieldset
+        class="flex flex-col gap-4 rounded-lg border border-gh-border/50 bg-gh-card p-4"
+      >
+        <legend class="px-1 font-semibold text-gh-text">Messages</legend>
+        <p class="text-xs text-gh-muted -mt-2">
           Custom comment messages per classification. Supports Markdown. Leave
           blank to use the default message.
         </p>
-        <label class="flex flex-col gap-1 text-sm">
-          Organic
-          <textarea
+        <div class="flex flex-col gap-1.5 text-sm">
+          <span>Organic</span>
+          <CommonMarkdownEditor
             v-model="messageOrganic"
-            rows="2"
-            class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-border-light"
+            placeholder="Default message"
           />
-        </label>
-        <label class="flex flex-col gap-1 text-sm">
-          Mixed
-          <textarea
+        </div>
+        <div class="flex flex-col gap-1.5 text-sm">
+          <span>Mixed</span>
+          <CommonMarkdownEditor
             v-model="messageMixed"
-            rows="2"
-            class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-border-light"
+            placeholder="Default message"
           />
-        </label>
-        <label class="flex flex-col gap-1 text-sm">
-          Automation
-          <textarea
+        </div>
+        <div class="flex flex-col gap-1.5 text-sm">
+          <span>Automation</span>
+          <CommonMarkdownEditor
             v-model="messageAutomation"
-            rows="2"
-            class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-border-light"
+            placeholder="Default message"
           />
-        </label>
-        <label class="flex flex-col gap-1 text-sm">
-          Community-flagged
-          <textarea
+        </div>
+        <div class="flex flex-col gap-1.5 text-sm">
+          <span>Community-flagged</span>
+          <CommonMarkdownEditor
             v-model="messageCommunityFlagged"
-            rows="2"
-            class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-border-light"
+            placeholder="Default message"
           />
-        </label>
+        </div>
       </fieldset>
     </form>
 
