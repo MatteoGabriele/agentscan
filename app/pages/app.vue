@@ -88,7 +88,7 @@ function scrollToConfig() {
       ref="configGenerator"
       class="flex items-center py-12 border-t border-gh-border-light/60 w-full"
     >
-      <div class="w-full max-w-2xl text-left mx-auto">
+      <div class="w-full max-w-2xl text-left mx-auto px-6">
         <AppConfigGenerator />
       </div>
     </section>

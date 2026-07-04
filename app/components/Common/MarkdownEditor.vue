@@ -2,9 +2,27 @@
 import type { Editor } from '@tiptap/core'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import Text from '@tiptap/extension-text'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown, type MarkdownStorage } from 'tiptap-markdown'
+
+// Typed text is treated as markdown source (e.g. a
+// pasted image URL like `![](...)` shouldn't come out as `!\[\]\(...\)`).
+const RawText = Text.extend({
+  addStorage() {
+    return {
+      markdown: {
+        serialize(
+          state: { text: (text: string, escape?: boolean) => void },
+          node: { text?: string },
+        ) {
+          state.text(node.text ?? '', false)
+        },
+      },
+    }
+  },
+})
 
 const props = defineProps<{
   placeholder?: string
@@ -23,6 +41,7 @@ const editor = useEditor({
   content: modelValue.value,
   extensions: [
     StarterKit,
+    RawText,
     Link.configure({ openOnClick: false }),
     Placeholder.configure({ placeholder: props.placeholder ?? '' }),
     Markdown.configure({ html: false }),
@@ -97,7 +116,7 @@ function setLink() {
 
 <template>
   <div
-    class="border border-gh-border/60 rounded overflow-hidden focus-within:border-gh-border-light"
+    class="min-w-0 border border-gh-border/60 rounded overflow-hidden focus-within:border-gh-border-light"
   >
     <div
       class="flex items-center gap-0.5 px-1.5 py-1 border-b border-gh-border/60 bg-gh-muted/10"
@@ -160,6 +179,7 @@ function setLink() {
 :deep(.tiptap) {
   outline: none;
   min-height: 7rem;
+  overflow-wrap: break-word;
 }
 
 :deep(.tiptap p.is-editor-empty:first-child::before) {
