@@ -239,8 +239,8 @@ const { copy, copied } = useClipboard({ source: yaml })
         <div>
           <p class="text-sm font-medium text-gh-text">Allowed users</p>
           <p class="text-xs text-gh-muted mt-1">
-            GitHub usernames to exclude from scanning. Press Enter or comma to
-            add.
+            GitHub usernames to exclude from scanning. Major known CI bots (e.g.
+            dependabot[bot]) are already excluded by default.
           </p>
         </div>
         <div class="self-start">
@@ -265,7 +265,7 @@ const { copy, copied } = useClipboard({ source: yaml })
             <input
               v-model="newAllowedUser"
               type="text"
-              placeholder="dependabot[bot]"
+              placeholder="Add username"
               class="flex-1 min-w-32 px-1 py-1 bg-transparent text-sm text-gh-text font-mono placeholder:text-gh-muted/60 focus:outline-none"
               @keydown.enter.prevent="addAllowedUser"
               @keydown.,.prevent="addAllowedUser"
@@ -273,6 +273,7 @@ const { copy, copied } = useClipboard({ source: yaml })
               @blur="addAllowedUser"
             />
           </div>
+          <p class="text-xs text-gh-muted mt-1">Press Enter or comma to add.</p>
         </div>
       </fieldset>
 
