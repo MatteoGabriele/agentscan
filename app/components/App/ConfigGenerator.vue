@@ -52,7 +52,8 @@ function sameMembers<T>(a: T[], b: T[]): boolean {
 const mode = ref<ScanMode>('full')
 const scanPullRequests = ref(true)
 const scanIssues = ref(false)
-const allowedUsers = ref('')
+const allowedUsersList = ref<string[]>([])
+const newAllowedUser = ref('')
 const trustedAuthorAssociations = ref<AuthorAssociation[]>([])
 const commentOnOrganic = ref(false)
 const autoClose = ref(false)
@@ -67,12 +68,30 @@ const messageMixed = ref('')
 const messageAutomation = ref('')
 const messageCommunityFlagged = ref('')
 
-const allowedUsersList = computed(() =>
-  allowedUsers.value
+function addAllowedUser() {
+  const users = newAllowedUser.value
     .split(/[\n,]/)
     .map((user) => user.trim())
-    .filter(Boolean),
-)
+    .filter(Boolean)
+
+  for (const user of users) {
+    if (!allowedUsersList.value.includes(user)) {
+      allowedUsersList.value.push(user)
+    }
+  }
+
+  newAllowedUser.value = ''
+}
+
+function removeAllowedUser(index: number) {
+  allowedUsersList.value.splice(index, 1)
+}
+
+function removeLastAllowedUser() {
+  if (newAllowedUser.value === '' && allowedUsersList.value.length > 0) {
+    allowedUsersList.value.pop()
+  }
+}
 
 const yaml = computed(() => {
   const config: Record<string, unknown> = { version: 1 }
@@ -190,14 +209,38 @@ const { copy, copied } = useClipboard({ source: yaml })
       <fieldset class="flex flex-col gap-2">
         <legend class="font-semibold text-gh-text">Allowed users</legend>
         <p class="text-xs text-gh-muted">
-          GitHub usernames to exclude from scanning, one per line.
+          GitHub usernames to exclude from scanning. Press Enter or comma to
+          add.
         </p>
-        <textarea
-          v-model="allowedUsers"
-          rows="3"
-          placeholder="dependabot[bot]&#10;renovate[bot]"
-          class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono placeholder:text-gh-muted/60 focus:outline-none focus:border-gh-border-light"
-        />
+        <div
+          class="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-gh-bg border border-gh-border/60 rounded focus-within:border-gh-border-light"
+        >
+          <span
+            v-for="(user, index) in allowedUsersList"
+            :key="user"
+            class="flex items-center gap-1 pl-2 pr-1 py-1 rounded bg-gh-muted/20 text-xs font-mono text-gh-text"
+          >
+            {{ user }}
+            <button
+              type="button"
+              class="flex rounded hover:bg-gh-muted/30 p-0.5"
+              @click="removeAllowedUser(index)"
+            >
+              <span class="i-lucide:x text-xs" aria-hidden="true" />
+              <span class="sr-only">Remove {{ user }}</span>
+            </button>
+          </span>
+          <input
+            v-model="newAllowedUser"
+            type="text"
+            placeholder="dependabot[bot]"
+            class="flex-1 min-w-32 px-1 py-1 bg-transparent text-sm text-gh-text font-mono placeholder:text-gh-muted/60 focus:outline-none"
+            @keydown.enter.prevent="addAllowedUser"
+            @keydown.,.prevent="addAllowedUser"
+            @keydown.backspace="removeLastAllowedUser"
+            @blur="addAllowedUser"
+          />
+        </div>
       </fieldset>
 
       <fieldset class="flex flex-col gap-2">
