@@ -13,7 +13,7 @@ const { data: contributors } = await useContributorsList()
       <li
         v-for="contributor in contributors"
         :key="contributor.name"
-        class="mx-1 transition-all md:group-hover:mx-0 md:-mx-1"
+        class="mx-0 transition-all md:group-hover:mx-0 md:-mx-1"
       >
         <NuxtLink
           :to="contributor.url"

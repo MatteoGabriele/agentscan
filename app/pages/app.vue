@@ -27,6 +27,7 @@ useHead({
       <p class="mt-1 mb-6 text-gh-text/80">
         Built for maintainers dealing with automated accounts on GitHub
       </p>
+
       <p class="text-gh-muted mt-2 max-w-md mx-auto text-pretty">
         Zero config. Works instantly. Fully open-source. <br />Install it on
         your repositories and start scanning now.
@@ -54,5 +55,9 @@ useHead({
       </NuxtLink>
       instead.
     </p>
+
+    <ContributorsList
+      class="absolute w-full px-4 bottom-4 left-1/2 -translate-x-1/2 flex"
+    />
   </section>
 </template>
