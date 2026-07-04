@@ -77,9 +77,15 @@ function scrollToConfig() {
               @click="scrollToConfig"
             >
               <span
-                class="i-lucide:chevrons-down animate-scroll-hint"
+                class="flex flex-col items-center -space-y-2"
                 aria-hidden="true"
-              />
+              >
+                <span class="i-lucide:chevron-down animate-chevron-float" />
+                <span
+                  class="i-lucide:chevron-down animate-chevron-float"
+                  style="animation-delay: 180ms"
+                />
+              </span>
               Customize configuration
             </button>
           </div>
