@@ -28,14 +28,12 @@ defineProps<{
 
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
       <NuxtLink
-        external
-        target="_blank"
-        to="https://github.com/marketplace/actions/agentscan"
+        to="/app"
         class="hidden lg:inline-flex items-center px-3.5 lg:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
-        title="Use it as a GitHub Action"
+        title="Install the GitHub App or use the GitHub Action"
       >
-        <span class="i-lucide:git-fork"></span>
-        <span>GitHub action</span>
+        <span class="i-lucide-github"></span>
+        <span>Get AgentScan</span>
       </NuxtLink>
 
       <MainMobileMenu class="lg:hidden" />

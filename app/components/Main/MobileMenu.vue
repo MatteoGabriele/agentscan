@@ -66,14 +66,12 @@ onBeforeUnmount(() => {
       <div class="w-1/2 border-b h-px border-gh-border-light/80"></div>
 
       <NuxtLink
-        external
-        target="_blank"
-        to="https://github.com/marketplace/actions/agentscan"
+        to="/app"
         class="flex items-center px-4 gap-1 py-1 font-medium rounded-full border border-gh-border text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
-        title="Use it as a GitHub Action"
+        title="Install the GitHub App or use the GitHub Action"
       >
-        <span class="i-lucide:git-fork text-sm"></span>
-        <span>AgentScan GitHub action</span>
+        <span class="i-lucide-github text-sm"></span>
+        <span>Get AgentScan</span>
       </NuxtLink>
 
       <ContributorsList class="my-12" />

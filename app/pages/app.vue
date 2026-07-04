@@ -7,7 +7,7 @@ useHead({
   title: 'GitHub App | AgentScan',
   meta: [
     { property: 'og:title', content: 'GitHub App | AgentScan' },
-    { property: 'og:image', content: '/app.jpg' },
+    { property: 'og:image', content: '/app.png' },
     {
       property: 'og:description',
       content:
