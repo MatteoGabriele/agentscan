@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentscan.tools/schemas/agentscan-action-v2.json",
+  "title": "AgentScan Action Inputs (v2)",
+  "description": "Semantic reference for the `with:` inputs accepted by the AgentScan GitHub Action (action.yml). GitHub Actions passes every input as a string, so booleans/arrays below are the string encodings actions/core expects (e.g. \"true\"/\"false\", comma-separated or JSON-array-syntax lists) rather than native JSON types.",
+  "version": "2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "github-token": {
+      "description": "GitHub token for API access.",
+      "type": "string"
+    },
+    "allowed-users": {
+      "description": "GitHub usernames to exclude from scanning.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["torvalds"]]
+    },
+    "trusted-author-associations": {
+      "description": "Author associations to exclude from scanning (e.g. trusted maintainers opening their own PRs/issues).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "collaborator",
+          "contributor",
+          "first_timer",
+          "first_time_contributor",
+          "member",
+          "owner"
+        ]
+      },
+      "examples": [["owner", "member", "collaborator"]]
+    },
+    "scan-pull-requests": {
+      "description": "Analyze pull requests. Enabled by default.",
+      "type": "boolean",
+      "default": true
+    },
+    "scan-issues": {
+      "description": "Analyze issues. Disabled by default.",
+      "type": "boolean",
+      "default": false
+    },
+    "mode": {
+      "description": "Controls what the action does with its findings.\n- full: post a comment and apply labels (default)\n- comment: post a comment only\n- labels: apply labels only\n- silent: run analysis but post no comment or labels (outputs are still set)",
+      "type": "string",
+      "enum": ["full", "comment", "labels", "silent"],
+      "default": "full"
+    },
+    "comment-on-organic": {
+      "description": "Post a comment even when the analysis result is 'organic'. Organic accounts are silenced by default.",
+      "type": "boolean",
+      "default": false
+    },
+    "cache-path": {
+      "description": "Path to a directory used to cache analysis results between workflow runs (e.g. '.agentscan-cache'). Caching is disabled if omitted.",
+      "type": "string",
+      "default": ""
+    },
+    "label-community-flagged": {
+      "description": "Label applied when the account is on the community-verified automations list.",
+      "type": "string",
+      "default": "agentscan:community-flagged"
+    },
+    "label-mixed": {
+      "description": "Label applied when the account has mixed automation signals.",
+      "type": "string",
+      "default": "agentscan:mixed-signals"
+    },
+    "label-automation": {
+      "description": "Label applied when the account is classified as automated.",
+      "type": "string",
+      "default": "agentscan:automated-account"
+    },
+    "auto-close": {
+      "description": "Automatically close PRs/issues opened by flagged accounts.",
+      "type": "boolean",
+      "default": false
+    },
+    "auto-close-classifications": {
+      "description": "Classifications that trigger auto-close. Requires auto-close to be true.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["mixed", "automation"]
+      },
+      "default": ["automation"],
+      "examples": [["automation"], ["automation", "mixed"]]
+    },
+    "message-organic": {
+      "description": "Custom comment message posted when the account is classified as organic (human).",
+      "type": "string"
+    },
+    "message-mixed": {
+      "description": "Custom comment message posted when the account has mixed automation signals.",
+      "type": "string"
+    },
+    "message-automation": {
+      "description": "Custom comment message posted when the account is classified as automated.",
+      "type": "string"
+    },
+    "message-community-flagged": {
+      "description": "Custom comment message posted when the account is on the community-verified automations list.",
+      "type": "string"
+    }
+  },
+  "required": ["github-token"]
+}
