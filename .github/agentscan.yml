@@ -1,6 +1,10 @@
 # yaml-language-server: $schema=https://agentscan.tools/schemas/agentscan.json
 version: 1
 
+scan:
+  pull-requests: true
+  issues: true
+
 allowed-users:
   - MatteoGabriele
   - graphieros
