@@ -45,8 +45,8 @@ importers:
         specifier: ^66.6.0
         version: 66.6.7
       '@unveil/identity':
-        specifier: 1.12.0
-        version: 1.12.0
+        specifier: 1.12.1
+        version: 1.12.1
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.35(typescript@6.0.3))
@@ -2514,8 +2514,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@unveil/identity@1.12.0':
-    resolution: {integrity: sha512-phKiVMs5y3zylX/o7KkcfHPGYGTIKdSAcl9bzkhBD9xmBbjlLtIKc44UfiCybfshE39PtK5ZVK+EnzV5OUKBjw==}
+  '@unveil/identity@1.12.1':
+    resolution: {integrity: sha512-tDXMuHdbxJHGmF5vP+EulZ+thPmhWwh2Tw+H/6K6RPwn2UbohOCY/JDrhYBTk+z7gb0XvisRPcB3W2qKEEXGSQ==}
 
   '@valibot/to-json-schema@1.7.1':
     resolution: {integrity: sha512-3qkmU6KXWh8GIThEAW3kuRHPQBMjWkKy+Ppz3WkUucx53DTpOa6siMn4xDGSOhlVyMrDaJTCTMLYPZVAIk1P0A==}
@@ -8023,7 +8023,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@unveil/identity@1.12.0': {}
+  '@unveil/identity@1.12.1': {}
 
   '@valibot/to-json-schema@1.7.1(valibot@1.4.1(typescript@6.0.3))':
     dependencies:
