@@ -1,7 +1,7 @@
 name: Report Automated Account
 description: Help identify and report automated GitHub accounts
 title: '[AUTOMATION] '
-labels: ['automation']
+labels: ['automation', 'automation:pending']
 body:
   - type: markdown
     attributes:
