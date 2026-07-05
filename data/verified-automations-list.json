@@ -222,5 +222,19 @@
     "reason": "Automated bounty-focused account that opened a PR on AgentScan with completely unrelated code changes.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/202",
     "createdAt": "2026-06-22"
+  },
+  {
+    "username": "mayank-dev-15",
+    "id": 289773841,
+    "reason": "11 forks within a minute",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/243",
+    "createdAt": "2026-07-03"
+  },
+  {
+    "username": "chatman-media",
+    "id": 883279,
+    "reason": "Account that relies heavily in automations. Possibly farming stats with over 900PRs in 100+ repositories in less than few weeks.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/244",
+    "createdAt": "2026-07-04"
   }
 ]
