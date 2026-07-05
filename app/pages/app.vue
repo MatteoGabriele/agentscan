@@ -69,7 +69,7 @@ function scrollToConfig() {
           <ContributorsList class="mt-4" />
 
           <div
-            class="absolute w-full px-4 bottom-4 left-1/2 -translate-x-1/2 flex text-center justify-center"
+            class="md:absolute w-full px-4 md:bottom-4 md:left-1/2 md:-translate-x-1/2 flex text-center justify-center"
           >
             <button
               type="button"

@@ -50,7 +50,9 @@ useHead({
       <MainHeader only-logo />
 
       <div v-if="$slots.hero" class="flex flex-1 items-center justify-center">
-        <section class="max-w-screen-md mx-auto px-4 @container w-full py-20">
+        <section
+          class="max-w-screen-md mx-auto px-4 @container w-full py-10 md:py-20"
+        >
           <slot name="hero" />
         </section>
       </div>
