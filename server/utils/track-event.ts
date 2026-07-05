@@ -12,7 +12,7 @@ export async function trackServerEvent(
   }
 
   try {
-    await fetch(SA_EVENTS_URL, {
+    const response = await fetch(SA_EVENTS_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,6 +27,17 @@ export async function trackServerEvent(
       }),
       signal: AbortSignal.timeout(SA_REQUEST_TIMEOUT_MS),
     })
+
+    if (!response.ok) {
+      try {
+        console.error(
+          `Failed to track event: ${response.status}`,
+          await response.json(),
+        )
+      } catch {
+        console.error(`Failed to track event: ${response.status}`)
+      }
+    }
   } catch {
     // best-effort tracking, ignore delivery failures
   }
