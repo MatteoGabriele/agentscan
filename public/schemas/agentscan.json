@@ -34,7 +34,7 @@
       "items": {
         "type": "string"
       },
-      "examples": [["dependabot[bot]", "renovate[bot]"]]
+      "examples": [["torvalds"]]
     },
     "trusted-author-associations": {
       "description": "Author associations to exclude from scanning (e.g. trusted maintainers opening their own PRs/issues).",
