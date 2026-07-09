@@ -236,5 +236,26 @@
     "reason": "Account that relies heavily in automations. Possibly farming stats with over 900PRs in 100+ repositories in less than few weeks.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/244",
     "createdAt": "2026-07-04"
+  },
+  {
+    "username": "ifabrish",
+    "id": 192510499,
+    "reason": "230+ branches created in a single day, each just seconds apart, plus multiple PRs with the identical goal of adding random GitHub Action and zero comments or descriptions, strongly suggests automated activity.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/251",
+    "createdAt": "2026-07-09"
+  },
+  {
+    "username": "creazyfrog",
+    "id": 42964735,
+    "reason": "This user produces low-quality PRs, with bursts on specific days and no activity on other days. They are unresponsive the rest of the time, and their PRs include images that look like the BEFORE/AFTER test probes that some agents generate.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/240",
+    "createdAt": "2026-07-03"
+  },
+  {
+    "username": "spokodev",
+    "id": 239690017,
+    "reason": "The timing pattern between forking and PR submission, just seconds apart, across a high volume of repos in one day, looks more consistent with automated activity than manual contribution. Flagging for visibility. Could be legitimate automation.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/245",
+    "createdAt": "2026-07-04"
   }
 ]
