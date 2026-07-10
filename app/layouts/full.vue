@@ -46,8 +46,8 @@ useHead({
   <NuxtLoadingIndicator />
 
   <div class="flex flex-col">
-    <div class="min-h-svh flex flex-col">
-      <MainHeader />
+    <div class="min-h-svh flex flex-col @container">
+      <MainHeader class="mx-auto w-full max-w-screen-xl" />
 
       <main class="main-height">
         <slot />
