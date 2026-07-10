@@ -239,6 +239,7 @@ useSeoAnalysis(identifyAnalysis, {
     />
 
     <ChartAccountEventsTimeline
+      v-if="data.analysis.classification !== 'organic'"
       :classification="data.analysis.classification"
       :events="data.events"
     />

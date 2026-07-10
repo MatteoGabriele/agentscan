@@ -213,7 +213,7 @@ const timeLabels = computed<string[]>(() => {
 const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 1)
 
 const hasEnoughHours = computed<boolean>(() => {
-  return !usesHourlyGranularity.value || timeLabels.value.length > 5
+  return !usesHourlyGranularity.value || timeLabels.value.length > 1
 })
 
 const hasEnoughDataPoints = computed<boolean>(() => {
