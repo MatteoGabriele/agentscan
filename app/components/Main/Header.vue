@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <header class="h-12 flex justify-between items-center px-4 lg:px-6 py-4">
+  <header class="h-12 flex justify-between items-center px-4 @4xl:px-6 py-4">
     <div class="flex-1">
       <NuxtLink
         class="flex gap-2 items-center text-gh-text"
@@ -16,7 +16,7 @@ defineProps<{
         AgentScan
       </NuxtLink>
     </div>
-    <div v-if="!onlyLogo" class="hidden lg:block">
+    <div v-if="!onlyLogo" class="hidden @4xl:block">
       <ul class="flex items-center gap-4">
         <li><MainMenuItem to="/" label="Search" /></li>
         <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
@@ -29,14 +29,14 @@ defineProps<{
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
       <NuxtLink
         to="/app"
-        class="hidden lg:inline-flex items-center px-3.5 lg:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
+        class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
         title="Install the GitHub App or use the GitHub Action"
       >
         <span class="i-lucide-github"></span>
         <span>Get AgentScan</span>
       </NuxtLink>
 
-      <MainMobileMenu class="lg:hidden" />
+      <MainMobileMenu class="@4xl:hidden" />
     </div>
   </header>
 </template>
