@@ -77,7 +77,7 @@ useHead({
 
         <button
           type="button"
-          class="shrink-0 size-9 flex items-center justify-center rounded-lg border-1 border-solid border-gh-border text-gh-muted transition-colors hover:text-gh-danger hover:border-gh-danger/40"
+          class="shrink-0 size-9 flex items-center justify-center rounded-full hover:bg-gh-danger-hover/10 text-gh-muted transition-colors hover:text-gh-danger hover:border-gh-danger/40"
           :aria-label="`Remove ${account.login} from bookmarks`"
           @click="removeBookmark(account.login)"
         >
