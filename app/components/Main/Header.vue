@@ -5,7 +5,9 @@ defineProps<{
 </script>
 
 <template>
-  <header class="h-12 flex justify-between items-center px-4 @4xl:px-6 py-4">
+  <header
+    class="h-12 flex justify-between items-center gap-6 px-4 @4xl:px-6 py-4"
+  >
     <div class="flex-1">
       <NuxtLink
         class="flex gap-2 items-center text-gh-text"
@@ -18,11 +20,14 @@ defineProps<{
     </div>
     <div v-if="!onlyLogo" class="hidden @4xl:block">
       <ul class="flex items-center gap-4">
-        <li><MainMenuItem to="/" label="Search" /></li>
+        <li class="hidden @5xl:block">
+          <MainMenuItem to="/" label="Search" />
+        </li>
         <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
         <li><MainMenuItem to="/lab" label="The lab" /></li>
         <li><MainMenuItem to="/scan" label="Repository scan" /></li>
         <li><MainMenuItem to="/automations" label="Community reports" /></li>
+        <li><MainMenuItem to="/bookmarks" label="Bookmarks" /></li>
       </ul>
     </div>
 

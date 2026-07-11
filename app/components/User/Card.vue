@@ -18,9 +18,12 @@ defineProps<{
     </div>
 
     <div class="w-full flex flex-col">
-      <h2 class="text-gh-text text-xl font-mono">
-        {{ user.name || user.login }}
-      </h2>
+      <div class="flex items-start justify-between gap-4">
+        <h2 class="text-gh-text text-xl font-mono">
+          {{ user.name || user.login }}
+        </h2>
+        <UserBookmarkButton :user />
+      </div>
       <NuxtLink
         :external="true"
         target="_blank"
