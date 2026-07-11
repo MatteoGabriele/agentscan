@@ -61,6 +61,9 @@ onBeforeUnmount(() => {
             label="Community reports"
           />
         </li>
+        <li>
+          <MainMenuItem class="text-xl" to="/bookmarks" label="Bookmarks" />
+        </li>
       </ul>
 
       <div class="w-1/2 border-b h-px border-gh-border-light/80"></div>

@@ -38,6 +38,7 @@ const restItemsCount = computed<number>(() => {
           :key="account.username"
           :to="{ name: 'user-name', params: { name: account.username } }"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border border-gh-border/40 bg-white/2 hover:bg-white/4 hover:border-gh-border/60 transition-all"
+          @click="trackEvent('automation_list_account_link_clicked')"
         >
           <span class="text-gh-text">@{{ account.username }}</span>
         </NuxtLink>
