@@ -4,6 +4,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(SimpleAnalytics, {
     skip: process.env.NODE_ENV !== 'production',
     autoCollect: true,
-    domain: 'agentscan.tools',
+    hostname: 'agentscan.tools',
   })
 })
