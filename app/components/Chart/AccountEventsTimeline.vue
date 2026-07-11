@@ -15,6 +15,7 @@ import {
   type GitHubEvent,
 } from '@unveil/identity'
 import type { VueUiXyDatasetLineItem } from 'vue-data-ui/vue-ui-xy'
+import { useTimeoutFn } from '@vueuse/core'
 
 import('vue-data-ui/style.css')
 
@@ -495,114 +496,140 @@ function getZapIconPath({ x, y }: { x: number; y: number }) {
   // ⚡ with relative coordinates from initial position
   return `M ${x} ${y} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`
 }
+
+const shouldPauseChartTransitions = shallowRef(true)
+
+const { start: startChartTransitionPauseTimer } = useTimeoutFn(
+  () => {
+    shouldPauseChartTransitions.value = false
+  },
+  1000,
+  { immediate: false },
+)
+
+function pauseChartAnimations() {
+  shouldPauseChartTransitions.value = true
+  startChartTransitionPauseTimer()
+}
+
+onMounted(pauseChartAnimations)
 </script>
 
 <template>
   <ClientOnly>
-    <VueUiXy
-      v-if="hasEnoughDataPoints && !isEmpty"
-      ref="chartLineRef"
-      :dataset="datasetLine"
-      :config="configLine"
-      @select-legend="selectLegend"
-    >
-      <template #area-gradient="{ series, id }">
-        <linearGradient :id="id" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
-          <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-        </linearGradient>
-      </template>
+    <div :class="{ loading: shouldPauseChartTransitions }">
+      <VueUiXy
+        v-if="hasEnoughDataPoints && !isEmpty"
+        ref="chartLineRef"
+        :dataset="datasetLine"
+        :config="configLine"
+        @select-legend="selectLegend"
+      >
+        <template #area-gradient="{ series, id }">
+          <linearGradient :id="id" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
+            <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+          </linearGradient>
+        </template>
 
-      <!-- Custom tooltip -->
-      <template #tooltip="{ datapoint, seriesIndex }">
-        <div class="flex flex-col">
-          <div class="mb-1">
-            {{ getTooltipTimeLabel(seriesIndex) }}
-          </div>
-          <div
-            v-for="series in datapoint"
-            :key="`${series.name}-${series.absoluteIndex}`"
-            class="flex flex-row gap-2 items-center"
-          >
-            <div class="h-2 w-2">
-              <svg viewBox="0 0 2 2" class="w-full h-full">
-                <circle cx="1" cy="1" r="1" :fill="series.color" />
+        <!-- Custom tooltip -->
+        <template #tooltip="{ datapoint, seriesIndex }">
+          <div class="flex flex-col">
+            <div class="mb-1">
+              {{ getTooltipTimeLabel(seriesIndex) }}
+            </div>
+            <div
+              v-for="series in datapoint"
+              :key="`${series.name}-${series.absoluteIndex}`"
+              class="flex flex-row gap-2 items-center"
+            >
+              <div class="h-2 w-2">
+                <svg viewBox="0 0 2 2" class="w-full h-full">
+                  <circle cx="1" cy="1" r="1" :fill="series.color" />
+                </svg>
+              </div>
+              <span :style="{ color: colors.textMuted }">{{
+                series.name
+              }}</span>
+              <span>{{ series.value }}</span>
+              <svg
+                v-if="isTooltipAlert(series)"
+                viewBox="0 0 30 30"
+                class="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path
+                  :d="getZapIconPath({ x: 2, y: 30 })"
+                  :fill="colors.amber"
+                  :stroke="colors.bg"
+                />
               </svg>
             </div>
-            <span :style="{ color: colors.textMuted }">{{ series.name }}</span>
-            <span>{{ series.value }}</span>
-            <svg
-              v-if="isTooltipAlert(series)"
-              viewBox="0 0 30 30"
-              class="w-5 h-5"
-              aria-hidden="true"
+          </div>
+        </template>
+
+        <!-- Custom legend -->
+        <template #legend="{ legend }">
+          <div class="flex flex-row gap-4 justify-center mt-2">
+            <button
+              v-for="item in legend"
+              :key="item.id"
+              class="flex flex-row gap-1.5 place-items-center"
+              :class="item.isSegregated ? 'opacity-50' : 'hover:underline'"
+              @click="item.segregate()"
+            >
+              <div class="w-2 h-2">
+                <svg viewBox="0 0 2 2" class="w-full h-full">
+                  <circle :cx="1" :cy="1" :r="1" :fill="item.color" />
+                </svg>
+              </div>
+              <div
+                :class="`text-sm ${item.isSegregated ? 'line-through' : ''}`"
+              >
+                {{ item.name }}
+              </div>
+            </button>
+          </div>
+        </template>
+
+        <!-- Custom SVG content ⚡ -->
+        <template #svg="{ svg }">
+          <g
+            v-for="alerts in alertIcons(
+              svg.data as Datapoints,
+              svg.slicer.start,
+            )"
+            :key="alerts.name"
+          >
+            <template
+              v-for="plot in alerts.coordinates"
+              :key="`${alerts.name}-${plot.absoluteIndex}`"
             >
               <path
-                :d="getZapIconPath({ x: 2, y: 30 })"
+                v-show="plot.isAlert"
+                class="zap-icon"
+                :d="
+                  getZapIconPath({
+                    x: plot.x - 4,
+                    y: plot.y - 6,
+                  })
+                "
                 :fill="colors.amber"
                 :stroke="colors.bg"
               />
-            </svg>
+            </template>
+          </g>
+        </template>
+      </VueUiXy>
+      <div v-else class="w-full h-40 flex place-items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+          <span class="i-lucide:circle-dashed text-gh-muted"></span>
+          <div class="flex flex-col items-center">
+            <p class="text-gh-muted text-base">Insufficient activity data</p>
+            <p class="text-gh-muted/50 text-sm">
+              Not enough events to display a timeline
+            </p>
           </div>
-        </div>
-      </template>
-
-      <!-- Custom legend -->
-      <template #legend="{ legend }">
-        <div class="flex flex-row gap-4 justify-center mt-2">
-          <button
-            v-for="item in legend"
-            :key="item.id"
-            class="flex flex-row gap-1.5 place-items-center"
-            :class="item.isSegregated ? 'opacity-50' : 'hover:underline'"
-            @click="item.segregate()"
-          >
-            <div class="w-2 h-2">
-              <svg viewBox="0 0 2 2" class="w-full h-full">
-                <circle :cx="1" :cy="1" :r="1" :fill="item.color" />
-              </svg>
-            </div>
-            <div :class="`text-sm ${item.isSegregated ? 'line-through' : ''}`">
-              {{ item.name }}
-            </div>
-          </button>
-        </div>
-      </template>
-
-      <!-- Custom SVG content ⚡ -->
-      <template #svg="{ svg }">
-        <g
-          v-for="alerts in alertIcons(svg.data as Datapoints, svg.slicer.start)"
-          :key="alerts.name"
-        >
-          <template
-            v-for="plot in alerts.coordinates"
-            :key="`${alerts.name}-${plot.absoluteIndex}`"
-          >
-            <path
-              v-show="plot.isAlert"
-              class="zap-icon"
-              :d="
-                getZapIconPath({
-                  x: plot.x - 4,
-                  y: plot.y - 6,
-                })
-              "
-              :fill="colors.amber"
-              :stroke="colors.bg"
-            />
-          </template>
-        </g>
-      </template>
-    </VueUiXy>
-    <div v-else class="w-full h-40 flex place-items-center justify-center">
-      <div class="flex flex-col items-center gap-4">
-        <span class="i-lucide:circle-dashed text-gh-muted"></span>
-        <div class="flex flex-col items-center">
-          <p class="text-gh-muted text-base">Insufficient activity data</p>
-          <p class="text-gh-muted/50 text-sm">
-            Not enough events to display a timeline
-          </p>
         </div>
       </div>
     </div>
@@ -631,5 +658,11 @@ I figure out why it is not so in this project, as I don't replicate in vue-data-
   .zap-icon {
     transition: none !important;
   }
+}
+
+.loading :deep(.vue-data-ui-component path),
+.loading :deep(.vdui-shape-circle) {
+  transition: none !important;
+  animation: none !important;
 }
 </style>
