@@ -85,6 +85,7 @@ export function useColors(
     [
       '--bg',
       '--card',
+      '--card-light',
       '--border',
       '--border-light',
       '--text',
