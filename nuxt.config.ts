@@ -8,8 +8,13 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/fonts',
+    '@simpleanalytics/nuxt',
   ],
-  plugins: ['~/plugins/simpleanalytics.client'],
+
+  simpleAnalytics: {
+    hostname: 'agentscan.tools',
+    enabled: true,
+  },
 
   vite: {
     optimizeDeps: {

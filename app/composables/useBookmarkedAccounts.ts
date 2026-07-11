@@ -134,8 +134,10 @@ export function useBookmarkedAccounts() {
   async function toggleBookmark(user: GitHubUser): Promise<void> {
     if (isBookmarked(user.login)) {
       await removeBookmark(user.login)
+      await trackEvent('bookmark_toggle_remove_clicked')
     } else {
       await addBookmark(user)
+      await trackEvent('bookmark_toggle_add_clicked')
     }
   }
 

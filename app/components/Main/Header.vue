@@ -36,6 +36,7 @@ defineProps<{
         to="/app"
         class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
         title="Install the GitHub App or use the GitHub Action"
+        @click="trackEvent('get_agentscan_clicked')"
       >
         <span class="i-lucide-github"></span>
         <span>Get AgentScan</span>

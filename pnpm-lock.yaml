@@ -23,6 +23,9 @@ importers:
       '@octokit/webhooks':
         specifier: ^14.2.0
         version: 14.2.0
+      '@simpleanalytics/nuxt':
+        specifier: ^2.0.0
+        version: 2.0.0(magicast@0.5.2)(vue@3.5.35(typescript@6.0.3))
       '@tiptap/core':
         specifier: ^3.27.1
         version: 3.27.1(@tiptap/pm@3.27.1)
@@ -59,6 +62,9 @@ importers:
       octokit:
         specifier: ^5.0.5
         version: 5.0.5
+      simple-analytics-vue:
+        specifier: ^3.1.0
+        version: 3.1.0(vue@3.5.35(typescript@6.0.3))
       tiptap-markdown:
         specifier: ^0.9.0
         version: 0.9.0(@tiptap/core@3.27.1(@tiptap/pm@3.27.1))
@@ -111,9 +117,6 @@ importers:
       prettier:
         specifier: ^3.8.5
         version: 3.8.5
-      simple-analytics-vue:
-        specifier: ^3.1.0
-        version: 3.1.0(vue@3.5.35(typescript@6.0.3))
       tsx:
         specifier: ^4.22.4
         version: 4.22.4
@@ -2007,6 +2010,9 @@ packages:
 
   '@simple-git/argv-parser@1.1.1':
     resolution: {integrity: sha512-Q9lBcfQ+VQCpQqGJFHe5yooOS5hGdLFFbJ5R+R5aDsnkPCahtn1hSkMcORX65J2Z5lxSkD0lQorMsncuBQxYUw==}
+
+  '@simpleanalytics/nuxt@2.0.0':
+    resolution: {integrity: sha512-hYGBKLcU4CUSpewxhxf8TJQex4V8sezsNFXMwo1TNNIYpzfyV1Y7GbTee/tfNaej37L8uFlfFQtdjU/n5rg6fg==}
 
   '@sindresorhus/base62@1.0.0':
     resolution: {integrity: sha512-TeheYy0ILzBEI/CO55CP6zJCSdSWeRtGnHy8U8dWSUH4I68iqTsy7HkMktR4xakThc9jotkPQUXT4ITdbV7cHA==}
@@ -7425,6 +7431,14 @@ snapshots:
   '@simple-git/argv-parser@1.1.1':
     dependencies:
       '@simple-git/args-pathspec': 1.0.3
+
+  '@simpleanalytics/nuxt@2.0.0(magicast@0.5.2)(vue@3.5.35(typescript@6.0.3))':
+    dependencies:
+      '@nuxt/kit': 4.4.8(magicast@0.5.2)
+      simple-analytics-vue: 3.1.0(vue@3.5.35(typescript@6.0.3))
+    transitivePeerDependencies:
+      - magicast
+      - vue
 
   '@sindresorhus/base62@1.0.0': {}
 
