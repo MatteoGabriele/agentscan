@@ -9,6 +9,7 @@
 :root[data-theme='dark'] {
   --bg: #0b0b0b;
   --card: #161616;
+  --card-light: #262626;
   --border: #575757;
   --border-light: #757575;
   --text: #f0f0f0;
@@ -49,6 +50,7 @@
 :root[data-theme='light'] {
   --bg: #f6f8fa;
   --card: #ffffff;
+  --card-light: #d0d7de;
   --border: #b7b7b7;
   --border-light: #d0d7de;
   --text: #222222;

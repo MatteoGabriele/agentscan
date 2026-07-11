@@ -239,11 +239,14 @@ useSeoAnalysis(identifyAnalysis, {
     />
 
     <ChartAccountEventsTimeline
-      v-if="data.analysis.classification !== 'organic'"
       :classification="data.analysis.classification"
       :events="data.events"
     />
 
+    <ChartAccountEventsBreakdown
+      :classification="data.analysis.classification"
+      :events="data.events"
+    />
     <p
       class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
     >
