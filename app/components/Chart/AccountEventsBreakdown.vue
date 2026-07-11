@@ -96,6 +96,7 @@ const config = computed<VueUiHorizontalBarConfig>(() => ({
 }))
 
 const isExpanded = shallowRef(false)
+
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
 

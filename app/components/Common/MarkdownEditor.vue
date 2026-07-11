@@ -40,7 +40,7 @@ function getMarkdown(instance: Editor) {
 const editor = useEditor({
   content: modelValue.value,
   extensions: [
-    StarterKit,
+    StarterKit.configure({ text: false, link: false }),
     RawText,
     Link.configure({ openOnClick: false }),
     Placeholder.configure({ placeholder: props.placeholder ?? '' }),

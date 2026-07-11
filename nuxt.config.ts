@@ -13,7 +13,9 @@ export default defineNuxtConfig({
 
   simpleAnalytics: {
     hostname: 'agentscan.tools',
+    autoCollect: true,
     enabled: true,
+    debug: true,
   },
 
   vite: {
