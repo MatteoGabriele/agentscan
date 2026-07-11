@@ -213,7 +213,12 @@ const timeLabels = computed<string[]>(() => {
 const hasEnoughDays = computed<boolean>(() => eventDays.value.length > 1)
 
 const hasEnoughHours = computed<boolean>(() => {
-  return !usesHourlyGranularity.value || timeLabels.value.length > 1
+  // Short hourly spans for organic accounts are more likely to show useless data, threfore there is no need to show the hourly chart with little hours.
+  // However, since mixed/automated accounts can possibly condense a lot of events in a few hours, we allow fewer hours to condition the display.
+  return (
+    !usesHourlyGranularity.value ||
+    timeLabels.value.length > (props.classification === 'organic' ? 5 : 1)
+  )
 })
 
 const hasEnoughDataPoints = computed<boolean>(() => {
@@ -244,20 +249,25 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
     counts[event.type][label] = (counts[event.type][label] || 0) + 1
   }
 
-  const individualEvents: VueUiXyDatasetItem[] = activeGitHubEventTypes.map(
-    (eventType) => {
+  const individualEvents: VueUiXyDatasetItem[] = activeGitHubEventTypes
+    .map((eventType) => {
       const config = eventConfig.value[eventType]
+      const series = timeLabels.value.map(
+        (label) => counts[eventType][label] || 0,
+      )
+
       return {
-        type: 'line',
+        type: 'line' as const,
         useArea: true,
         smooth: true,
         name: config.name,
         color: config.color,
         threshold: config.threshold,
-        series: timeLabels.value.map((label) => counts[eventType][label] || 0),
+        series,
+        visible: series.reduce((sum, value) => sum + (value ?? 0), 0) > 0,
       }
-    },
-  )
+    })
+    .filter((event) => event.visible)
 
   const totalEvents: VueUiXyDatasetItem = {
     type: 'line',
@@ -270,6 +280,10 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
         return total + Number(event.series[index])
       }, 0)
     }),
+  }
+
+  if (individualEvents.length === 1) {
+    return individualEvents
   }
 
   return [...individualEvents, totalEvents]
