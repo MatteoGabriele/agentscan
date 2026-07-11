@@ -15,7 +15,7 @@ let dbPromise: Promise<IDBDatabase> | null = null
 
 function openDb(): Promise<IDBDatabase> {
   if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
+    dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION)
 
       request.onupgradeneeded = () => {
@@ -27,6 +27,9 @@ function openDb(): Promise<IDBDatabase> {
 
       request.onsuccess = () => resolve(request.result)
       request.onerror = () => reject(request.error)
+    }).catch((error) => {
+      dbPromise = null
+      throw error
     })
   }
 
@@ -41,21 +44,28 @@ let loadPromise: Promise<void> | null = null
 
 function loadBookmarks(): Promise<void> {
   if (!loadPromise) {
-    loadPromise = openDb().then((db) => {
-      return new Promise<void>((resolve, reject) => {
-        const request = db
-          .transaction(STORE_NAME, 'readonly')
-          .objectStore(STORE_NAME)
-          .getAll()
+    loadPromise = openDb()
+      .then((db) => {
+        return new Promise<void>((resolve, reject) => {
+          const request = db
+            .transaction(STORE_NAME, 'readonly')
+            .objectStore(STORE_NAME)
+            .getAll()
 
-        request.onsuccess = () => {
-          bookmarkedAccounts.value = request.result as BookmarkedAccount[]
-          isLoaded.value = true
-          resolve()
-        }
-        request.onerror = () => reject(request.error)
+          request.onsuccess = () => {
+            bookmarkedAccounts.value = request.result as BookmarkedAccount[]
+            isLoaded.value = true
+            resolve()
+          }
+          request.onerror = () => reject(request.error)
+        })
       })
-    })
+      .catch((error) => {
+        loadPromise = null
+        bookmarkedAccounts.value = []
+        isLoaded.value = true
+        throw error
+      })
   }
 
   return loadPromise
@@ -63,7 +73,7 @@ function loadBookmarks(): Promise<void> {
 
 export function useBookmarkedAccounts() {
   if (import.meta.client) {
-    loadBookmarks()
+    loadBookmarks().catch(() => {})
   }
 
   const sortedBookmarkedAccounts = computed(() => {
@@ -77,40 +87,48 @@ export function useBookmarkedAccounts() {
   }
 
   async function addBookmark(user: GitHubUser): Promise<void> {
-    const db = await openDb()
-    const account: BookmarkedAccount = {
-      login: user.login,
-      name: user.name ?? null,
-      avatarUrl: user.avatar_url ?? null,
-      bookmarkedAt: Date.now(),
+    try {
+      const db = await openDb()
+      const account: BookmarkedAccount = {
+        login: user.login,
+        name: user.name ?? null,
+        avatarUrl: user.avatar_url ?? null,
+        bookmarkedAt: Date.now(),
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite')
+        tx.objectStore(STORE_NAME).put(account)
+        tx.oncomplete = () => resolve()
+        tx.onerror = () => reject(tx.error)
+      })
+
+      bookmarkedAccounts.value = [
+        ...bookmarkedAccounts.value.filter((a) => a.login !== account.login),
+        account,
+      ]
+    } catch (error) {
+      console.error('Failed to add bookmark:', error)
     }
-
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite')
-      tx.objectStore(STORE_NAME).put(account)
-      tx.oncomplete = () => resolve()
-      tx.onerror = () => reject(tx.error)
-    })
-
-    bookmarkedAccounts.value = [
-      ...bookmarkedAccounts.value.filter((a) => a.login !== account.login),
-      account,
-    ]
   }
 
   async function removeBookmark(login: string): Promise<void> {
-    const db = await openDb()
+    try {
+      const db = await openDb()
 
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite')
-      tx.objectStore(STORE_NAME).delete(login)
-      tx.oncomplete = () => resolve()
-      tx.onerror = () => reject(tx.error)
-    })
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite')
+        tx.objectStore(STORE_NAME).delete(login)
+        tx.oncomplete = () => resolve()
+        tx.onerror = () => reject(tx.error)
+      })
 
-    bookmarkedAccounts.value = bookmarkedAccounts.value.filter(
-      (account) => account.login !== login,
-    )
+      bookmarkedAccounts.value = bookmarkedAccounts.value.filter(
+        (account) => account.login !== login,
+      )
+    } catch (error) {
+      console.error('Failed to remove bookmark:', error)
+    }
   }
 
   async function toggleBookmark(user: GitHubUser): Promise<void> {
