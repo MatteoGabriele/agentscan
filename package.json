@@ -26,7 +26,6 @@
     "@octokit/app": "^16.1.2",
     "@octokit/request-error": "^7.1.0",
     "@octokit/webhooks": "^14.2.0",
-    "@simpleanalytics/nuxt": "^2.0.0",
     "@tiptap/core": "^3.27.1",
     "@tiptap/extension-link": "^3.27.1",
     "@tiptap/extension-placeholder": "^3.27.1",

@@ -12,6 +12,8 @@ const recentItems = computed<VerifiedAutomation[]>(() => {
 const restItemsCount = computed<number>(() => {
   return items.value.slice(MAX_VISIBLE_ITEMS).length
 })
+
+const { trackEvent } = useSaEvent()
 </script>
 
 <template>

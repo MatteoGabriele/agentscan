@@ -96,7 +96,7 @@ const config = computed<VueUiHorizontalBarConfig>(() => ({
 }))
 
 const isExpanded = shallowRef(false)
-
+const { trackEvent } = useSaEvent()
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
 

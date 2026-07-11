@@ -2,6 +2,8 @@
 defineProps<{
   onlyLogo?: boolean
 }>()
+
+const { trackEvent } = useSaEvent()
 </script>
 
 <template>

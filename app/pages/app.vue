@@ -23,6 +23,8 @@ function scrollToConfig() {
     behavior: 'smooth',
   })
 }
+
+const { trackEvent } = useSaEvent()
 </script>
 
 <template>
