@@ -46,7 +46,7 @@ const { trackEvent } = useSaEvent()
         <span>Get AgentScan</span>
       </NuxtLink>
 
-      <LazyMainMobileMenu class="@4xl:hidden" />
+      <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>
   </header>
 </template>

@@ -37,10 +37,10 @@ useSeoUser(user)
 
   <div class="flex flex-col gap-6 @container">
     <template v-if="user">
-      <UserCard :user />
-      <AnalysisCard :user />
+      <LazyUserCard :user />
+      <LazyAnalysisCard :user hydrate-on-visible />
     </template>
 
-    <UserCardError v-else-if="error" :error :username />
+    <LazyUserCardError v-else-if="error" :error :username />
   </div>
 </template>

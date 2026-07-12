@@ -119,9 +119,8 @@ const hiddenCount = computed(() => {
   <div class="pt-2 border-t border-gh-border-light/20 space-y-3">
     <p class="text-gh-muted text-xs">Evidence</p>
 
-    <!-- ── CONNECTED PAIRS (branch→PR, fork→PR) ─────────────── -->
     <template v-if="hasConnections">
-      <AnalysisFlagEvidenceFast
+      <LazyAnalysisFlagEvidenceFast
         v-if="fastestConnection"
         :time="formatSpan(fastestConnection.delta)"
       >
@@ -184,7 +183,7 @@ const hiddenCount = computed(() => {
             </div>
           </div>
         </div>
-      </AnalysisFlagEvidenceFast>
+      </LazyAnalysisFlagEvidenceFast>
 
       <div class="space-y-4">
         <div v-for="(conn, i) in visibleConnections" :key="i">
@@ -222,7 +221,6 @@ const hiddenCount = computed(() => {
             </div>
           </div>
 
-          <!-- to event -->
           <div class="flex gap-3">
             <span
               :class="getEventIcon(conn.to)"
@@ -263,11 +261,8 @@ const hiddenCount = computed(() => {
       </button>
     </template>
 
-    <!-- ── GROUPED CARD (mixed event types forming a pattern) ── -->
     <template v-else-if="isMixedTypes">
-      <!-- fastest event pair callout -->
-
-      <AnalysisFlagEvidenceFast
+      <LazyAnalysisFlagEvidenceFast
         v-if="fastestEventPair"
         :time="formatSpan(fastestEventPair.delta)"
       >
@@ -305,7 +300,7 @@ const hiddenCount = computed(() => {
             </div>
           </div>
         </div>
-      </AnalysisFlagEvidenceFast>
+      </LazyAnalysisFlagEvidenceFast>
 
       <div class="rounded-lg border border-gh-border-light/30 overflow-hidden">
         <div class="divide-y divide-gh-border-light/15">
@@ -355,7 +350,7 @@ const hiddenCount = computed(() => {
 
     <!-- ── ORIGINAL icon+sticky list (single event type) ── -->
     <template v-else>
-      <AnalysisFlagEvidenceFast
+      <LazyAnalysisFlagEvidenceFast
         v-if="fastestEventPair"
         :time="formatSpan(fastestEventPair.delta)"
       >
@@ -393,7 +388,7 @@ const hiddenCount = computed(() => {
             </div>
           </div>
         </div>
-      </AnalysisFlagEvidenceFast>
+      </LazyAnalysisFlagEvidenceFast>
 
       <div
         v-for="(group, i) in groupEvents(visibleSortedEvents)"

@@ -15,7 +15,7 @@ defineProps<{
       <AnalysisFlagItem v-for="flag in flags" :key="flag.label" :flag="flag" />
     </ul>
 
-    <ExternalAnlysisCard
+    <LazyExternalAnlysisCard
       v-if="activityReport"
       :items="[activityReport]"
       class="mt-4"

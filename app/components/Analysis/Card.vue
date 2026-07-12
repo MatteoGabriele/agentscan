@@ -125,8 +125,8 @@ useSeoAnalysis(identifyAnalysis, {
 </script>
 
 <template>
-  <AnalysisCardSkeleton v-if="status === 'pending'" />
-  <ErrorCardGeneric v-else-if="error" :error />
+  <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
+  <LazyErrorCardGeneric v-else-if="error" :error />
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
@@ -242,7 +242,7 @@ useSeoAnalysis(identifyAnalysis, {
     <LazyChartAccountEventsTimeline
       :classification="data.analysis.classification"
       :events="data.events"
-      hydrate-on-idle
+      hydrate-on-visible
     />
 
     <LazyChartAccountEventsBreakdown

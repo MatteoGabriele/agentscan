@@ -57,7 +57,7 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
           class="max-w-screen-md mx-auto px-4 @container w-full"
           :class="{ 'py-20': !isHomePage }"
         >
-          <MainBrand v-if="isHomePage" class="mb-4" />
+          <LazyMainBrand v-if="isHomePage" class="mb-4" />
           <slot />
         </main>
       </div>

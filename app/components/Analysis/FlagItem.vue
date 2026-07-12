@@ -77,7 +77,7 @@ function toggleExpanded() {
           </div>
         </div>
 
-        <AnalysisFlagEvidence v-if="flag.events.length" :flag />
+        <LazyAnalysisFlagEvidence v-if="flag.events.length" :flag />
       </div>
     </template>
   </li>
