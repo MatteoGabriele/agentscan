@@ -81,22 +81,26 @@ const dataset = computed(() => stacklineData.value.dataset)
       class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto pb-12 w-full px-4"
     >
       <div class="w-full">
-        <ChartHealthResponseSparklines />
+        <LazyChartHealthResponseSparklines />
       </div>
       <div class="w-full">
-        <ChartScoreDistribution :data="data?.results" />
+        <LazyChartScoreDistribution :data="data?.results" hydrate-on-visible />
       </div>
       <div class="w-full">
-        <ReportWeeklyClassification />
+        <LazyReportWeeklyClassification hydrate-on-visible />
       </div>
       <div class="w-full">
-        <ChartFeaturedPackageHealthRanking />
+        <LazyChartFeaturedPackageHealthRanking hydrate-on-visible />
       </div>
       <div class="w-full">
-        <ChartGlobalEventsHeatmap :data="dataset" :timestamps="dates" />
+        <LazyChartGlobalEventsHeatmap
+          :data="dataset"
+          :timestamps="dates"
+          hydrate-on-visible
+        />
       </div>
       <div class="w-full">
-        <LabBountyRepoList />
+        <LazyLabBountyRepoList hydrate-on-visible />
       </div>
     </div>
   </section>
