@@ -61,6 +61,7 @@ export default defineNuxtConfig({
     githubAppId: '',
     githubAppPrivateKey: '',
     githubWebhookSecret: '',
+    discordPublicKey: '',
   },
 
   css: ['~/assets/main.css'],
