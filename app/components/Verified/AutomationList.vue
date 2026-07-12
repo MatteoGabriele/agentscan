@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data, pending } = useVerifiedAutomations()
+const { data, pending } = await useVerifiedAutomations()
 
 const MAX_VISIBLE_ITEMS = 4
 const items = computed<VerifiedAutomation[]>(
@@ -26,7 +26,7 @@ const { trackEvent } = useSaEvent()
 
     <div class="flex flex-wrap items-center justify-center gap-2 min-h-[30px]">
       <template v-if="pending">
-        <Skeleton
+        <LazySkeleton
           v-for="i in MAX_VISIBLE_ITEMS"
           :key="`skeleton-${i}`"
           width="w-24"

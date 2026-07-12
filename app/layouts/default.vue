@@ -63,6 +63,6 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
       </div>
     </div>
 
-    <MainFooter />
+    <LazyMainFooter hydrate-on-interaction />
   </div>
 </template>

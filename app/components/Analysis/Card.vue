@@ -152,12 +152,12 @@ useSeoAnalysis(identifyAnalysis, {
                 </ul>
               </div>
 
-              <span class="flex gap-2 items-center" :class="scoreStyle.text">
+              <div class="flex gap-2 items-center" :class="scoreStyle.text">
                 <span :class="classificationIcon" class="text-base" />
                 <h3 class="text-xl font-mono">
                   {{ classificationDetails.label }}
                 </h3>
-              </span>
+              </div>
             </div>
             <p class="mt-1 text-gh-text">
               {{ classificationDetails.description }}
@@ -232,20 +232,23 @@ useSeoAnalysis(identifyAnalysis, {
       </div>
     </div>
 
-    <AnalysisFlags
+    <LazyAnalysisFlags
       v-if="data.analysis.flags.length > 0 || hasActivityReport"
       :flags="data.analysis.flags"
       :activity-report="activityReport"
+      hydrate-on-interaction
     />
 
-    <ChartAccountEventsTimeline
+    <LazyChartAccountEventsTimeline
       :classification="data.analysis.classification"
       :events="data.events"
+      hydrate-on-idle
     />
 
-    <ChartAccountEventsBreakdown
+    <LazyChartAccountEventsBreakdown
       :classification="data.analysis.classification"
       :events="data.events"
+      hydrate-on-interaction
     />
     <p
       class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
