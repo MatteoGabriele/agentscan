@@ -257,5 +257,12 @@
     "reason": "The timing pattern between forking and PR submission, just seconds apart, across a high volume of repos in one day, looks more consistent with automated activity than manual contribution. Flagging for visibility. Could be legitimate automation.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/245",
     "createdAt": "2026-07-04"
+  },
+  {
+    "username": "esaari",
+    "id": 5210550,
+    "reason": "A sudden burst of 7 PRs to Biome, all submitted at the exact same moment",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/259",
+    "createdAt": "2026-07-12"
   }
 ]
