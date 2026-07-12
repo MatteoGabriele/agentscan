@@ -2,12 +2,13 @@ import { resolve } from 'path'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   modules: [
     '@nuxt/eslint',
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/fonts',
+    '@nuxt/hints',
   ],
 
   plugins: ['~/plugins/analytics.client'],

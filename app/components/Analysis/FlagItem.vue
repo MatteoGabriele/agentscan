@@ -18,12 +18,11 @@ function toggleExpanded() {
 
 <template>
   <li class="not-last:border-b border-gh-border-light/40 py-4">
-    <!-- Flag header -->
     <button
       class="flex text-left items-center gap-2 mb-1 flex-wrap"
       @click="toggleExpanded"
     >
-      <h4 class="font-mono">{{ flag.label }}</h4>
+      <span class="font-mono">{{ flag.label }}</span>
       <span
         v-if="flag.data.length"
         class="i-lucide:chevron-down text-sm text-gh-muted transition-transform mt-0.5 shrink-0 ml-auto"
@@ -37,7 +36,6 @@ function toggleExpanded() {
         v-if="isExpanded"
         class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2"
       >
-        <!-- Data points -->
         <div
           v-for="(group, i) in groupDataPoints(flag.data)"
           :key="`${group.icon}-${i}`"
@@ -79,7 +77,7 @@ function toggleExpanded() {
           </div>
         </div>
 
-        <AnalysisFlagEvidence v-if="flag.events.length" :flag />
+        <LazyAnalysisFlagEvidence v-if="flag.events.length" :flag />
       </div>
     </template>
   </li>

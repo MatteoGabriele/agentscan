@@ -45,24 +45,32 @@ onBeforeUnmount(() => {
     >
       <ul class="flex flex-col items-center gap-4">
         <li>
-          <MainMenuItem class="text-xl" to="/" label="Search" />
+          <LazyMainMenuItem class="text-xl" to="/" label="Search" />
         </li>
         <li>
-          <MainMenuItem class="text-xl" to="/health" label="Ecosystem health" />
+          <LazyMainMenuItem
+            class="text-xl"
+            to="/health"
+            label="Ecosystem health"
+          />
         </li>
-        <li><MainMenuItem class="text-xl" to="/lab" label="The lab" /></li>
+        <li><LazyMainMenuItem class="text-xl" to="/lab" label="The lab" /></li>
         <li>
-          <MainMenuItem class="text-xl" to="/scan" label="Repository scan" />
+          <LazyMainMenuItem
+            class="text-xl"
+            to="/scan"
+            label="Repository scan"
+          />
         </li>
         <li>
-          <MainMenuItem
+          <LazyMainMenuItem
             class="text-xl"
             to="/automations"
             label="Community reports"
           />
         </li>
         <li>
-          <MainMenuItem class="text-xl" to="/bookmarks" label="Bookmarks" />
+          <LazyMainMenuItem class="text-xl" to="/bookmarks" label="Bookmarks" />
         </li>
       </ul>
 
@@ -77,7 +85,7 @@ onBeforeUnmount(() => {
         <span>Get AgentScan</span>
       </NuxtLink>
 
-      <ContributorsList class="my-12" />
+      <LazyContributorsList class="my-12" />
     </div>
   </div>
 </template>

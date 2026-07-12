@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
+    "@nuxt/hints": "1.1.3",
     "@nuxtjs/color-mode": "^4.0.0",
     "@octokit/app": "^16.1.2",
     "@octokit/request-error": "^7.1.0",

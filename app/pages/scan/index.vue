@@ -46,7 +46,11 @@ async function handleSubmit(value: string) {
     </p>
   </header>
 
-  <RepoForm v-model="repoInput" @submit="handleSubmit" />
+  <RepoForm
+    v-model="repoInput"
+    :hydrate-on-interaction="['click', 'focus']"
+    @submit="handleSubmit"
+  />
 
   <p
     class="mt-4 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"

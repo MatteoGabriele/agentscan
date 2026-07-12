@@ -125,8 +125,8 @@ useSeoAnalysis(identifyAnalysis, {
 </script>
 
 <template>
-  <AnalysisCardSkeleton v-if="status === 'pending'" />
-  <ErrorCardGeneric v-else-if="error" :error />
+  <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
+  <LazyErrorCardGeneric v-else-if="error" :error />
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
@@ -152,12 +152,12 @@ useSeoAnalysis(identifyAnalysis, {
                 </ul>
               </div>
 
-              <span class="flex gap-2 items-center" :class="scoreStyle.text">
+              <div class="flex gap-2 items-center" :class="scoreStyle.text">
                 <span :class="classificationIcon" class="text-base" />
                 <h3 class="text-xl font-mono">
                   {{ classificationDetails.label }}
                 </h3>
-              </span>
+              </div>
             </div>
             <p class="mt-1 text-gh-text">
               {{ classificationDetails.description }}
@@ -232,20 +232,23 @@ useSeoAnalysis(identifyAnalysis, {
       </div>
     </div>
 
-    <AnalysisFlags
+    <LazyAnalysisFlags
       v-if="data.analysis.flags.length > 0 || hasActivityReport"
       :flags="data.analysis.flags"
       :activity-report="activityReport"
+      hydrate-on-interaction
     />
 
-    <ChartAccountEventsTimeline
+    <LazyChartAccountEventsTimeline
       :classification="data.analysis.classification"
       :events="data.events"
+      hydrate-on-visible
     />
 
-    <ChartAccountEventsBreakdown
+    <LazyChartAccountEventsBreakdown
       :classification="data.analysis.classification"
       :events="data.events"
+      hydrate-on-interaction
     />
     <p
       class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"

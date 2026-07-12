@@ -4,11 +4,11 @@ const { data: contributors } = await useContributorsList()
 
 <template>
   <div class="flex flex-col items-center group">
-    <h3
+    <h2
       class="text-sm mb-2 text-gh-muted/80 group-hover:text-gh-text transition-all"
     >
       Built by the community
-    </h3>
+    </h2>
     <ul class="flex items-center flex-wrap justify-center px-12 gap-1 md:gap-0">
       <li
         v-for="contributor in contributors"

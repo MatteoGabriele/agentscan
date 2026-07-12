@@ -114,7 +114,7 @@ function toggleExpanded() {
       class="mx-auto flex w-fit flex-wrap items-center gap-2 mb-1 text-left text-sm text-gh-muted"
       @click="toggleExpanded"
     >
-      <h4>Events breakdown</h4>
+      <span>Events breakdown</span>
       <span
         class="i-lucide:chevron-down ml-auto mt-0.5 shrink-0 text-sm text-gh-muted transition-transform"
         :class="isExpanded && 'rotate-180'"

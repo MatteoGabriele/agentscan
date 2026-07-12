@@ -23,13 +23,15 @@ const { trackEvent } = useSaEvent()
     <div v-if="!onlyLogo" class="hidden @4xl:block">
       <ul class="flex items-center gap-4">
         <li class="hidden @5xl:block">
-          <MainMenuItem to="/" label="Search" />
+          <LazyMainMenuItem to="/" label="Search" />
         </li>
-        <li><MainMenuItem to="/health" label="Ecosystem health" /></li>
-        <li><MainMenuItem to="/lab" label="The lab" /></li>
-        <li><MainMenuItem to="/scan" label="Repository scan" /></li>
-        <li><MainMenuItem to="/automations" label="Community reports" /></li>
-        <li><MainMenuItem to="/bookmarks" label="Bookmarks" /></li>
+        <li><LazyMainMenuItem to="/health" label="Ecosystem health" /></li>
+        <li><LazyMainMenuItem to="/lab" label="The lab" /></li>
+        <li><LazyMainMenuItem to="/scan" label="Repository scan" /></li>
+        <li>
+          <LazyMainMenuItem to="/automations" label="Community reports" />
+        </li>
+        <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
       </ul>
     </div>
 
@@ -44,7 +46,7 @@ const { trackEvent } = useSaEvent()
         <span>Get AgentScan</span>
       </NuxtLink>
 
-      <MainMobileMenu class="@4xl:hidden" />
+      <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>
   </header>
 </template>
