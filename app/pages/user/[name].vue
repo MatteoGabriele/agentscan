@@ -33,7 +33,11 @@ useSeoUser(user)
 <template>
   <h1 class="sr-only">{{ username }} analysis page</h1>
 
-  <AnalysisForm :model-value="username" @submit="handleSubmit" />
+  <AnalysisForm
+    :hydrate-on-interaction="['click', 'focus']"
+    :model-value="username"
+    @submit="handleSubmit"
+  />
 
   <div class="flex flex-col gap-6 @container">
     <template v-if="user">

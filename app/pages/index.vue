@@ -11,7 +11,7 @@ function handleSubmit(name: string) {
   <div class="max-w-2xl mx-auto">
     <LazyAnalysisForm
       v-model="accountName"
-      hydrate-on-interaction="click"
+      :hydrate-on-interaction="['click', 'focus']"
       @submit="handleSubmit"
     />
   </div>
