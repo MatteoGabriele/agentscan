@@ -4,7 +4,6 @@ import type {
   IdentityClassification,
   IdentifyResult,
 } from '@unveil/identity'
-import dayjs from 'dayjs'
 
 const props = defineProps<{
   user: GitHubUser
