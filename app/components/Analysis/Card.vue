@@ -49,14 +49,6 @@ const activityReport = computed<IntegrationItem | undefined>(() => {
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
-const flagCreatedAt = computed<string | undefined>(() => {
-  if (!verifiedAutomation.value) {
-    return
-  }
-
-  return dayjs(verifiedAutomation.value.createdAt).format('MMM D, YYYY')
-})
-
 const classification = computed<IdentityClassification | undefined>(() => {
   return data.value?.analysis.classification
 })
@@ -204,7 +196,29 @@ useSeoAnalysis(identifyAnalysis, {
             {{ verifiedAutomation.reason }}
           </p>
           <footer class="flex items-baseline justify-between">
-            <p class="text-gh-muted text-xs">Reported {{ flagCreatedAt }}</p>
+            <p class="flex gap-1 items-baseline text-gh-muted text-xs">
+              <span>
+                Reported by
+                <NuxtLink
+                  :external="true"
+                  target="_blank"
+                  :to="`https://github.com/${verifiedAutomation.reportedBy}`"
+                  class="text-gh-muted underline hover:text-gh-text"
+                >
+                  {{ verifiedAutomation.reportedBy }}
+                </NuxtLink>
+              </span>
+
+              <span>
+                on
+                <NuxtTime
+                  date-style="medium"
+                  :title="verifiedAutomation.createdAt"
+                  :datetime="verifiedAutomation.createdAt"
+                />
+              </span>
+            </p>
+
             <NuxtLink
               :to="verifiedAutomation.issueUrl"
               target="_blank"

@@ -16,6 +16,7 @@ interface AutomationEntry {
   reason: string
   issueUrl: string
   createdAt: string
+  reportedBy: string
 }
 
 export type { AutomationEntry }
@@ -67,12 +68,17 @@ export function validateEntry(
     console.error('✗ Missing issue URL')
     return false
   }
+  if (!entry.reportedBy || typeof entry.reportedBy !== 'string') {
+    console.error('✗ Missing or invalid reportedBy')
+    return false
+  }
   return true
 }
 
 export function generateEntry(
   parsed: Partial<AutomationEntry>,
   issueUrl: string,
+  reportedBy: string,
   createdAt?: string,
 ): AutomationEntry {
   return {
@@ -80,6 +86,7 @@ export function generateEntry(
     id: parsed.id!,
     reason: parsed.reason!,
     issueUrl,
+    reportedBy,
     createdAt: createdAt || new Date().toISOString().split('T')[0],
   }
 }
@@ -110,9 +117,12 @@ function addEntryToJson(entry: AutomationEntry): void {
   console.log(`✓ Added "${entry.username}" to verified-automations-list.json`)
 }
 
-async function fetchIssueFromGitHub(
-  issueNumber: number,
-): Promise<{ body: string; issueUrl: string; createdAt: string }> {
+async function fetchIssueFromGitHub(issueNumber: number): Promise<{
+  body: string
+  issueUrl: string
+  createdAt: string
+  reportedBy: string
+}> {
   const octokit = new Octokit()
 
   try {
@@ -128,6 +138,7 @@ async function fetchIssueFromGitHub(
       createdAt:
         issue.created_at?.split('T')[0] ||
         new Date().toISOString().split('T')[0],
+      reportedBy: issue.user?.login || '',
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -153,7 +164,7 @@ async function main() {
       'Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>',
     )
     console.error(
-      '  or: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] [created-at] (legacy)',
+      '  or: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] [reported-by] [created-at] (legacy)',
     )
     process.exit(1)
   }
@@ -162,6 +173,7 @@ async function main() {
 
   let issueBody: string
   let issueUrl: string
+  let reportedBy: string
   let createdAt: string
 
   // Check if first argument is an issue number
@@ -172,15 +184,18 @@ async function main() {
       body,
       issueUrl: fetchedUrl,
       createdAt: fetchedDate,
+      reportedBy: fetchedReportedBy,
     } = await fetchIssueFromGitHub(issueNumber)
     issueBody = body
     issueUrl = fetchedUrl
     createdAt = fetchedDate
+    reportedBy = fetchedReportedBy
   } else {
     // Legacy mode: issue body passed directly
     issueBody = firstArg
     issueUrl = secondArg || ''
-    createdAt = thirdArg || new Date().toISOString().split('T')[0]
+    reportedBy = thirdArg || ''
+    createdAt = process.argv[5] || new Date().toISOString().split('T')[0]
   }
 
   const parsed = parseIssueBody(issueBody)
@@ -190,9 +205,10 @@ async function main() {
   console.log(`  username: "${parsed.username}"`)
   console.log(`  id: ${parsed.id}`)
   console.log(`  reason: "${parsed.reason?.substring(0, 60)}..."`)
+  console.log(`  reportedBy: "${reportedBy}"`)
   console.log('')
 
-  const entry = generateEntry(parsed, issueUrl || '', createdAt)
+  const entry = generateEntry(parsed, issueUrl || '', reportedBy, createdAt)
 
   if (!validateEntry(entry)) {
     process.exit(1)
@@ -203,6 +219,7 @@ async function main() {
   console.log(`  ID: ${entry.id}`)
   console.log(`  Reason: ${entry.reason.substring(0, 50)}...`)
   console.log(`  Issue: ${entry.issueUrl}`)
+  console.log(`  Reported by: ${entry.reportedBy}`)
   console.log(`  Created: ${entry.createdAt}`)
 
   addEntryToJson(entry)

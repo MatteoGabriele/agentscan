@@ -98,6 +98,7 @@ describe('validateEntry', () => {
       reason: 'Suspicious behavior',
       issueUrl: 'https://github.com/test/issue/1',
       createdAt: '2024-01-01',
+      reportedBy: 'reporter',
     }
     expect(validateEntry(entry)).toBe(true)
   })
@@ -108,6 +109,7 @@ describe('validateEntry', () => {
       reason: 'Suspicious',
       issueUrl: 'https://github.com/test/issue/1',
       createdAt: '2024-01-01',
+      reportedBy: 'reporter',
     }
     expect(validateEntry(entry)).toBe(false)
   })
@@ -118,6 +120,7 @@ describe('validateEntry', () => {
       reason: 'Suspicious',
       issueUrl: 'https://github.com/test/issue/1',
       createdAt: '2024-01-01',
+      reportedBy: 'reporter',
     }
     expect(validateEntry(entry)).toBe(false)
   })
@@ -128,6 +131,7 @@ describe('validateEntry', () => {
       id: 123456,
       issueUrl: 'https://github.com/test/issue/1',
       createdAt: '2024-01-01',
+      reportedBy: 'reporter',
     }
     expect(validateEntry(entry)).toBe(false)
   })
@@ -137,6 +141,18 @@ describe('validateEntry', () => {
       username: 'testuser',
       id: 123456,
       reason: 'Suspicious',
+      createdAt: '2024-01-01',
+      reportedBy: 'reporter',
+    }
+    expect(validateEntry(entry)).toBe(false)
+  })
+
+  it('should reject entry missing reportedBy', () => {
+    const entry: Partial<AutomationEntry> = {
+      username: 'testuser',
+      id: 123456,
+      reason: 'Suspicious',
+      issueUrl: 'https://github.com/test/issue/1',
       createdAt: '2024-01-01',
     }
     expect(validateEntry(entry)).toBe(false)
@@ -151,11 +167,16 @@ describe('generateEntry', () => {
   }
 
   it('should generate a complete entry', () => {
-    const entry = generateEntry(parsedData, 'https://github.com/test/issue/1')
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      'reporter',
+    )
     expect(entry.username).toBe('testuser')
     expect(entry.id).toBe(123456)
     expect(entry.reason).toBe('Test reason')
     expect(entry.issueUrl).toBe('https://github.com/test/issue/1')
+    expect(entry.reportedBy).toBe('reporter')
     expect(entry.createdAt).toBeDefined()
   })
 
@@ -163,19 +184,24 @@ describe('generateEntry', () => {
     const entry = generateEntry(
       parsedData,
       'https://github.com/test/issue/1',
+      'reporter',
       '2024-01-15',
     )
     expect(entry.createdAt).toBe('2024-01-15')
   })
 
   it('should generate ISO date when createdAt is not provided', () => {
-    const entry = generateEntry(parsedData, 'https://github.com/test/issue/1')
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      'reporter',
+    )
     // Check it's in YYYY-MM-DD format
     expect(entry.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
   it('should handle empty issueUrl', () => {
-    const entry = generateEntry(parsedData, '')
+    const entry = generateEntry(parsedData, '', 'reporter')
     expect(entry.issueUrl).toBe('')
   })
 })
@@ -202,6 +228,7 @@ This is suspicious behavior.
     const entry = generateEntry(
       parsed,
       'https://github.com/biomejs/biome/pull/4891#issuecomment-4323263151',
+      'reporter',
       '2024-04-28',
     )
 
@@ -212,6 +239,7 @@ This is suspicious behavior.
     expect(entry.issueUrl).toBe(
       'https://github.com/biomejs/biome/pull/4891#issuecomment-4323263151',
     )
+    expect(entry.reportedBy).toBe('reporter')
     expect(entry.createdAt).toBe('2024-04-28')
   })
 })
