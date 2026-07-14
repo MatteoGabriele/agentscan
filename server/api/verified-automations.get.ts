@@ -2,18 +2,11 @@ import type { VerifiedAutomation } from '~~/shared/types/automation'
 
 export default defineEventHandler(async () => {
   try {
-    const raw = await useStorage('assets:data').getItemRaw(
-      'verified-automations-list.json',
-    )
+    const results = await useStorage('assets:data').getItem<
+      VerifiedAutomation[]
+    >('verified-automations-list.json')
 
-    if (!raw) {
-      return []
-    }
-
-    const content = Buffer.isBuffer(raw) ? raw.toString() : String(raw)
-    const results: VerifiedAutomation[] = JSON.parse(content)
-
-    return results
+    return results ?? []
   } catch {
     throw createError({
       statusCode: 500,
