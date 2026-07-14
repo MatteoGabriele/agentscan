@@ -46,7 +46,7 @@ async function handleSubmit(value: string) {
     </p>
   </header>
 
-  <RepoForm
+  <LazyRepoForm
     v-model="repoInput"
     :hydrate-on-interaction="['click', 'focus']"
     @submit="handleSubmit"

@@ -4,7 +4,6 @@ import type {
   IdentityClassification,
   IdentifyResult,
 } from '@unveil/identity'
-import dayjs from 'dayjs'
 
 const props = defineProps<{
   user: GitHubUser
@@ -48,14 +47,6 @@ const activityReport = computed<IntegrationItem | undefined>(() => {
 
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
-
-const flagCreatedAt = computed<string | undefined>(() => {
-  if (!verifiedAutomation.value) {
-    return
-  }
-
-  return dayjs(verifiedAutomation.value.createdAt).format('MMM D, YYYY')
-})
 
 const classification = computed<IdentityClassification | undefined>(() => {
   return data.value?.analysis.classification
@@ -204,7 +195,8 @@ useSeoAnalysis(identifyAnalysis, {
             {{ verifiedAutomation.reason }}
           </p>
           <footer class="flex items-baseline justify-between">
-            <p class="text-gh-muted text-xs">Reported {{ flagCreatedAt }}</p>
+            <ReportMeta :report="verifiedAutomation" />
+
             <NuxtLink
               :to="verifiedAutomation.issueUrl"
               target="_blank"

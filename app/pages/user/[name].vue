@@ -33,7 +33,7 @@ useSeoUser(user)
 <template>
   <h1 class="sr-only">{{ username }} analysis page</h1>
 
-  <AnalysisForm
+  <LazyAnalysisForm
     :hydrate-on-interaction="['click', 'focus']"
     :model-value="username"
     @submit="handleSubmit"

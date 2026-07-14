@@ -4,4 +4,5 @@ export type VerifiedAutomation = {
   reason: string
   issueUrl: string
   createdAt: string
+  reportedBy: string
 }

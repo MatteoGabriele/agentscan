@@ -131,10 +131,8 @@ useHead({
           <p class="my-2 text-sm">{{ item.reason }}</p>
 
           <footer class="flex items-baseline justify-between mt-4">
-            <p class="text-gh-muted text-xs">
-              Reported
-              <NuxtTime :title="item.createdAt" :datetime="item.createdAt" />
-            </p>
+            <ReportMeta :report="item" />
+
             <NuxtLink
               :to="item.issueUrl"
               target="_blank"
