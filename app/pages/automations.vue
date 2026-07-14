@@ -31,6 +31,10 @@ const filteredItems = computed(() => {
   return items.value.filter((item) => fuzzySearch(query, item.username))
 })
 
+const lastUpdateDate = computed<string | undefined>(() => {
+  return items.value[0]?.createdAt
+})
+
 useHead({
   title: 'Community reports | AgentScan',
   meta: [
@@ -60,14 +64,14 @@ useHead({
         let us know</NuxtLink
       >.
     </p>
-    <p v-if="items?.[0]" class="mt-6 text-sm text-gh-text">
+    <p v-if="lastUpdateDate" class="mt-6 text-sm text-gh-text">
       Last updated:
 
       <span
         v-if="status === 'pending'"
         class="h-2.5 bg-gh-border rounded w-20 inline-block animate-pulse"
       />
-      <NuxtTime v-else :datetime="items[0].createdAt" />
+      <NuxtTime v-else :datetime="lastUpdateDate" />
     </p>
 
     <input
