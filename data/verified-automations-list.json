@@ -152,14 +152,6 @@
     "reportedBy": "MatteoGabriele"
   },
   {
-    "username": "orbisai0security",
-    "id": 242526317,
-    "reason": "Self-identified automated account that opens pull requests across repositories, claiming security improvements, but has spammed over 260 projects with more than 360 PRs.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/73",
-    "createdAt": "2026-04-27",
-    "reportedBy": "MatteoGabriele"
-  },
-  {
     "username": "nanookclaw",
     "id": 258741235,
     "reason": "This user left a lengthy, unsolicited comment on a PR, treating it as a response to feedback. Since the user is not a contributor to the repo, responding to feedback makes no sense. Additionally, the user's name is suffixed with \"claw\".",
@@ -198,14 +190,6 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/125",
     "createdAt": "2026-05-16",
     "reportedBy": "azrdn"
-  },
-  {
-    "username": "Sean-Kenneth-Doherty",
-    "id": 9375875,
-    "reason": "This account opened approximately 300 PRs across 90+ projects in under a week, showing clear automated bulk spam behavior.",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/128",
-    "createdAt": "2026-05-17",
-    "reportedBy": "MatteoGabriele"
   },
   {
     "username": "xxiaoxiong",
@@ -293,14 +277,6 @@
     "reason": "The timing pattern between forking and PR submission, just seconds apart, across a high volume of repos in one day, looks more consistent with automated activity than manual contribution. Flagging for visibility. Could be legitimate automation.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/245",
     "createdAt": "2026-07-04",
-    "reportedBy": "MatteoGabriele"
-  },
-  {
-    "username": "sanludhi",
-    "id": 20740909,
-    "reason": "Self-disclosed as an AI agent",
-    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/260",
-    "createdAt": "2026-07-12",
     "reportedBy": "MatteoGabriele"
   },
   {
