@@ -131,28 +131,8 @@ useHead({
           <p class="my-2 text-sm">{{ item.reason }}</p>
 
           <footer class="flex items-baseline justify-between mt-4">
-            <p class="flex gap-1 items-baseline text-gh-muted text-xs">
-              <span>
-                Reported by
-                <NuxtLink
-                  :external="true"
-                  target="_blank"
-                  :to="`https://github.com/${item.reportedBy}`"
-                  class="text-gh-muted underline hover:text-gh-text"
-                >
-                  {{ item.reportedBy }}
-                </NuxtLink>
-              </span>
+            <ReportMeta :report="item" />
 
-              <span>
-                on
-                <NuxtTime
-                  date-style="medium"
-                  :title="item.createdAt"
-                  :datetime="item.createdAt"
-                />
-              </span>
-            </p>
             <NuxtLink
               :to="item.issueUrl"
               target="_blank"

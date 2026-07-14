@@ -195,28 +195,7 @@ useSeoAnalysis(identifyAnalysis, {
             {{ verifiedAutomation.reason }}
           </p>
           <footer class="flex items-baseline justify-between">
-            <p class="flex gap-1 items-baseline text-gh-muted text-xs">
-              <span>
-                Reported by
-                <NuxtLink
-                  :external="true"
-                  target="_blank"
-                  :to="`https://github.com/${verifiedAutomation.reportedBy}`"
-                  class="text-gh-muted underline hover:text-gh-text"
-                >
-                  {{ verifiedAutomation.reportedBy }}
-                </NuxtLink>
-              </span>
-
-              <span>
-                on
-                <NuxtTime
-                  date-style="medium"
-                  :title="verifiedAutomation.createdAt"
-                  :datetime="verifiedAutomation.createdAt"
-                />
-              </span>
-            </p>
+            <ReportMeta :report="verifiedAutomation" />
 
             <NuxtLink
               :to="verifiedAutomation.issueUrl"
