@@ -7,9 +7,7 @@ const { trackEvent } = useSaEvent()
 </script>
 
 <template>
-  <header
-    class="h-12 flex justify-between items-center gap-6 px-4 @4xl:px-6 py-4"
-  >
+  <header class="flex justify-between items-center gap-6 px-4 @4xl:px-6 py-4">
     <div class="flex-1">
       <NuxtLink
         class="flex gap-2 items-center text-gh-text"

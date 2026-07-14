@@ -74,7 +74,7 @@ useHead({
       v-model="search"
       type="text"
       placeholder="Search by username..."
-      class="mt-12 w-full px-3 py-2 bg-gh-bg border border-gh-border rounded text-sm text-gh-text placeholder:text-gh-muted focus:outline-none focus:border-gh-border/80"
+      class="mt-12 w-full px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text placeholder:text-gh-muted focus:outline-none focus:border-gh-border/80"
     />
   </header>
 
@@ -116,7 +116,7 @@ useHead({
       <li
         v-for="item in filteredItems"
         :key="item.username"
-        class="not-last:border-b border-gh-border-light pb-6 mb-2"
+        class="not-last:border-b border-gh-border-light/40 pb-6 mb-2"
       >
         <article>
           <h2>

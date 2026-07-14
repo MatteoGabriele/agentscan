@@ -60,6 +60,6 @@ useHead({
 
 <style scoped>
 .main-height {
-  height: calc(100svh - 48px);
+  height: calc(100svh - 60px);
 }
 </style>
