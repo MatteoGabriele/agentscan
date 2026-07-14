@@ -21,7 +21,7 @@ const { trackEvent } = useSaEvent()
     <p
       class="text-xs text-gh-muted/80 tracking-wider font-medium text-center mb-3"
     >
-      Latest flagged by the community
+      Recently reported by the community
     </p>
 
     <div class="flex flex-wrap items-center justify-center gap-2 min-h-[30px]">
