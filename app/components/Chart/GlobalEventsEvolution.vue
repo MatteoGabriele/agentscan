@@ -7,13 +7,11 @@ import {
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
-import { getClosedPrPercentageEvolutionTotal } from '~~/shared/utils/charts'
-import { identityConfig } from '@unveil/identity'
 import { round } from '~~/shared/utils/numbers'
+import { formatDateRange } from '~~/shared/utils/dates'
 
 import 'vue-data-ui/style.css'
 const { data: ecosystemHealth } = await useEcosystemHealth()
-const data = computed(() => ecosystemHealth.value?.results ?? [])
 const dates = computed(() => ecosystemHealth.value?.dates)
 const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
@@ -34,10 +32,13 @@ onMounted(() => {
 const colors = useColors(rootEl)
 
 const automatedClosureRateData = computed(() => ({
-  ...getClosedPrPercentageEvolutionTotal(data.value, [
-    0,
-    identityConfig.THRESHOLD_SUSPICIOUS,
-  ]),
+  name: 'Automation PR closure rate',
+  series:
+    dates.value?.map(
+      (date) => countsByDate.value?.[date]?.automationClosure.percentage ?? 100,
+    ) ?? [],
+  type: 'line' as const,
+  smooth: true,
   scaleMin: 0,
   scaleMax: 100,
   color: 'grey',
@@ -135,7 +136,7 @@ const viewBoxPadding = computed(() => {
   }
 })
 
-const tooltipTimeFormat = 'dddd • MMM dd • HH:mm'
+const tooltipTimeFormat = 'dddd • MMM dd'
 
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
@@ -221,6 +222,22 @@ function getTrend({
     color: getTrendColor({ value: trend, reversed: item.name !== 'Organic' }),
     arrow: getTrendArrow(trend),
   }
+}
+
+function getWeekRangeLabel(index: number): string {
+  const week = ecosystemHealth.value?.weeks?.[index]
+
+  if (!week) {
+    return ''
+  }
+
+  return formatDateRange({
+    startDate: week.weekStart,
+    endDate: week.weekEnd,
+    startYear: false,
+    endYear: true,
+    locale: 'en-GB',
+  })
 }
 
 /**
@@ -380,7 +397,7 @@ const visibleLandmarkByIndex = computed(() => {
             <template #tooltip="{ datapoint, timeLabel, series }">
               <div class="flex flex-col">
                 <div :style="{ color: colors.textMuted }" class="mb-1">
-                  {{ timeLabel.text }}
+                  {{ getWeekRangeLabel(timeLabel.absoluteIndex) }}
                 </div>
                 <div
                   v-for="dp in datapoint"

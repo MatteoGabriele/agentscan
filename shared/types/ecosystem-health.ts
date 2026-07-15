@@ -23,3 +23,23 @@ export type EcosystemHealthCategoryProgression = Record<
   IdentityClassification,
   ReturnType<typeof calcLinearProgression>
 >
+
+export type EcosystemHealthCategoryStat = {
+  count: number
+  percentage: number
+}
+
+export type EcosystemHealthWeeklyItem = {
+  weekStart: string
+  weekEnd: string
+  createdAt: string
+  organic: EcosystemHealthCategoryStat
+  mixed: EcosystemHealthCategoryStat
+  automation: EcosystemHealthCategoryStat
+  total: number
+  automationClosure: {
+    eligiblePrs: number
+    closedPrs: number
+    percentage: number
+  }
+}

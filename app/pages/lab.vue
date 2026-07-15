@@ -8,7 +8,7 @@ definePageMeta({
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 
-const { data } = await useEcosystemHealth()
+const { data } = await useEcosystemHealthCurrentWeek()
 const dates = computed(() => data.value?.dates ?? [])
 
 function createChartDataset(): {

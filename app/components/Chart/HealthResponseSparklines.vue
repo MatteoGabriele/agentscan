@@ -13,7 +13,7 @@ import { usePreferredDark } from '@vueuse/core'
 
 import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealth()
+const { data } = useEcosystemHealthCurrentWeek()
 const dates = computed(() => data.value?.dates)
 
 const rootEl = shallowRef<HTMLElement | null>(null)

@@ -12,12 +12,65 @@ import {
 } from '../shared/utils/count-classification-by-date'
 import { unpack } from '../shared/utils/compactor'
 import { formatDateRange } from '../shared/utils/dates'
+import type { EcosystemHealthWeeklyItem } from '../shared/types/ecosystem-health'
+
+async function sendDiscordNotification(payload: { content: string }) {
+  const webhook = process.env.DISCORD_WEBHOOK
+
+  if (!webhook) {
+    console.log('Discord webhook URL not found!')
+    console.log(JSON.stringify(payload, null, 2))
+    console.log(payload.content)
+    return
+  }
+
+  const discordRes = await fetch(webhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10_000),
+  })
+
+  if (!discordRes.ok) {
+    console.error('Discord webhook failed:', discordRes.status)
+    process.exit(1)
+  }
+
+  console.log('Discord notification sent')
+}
 
 async function main() {
-  const results = unpack(readFileSync('data/scan-results.txt', 'utf-8'))
+  const results = unpack(readFileSync('data/scan-results-tmp.txt', 'utf-8'))
 
-  if (!results?.length) {
-    console.log('No data returned from API')
+  // Right after a Sunday compaction, the tmp file is freshly cleared — fall back
+  // to reporting the week that was just written to scan-results.json instead.
+  if (!results.length) {
+    const weeks: EcosystemHealthWeeklyItem[] = JSON.parse(
+      readFileSync('data/scan-results.json', 'utf-8'),
+    )
+    const lastWeek = weeks.at(-1)
+
+    if (!lastWeek) {
+      console.log('No data returned from API')
+      return
+    }
+
+    const payload = {
+      content: [
+        'Daily Dose of Clankers',
+        '',
+        `${formatDateRange({ startDate: lastWeek.weekStart, endDate: lastWeek.weekEnd, startYear: true, endYear: true, locale: 'en-GB' })}`,
+        '',
+        `🟢 Organic: ${lastWeek.organic.percentage}%`,
+        `🟡 Mixed: ${lastWeek.mixed.percentage}%`,
+        `🔴 Automation: ${lastWeek.automation.percentage}%`,
+        '',
+        `⚫ Automation PR closure rate: ${lastWeek.automationClosure.percentage}%`,
+        '',
+      ].join('\n'),
+    }
+
+    await sendDiscordNotification(payload)
     return
   }
 
@@ -96,28 +149,7 @@ async function main() {
     ].join('\n'),
   }
 
-  const webhook = process.env.DISCORD_WEBHOOK
-
-  if (!webhook) {
-    console.log('Discord webhook URL not found!')
-    console.log(JSON.stringify(payload, null, 2))
-    console.log(payload.content)
-    return
-  }
-
-  const discordRes = await fetch(webhook, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(10_000),
-  })
-
-  if (!discordRes.ok) {
-    console.error('Discord webhook failed:', discordRes.status)
-    process.exit(1)
-  }
-
-  console.log('Discord notification sent')
+  await sendDiscordNotification(payload)
 }
 
 // Only run main if this script is executed directly (not imported)

@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import type { VerifiedAutomation } from '../shared/types/automation'
+import type { EcosystemHealthWeeklyItem } from '../shared/types/ecosystem-health'
 import { libraries } from '../shared/daily-scan'
 import { isKnownBot } from '../shared/cicd-known-bots'
 import { readFileSync, writeFileSync } from 'fs'
@@ -8,6 +9,7 @@ import { Octokit } from 'octokit'
 import type { IdentifyResult } from '@unveil/identity'
 import { hashPrId } from './pr-hash'
 import { pack, unpack } from '../shared/utils/compactor'
+import { buildWeeklyEntry } from '../shared/utils/weekly-aggregator'
 
 // Configuration
 const API_TIMEOUT = 30000
@@ -65,8 +67,8 @@ function loadVerifiedAutomations(): Set<number> {
   }
 }
 
-function loadScanResults(): ScanResult[] {
-  const filePath = join(process.cwd(), 'data', 'scan-results.txt')
+function loadTmpResults(): ScanResult[] {
+  const filePath = join(process.cwd(), 'data', 'scan-results-tmp.txt')
   try {
     return unpack(readFileSync(filePath, 'utf-8')) as ScanResult[]
   } catch (err) {
@@ -77,12 +79,35 @@ function loadScanResults(): ScanResult[] {
   }
 }
 
-function saveScanResults(results: ScanResult[], dryRun: boolean = false): void {
+function saveTmpResults(results: ScanResult[], dryRun: boolean = false): void {
   if (dryRun) {
     return
   }
-  const filePath = join(process.cwd(), 'data', 'scan-results.txt')
+  const filePath = join(process.cwd(), 'data', 'scan-results-tmp.txt')
   writeFileSync(filePath, pack(results))
+}
+
+function loadWeeklyResults(): EcosystemHealthWeeklyItem[] {
+  const filePath = join(process.cwd(), 'data', 'scan-results.json')
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf-8'))
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      return []
+    }
+    throw err
+  }
+}
+
+function saveWeeklyResults(
+  results: EcosystemHealthWeeklyItem[],
+  dryRun: boolean = false,
+): void {
+  if (dryRun) {
+    return
+  }
+  const filePath = join(process.cwd(), 'data', 'scan-results.json')
+  writeFileSync(filePath, JSON.stringify(results, null, 2))
 }
 
 type ScanUserResponse = {
@@ -204,7 +229,7 @@ export async function main(options: ScanOptions = {}) {
   }
 
   const octokit = new Octokit({ auth: token })
-  const scanResults = dryRun ? [] : loadScanResults()
+  const tmpResults = dryRun ? [] : loadTmpResults()
   const verifiedAutomations = loadVerifiedAutomations()
   const now = new Date().toISOString()
 
@@ -230,7 +255,7 @@ export async function main(options: ScanOptions = {}) {
       score = 0
     }
 
-    scanResults.push({
+    tmpResults.push({
       created_at: now,
       score,
       pr_key: user.pr_key,
@@ -251,7 +276,16 @@ export async function main(options: ScanOptions = {}) {
   }
 
   // Only reached if every repo and every user scan succeeded
-  saveScanResults(scanResults, dryRun)
+  const isEndOfWeek = new Date(now).getUTCDay() === 0 // Sunday
+
+  if (isEndOfWeek) {
+    const weeklyResults = dryRun ? [] : loadWeeklyResults()
+    weeklyResults.push(buildWeeklyEntry(tmpResults, now))
+    saveWeeklyResults(weeklyResults, dryRun)
+    saveTmpResults([], dryRun)
+  } else {
+    saveTmpResults(tmpResults, dryRun)
+  }
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
     (a, b) => b[1] - a[1],

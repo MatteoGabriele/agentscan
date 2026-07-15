@@ -1,0 +1,140 @@
+[
+  {
+    "weekStart": "2026-06-01",
+    "weekEnd": "2026-06-07",
+    "createdAt": "2026-07-15T06:23:10.108Z",
+    "organic": {
+      "count": 795,
+      "percentage": 71.49
+    },
+    "mixed": {
+      "count": 123,
+      "percentage": 11.06
+    },
+    "automation": {
+      "count": 194,
+      "percentage": 17.45
+    },
+    "total": 1112,
+    "automationClosure": {
+      "eligiblePrs": 136,
+      "closedPrs": 63,
+      "percentage": 46
+    }
+  },
+  {
+    "weekStart": "2026-06-08",
+    "weekEnd": "2026-06-14",
+    "createdAt": "2026-07-15T06:23:10.110Z",
+    "organic": {
+      "count": 728,
+      "percentage": 65.47
+    },
+    "mixed": {
+      "count": 130,
+      "percentage": 11.69
+    },
+    "automation": {
+      "count": 254,
+      "percentage": 22.84
+    },
+    "total": 1112,
+    "automationClosure": {
+      "eligiblePrs": 153,
+      "closedPrs": 71,
+      "percentage": 46
+    }
+  },
+  {
+    "weekStart": "2026-06-15",
+    "weekEnd": "2026-06-21",
+    "createdAt": "2026-07-15T06:23:10.111Z",
+    "organic": {
+      "count": 733,
+      "percentage": 66.16
+    },
+    "mixed": {
+      "count": 146,
+      "percentage": 13.18
+    },
+    "automation": {
+      "count": 229,
+      "percentage": 20.67
+    },
+    "total": 1108,
+    "automationClosure": {
+      "eligiblePrs": 140,
+      "closedPrs": 78,
+      "percentage": 56
+    }
+  },
+  {
+    "weekStart": "2026-06-22",
+    "weekEnd": "2026-06-28",
+    "createdAt": "2026-07-15T06:23:10.113Z",
+    "organic": {
+      "count": 735,
+      "percentage": 65.8
+    },
+    "mixed": {
+      "count": 156,
+      "percentage": 13.97
+    },
+    "automation": {
+      "count": 226,
+      "percentage": 20.23
+    },
+    "total": 1117,
+    "automationClosure": {
+      "eligiblePrs": 158,
+      "closedPrs": 79,
+      "percentage": 50
+    }
+  },
+  {
+    "weekStart": "2026-06-29",
+    "weekEnd": "2026-07-05",
+    "createdAt": "2026-07-15T06:23:10.115Z",
+    "organic": {
+      "count": 1349,
+      "percentage": 70.26
+    },
+    "mixed": {
+      "count": 215,
+      "percentage": 11.2
+    },
+    "automation": {
+      "count": 356,
+      "percentage": 18.54
+    },
+    "total": 1920,
+    "automationClosure": {
+      "eligiblePrs": 227,
+      "closedPrs": 99,
+      "percentage": 44
+    }
+  },
+  {
+    "weekStart": "2026-07-06",
+    "weekEnd": "2026-07-12",
+    "createdAt": "2026-07-15T06:23:10.118Z",
+    "organic": {
+      "count": 1634,
+      "percentage": 72.95
+    },
+    "mixed": {
+      "count": 244,
+      "percentage": 10.89
+    },
+    "automation": {
+      "count": 362,
+      "percentage": 16.16
+    },
+    "total": 2240,
+    "automationClosure": {
+      "eligiblePrs": 215,
+      "closedPrs": 108,
+      "percentage": 50
+    }
+  }
+]

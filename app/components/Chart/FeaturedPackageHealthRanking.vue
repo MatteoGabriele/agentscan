@@ -8,7 +8,7 @@ import {
 import { interpolateHexColors } from '~/utils/colors'
 import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealth()
+const { data } = useEcosystemHealthCurrentWeek()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)

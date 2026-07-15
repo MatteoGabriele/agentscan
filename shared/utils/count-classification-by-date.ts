@@ -226,7 +226,7 @@ function getNextDays({
   )
 }
 
-function getMondayDateKey(date: string): string {
+export function getMondayDateKey(date: string): string {
   const millisecondsPerDay = 24 * 60 * 60 * 1000
   const currentDate = new Date(`${getDateKey(date)}T00:00:00.000Z`)
   const dayOfWeek = currentDate.getUTCDay()
@@ -418,7 +418,7 @@ type ClassificationChunk = {
   classification: ClassificationStats
 }
 
-function getSundayDateKey(date: string): string {
+export function getSundayDateKey(date: string): string {
   const millisecondsPerDay = 24 * 60 * 60 * 1000
   const monday = new Date(`${getMondayDateKey(date)}T00:00:00.000Z`)
 
