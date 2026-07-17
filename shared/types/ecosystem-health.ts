@@ -1,11 +1,13 @@
 import type { calcLinearProgression } from '../utils/calc-linear-progression'
 import type { IdentityClassification } from '@unveil/identity'
 
+export type PrStatus = 'open' | 'closed' | 'merged'
+
 export type EcosystemHealthItem = {
   created_at: string
   score: number
   pr_key: string
-  pr_status: string // FIXME: narrow down
+  pr_status: PrStatus
   user_created_at: string
   user_public_repos_count: number
   events_count: number

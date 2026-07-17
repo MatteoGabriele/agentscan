@@ -78,6 +78,7 @@ export type RepoClosedPrOptions = {
   scoreBounds?: ScoreBounds
   openState?: string
   closedState?: string
+  mergedState?: string
   includeAlreadyClosed?: boolean
 }
 
@@ -93,6 +94,7 @@ export function getClosedPrPercentageByRepo(
     scoreBounds = [0, 100],
     openState = 'open',
     closedState = 'closed',
+    mergedState = 'merged',
   } = options
 
   const resolvedScoreBounds: ScoreBounds = Array.isArray(scoreBounds)
@@ -140,7 +142,9 @@ export function getClosedPrPercentageByRepo(
           !Number.isNaN(score) &&
           score >= minScore &&
           score <= maxScore &&
-          (status === openState || status === closedState)
+          (status === openState ||
+            status === closedState ||
+            status === mergedState)
         )
       })
 
@@ -219,7 +223,9 @@ export type ClosedPrPercentageEvolutionSeries = {
  * - Only entries where `dateKey` matches that given day are considered
  * - PRs are deduped by `pr_key`
  * - A PR is considered closed if at least one entry for that PR on that day has a closed status
- * - A PR is considered eligible if it has at least one entry within the selected score range for that day
+ *   (a merged PR does not count as closed — merging is a positive outcome, not a rejection)
+ * - A PR is considered eligible if it has at least one entry within the selected score range for that day,
+ *   whether open, closed, or merged
  *
  * Closure rate is calculated as:
  *

@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import type { EcosystemHealthItem } from '../types/ecosystem-health'
+import type { EcosystemHealthItem, PrStatus } from '../types/ecosystem-health'
 
 // Compact CSV format for scan results — ~72% smaller than pretty-printed JSON.
 //
@@ -9,12 +9,20 @@ import type { EcosystemHealthItem } from '../types/ecosystem-health'
 //
 //   created_ts / user_ts : unix seconds (drops sub-second precision)
 //   pr_key               : base64url, no padding  (64 hex → 43 chars)
-//   status               : "o" = open | "c" = closed
+//   status               : "o" = open | "c" = closed | "m" = merged
 //   repo_idx             : index into the REPOS header
 //   is_bounty            : 1 = bounty hunter | 0 = not
 
-const STATUS_ENCODE: Record<string, string> = { open: 'o', closed: 'c' }
-const STATUS_DECODE: Record<string, string> = { o: 'open', c: 'closed' }
+const STATUS_ENCODE: Record<string, string> = {
+  open: 'o',
+  closed: 'c',
+  merged: 'm',
+}
+const STATUS_DECODE: Record<string, string> = {
+  o: 'open',
+  c: 'closed',
+  m: 'merged',
+}
 
 function hexToBase64Url(hex: string): string {
   return Buffer.from(hex, 'hex').toString('base64url')
@@ -116,7 +124,7 @@ export function unpack(content: string): EcosystemHealthItem[] {
       created_at: fromUnixSecs(numCreatedTs),
       score: Number(score),
       pr_key: base64UrlToHex(prKeyB64!),
-      pr_status: STATUS_DECODE[status!] ?? status!,
+      pr_status: (STATUS_DECODE[status!] ?? status!) as PrStatus,
       user_created_at: fromUnixSecs(numUserCreatedTs),
       user_public_repos_count: numPublicRepos,
       events_count: numEvents,
