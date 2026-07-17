@@ -120,7 +120,7 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     layout: {
-      width: numberOfWeeks.value * 43,
+      width: 43 + numberOfWeeks.value * 32,
       cells: {
         spacing: 0,
         colors: {
