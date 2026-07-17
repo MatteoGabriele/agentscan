@@ -8,6 +8,7 @@ import { Octokit } from 'octokit'
 import type { IdentifyResult } from '@unveil/identity'
 import { hashPrId } from './pr-hash'
 import { pack, unpack } from '../shared/utils/compactor'
+import type { PrStatus } from '../shared/types/ecosystem-health'
 
 // Configuration
 const API_TIMEOUT = 30000
@@ -26,7 +27,7 @@ interface ScanResult {
   events_count: number
   repo_name: string
   pr_key: string
-  pr_status: string
+  pr_status: PrStatus
   is_bounty: boolean
 }
 
@@ -125,7 +126,7 @@ async function searchUsers(
     public_repos: number
     repo_name: string
     pr_key: string
-    pr_status: string
+    pr_status: PrStatus
   }> = []
 
   for (const repoFullName of libraries) {
@@ -168,7 +169,7 @@ async function searchUsers(
         login: fullProfile.data.login,
         created_at: fullProfile.data.created_at,
         pr_key: hashPrId(repoFullName, pr.number),
-        pr_status: pr.state,
+        pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
         public_repos: fullProfile.data.public_repos,
         repo_name: repoFullName,
       })

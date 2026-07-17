@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, vi, expect, it } from 'vitest'
 import {
   getCompleteDayRange,
   getDayKey,
@@ -136,6 +136,34 @@ describe('getClosedPrPercentageByRepo', () => {
         percentage: 100,
       }),
     )
+  })
+
+  it('counts merged PRs as eligible but not closed — merging is a positive outcome', () => {
+    const source: EcosystemHealthItem[] = [
+      {
+        repo_name: 'some/repo',
+        pr_key: 'pr-1',
+        pr_status: 'merged',
+        score: 25,
+      } as EcosystemHealthItem,
+      {
+        repo_name: 'some/repo',
+        pr_key: 'pr-2',
+        pr_status: 'closed',
+        score: 25,
+      } as EcosystemHealthItem,
+    ]
+
+    const result = getClosedPrPercentageByRepo(source, {})
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        repo: 'some/repo',
+        eligiblePrs: 2,
+        closedPrs: 1,
+        percentage: 50,
+      }),
+    ])
   })
 })
 
