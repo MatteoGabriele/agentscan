@@ -44,7 +44,7 @@
     "tiptap-markdown": "^0.9.0",
     "valibot": "^1.2.0",
     "vue": "^3.5.28",
-    "vue-data-ui": "^3.22.11",
+    "vue-data-ui": "^3.22.12",
     "vue-router": "^4.6.4",
     "yaml": "^2.9.0"
   },
