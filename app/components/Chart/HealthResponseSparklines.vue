@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, shallowRef, watch } from 'vue'
 import {
   VueUiXy,
   type VueUiXyConfig,
@@ -177,9 +176,17 @@ const activeRepoOptionId = computed(() => {
   if (!isRepoMenuOpen.value || !filteredRepoOptions.value.length) {
     return undefined
   }
-
   return `repository-option-${activeRepoOptionIndex.value}`
 })
+
+watch(
+  [isRepoMenuOpen, activeRepoOptionId, filteredRepoOptions],
+  async ([isOpen, optionId]) => {
+    if (!isOpen || !optionId) return
+    await nextTick()
+    document.getElementById(optionId)?.scrollIntoView({ block: 'nearest' })
+  },
+)
 
 const selectedRepoCount = computed(() => (selectedRepoName.value ? 1 : 0))
 
@@ -559,7 +566,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
           Featured repositories
         </label>
         <p class="m-0 text-xs text-gh-muted">
-          Search for and select one repository.
+          Search for and select one repository
         </p>
       </div>
 
