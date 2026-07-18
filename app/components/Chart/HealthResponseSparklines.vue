@@ -182,7 +182,9 @@ const activeRepoOptionId = computed(() => {
 watch(
   [isRepoMenuOpen, activeRepoOptionId, filteredRepoOptions],
   async ([isOpen, optionId]) => {
-    if (!isOpen || !optionId) return
+    if (!isOpen || !optionId) {
+      return
+    }
     await nextTick()
     document.getElementById(optionId)?.scrollIntoView({ block: 'nearest' })
   },
