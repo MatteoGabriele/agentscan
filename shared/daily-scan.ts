@@ -40,11 +40,11 @@ export const libraries = [
   'helix-editor/helix',
   'projectdiscovery/nuclei',
   'supabase/supabase',
-  'GoogleChrome/lighthouse',
   'Automattic/mongoose',
   'processing/p5.js',
   'oven-sh/bun',
-  'freeCodeCamp/freeCodeCamp',
   'huggingface/diffusers',
   'coollabsio/coolify',
+  'microsoft/TypeScript',
+  'shadcn-ui/ui',
 ] as const
