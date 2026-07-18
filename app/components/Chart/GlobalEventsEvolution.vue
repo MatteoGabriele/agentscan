@@ -234,6 +234,11 @@ const landmarks = [
     name: 'Sample update',
     description: '16 repositories added to the dataset',
   },
+  {
+    date: '2026-07-18',
+    name: 'Sample update',
+    description: '16 repositories added to the dataset',
+  },
 ]
 
 const keyDates = computed(() => {
