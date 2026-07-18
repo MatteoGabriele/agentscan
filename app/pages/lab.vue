@@ -1,52 +1,9 @@
 <script setup lang="ts">
-import type { VueUiStacklineDatasetItem } from 'vue-data-ui/vue-ui-stackline'
-
 definePageMeta({
   layout: 'default',
 })
 
-const rootEl = shallowRef<HTMLElement | null>(null)
-const colors = useColors(rootEl)
-
 const { data } = await useEcosystemHealth()
-const dates = computed(() => data.value?.dates ?? [])
-
-function createChartDataset(): {
-  categories: string[]
-  dataset: VueUiStacklineDatasetItem[]
-} {
-  return {
-    categories: dates.value,
-    dataset: [
-      {
-        name: 'Organic',
-        series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.organic.percentage ?? 0,
-        ),
-        color: colors.value.greenLine,
-      },
-      {
-        name: 'Mixed',
-        series: dates.value.map(
-          (date) => data.value?.countsByDate?.[date]?.mixed.percentage ?? 0,
-        ),
-        color: colors.value.amber,
-      },
-      {
-        name: 'Automation',
-        series: dates.value.map(
-          (date) =>
-            data.value?.countsByDate?.[date]?.automation.percentage ?? 0,
-        ),
-        color: colors.value.dangerHover,
-      },
-    ],
-  }
-}
-
-const stacklineData = computed(() => createChartDataset())
-
-const dataset = computed(() => stacklineData.value.dataset)
 </script>
 
 <template>
@@ -91,13 +48,6 @@ const dataset = computed(() => stacklineData.value.dataset)
       </div>
       <div class="w-full">
         <LazyChartFeaturedPackageHealthRanking hydrate-on-visible />
-      </div>
-      <div class="w-full">
-        <LazyChartGlobalEventsHeatmap
-          :data="dataset"
-          :timestamps="dates"
-          hydrate-on-visible
-        />
       </div>
       <div class="w-full">
         <LazyLabBountyRepoList hydrate-on-visible />

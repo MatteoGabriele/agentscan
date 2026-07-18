@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, shallowRef, watch } from 'vue'
 import {
   VueUiXy,
   type VueUiXyConfig,
@@ -50,7 +49,7 @@ function setScoreBounds(range: ScoreBounds) {
 
 const selectedRangeColor = computed(() => {
   if (isScoreRangeSelected(suspiciousScoreBounds)) {
-    return colors.value.danger
+    return colors.value.red
   }
   if (isScoreRangeSelected(amberScoreBounds)) {
     return colors.value.amber
@@ -58,8 +57,7 @@ const selectedRangeColor = computed(() => {
   return colors.value.green
 })
 
-const MAX_SELECTION = 5
-const DEFAULT_SELECTION = 1
+const DEFAULT_REPO_INDEX = 0
 
 type SparklineDatasetItem = VueUiXyDatasetItem & {
   hasData?: boolean
@@ -72,6 +70,8 @@ type RepoSelectorOption = {
   repo: string
   hasData: boolean
   latestValue: string | null
+  latestClosedPrs: number | null
+  latestEligiblePrs: number | null
 }
 
 type SparklineChart = SparklineDatasetItem[]
@@ -107,14 +107,6 @@ const rawSparklines = computed<SparklineChart[]>(() => {
   return nextValue
 })
 
-const GREEN_HUE = 155 // starting at green so we have Nuxt with its color ^^
-
-const repoPalette = Array.from(
-  { length: MAX_SELECTION },
-  (_, i) =>
-    `oklch(72% 0.14 ${(GREEN_HUE + Math.round((i * 360) / MAX_SELECTION)) % 360})`,
-)
-
 function getRepoNameParts(name: string) {
   const [rawOwner, ...repoParts] = name.split('/')
   const owner = rawOwner ?? ''
@@ -129,8 +121,12 @@ function getRepoNameParts(name: string) {
 function getLatestDatasetValue(entry?: SparklineDatasetItem) {
   const rawValue = Array.isArray(entry?.series) ? entry.series.at(-1) : null
   const value = Number(rawValue)
-
   return Number.isFinite(value) ? `${value.toFixed(0)}%` : null
+}
+
+function getLatestDetailValue(values?: number[]) {
+  const value = Number(values?.at(-1))
+  return Number.isFinite(value) ? value : null
 }
 
 const repoOptions = computed<RepoSelectorOption[]>(() => {
@@ -146,152 +142,207 @@ const repoOptions = computed<RepoSelectorOption[]>(() => {
         repo,
         hasData: Boolean(entry?.hasData),
         latestValue: getLatestDatasetValue(entry),
+        latestClosedPrs: getLatestDetailValue(entry?.details?.closedPrs),
+        latestEligiblePrs: getLatestDetailValue(entry?.details?.eligiblePrs),
       }
     })
     .filter((option) => option.key)
 })
 
-const selectedRepoNames = shallowRef<string[]>([])
-const selectedRepoColors = shallowRef<Record<string, string>>({})
+const selectedRepoName = shallowRef<string | null>(null)
+const repoSearch = shallowRef('')
+const isRepoMenuOpen = shallowRef(false)
+const activeRepoOptionIndex = shallowRef(0)
 
-function getRepoPaletteColor(index: number): string {
-  return repoPalette[index % repoPalette.length] ?? colors.value.textMuted!
-}
+const selectedRepoOption = computed(() =>
+  repoOptions.value.find((option) => option.key === selectedRepoName.value),
+)
 
-function getNormalizedRepoColors(repoNames: string[]) {
-  const usedColors = new Set<string>()
-  const nextColors: Record<string, string> = {}
+const filteredRepoOptions = computed(() => {
+  const query = repoSearch.value.trim().toLowerCase()
 
-  for (const repoName of repoNames) {
-    const existingColor = selectedRepoColors.value[repoName]
-    const color =
-      existingColor &&
-      repoPalette.includes(existingColor) &&
-      !usedColors.has(existingColor)
-        ? existingColor
-        : (repoPalette.find((paletteColor) => !usedColors.has(paletteColor)) ??
-          getRepoPaletteColor(usedColors.size))
-
-    nextColors[repoName] = color
-    usedColors.add(color)
+  if (!query || query === selectedRepoName.value?.toLowerCase()) {
+    return repoOptions.value
   }
 
-  return nextColors
-}
-
-function areStringArraysEqual(a: string[], b: string[]) {
-  return a.length === b.length && a.every((value, index) => value === b[index])
-}
-
-function areColorMapsEqual(
-  a: Record<string, string>,
-  b: Record<string, string>,
-) {
-  const aEntries = Object.entries(a)
-  const bEntries = Object.entries(b)
-
-  return (
-    aEntries.length === bEntries.length &&
-    aEntries.every(([key, value]) => b[key] === value)
+  return repoOptions.value.filter((option) =>
+    [option.key, option.owner, option.repo].some((value) =>
+      value.toLowerCase().includes(query),
+    ),
   )
-}
+})
 
-function setSelectedRepoNames(repoNames: string[]) {
-  const nextColors = getNormalizedRepoColors(repoNames)
-
-  if (!areStringArraysEqual(selectedRepoNames.value, repoNames)) {
-    selectedRepoNames.value = repoNames
+const activeRepoOptionId = computed(() => {
+  if (!isRepoMenuOpen.value || !filteredRepoOptions.value.length) {
+    return undefined
   }
+  return `repository-option-${activeRepoOptionIndex.value}`
+})
 
-  if (!areColorMapsEqual(selectedRepoColors.value, nextColors)) {
-    selectedRepoColors.value = nextColors
-  }
-}
+watch(
+  [isRepoMenuOpen, activeRepoOptionId, filteredRepoOptions],
+  async ([isOpen, optionId]) => {
+    if (!isOpen || !optionId) {
+      return
+    }
+    await nextTick()
+    document.getElementById(optionId)?.scrollIntoView({ block: 'nearest' })
+  },
+)
 
-const selectedRepoColorMap = computed(
-  () => new Map(Object.entries(selectedRepoColors.value)),
-)
-const selectedRepoNameSet = computed(() => new Set(selectedRepoNames.value))
-const selectedRepoCount = computed(() => selectedRepoNames.value.length)
-const selectionLimit = computed(() =>
-  Math.min(MAX_SELECTION, repoOptions.value.length),
-)
-const isSelectionFull = computed(() => selectedRepoCount.value >= MAX_SELECTION)
+const selectedRepoCount = computed(() => (selectedRepoName.value ? 1 : 0))
 
 watch(
   repoOptions,
   (options) => {
     if (!options.length) {
-      setSelectedRepoNames([])
+      selectedRepoName.value = null
+      repoSearch.value = ''
+      isRepoMenuOpen.value = false
       return
     }
 
-    const availableRepoNames = new Set(options.map((option) => option.key))
-    const preservedSelection = selectedRepoNames.value.filter((name) =>
-      availableRepoNames.has(name),
+    const selectedRepoIsAvailable = options.some(
+      (option) => option.key === selectedRepoName.value,
     )
+    const nextRepoName =
+      selectedRepoIsAvailable && selectedRepoName.value
+        ? selectedRepoName.value
+        : (options[DEFAULT_REPO_INDEX]?.key ?? options[0]?.key ?? null)
 
-    if (!preservedSelection.length) {
-      setSelectedRepoNames(
-        options
-          .slice(0, Math.min(DEFAULT_SELECTION, MAX_SELECTION))
-          .map((option) => option.key),
-      )
+    if (!nextRepoName) {
       return
     }
+    const selectionChanged = selectedRepoName.value !== nextRepoName
 
-    if (preservedSelection.length !== selectedRepoNames.value.length) {
-      setSelectedRepoNames(preservedSelection)
-      return
+    selectedRepoName.value = nextRepoName
+
+    if (selectionChanged || !isRepoMenuOpen.value) {
+      repoSearch.value = nextRepoName
     }
-
-    setSelectedRepoNames(preservedSelection)
   },
   { immediate: true },
 )
 
-function isRepoSelected(repoName: string) {
-  return selectedRepoNameSet.value.has(repoName)
-}
-
-function canToggleRepo(repoName: string) {
-  return isRepoSelected(repoName) || !isSelectionFull.value
-}
-
-function toggleRepo(repoName: string) {
-  const isSelected = isRepoSelected(repoName)
-
-  if (isSelected) {
-    if (selectedRepoNames.value.length <= 1) {
-      return
-    }
-
-    setSelectedRepoNames(
-      selectedRepoNames.value.filter((name) => name !== repoName),
-    )
+watch(filteredRepoOptions, (options) => {
+  if (!options.length) {
+    activeRepoOptionIndex.value = 0
     return
   }
 
-  if (selectedRepoNames.value.length >= MAX_SELECTION) {
-    return
+  activeRepoOptionIndex.value = Math.min(
+    activeRepoOptionIndex.value,
+    options.length - 1,
+  )
+})
+
+function openRepoMenu(event?: FocusEvent) {
+  isRepoMenuOpen.value = true
+
+  const selectedIndex = filteredRepoOptions.value.findIndex(
+    (option) => option.key === selectedRepoName.value,
+  )
+  activeRepoOptionIndex.value = selectedIndex >= 0 ? selectedIndex : 0
+
+  if (event?.target instanceof HTMLInputElement) {
+    event.target.select()
   }
-
-  setSelectedRepoNames([...selectedRepoNames.value, repoName])
 }
 
-function getRepoColor(repoName: string) {
-  return selectedRepoColorMap.value.get(repoName)
+function closeRepoMenu() {
+  isRepoMenuOpen.value = false
 }
 
-function getRepoStyle(repoName: string) {
-  const color = getRepoColor(repoName)
+function resetRepoSearch() {
+  repoSearch.value = selectedRepoOption.value?.key ?? ''
+}
+
+function onRepoSearchInput() {
+  isRepoMenuOpen.value = true
+  activeRepoOptionIndex.value = 0
+}
+
+function handleRepoSelectorEscape() {
+  resetRepoSearch()
+  closeRepoMenu()
+}
+
+function getRepoOptionClass(index: number) {
+  return index === activeRepoOptionIndex.value
+    ? 'bg-current/10'
+    : 'hover:bg-current/5'
+}
+
+function getRepoIndicatorStyle(repoName: string) {
+  const color =
+    repoName === selectedRepoName.value
+      ? selectedRangeColor.value
+      : 'transparent'
 
   return {
-    '--repo-color': color ?? 'transparent',
-    '--repo-selected-bg': color
-      ? `color-mix(in oklab, ${color} 12%, transparent)`
-      : 'transparent',
-  } as Record<string, string>
+    borderColor: color,
+    backgroundColor: color,
+  }
+}
+
+function getRepoOptionStatus(option: RepoSelectorOption) {
+  return option.hasData ? (option.latestValue ?? '—') : 'No data'
+}
+
+function selectRepo(option: RepoSelectorOption) {
+  selectedRepoName.value = option.key
+  repoSearch.value = option.key
+  closeRepoMenu()
+}
+
+function selectActiveRepoOption() {
+  const option = filteredRepoOptions.value[activeRepoOptionIndex.value]
+
+  if (option) {
+    selectRepo(option)
+  }
+}
+
+function moveActiveRepoOption(direction: 1 | -1) {
+  if (!isRepoMenuOpen.value) {
+    openRepoMenu()
+    return
+  }
+
+  const optionCount = filteredRepoOptions.value.length
+
+  if (!optionCount) {
+    return
+  }
+
+  activeRepoOptionIndex.value =
+    (activeRepoOptionIndex.value + direction + optionCount) % optionCount
+}
+
+function commitRepoSearch() {
+  const query = repoSearch.value.trim().toLowerCase()
+  const exactMatch = repoOptions.value.find(
+    (option) => option.key.toLowerCase() === query,
+  )
+
+  if (exactMatch) {
+    selectRepo(exactMatch)
+    return
+  }
+
+  resetRepoSearch()
+  closeRepoMenu()
+}
+
+function handleRepoSelectorFocusOut(event: FocusEvent) {
+  const selector = event.currentTarget as HTMLElement
+  const nextTarget = event.relatedTarget as Node | null
+
+  if (nextTarget && selector.contains(nextTarget)) {
+    return
+  }
+
+  commitRepoSearch()
 }
 
 const rawSparklineByRepoName = computed(() => {
@@ -309,20 +360,19 @@ const rawSparklineByRepoName = computed(() => {
 })
 
 const selectedRawSparklines = computed<SparklineChart[]>(() => {
-  return selectedRepoNames.value.flatMap((repoName) => {
-    const chart = rawSparklineByRepoName.value.get(repoName)
-    return chart ? [chart] : []
-  })
+  if (!selectedRepoName.value) {
+    return []
+  }
+
+  const chart = rawSparklineByRepoName.value.get(selectedRepoName.value)
+  return chart ? [chart] : []
 })
 
 const sparklines = computed<SparklineChart[]>(() => {
   return selectedRawSparklines.value.map((dataset) => {
-    const repoName = dataset[0]?.name
-    const repoColor = repoName ? getRepoColor(repoName) : undefined
-
     return dataset.map((datapoint) => ({
       ...datapoint,
-      color: repoColor ?? selectedRangeColor.value,
+      color: selectedRangeColor.value,
       dataLabels: false,
       suffix: '%',
       smooth: true,
@@ -342,10 +392,10 @@ const config = computed<VueUiXyConfig>(() => ({
     zoom: { show: false },
     legend: { show: false },
     backgroundColor: colors.value.bg,
-    height: 350,
+    height: 300,
     padding: {
       right: 100,
-      top: 80,
+      top: 20,
     },
     highlighter: {
       opacity: 5,
@@ -422,7 +472,12 @@ function drawLastDatapointLabel(svg: VueUiXySvgSlotProps['svg']) {
 
 type SvgSerieItem = {
   id?: string
+  color?: string
   plots?: Array<{ x: number; y: number; value: number }>
+}
+
+function getSvgSeries(data: unknown): SvgSerieItem[] {
+  return Array.isArray(data) ? (data as SvgSerieItem[]) : []
 }
 
 function getLastPlot(serie: SvgSerieItem) {
@@ -475,7 +530,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
       key: repoName,
       owner: owner!,
       repo,
-      color: getRepoColor(repoName) ?? colors.value.border ?? 'currentColor',
+      color: selectedRangeColor.value ?? 'currentColor',
       value: Number.isFinite(percentage) ? `${percentage.toFixed(0)}%` : '-',
       detail:
         closed == null || eligible == null
@@ -491,8 +546,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
     <!-- REPO SELECTOR -->
     <div
       class="mb-4 rounded-lg max-w-screen sm:max-w-[740px] min-w-0"
-      role="group"
-      aria-label="Repository selector"
+      aria-labelledby="repository-selector-label"
     >
       <div class="mb-5">
         <h2 class="text-center">
@@ -504,59 +558,106 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
           counts may change from one day to the next.
         </p>
       </div>
-      <div
-        class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
-      >
-        <div>
-          <p class="m-0 text-sm font-semibold leading-tight">
-            Featured repositories
-          </p>
-          <p class="m-0 text-xs text-gh-muted">
-            {{ selectedRepoCount }} / {{ selectionLimit }} selected
-          </p>
-        </div>
-        <p class="m-0 max-w-[260px] text-xs text-gh-muted sm:text-right">
-          Pick up to {{ MAX_SELECTION }} repositories. At least one must stay
-          selected.
+
+      <div class="mb-2">
+        <label
+          id="repository-selector-label"
+          for="repository-selector-input"
+          class="m-0 text-sm font-semibold leading-tight"
+        >
+          Featured repositories
+        </label>
+        <p class="m-0 text-xs text-gh-muted">
+          Search for and select one repository
         </p>
       </div>
 
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        <button
-          v-for="option in repoOptions"
-          :key="option.key"
-          type="button"
-          class="flex min-h-8 items-center gap-2 rounded-md border px-2.5 py-1 text-left text-xs transition disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-          :class="[
-            isRepoSelected(option.key)
-              ? 'border-[var(--repo-color)] bg-[var(--repo-selected-bg)] focus-visible:ring-[var(--repo-color)]'
-              : 'border-gh-border hover:border-current/30 focus-visible:ring-current/20',
-          ]"
-          :aria-pressed="isRepoSelected(option.key)"
-          :disabled="!canToggleRepo(option.key)"
-          :style="getRepoStyle(option.key)"
-          @click="toggleRepo(option.key)"
-        >
-          <span
-            class="h-2.5 w-2.5 rounded-full border"
-            :class="
-              isRepoSelected(option.key)
-                ? 'border-[var(--repo-color)] bg-[var(--repo-color)]'
-                : 'border-gh-border bg-transparent'
-            "
-            aria-hidden="true"
+      <div class="relative" @focusout="handleRepoSelectorFocusOut">
+        <div class="relative">
+          <input
+            id="repository-selector-input"
+            v-model="repoSearch"
+            type="text"
+            role="combobox"
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-controls="repository-selector-options"
+            :aria-expanded="isRepoMenuOpen"
+            :aria-activedescendant="activeRepoOptionId"
+            class="w-full rounded-md border border-gh-border bg-transparent px-3 py-2 pr-10 text-sm outline-none transition placeholder:text-gh-muted focus:border-current/30 focus:ring-2 focus:ring-current/20"
+            placeholder="Search repositories"
+            @click="openRepoMenu"
+            @focus="openRepoMenu"
+            @input="onRepoSearchInput"
+            @keydown.down.prevent="moveActiveRepoOption(1)"
+            @keydown.up.prevent="moveActiveRepoOption(-1)"
+            @keydown.enter.prevent="selectActiveRepoOption"
+            @keydown.esc.prevent="handleRepoSelectorEscape"
+            @keydown.tab="commitRepoSearch"
           />
-          <span class="min-w-0 flex-1 truncate font-medium leading-tight">
-            <span class="text-gh-muted"> {{ option.owner }}/ </span>
-            <span>{{ option.repo }}</span>
-          </span>
           <span
-            class="shrink-0 px-1.5 py-0.5 text-[11px] leading-none text-gh-muted tabular-nums"
+            class="i-lucide:chevron-down text-sm text-gh-muted transition-transform shrink-0 ml-auto pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gh-muted"
+            :class="isRepoMenuOpen && 'rotate-180'"
+          />
+        </div>
+
+        <ul
+          v-if="isRepoMenuOpen"
+          id="repository-selector-options"
+          role="listbox"
+          class="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-md border border-gh-border bg-[var(--bg)] p-1 shadow-lg"
+        >
+          <li
+            v-if="!filteredRepoOptions.length"
+            class="px-3 py-2 text-sm text-gh-muted"
           >
-            <span v-if="option.hasData">{{ option.latestValue ?? '—' }}</span>
-            <span v-else>No data</span>
-          </span>
-        </button>
+            No repositories found.
+          </li>
+          <li
+            v-for="(option, index) in filteredRepoOptions"
+            :key="option.key"
+            role="none"
+          >
+            <button
+              :id="`repository-option-${index}`"
+              type="button"
+              role="option"
+              :aria-selected="option.key === selectedRepoName"
+              class="flex w-full items-center gap-2 rounded px-2.5 py-2 text-left text-xs outline-none"
+              :class="getRepoOptionClass(index)"
+              @mouseenter="activeRepoOptionIndex = index"
+              @mousedown.prevent
+              @click="selectRepo(option)"
+            >
+              <span
+                class="h-2.5 w-2.5 shrink-0 rounded-full border border-gh-border"
+                :style="getRepoIndicatorStyle(option.key)"
+                aria-hidden="true"
+              />
+              <span class="min-w-0 flex-1 truncate font-medium leading-tight">
+                <span class="text-gh-muted">{{ option.owner }}/</span>
+                <span>{{ option.repo }}</span>
+              </span>
+              <span
+                class="flex shrink-0 flex-row gap-2 px-1.5 text-[11px] leading-none text-gh-muted tabular-nums"
+              >
+                <span>
+                  {{ getRepoOptionStatus(option) }}
+                </span>
+
+                <span
+                  v-if="
+                    option.latestClosedPrs !== null &&
+                    option.latestEligiblePrs !== null
+                  "
+                >
+                  ({{ option.latestClosedPrs }} /
+                  {{ option.latestEligiblePrs }})
+                </span>
+              </span>
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -610,7 +711,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
 
               <!-- LAST DATAPOINT CIRCLE -->
               <g
-                v-for="serie in Array.isArray(svg?.data) ? svg.data : []"
+                v-for="serie in getSvgSeries(svg.data)"
                 :key="serie.id"
                 class="last-datapoint"
                 :style="{ transform: getLastPlotTransform(serie) }"
