@@ -93,13 +93,6 @@ const dataset = computed(() => stacklineData.value.dataset)
         <LazyChartFeaturedPackageHealthRanking hydrate-on-visible />
       </div>
       <div class="w-full">
-        <LazyChartGlobalEventsHeatmap
-          :data="dataset"
-          :timestamps="dates"
-          hydrate-on-visible
-        />
-      </div>
-      <div class="w-full">
         <LazyLabBountyRepoList hydrate-on-visible />
       </div>
     </div>
