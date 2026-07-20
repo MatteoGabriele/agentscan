@@ -358,6 +358,7 @@ const visibleLandmarkByIndex = computed(() => {
                         fill="none"
                         v-html="landmark.iconSvg"
                       />
+                      <!-- eslint-enable vue/no-v-text-v-html-on-component, vue/no-v-html -->
                     </g>
                   </g>
                 </template>
