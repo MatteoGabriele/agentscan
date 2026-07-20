@@ -7,7 +7,10 @@ import {
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
-import { getClosedPrPercentageEvolutionTotal } from '~~/shared/utils/charts'
+import {
+  getClosedPrPercentageEvolutionTotal,
+  SVG_ICON,
+} from '~~/shared/utils/charts'
 import { identityConfig } from '@unveil/identity'
 import { round } from '~~/shared/utils/numbers'
 
@@ -226,18 +229,22 @@ function getTrend({
 /**
  * Temporary landmark for sample updates
  * We can remove it later if we don't notice any before/after trend shifts
- * The landmark is visible only when it is a week older than the last date of the dataset.
+ * The landmark is visible only when it is a day older than the last date of the dataset.
  */
 const landmarks = [
   {
     date: '2026-07-01',
     name: 'Sample update',
     description: '16 repositories added to the dataset',
+    icon: 'i-lucide:info', // for the tooltip
+    iconSvg: SVG_ICON.info, // for the #svg slot
   },
   {
     date: '2026-07-18',
     name: 'Sample update',
     description: '16 repositories added to the dataset',
+    icon: 'i-lucide:info',
+    iconSvg: SVG_ICON.info,
   },
 ]
 
@@ -341,30 +348,15 @@ const visibleLandmarkByIndex = computed(() => {
                       opacity="1"
                     >
                       <title>{{ landmark.name }}</title>
-                      <g transform="translate(-7.68, -7.68) scale(0.64)">
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          :stroke="colors.border"
-                          stroke-width="2"
-                          fill="none"
-                        />
-                        <path
-                          d="M12 16v-4"
-                          :stroke="colors.border"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          fill="none"
-                        />
-                        <path
-                          d="M12 8h.01"
-                          :stroke="colors.border"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          fill="none"
-                        />
-                      </g>
+                      <g
+                        transform="translate(-7.68, -7.68) scale(0.64)"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        fill="none"
+                        v-html="landmark.iconSvg"
+                      />
                     </g>
                   </g>
                 </template>
@@ -439,7 +431,13 @@ const visibleLandmarkByIndex = computed(() => {
                   class="mt-2 text-xs text-gh-muted"
                 >
                   <div class="flex flex-row gap-2 max-w-[200px]">
-                    <span class="i-lucide:info w-6" />
+                    <span
+                      class="w-6"
+                      :class="
+                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
+                          ?.icon
+                      "
+                    />
                     <span
                       >{{
                         visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
