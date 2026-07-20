@@ -348,6 +348,7 @@ const visibleLandmarkByIndex = computed(() => {
                       opacity="1"
                     >
                       <title>{{ landmark.name }}</title>
+                      <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component, vue/no-v-html -->
                       <g
                         transform="translate(-7.68, -7.68) scale(0.64)"
                         stroke="currentColor"
