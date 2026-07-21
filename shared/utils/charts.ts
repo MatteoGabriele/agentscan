@@ -297,6 +297,8 @@ export function getClosedPrPercentageEvolutionByRepo(
   ])
 }
 
+export const AUTOMATION_PR_CLOSURE_RATE = 'Automation PR closure rate' as const
+
 export function getClosedPrPercentageEvolutionTotal(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
@@ -324,7 +326,7 @@ export function getClosedPrPercentageEvolutionTotal(
   })
 
   return {
-    name: 'Automation PR closure rate',
+    name: AUTOMATION_PR_CLOSURE_RATE,
     series: series.map((value) => Math.round(value)),
     type: 'line',
     smooth: true,

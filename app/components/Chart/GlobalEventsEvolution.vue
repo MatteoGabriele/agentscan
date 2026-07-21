@@ -9,6 +9,7 @@ import {
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
 import {
+  AUTOMATION_PR_CLOSURE_RATE,
   getClosedPrPercentageEvolutionTotal,
   SVG_ICON,
 } from '~~/shared/utils/charts'
@@ -233,7 +234,7 @@ type Landmark = {
   description: string
   icon: string
   iconSvg: string
-  series?: IdentityClassification
+  series?: IdentityClassification | typeof AUTOMATION_PR_CLOSURE_RATE
   offsetY?: number
 }
 
@@ -333,7 +334,7 @@ function placeLandmark({
   }
 
   const seriesName = landmark.series.toLowerCase()
-  const seriesIndex = rawDataset.value.findIndex(
+  const seriesIndex = dataset.value.findIndex(
     (item) => item.name.toLowerCase() === seriesName,
   )
 
