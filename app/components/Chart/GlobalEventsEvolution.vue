@@ -298,12 +298,14 @@ const keyDates = computed(() => {
 
 const isChartHovered = shallowRef(false)
 
-const visibleLandmarkByIndex = computed(() => {
-  const landmarkMap = new Map<number, (typeof keyDates.value)[number]>()
+const visibleLandmarksByIndex = computed(() => {
+  const landmarkMap = new Map<number, Landmark[]>()
   keyDates.value.forEach((landmark) => {
-    if (landmark?.visible) {
-      landmarkMap.set(landmark.index, landmark)
+    if (!landmark?.visible) {
+      return
     }
+    const existingLandmarks = landmarkMap.get(landmark.index) ?? []
+    landmarkMap.set(landmark.index, [...existingLandmarks, landmark])
   })
   return landmarkMap
 })
@@ -487,30 +489,24 @@ function placeLandmark({
                   </template>
                 </div>
 
-                <!-- LANDMARK INFO-->
+                <!-- LANDMARK INFO -->
                 <div
-                  v-if="visibleLandmarkByIndex.has(timeLabel.absoluteIndex)"
-                  class="mt-2 text-xs text-gh-muted"
+                  v-if="visibleLandmarksByIndex.has(timeLabel.absoluteIndex)"
+                  class="mt-2 flex flex-col gap-2 text-xs text-gh-muted"
                 >
-                  <div class="flex flex-row gap-2 max-w-[200px]">
-                    <span
-                      class="w-6"
-                      :class="
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.icon
-                      "
-                    />
-                    <span
-                      >{{
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.name
-                      }}
-                      :
-                      {{
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.description
-                      }}</span
-                    >
+                  <div
+                    v-for="landmark in visibleLandmarksByIndex.get(
+                      timeLabel.absoluteIndex,
+                    ) ?? []"
+                    :key="`${landmark.date}-${landmark.name}-${landmark.series ?? 'global'}`"
+                    class="flex flex-row gap-2 max-w-[240px]"
+                  >
+                    <span class="w-6 shrink-0" :class="landmark.icon" />
+
+                    <span>
+                      {{ landmark.name }}:
+                      {{ landmark.description }}
+                    </span>
                   </div>
                 </div>
               </div>
