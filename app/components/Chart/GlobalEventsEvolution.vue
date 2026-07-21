@@ -9,7 +9,7 @@ import {
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
 import {
-  AUTOMATION_PR_CLOSURE_RATE,
+  type AUTOMATION_PR_CLOSURE_RATE,
   getClosedPrPercentageEvolutionTotal,
   SVG_ICON,
 } from '~~/shared/utils/charts'
