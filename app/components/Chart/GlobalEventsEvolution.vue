@@ -4,6 +4,7 @@ import {
   VueUiXy,
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
+  type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
@@ -11,7 +12,7 @@ import {
   getClosedPrPercentageEvolutionTotal,
   SVG_ICON,
 } from '~~/shared/utils/charts'
-import { identityConfig } from '@unveil/identity'
+import { identityConfig, type IdentityClassification } from '@unveil/identity'
 import { round } from '~~/shared/utils/numbers'
 
 import 'vue-data-ui/style.css'
@@ -226,12 +227,22 @@ function getTrend({
   }
 }
 
+type Landmark = {
+  date: string
+  name: string
+  description: string
+  icon: string
+  iconSvg: string
+  series?: IdentityClassification
+  offsetY?: number
+}
+
 /**
  * Temporary landmark for sample updates
  * We can remove it later if we don't notice any before/after trend shifts
  * The landmark is visible only when it is a day older than the last date of the dataset.
  */
-const landmarks = [
+const landmarks: Landmark[] = [
   {
     date: '2026-07-01',
     name: 'Sample update',
@@ -246,6 +257,16 @@ const landmarks = [
     icon: 'i-lucide:info',
     iconSvg: SVG_ICON.info,
   },
+  // Example to place a landmark on a specific series coordinates
+  // {
+  //   date: '2026-07-06',
+  //   name: 'Clank news',
+  //   description: 'Claude is dead',
+  //   icon: 'i-lucide:newspaper',
+  //   iconSvg: SVG_ICON.newspaper,
+  //   series: 'automation',
+  //   offsetY: -16,
+  // },
 ]
 
 const keyDates = computed(() => {
@@ -286,6 +307,43 @@ const visibleLandmarkByIndex = computed(() => {
   })
   return landmarkMap
 })
+
+function placeLandmark({
+  svg,
+  landmark,
+  plotIndex,
+}: {
+  svg: VueUiXySvgSlotProps['svg']
+  landmark: Landmark
+  plotIndex: number
+}): {
+  translate: string // for the landmark group wrapper
+  y: number // can be used for the landmark label
+} {
+  const fallbackY = svg.drawingArea.bottom - 22
+  const x = svg.data?.[0]?.plots?.[plotIndex]?.x ?? 0
+
+  if (!landmark.series) {
+    return {
+      translate: `translate(${x}, ${fallbackY})`,
+      y: fallbackY,
+    }
+  }
+
+  const seriesName = landmark.series.toLowerCase()
+  const seriesIndex = rawDataset.value.findIndex(
+    (item) => item.name.toLowerCase() === seriesName,
+  )
+
+  const y =
+    (svg.data?.[seriesIndex]?.plots?.[plotIndex]?.y ?? fallbackY) +
+    (landmark.offsetY ?? 0)
+
+  return {
+    translate: `translate(${x}, ${y})`,
+    y,
+  }
+}
 </script>
 <template>
   <div class="relative h-full w-full flex flex-col">
@@ -342,7 +400,9 @@ const visibleLandmarkByIndex = computed(() => {
                     </text>
                     <!-- Landmark icon -->
                     <g
-                      :transform="`translate(${plot.x}, ${svg.drawingArea.bottom - 22})`"
+                      :transform="
+                        placeLandmark({ svg, landmark, plotIndex: i }).translate
+                      "
                       class="hidden md:block"
                       style="pointer-events: all; cursor: default"
                       opacity="1"
