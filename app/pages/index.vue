@@ -9,11 +9,7 @@ function handleSubmit(name: string) {
 
 <template>
   <div class="max-w-2xl mx-auto">
-    <LazyAnalysisForm
-      v-model="accountName"
-      :hydrate-on-interaction="['click', 'focus']"
-      @submit="handleSubmit"
-    />
+    <AnalysisForm v-model="accountName" autofocus @submit="handleSubmit" />
   </div>
 
   <LazyVerifiedAutomationList hydrate-on-interaction />

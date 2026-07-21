@@ -3,6 +3,10 @@ const emit = defineEmits<{
   (e: 'submit', value: string): void
 }>()
 
+const { autofocus = false } = defineProps<{
+  autofocus?: boolean
+}>()
+
 const accountName = defineModel<string>({
   default: '',
 })
@@ -34,6 +38,7 @@ function clear() {
         ref="inputRef"
         v-model="accountName"
         class="outline-none w-full"
+        :autofocus="autofocus"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
