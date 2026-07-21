@@ -4,11 +4,16 @@ import {
   VueUiXy,
   type VueUiXyDatasetItem,
   type VueUiXyConfig,
+  type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
-import { getClosedPrPercentageEvolutionTotal } from '~~/shared/utils/charts'
-import { identityConfig } from '@unveil/identity'
+import {
+  type AUTOMATION_PR_CLOSURE_RATE,
+  getClosedPrPercentageEvolutionTotal,
+  SVG_ICON,
+} from '~~/shared/utils/charts'
+import { identityConfig, type IdentityClassification } from '@unveil/identity'
 import { round } from '~~/shared/utils/numbers'
 
 import 'vue-data-ui/style.css'
@@ -223,22 +228,46 @@ function getTrend({
   }
 }
 
+type Landmark = {
+  date: string
+  name: string
+  description: string
+  icon: string
+  iconSvg: string
+  series?: IdentityClassification | typeof AUTOMATION_PR_CLOSURE_RATE
+  offsetY?: number
+}
+
 /**
  * Temporary landmark for sample updates
  * We can remove it later if we don't notice any before/after trend shifts
- * The landmark is visible only when it is a week older than the last date of the dataset.
+ * The landmark is visible only when it is a day older than the last date of the dataset.
  */
-const landmarks = [
+const landmarks: Landmark[] = [
   {
     date: '2026-07-01',
     name: 'Sample update',
     description: '16 repositories added to the dataset',
+    icon: 'i-lucide:info', // for the tooltip
+    iconSvg: SVG_ICON.info, // for the #svg slot
   },
   {
     date: '2026-07-18',
     name: 'Sample update',
     description: '16 repositories added to the dataset',
+    icon: 'i-lucide:info',
+    iconSvg: SVG_ICON.info,
   },
+  // Example to place a landmark on a specific series coordinates
+  // {
+  //   date: '2026-07-06',
+  //   name: 'Clank news',
+  //   description: 'Claude is dead',
+  //   icon: 'i-lucide:newspaper',
+  //   iconSvg: SVG_ICON.newspaper,
+  //   series: 'automation',
+  //   offsetY: -16,
+  // },
 ]
 
 const keyDates = computed(() => {
@@ -270,15 +299,54 @@ const keyDates = computed(() => {
 
 const isChartHovered = shallowRef(false)
 
-const visibleLandmarkByIndex = computed(() => {
-  const landmarkMap = new Map<number, (typeof keyDates.value)[number]>()
+const visibleLandmarksByIndex = computed(() => {
+  const landmarkMap = new Map<number, Landmark[]>()
   keyDates.value.forEach((landmark) => {
-    if (landmark?.visible) {
-      landmarkMap.set(landmark.index, landmark)
+    if (!landmark?.visible) {
+      return
     }
+    const existingLandmarks = landmarkMap.get(landmark.index) ?? []
+    landmarkMap.set(landmark.index, [...existingLandmarks, landmark])
   })
   return landmarkMap
 })
+
+function placeLandmark({
+  svg,
+  landmark,
+  plotIndex,
+}: {
+  svg: VueUiXySvgSlotProps['svg']
+  landmark: Landmark
+  plotIndex: number
+}): {
+  translate: string // for the landmark group wrapper
+  y: number // can be used for the landmark label
+} {
+  const fallbackY = svg.drawingArea.bottom - 22
+  const x = svg.data?.[0]?.plots?.[plotIndex]?.x ?? 0
+
+  if (!landmark.series) {
+    return {
+      translate: `translate(${x}, ${fallbackY})`,
+      y: fallbackY,
+    }
+  }
+
+  const seriesName = landmark.series.toLowerCase()
+  const seriesIndex = dataset.value.findIndex(
+    (item) => item.name.toLowerCase() === seriesName,
+  )
+
+  const y =
+    (svg.data?.[seriesIndex]?.plots?.[plotIndex]?.y ?? fallbackY) +
+    (landmark.offsetY ?? 0)
+
+  return {
+    translate: `translate(${x}, ${y})`,
+    y,
+  }
+}
 </script>
 <template>
   <div class="relative h-full w-full flex flex-col">
@@ -335,36 +403,25 @@ const visibleLandmarkByIndex = computed(() => {
                     </text>
                     <!-- Landmark icon -->
                     <g
-                      :transform="`translate(${plot.x}, ${svg.drawingArea.bottom - 22})`"
+                      :transform="
+                        placeLandmark({ svg, landmark, plotIndex: i }).translate
+                      "
                       class="hidden md:block"
                       style="pointer-events: all; cursor: default"
                       opacity="1"
                     >
                       <title>{{ landmark.name }}</title>
-                      <g transform="translate(-7.68, -7.68) scale(0.64)">
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          :stroke="colors.border"
-                          stroke-width="2"
-                          fill="none"
-                        />
-                        <path
-                          d="M12 16v-4"
-                          :stroke="colors.border"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          fill="none"
-                        />
-                        <path
-                          d="M12 8h.01"
-                          :stroke="colors.border"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          fill="none"
-                        />
-                      </g>
+                      <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
+                      <g
+                        transform="translate(-7.68, -7.68) scale(0.64)"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        fill="none"
+                        v-html="landmark.iconSvg"
+                      />
+                      <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
                     </g>
                   </g>
                 </template>
@@ -433,24 +490,24 @@ const visibleLandmarkByIndex = computed(() => {
                   </template>
                 </div>
 
-                <!-- LANDMARK INFO-->
+                <!-- LANDMARK INFO -->
                 <div
-                  v-if="visibleLandmarkByIndex.has(timeLabel.absoluteIndex)"
-                  class="mt-2 text-xs text-gh-muted"
+                  v-if="visibleLandmarksByIndex.has(timeLabel.absoluteIndex)"
+                  class="mt-2 flex flex-col gap-2 text-xs text-gh-muted"
                 >
-                  <div class="flex flex-row gap-2 max-w-[200px]">
-                    <span class="i-lucide:info w-6" />
-                    <span
-                      >{{
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.name
-                      }}
-                      :
-                      {{
-                        visibleLandmarkByIndex.get(timeLabel.absoluteIndex)
-                          ?.description
-                      }}</span
-                    >
+                  <div
+                    v-for="landmark in visibleLandmarksByIndex.get(
+                      timeLabel.absoluteIndex,
+                    ) ?? []"
+                    :key="`${landmark.date}-${landmark.name}-${landmark.series ?? 'global'}`"
+                    class="flex flex-row gap-2 max-w-[240px]"
+                  >
+                    <span class="w-6 shrink-0" :class="landmark.icon" />
+
+                    <span>
+                      {{ landmark.name }}:
+                      {{ landmark.description }}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -297,6 +297,8 @@ export function getClosedPrPercentageEvolutionByRepo(
   ])
 }
 
+export const AUTOMATION_PR_CLOSURE_RATE = 'Automation PR closure rate' as const
+
 export function getClosedPrPercentageEvolutionTotal(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
@@ -324,7 +326,7 @@ export function getClosedPrPercentageEvolutionTotal(
   })
 
   return {
-    name: 'Automation PR closure rate',
+    name: AUTOMATION_PR_CLOSURE_RATE,
     series: series.map((value) => Math.round(value)),
     type: 'line',
     smooth: true,
@@ -627,4 +629,30 @@ function isLastDatapointLabel(
   label: LastDatapointLabel | null,
 ): label is LastDatapointLabel {
   return label !== null
+}
+
+/**
+ * SVG markup fragments based on related Lucide icons.
+ *
+ * Render an icon using `v-html` inside an SVG `<g>` element.
+ * Apply stroke, fill, and transformation attributes to the `<g>` element.
+ *
+ * @example
+ * ```vue
+ * <g
+ *   transform="translate(-7.68, -7.68) scale(0.64)"
+ *   stroke="currentColor"
+ *   stroke-width="2"
+ *   stroke-linecap="round"
+ *   stroke-linejoin="round"
+ *   fill="none"
+ *   v-html="landmark.iconSvg"
+ * />
+ * ```
+ * To extend the list of icons, add the lucide icon key, copy the svg from lucide website, and only keep the SVG elements (not the wrapping <svg> tag basically)
+ *
+ */
+export const SVG_ICON = {
+  info: `<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>`,
+  newspaper: `<path d="M15 18h-5"/><path d="M18 14h-8"/><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2"/><rect stroke="currentColor" width="8" height="4" x="10" y="6" rx="1"/>`,
 }
