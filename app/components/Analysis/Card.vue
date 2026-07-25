@@ -4,6 +4,7 @@ import type {
   IdentityClassification,
   IdentifyResult,
 } from '@unveil/identity'
+import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
 
 const props = defineProps<{
   user: GitHubUser
@@ -71,14 +72,14 @@ const classificationIcon = computed<string>(() => {
 })
 
 const flagAccountUrl = computed<string>(() => {
-  const baseUrl = 'https://github.com/MatteoGabriele/agentscan/issues/new'
-  const params = new URLSearchParams({
-    template: 'report-automated-account.yml',
-    title: `[AUTOMATION] ${username.value}`,
+  return buildReportIssueUrl({
     username: username.value || '',
-    'user-id': props.user.id.toString(),
+    userId: props.user.id,
+    classification: classification.value ?? 'organic',
+    score: score.value ?? 0,
+    flags: data.value?.analysis.flags ?? [],
+    sourceUrl: `https://agentscan.tools/user/${username.value}`,
   })
-  return `${baseUrl}?${params.toString()}`
 })
 
 const identifyAnalysis = computed<IdentifyResult | undefined>(() => {

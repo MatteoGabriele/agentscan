@@ -13,6 +13,10 @@ import {
   type AuthorAssociation,
   type RepoConfig,
 } from './_config'
+import {
+  buildEvidenceLines,
+  buildReportIssueUrl,
+} from '~~/shared/utils/report-issue'
 
 type AutomationListItem = {
   username: string
@@ -222,6 +226,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const hasCommunityFlag = verified.some((a) => a.username === username)
+    const userId: number | undefined = user.id
 
     const analysis: IdentifyResult = identify({
       accountName: username,
@@ -313,6 +318,30 @@ export default defineEventHandler(async (event) => {
 
     const MARKER = '<!-- agentscanapp-bot -->'
 
+    const sourceUrl: string =
+      payload.pull_request?.html_url ??
+      payload.issue?.html_url ??
+      `https://github.com/${owner}/${repo}/${isPR ? 'pull' : 'issues'}/${targetNumber}`
+
+    const reportUrl =
+      analysis.classification === 'automation' && !hasCommunityFlag
+        ? buildReportIssueUrl({
+            username,
+            userId,
+            classification: analysis.classification,
+            score: analysis.score,
+            flags: analysis.flags,
+            sourceUrl,
+          })
+        : null
+
+    // Rendered inline (no sourceUrl - pointing back at the PR/issue it's already on is redundant)
+    // so a reviewer can see the evidence without leaving this page.
+    const evidenceLines =
+      analysis.flags.length > 0
+        ? buildEvidenceLines({ flags: analysis.flags })
+        : []
+
     const body = [
       MARKER,
       `### ${indicator} ${details.label}`,
@@ -320,6 +349,18 @@ export default defineEventHandler(async (event) => {
       description,
       '',
       `[View full analysis →](https://agentscan.tools/user/${username})`,
+      ...(reportUrl ? ['', `[🚩 Report this account →](${reportUrl})`] : []),
+      ...(evidenceLines.length > 0
+        ? [
+            '',
+            '<details>',
+            '<summary>Evidence</summary>',
+            '',
+            ...evidenceLines,
+            '',
+            '</details>',
+          ]
+        : []),
       '',
       '<sub>This is an automated analysis by [AgentScan](https://agentscan.tools)</sub>',
     ].join('\n')
