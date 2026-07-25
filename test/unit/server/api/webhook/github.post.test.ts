@@ -900,6 +900,93 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
+  describe('Report Link', () => {
+    it('includes a pre-filled report-issue link for automation classifications', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+      expect(commentCall.body).toContain('[🚩 Report this account →]')
+      expect(commentCall.body).toContain(
+        'https://github.com/matteogabriele/agentscan/issues/new',
+      )
+      expect(commentCall.body).toContain('username=test-user')
+    })
+
+    it('omits the report link for mixed classifications', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'mixed',
+      })
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+      expect(commentCall.body).not.toContain('Report this account')
+    })
+
+    it('omits the report link for organic classifications', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+      expect(commentCall.body).not.toContain('Report this account')
+    })
+
+    it('omits the report link for community-flagged accounts even when classification is automation', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+      mockVerifiedList(['test-user'])
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+      expect(commentCall.body).not.toContain('Report this account')
+    })
+  })
+
+  describe('Evidence', () => {
+    it('includes a collapsible evidence section listing the flags', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+      expect(commentCall.body).toContain('<details>')
+      expect(commentCall.body).toContain('<summary>Evidence</summary>')
+      expect(commentCall.body).toContain('Test Flag: Test detail')
+    })
+
+    it('omits the evidence section when there are no flags', async () => {
+      vi.mocked(identify).mockReturnValue({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+        flags: [],
+      })
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+      expect(commentCall.body).not.toContain('<details>')
+    })
+  })
+
   describe('GitHub Checks', () => {
     it('creates an in-progress check run on the PR head SHA before scanning', async () => {
       await handler(MOCK_EVENT)
