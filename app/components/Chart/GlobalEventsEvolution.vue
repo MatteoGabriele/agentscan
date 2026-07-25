@@ -17,6 +17,7 @@ import { identityConfig, type IdentityClassification } from '@unveil/identity'
 import { round } from '~~/shared/utils/numbers'
 
 import 'vue-data-ui/style.css'
+import { useIsMobile } from '~/composables/useIsMobile'
 const { data: ecosystemHealth } = await useEcosystemHealth()
 const data = computed(() => ecosystemHealth.value?.results ?? [])
 const dates = computed(() => ecosystemHealth.value?.dates)
@@ -24,6 +25,7 @@ const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
+const isMobile = useIsMobile()
 
 const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,
@@ -148,6 +150,7 @@ const config = computed<VueUiXyConfig>(() => ({
     threshold: 5000,
   },
   line: {
+    strokeWidth: isMobile.value ? 1 : 3,
     radius: 0,
     useGradient: false,
     dot: {
