@@ -261,16 +261,17 @@ const landmarks: Landmark[] = [
     icon: 'i-lucide:info',
     iconSvg: SVG_ICON.info,
   },
-  // Example to place a landmark on a specific series coordinates
-  // {
-  //   date: '2026-07-06',
-  //   name: 'Clank news',
-  //   description: 'Claude is dead',
-  //   icon: 'i-lucide:newspaper',
-  //   iconSvg: SVG_ICON.newspaper,
-  //   series: 'automation',
-  //   offsetY: -16,
-  // },
+
+  {
+    date: '2026-07-24',
+    name: 'Claude Opus 5 release',
+    description:
+      'A more agentic model that gets close to Claude Fable 5 at half the price.',
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+    series: 'automation',
+    offsetY: -16,
+  },
 ]
 
 const keyDates = computed(() => {
