@@ -61,14 +61,6 @@ useHead({
       >
         <ChartGlobalEventsEvolution />
       </div>
-
-      <div
-        class="absolute -bottom-4 text-center md:text-left w-full md:bottom-2 pl-4"
-      >
-        <p class="text-xs text-gh-text/40 mt-3">
-          {{ formattedNextScanTime }}
-        </p>
-      </div>
     </div>
   </section>
 </template>
