@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const { formattedNextScanTime } = useNextScanTime()
-
 definePageMeta({
   layout: 'full',
 })
