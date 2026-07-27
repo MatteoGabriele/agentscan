@@ -1,3 +1,25 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
+
+// dayjs clamps overflowing days, so 30 Apr - 2 months = 28 Feb
+export function subtractMonths({
+  date,
+  months,
+}: {
+  date: string
+  months: number
+}): string {
+  const source = dayjs.utc(date)
+
+  if (!source.isValid()) {
+    return ''
+  }
+
+  return source.subtract(months, 'month').startOf('day').toISOString()
+}
+
 export function formatDateRange({
   startDate,
   endDate,

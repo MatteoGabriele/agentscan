@@ -5,9 +5,44 @@ import type {
 
 import { unpack } from '~~/shared/utils/compactor'
 import { getClassificationStatsByDate } from '~~/shared/utils/count-classification-by-date'
+import { subtractMonths } from '~~/shared/utils/dates'
 
-export default defineEventHandler(async () => {
+const DEFAULT_HISTORY_MONTHS = 2
+
+function getRecentResults({
+  results,
+  months,
+}: {
+  results: EcosystemHealthItem[]
+  months: number
+}): EcosystemHealthItem[] {
+  const latestCreatedAt = results.reduce(
+    (latest, item) => (item.created_at > latest ? item.created_at : latest),
+    '',
+  )
+
+  if (!latestCreatedAt) {
+    return results
+  }
+
+  const rangeStart = subtractMonths({
+    date: latestCreatedAt,
+    months,
+  })
+
+  return results.filter((item) => item.created_at >= rangeStart)
+}
+
+export default defineEventHandler(async (event) => {
   try {
+    const query = getQuery(event)
+    const isFullHistory = String(query.full ?? 'false') === 'true'
+    const requestedMonths = Number(query.months ?? DEFAULT_HISTORY_MONTHS)
+    const months =
+      Number.isInteger(requestedMonths) && requestedMonths > 0
+        ? requestedMonths
+        : DEFAULT_HISTORY_MONTHS
+
     const raw = await useStorage('assets:data').getItemRaw('scan-results.txt')
 
     if (!raw) {
@@ -15,7 +50,10 @@ export default defineEventHandler(async () => {
     }
 
     const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
-    const results: EcosystemHealthItem[] = unpack(content)
+    const allResults = unpack(content)
+    const results = isFullHistory
+      ? allResults
+      : getRecentResults({ results: allResults, months })
 
     const automationPercentages: number[] = []
     const mixedPercentages: number[] = []
