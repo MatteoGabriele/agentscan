@@ -1,3 +1,24 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+
+dayjs.extend(utc)
+
+export function subtractMonths({
+  date,
+  months,
+}: {
+  date: string
+  months: number
+}): string {
+  const source = dayjs.utc(date)
+
+  if (!source.isValid()) {
+    return ''
+  }
+
+  return source.subtract(months, 'month').startOf('day').toISOString()
+}
+
 export function formatDateRange({
   startDate,
   endDate,

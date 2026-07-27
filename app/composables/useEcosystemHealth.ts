@@ -1,5 +1,17 @@
-export function useEcosystemHealth() {
-  return useAsyncData('ecosystem-health', async () => {
-    return $fetch('/api/health')
+type UseEcosystemHealthOptions = {
+  full?: boolean
+}
+
+export function useEcosystemHealth({
+  full = false,
+}: UseEcosystemHealthOptions = {}) {
+  const key = full ? 'ecosystem-health-full' : 'ecosystem-health-default'
+
+  return useAsyncData(key, async () => {
+    return $fetch('/api/health', {
+      query: {
+        full,
+      },
+    })
   })
 }
