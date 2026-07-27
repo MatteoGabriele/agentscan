@@ -1,6 +1,5 @@
 type UseEcosystemHealthOptions = {
   full?: boolean
-  months?: number
 }
 
 export function useEcosystemHealth({
