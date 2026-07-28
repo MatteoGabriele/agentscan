@@ -33,25 +33,53 @@ type UseNextScanTimeReturn = {
 }
 
 export function useNextScanTime(): UseNextScanTimeReturn {
-  const nextScanTime = computed<string | undefined>(() => {
-    const now = dayjs.utc()
-    const today = scanTimeOn(now)
+  const now = ref(dayjs.utc())
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+  const nextScan = computed<Dayjs | undefined>(() => {
+    const today = scanTimeOn(now.value)
 
     if (!today) {
       return
     }
 
-    const nextScan = today.isAfter(now) ? today : scanTimeOn(now.add(1, 'day'))
+    return today.isAfter(now.value)
+      ? today
+      : scanTimeOn(now.value.add(1, 'day'))
+  })
 
-    const local = nextScan?.local()
+  const nextScanTime = computed<string | undefined>(() => {
+    const local = nextScan.value?.local()
 
     if (!local) {
       return
     }
 
-    const day = local.isSame(dayjs(), 'day') ? 'today' : 'tomorrow'
+    const day = local.isSame(now.value.local(), 'day') ? 'today' : 'tomorrow'
 
     return `Next scan ${day} at ${local.format('HH:mm')}`
+  })
+
+  function scheduleRefresh() {
+    const target = nextScan.value
+
+    if (!target) {
+      return
+    }
+
+    timeoutId = setTimeout(
+      () => {
+        now.value = dayjs.utc()
+        scheduleRefresh()
+      },
+      Math.max(target.diff(dayjs.utc()) + 1000, 1000),
+    )
+  }
+
+  onMounted(scheduleRefresh)
+
+  onBeforeUnmount(() => {
+    clearTimeout(timeoutId)
   })
 
   return {
