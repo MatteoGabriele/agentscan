@@ -3,6 +3,8 @@ definePageMeta({
   layout: 'full',
 })
 
+const { nextScanTime } = useNextScanTime()
+
 useHead({
   title: 'GitHub Ecosystem Health | AgentScan',
   meta: [
@@ -46,6 +48,11 @@ useHead({
                 list of repositories
               </NuxtLink>
             </p>
+            <ClientOnly>
+              <p class="text-xs text-gh-muted/70 mt-1 text-pretty">
+                {{ nextScanTime }}
+              </p>
+            </ClientOnly>
           </div>
         </header>
 
