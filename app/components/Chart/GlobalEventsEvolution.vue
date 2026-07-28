@@ -261,16 +261,61 @@ const landmarks: Landmark[] = [
     icon: 'i-lucide:info',
     iconSvg: SVG_ICON.info,
   },
-  // Example to place a landmark on a specific series coordinates
-  // {
-  //   date: '2026-07-06',
-  //   name: 'Clank news',
-  //   description: 'Claude is dead',
-  //   icon: 'i-lucide:newspaper',
-  //   iconSvg: SVG_ICON.newspaper,
-  //   series: 'automation',
-  //   offsetY: -16,
-  // },
+
+  {
+    date: '2026-05-28',
+    name: 'Opus 4.8',
+    description:
+      'Anthropic hit 61.4 on the Intelligence Index and 69.2% on SWE-Bench Pro, holding Opus 4.7 pricing at $5 / $25.',
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+    series: 'automation',
+    offsetY: -16,
+  },
+
+  {
+    date: '2026-06-12',
+    name: 'Fable and Mythos ban',
+    description:
+      'A US export-control directive barred foreign-national access, pulling both models from general availability until July 1.',
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+    series: 'automation',
+    offsetY: -16,
+  },
+
+  {
+    date: '2026-06-26',
+    name: 'GPT-5.6 preview',
+    description:
+      'OpenAI previewed a three-model series in a curated limited release. Sol flagship, Terra balanced, Luna fast and cheap.',
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+    series: 'automation',
+    offsetY: -16,
+  },
+
+  {
+    date: '2026-07-09',
+    name: 'GPT-5.6',
+    description:
+      'OpenAI opened the Sol, Terra and Luna models to everyone after the June preview.',
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+    series: 'automation',
+    offsetY: -16,
+  },
+
+  {
+    date: '2026-07-24',
+    name: 'Opus 5',
+    description:
+      'A more agentic model that gets close to Claude Fable 5 at half the price.',
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+    series: 'automation',
+    offsetY: -16,
+  },
 ]
 
 const keyDates = computed(() => {

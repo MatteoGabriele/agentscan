@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const { formattedNextScanTime } = useNextScanTime()
-
 definePageMeta({
   layout: 'full',
 })
@@ -60,14 +58,6 @@ useHead({
         class="w-full min-h-0 shrink overflow-hidden basis-[300px] max-h-[300px] sm:basis-[500px] sm:max-h-[500px]"
       >
         <ChartGlobalEventsEvolution />
-      </div>
-
-      <div
-        class="absolute -bottom-4 text-center md:text-left w-full md:bottom-2 pl-4"
-      >
-        <p class="text-xs text-gh-text/40 mt-3">
-          {{ formattedNextScanTime }}
-        </p>
       </div>
     </div>
   </section>

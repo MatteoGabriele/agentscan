@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'default',
 })
 
-const { data } = await useEcosystemHealth()
+const { data } = await useEcosystemHealth({ full: true })
 </script>
 
 <template>
