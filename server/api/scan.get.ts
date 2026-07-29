@@ -117,9 +117,7 @@ export default defineCachedEventHandler(
           const events = eventResponses.flatMap((r) => r.data)
 
           const analysis = identify({
-            accountName: entry.login,
-            reposCount: user.public_repos,
-            createdAt: user.created_at,
+            user,
             events,
           })
 

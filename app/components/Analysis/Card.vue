@@ -139,77 +139,10 @@ useSeoAnalysis(identifyAnalysis, {
       :class="scoreStyle.border"
     >
       <div class="w-full">
-        <header class="flex items-center justify-between mb-2">
-          <div class="w-full">
-            <div class="mb-2 flex flex-col">
-              <div
-                v-if="warnings.length"
-                class="flex items-start gap-2 text-sm text-gh-muted mb-2"
-              >
-                <span class="i-lucide:megaphone text-xs shrink-0"></span>
-                <ul class="flex flex-col gap-1">
-                  <li
-                    v-for="(warning, i) in warnings"
-                    :key="i"
-                    class="text-pretty line-height-none"
-                  >
-                    {{ warning }}
-                  </li>
-                </ul>
-              </div>
-
-              <div class="flex gap-2 items-center" :class="scoreStyle.text">
-                <span :class="classificationIcon" class="text-base" />
-                <h3 class="text-xl font-mono">
-                  {{ classificationDetails.label }}
-                </h3>
-              </div>
-            </div>
-            <p class="mt-1 text-gh-text">
-              {{ classificationDetails.description }}
-            </p>
-          </div>
-        </header>
-
-        <div
-          class="text-sm text-gh-muted flex flex-wrap items-center gap-x-3 gap-y-2"
-        >
-          <p v-if="data.eventsCount > 0">
-            Analyzed from the last {{ data.eventsCount }} public GitHub
-            <NuxtLink
-              external
-              target="_blank"
-              class="underline"
-              :to="`https://api.github.com/users/${username}/events?per_page=100`"
-            >
-              events
-            </NuxtLink>
-          </p>
-          <p v-else>
-            No recent
-            <NuxtLink
-              external
-              target="_blank"
-              class="underline"
-              :to="`https://api.github.com/users/${username}/events?per_page=100`"
-            >
-              events</NuxtLink
-            >
-            from this account
-          </p>
-
-          <!-- <AnalysisDataCoverage v-if="coverageLevel" :level="coverageLevel" /> -->
-        </div>
-
-        <section
-          v-if="verifiedAutomation"
-          class="mt-4 pt-4 border-t border-gh-border-light/40"
-        >
-          <p
-            class="flex gap-2 items-center mb-2 text-gh-muted font-mono text-base"
-          >
+        <section v-if="verifiedAutomation">
+          <h3 class="text-xl font-mono mb-2 text-gh-danger-hover">
             Community reported
-          </p>
+          </h3>
           <p class="text-gh-text text-sm mb-2">
             {{ verifiedAutomation.reason }}
           </p>
@@ -226,8 +159,74 @@ useSeoAnalysis(identifyAnalysis, {
             </NuxtLink>
           </footer>
         </section>
+        <template v-else>
+          <header class="flex items-center justify-between mb-2">
+            <div class="w-full">
+              <div class="mb-2 flex flex-col">
+                <div
+                  v-if="warnings.length"
+                  class="flex items-start gap-2 text-sm text-gh-muted mb-2"
+                >
+                  <span class="i-lucide:megaphone text-xs shrink-0"></span>
+                  <ul class="flex flex-col gap-1">
+                    <li
+                      v-for="(warning, i) in warnings"
+                      :key="i"
+                      class="text-pretty line-height-none"
+                    >
+                      {{ warning }}
+                    </li>
+                  </ul>
+                </div>
 
-        <section v-else class="mt-4 pt-4 border-t border-gh-border-light">
+                <div class="flex gap-2 items-center" :class="scoreStyle.text">
+                  <span :class="classificationIcon" class="text-base" />
+                  <h3 class="text-xl font-mono">
+                    {{ classificationDetails.label }}
+                  </h3>
+                </div>
+              </div>
+              <p class="mt-1 text-gh-text">
+                {{ classificationDetails.description }}
+              </p>
+            </div>
+          </header>
+
+          <div
+            class="text-sm text-gh-muted flex flex-wrap items-center gap-x-3 gap-y-2"
+          >
+            <p v-if="data.eventsCount > 0">
+              Analyzed from the last {{ data.eventsCount }} public GitHub
+              <NuxtLink
+                external
+                target="_blank"
+                class="underline"
+                :to="`https://api.github.com/users/${username}/events?per_page=100`"
+              >
+                events
+              </NuxtLink>
+            </p>
+            <p v-else>
+              No recent
+              <NuxtLink
+                external
+                target="_blank"
+                class="underline"
+                :to="`https://api.github.com/users/${username}/events?per_page=100`"
+              >
+                events</NuxtLink
+              >
+              from this account
+            </p>
+
+            <!-- <AnalysisDataCoverage v-if="coverageLevel" :level="coverageLevel" /> -->
+          </div>
+        </template>
+
+        <section
+          v-if="!verifiedAutomation"
+          class="mt-4 pt-4 border-t border-gh-border-light"
+        >
           <p class="text-gh-muted text-sm">
             Know something about this account? Help the community.
           </p>
