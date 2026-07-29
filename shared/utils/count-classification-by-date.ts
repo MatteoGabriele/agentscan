@@ -1,5 +1,7 @@
-import { identityConfig, type IdentityClassification } from '@unveil/identity'
+import { identityConfig } from '@unveil/identity'
+import type { EcosystemHealthCategory } from '../types/ecosystem-health'
 import { round } from './numbers'
+import { INSUFFICIENT_DATA_SCORE } from './health-stats'
 
 export type ClassificationMetric = {
   count: number
@@ -24,7 +26,7 @@ export const CLASSIFICATION_CATEGORIES = [
 ] as const
 
 type CategoryPercentageComparison = {
-  category: IdentityClassification
+  category: EcosystemHealthCategory
   lastDate: string | undefined
   lastCount: number | null
   lastTotal: number | null
@@ -37,7 +39,7 @@ type CategoryPercentageComparison = {
 }
 
 type CategoryPercentageComparisons = Record<
-  IdentityClassification,
+  EcosystemHealthCategory,
   CategoryPercentageComparison
 >
 
@@ -60,15 +62,17 @@ export function getClassificationStatsByDate(
 ): getClassificationStatsByDateResults {
   const result: getClassificationStatsByDateResults = {}
 
+  const scored = data.filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
+
   const dates = [
-    ...new Set(data.map((item) => getDateKey(item.created_at))),
+    ...new Set(scored.map((item) => getDateKey(item.created_at))),
   ].sort()
 
   dates.forEach((date) => {
     result[date] = createEmptyClassificationStats()
   })
 
-  data.forEach((item) => {
+  scored.forEach((item) => {
     const dateCounts = result[getDateKey(item.created_at)]
 
     if (!dateCounts) {
@@ -120,7 +124,7 @@ function getTotalClassificationCount(
 
 function getCategoryPercentage(
   counts: ClassificationStats | undefined,
-  category: IdentityClassification,
+  category: EcosystemHealthCategory,
 ): number | null {
   if (!counts || counts.total.count === 0) {
     return null
@@ -135,7 +139,7 @@ function getCategoryPercentageComparison({
   previousDate,
   countsByDate,
 }: {
-  category: IdentityClassification
+  category: EcosystemHealthCategory
   lastDate: string | undefined
   previousDate: string | undefined
   countsByDate: getClassificationStatsByDateResults

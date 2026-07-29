@@ -1,5 +1,6 @@
 import type { VueUiHorizontalBarDatasetItem } from 'vue-data-ui/vue-ui-horizontal-bar'
 import type { VueUiXyDatasetItem } from 'vue-data-ui/vue-ui-xy'
+import { INSUFFICIENT_DATA_SCORE } from './health-stats'
 
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
@@ -46,6 +47,10 @@ export function convertToHorizontalBarDataset(
     const createdDay = getDayKey(item.created_at)
 
     if (targetDay && createdDay !== targetDay) {
+      return acc
+    }
+
+    if (item.score === INSUFFICIENT_DATA_SCORE) {
       return acc
     }
 

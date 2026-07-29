@@ -1,10 +1,17 @@
 // @unocss-include
 import { identityConfig, type IdentityClassification } from '@unveil/identity'
-import type { EcosystemHealthItem } from '../types/ecosystem-health'
+import type {
+  EcosystemHealthCategory,
+  EcosystemHealthItem,
+} from '../types/ecosystem-health'
 import { round } from './numbers'
 
+export const INSUFFICIENT_DATA_SCORE = -1
+
 export function classifyByScore(score: number): IdentityClassification {
-  if (score >= identityConfig.THRESHOLD_HUMAN) {
+  if (score === INSUFFICIENT_DATA_SCORE) {
+    return 'insufficient-data'
+  } else if (score >= identityConfig.THRESHOLD_HUMAN) {
     return 'organic'
   } else if (score >= identityConfig.THRESHOLD_SUSPICIOUS) {
     return 'mixed'
@@ -27,23 +34,30 @@ export function formatTrend(value: number = 0) {
 export function getHealthStats(
   data: EcosystemHealthItem[] = [],
 ): Record<
-  IdentityClassification,
+  EcosystemHealthCategory,
   { count: number; percentage: string }
 > | null {
   if (!data.length) {
     return null
   }
 
-  const totalCount = data.length
+  const scored = data.filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
+  const totalCount = scored.length
 
-  const counts: Record<IdentityClassification, number> = {
+  if (!totalCount) {
+    return null
+  }
+
+  const counts: Record<EcosystemHealthCategory, number> = {
     organic: 0,
     mixed: 0,
     automation: 0,
   }
 
-  data.forEach((item) => {
-    const classification = classifyByScore(item.score)
+  scored.forEach((item) => {
+    const classification = classifyByScore(
+      item.score,
+    ) as EcosystemHealthCategory
     counts[classification]++
   })
 

@@ -17,9 +17,6 @@ const { data, status, error } = useFetch(
   () => `/api/identify-replicant/${username.value}`,
   {
     query: {
-      created_at: props.user.created_at,
-      repos_count: props.user.public_repos,
-      pages: 3,
       show_events: true,
     },
     key: analysisKey,
@@ -60,6 +57,10 @@ const { scoreStyle } = useScoreStyle(
 )
 
 const classificationIcon = computed<string>(() => {
+  if (classification.value === 'insufficient-data') {
+    return 'i-lucide:circle-slash'
+  }
+
   if (classification.value === 'organic') {
     return 'i-lucide:heart-handshake'
   }
@@ -96,8 +97,21 @@ const isBountyHunter = computed<boolean>(() => {
 
 const { nearestClassification } = useNearestClassification(score)
 
+const confidence = computed<number | undefined>(() => {
+  return data.value?.analysis.confidence
+})
+
+const { coverageLevel } = useDataCoverage(confidence)
+
 const warnings = computed<string[]>(() => {
   const list: string[] = []
+
+  if (
+    coverageLevel.value === 'low' &&
+    classification.value !== 'insufficient-data'
+  ) {
+    list.push('Limited activity to analyze. Treat this result as provisional.')
+  }
 
   if (nearestClassification.value) {
     list.push(`Activity close to ${nearestClassification.value} signals.`)
@@ -157,7 +171,9 @@ useSeoAnalysis(identifyAnalysis, {
           </div>
         </header>
 
-        <div class="text-sm text-gh-muted">
+        <div
+          class="text-sm text-gh-muted flex flex-wrap items-center gap-x-3 gap-y-2"
+        >
           <p v-if="data.eventsCount > 0">
             Analyzed from the last {{ data.eventsCount }} public GitHub
             <NuxtLink
@@ -181,6 +197,8 @@ useSeoAnalysis(identifyAnalysis, {
             >
             from this account
           </p>
+
+          <!-- <AnalysisDataCoverage v-if="coverageLevel" :level="coverageLevel" /> -->
         </div>
 
         <section
@@ -232,17 +250,20 @@ useSeoAnalysis(identifyAnalysis, {
       hydrate-on-interaction
     />
 
-    <LazyChartAccountEventsTimeline
-      :classification="data.analysis.classification"
-      :events="data.events"
-      hydrate-on-visible
-    />
+    <template v-if="classification !== 'insufficient-data'">
+      <LazyChartAccountEventsTimeline
+        :classification="classification"
+        :events="data.events"
+        hydrate-on-visible
+      />
 
-    <LazyChartAccountEventsBreakdown
-      :classification="data.analysis.classification"
-      :events="data.events"
-      hydrate-on-interaction
-    />
+      <LazyChartAccountEventsBreakdown
+        :classification="classification"
+        :events="data.events"
+        hydrate-on-interaction
+      />
+    </template>
+
     <p
       class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
     >

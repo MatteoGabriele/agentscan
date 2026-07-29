@@ -52,6 +52,24 @@ describe('getClassificationStatsByDate', () => {
     expect(Object.keys(result)).toEqual(['2026-06-10', '2026-06-11'])
   })
 
+  it('ignores insufficient-data entries', () => {
+    const result = getClassificationStatsByDate([
+      createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 90),
+      createEcosystemHealthItem('2026-06-10T11:00:00.000Z', 10),
+      createEcosystemHealthItem('2026-06-10T12:00:00.000Z', -1),
+
+      // a date with only insufficient-data never gets a bucket
+      createEcosystemHealthItem('2026-06-11T10:00:00.000Z', -1),
+    ])
+
+    expect(Object.keys(result)).toEqual(['2026-06-10'])
+    expect(result['2026-06-10']!.total.count).toBe(2)
+    expect(result['2026-06-10']!.organic.count).toBe(1)
+    expect(result['2026-06-10']!.organic.percentage).toBe(50)
+    expect(result['2026-06-10']!.automation.count).toBe(1)
+    expect(result['2026-06-10']!.automation.percentage).toBe(50)
+  })
+
   it('returns counts, percentages, and default trends for each date', () => {
     const result = getClassificationStatsByDate([
       createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 90),

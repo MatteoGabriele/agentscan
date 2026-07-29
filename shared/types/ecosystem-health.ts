@@ -3,6 +3,13 @@ import type { IdentityClassification } from '@unveil/identity'
 
 export type PrStatus = 'open' | 'closed' | 'merged'
 
+// Categories plotted on the health graph. "insufficient-data" scans are stored
+// with a negative score and excluded from every aggregate.
+export type EcosystemHealthCategory = Exclude<
+  IdentityClassification,
+  'insufficient-data'
+>
+
 export type EcosystemHealthItem = {
   created_at: string
   score: number
@@ -22,6 +29,6 @@ export type EcosystemHealthCategoryCounts = {
 }
 
 export type EcosystemHealthCategoryProgression = Record<
-  IdentityClassification,
+  EcosystemHealthCategory,
   ReturnType<typeof calcLinearProgression>
 >

@@ -1,28 +1,9 @@
 import { identify } from '@unveil/identity'
 import * as v from 'valibot'
 
-const MIN_PAGES = 1
-const MAX_PAGES = 3
+const MAX_API_ALLOWED_PAGES = 3
 
 const QuerySchema = v.object({
-  created_at: v.pipe(
-    v.string('created_at is required'),
-    v.check(
-      (value) => value.trim().length > 0 && !Number.isNaN(Date.parse(value)),
-      'created_at must be a valid ISO 8601 date string',
-    ),
-  ),
-  repos_count: v.pipe(
-    v.number('repos_count must be a number'),
-    v.integer('repos_count must be an integer'),
-    v.minValue(0, 'repos_count must be a non-negative integer'),
-  ),
-  pages: v.pipe(
-    v.number('pages must be a number'),
-    v.integer('pages must be an integer'),
-    v.minValue(MIN_PAGES, 'pages must be at least 1'),
-    v.maxValue(MAX_PAGES, `pages must be equal or less than ${MAX_PAGES}`),
-  ),
   show_events: v.pipe(
     v.string('show_events must be a string'),
     v.check(
@@ -46,11 +27,6 @@ export default defineEventHandler(async (event) => {
 
   const query = getQuery(event)
   const parsedQuery = v.safeParse(QuerySchema, {
-    created_at: query.created_at,
-    pages: query.pages ? parseInt(String(query.pages), 10) : 1,
-    repos_count: query.repos_count
-      ? parseInt(String(query.repos_count), 10)
-      : 0,
     show_events: query.show_events ? String(query.show_events) : 'false',
   })
 
@@ -65,23 +41,27 @@ export default defineEventHandler(async (event) => {
     const octokit = createOctokit(config.githubToken)
     const formattedUsername = formatUsername(username)
 
-    const validatedPages = Math.min(parsedQuery.output.pages, MAX_PAGES)
-    const pageRequests = Array.from({ length: validatedPages }, (_, index) => {
-      return octokit.rest.activity.listPublicEventsForUser({
-        username: formattedUsername,
-        per_page: 100,
-        page: index + 1,
-      })
+    const { data: user } = await octokit.rest.users.getByUsername({
+      username: formattedUsername,
     })
+
+    const pageRequests = Array.from(
+      { length: MAX_API_ALLOWED_PAGES },
+      (_, index) => {
+        return octokit.rest.activity.listPublicEventsForUser({
+          username: formattedUsername,
+          per_page: 100,
+          page: index + 1,
+        })
+      },
+    )
 
     const responses = await Promise.all(pageRequests)
     const events = responses.flatMap((response) => response.data)
 
     return {
       analysis: identify({
-        accountName: formattedUsername,
-        reposCount: parsedQuery.output.repos_count,
-        createdAt: parsedQuery.output.created_at,
+        user,
         events,
       }),
       events: parsedQuery.output.show_events ? events : [],
