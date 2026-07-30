@@ -9,6 +9,7 @@ import {
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { identityConfig } from '@unveil/identity'
 import { usePreferredDark } from '@vueuse/core'
+import { SERIES } from '~~/shared/utils/charts'
 
 import('vue-data-ui/style.css')
 
@@ -370,13 +371,15 @@ const selectedRawSparklines = computed<SparklineChart[]>(() => {
 
 const sparklines = computed<SparklineChart[]>(() => {
   return selectedRawSparklines.value.map((dataset) => {
-    return dataset.map((datapoint) => ({
-      ...datapoint,
-      color: selectedRangeColor.value,
-      dataLabels: false,
-      suffix: '%',
-      smooth: true,
-    }))
+    return dataset.map((datapoint) => {
+      const isCount = datapoint.name === SERIES.PR_COUNT
+      return {
+        ...datapoint,
+        color: isCount ? colors.value.textMuted : selectedRangeColor.value,
+        dataLabels: false,
+        suffix: isCount ? '' : '%',
+      }
+    })
   })
 })
 
@@ -420,6 +423,7 @@ const config = computed<VueUiXyConfig>(() => ({
         yAxis: {
           scaleMin: 0,
           scaleMax: 100,
+          useIndividualScale: true,
         },
         xAxisLabels: {
           show: false,
@@ -443,6 +447,7 @@ const config = computed<VueUiXyConfig>(() => ({
   line: {
     radius: 0,
     useGradient: false,
+    strokeWidth: 1.5,
     dot: {
       useSerieColor: true,
       fill: selectedRangeColor.value,
@@ -464,8 +469,10 @@ function drawLastDatapointLabel(svg: VueUiXySvgSlotProps['svg']) {
       background: colors.value.bg!,
       fallbackSerieColor: colors.value.textMuted!,
     },
-    formatValue: (value) =>
-      Number.isFinite(value) ? `${value.toFixed(0)}%` : '-',
+    formatValue: (value, serie) =>
+      Number.isFinite(value)
+        ? `${value.toFixed(0)}${serie.name === SERIES.PR_COUNT ? '' : '%'}`
+        : '-',
     isDarkMode: isDarkMode.value,
   })
 }
@@ -503,6 +510,8 @@ type TooltipRow = {
   color: string
   value: string
   detail: string
+  eligiblePrCount: number
+  label: string
 }
 
 function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
@@ -526,14 +535,25 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
           ? 100
           : Math.round((closed / eligible) * 100)
 
+    const isCount = datapoint.name === SERIES.PR_COUNT
+
     return {
       key: repoName,
       owner: owner!,
       repo,
-      color: selectedRangeColor.value ?? 'currentColor',
-      value: Number.isFinite(percentage) ? `${percentage.toFixed(0)}%` : '-',
-      detail:
-        closed == null || eligible == null
+      color: isCount
+        ? (datapoint?.color ?? '#666666')
+        : (selectedRangeColor.value ?? 'currentColor'),
+      eligiblePrCount: eligible ?? 0,
+      label: isCount ? datapoint.name : 'Closure rate',
+      value: isCount
+        ? String(eligible ?? 0)
+        : Number.isFinite(percentage)
+          ? `${percentage.toFixed(0)}%`
+          : '-',
+      detail: isCount
+        ? ''
+        : closed == null || eligible == null
           ? 'No data'
           : `${closed} / ${eligible}`,
     }
@@ -728,16 +748,40 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
               </g>
             </template>
 
+            <template #legend="{ legend }">
+              <div class="flex flex-row gap-4 justify-center mt-2">
+                <button
+                  v-for="item in legend"
+                  :key="item.id"
+                  class="flex flex-row gap-1.5 place-items-center"
+                  :class="item.isSegregated ? 'opacity-50' : 'hover:underline'"
+                  @click="item.segregate()"
+                >
+                  <div class="w-4 h-4">
+                    <svg viewBox="0 0 2 2" class="w-full h-full">
+                      <circle :cx="1" :cy="1" :r="1" :fill="item.color" />
+                    </svg>
+                  </div>
+                  <div
+                    :class="`text-gh-muted text-sm ${item.isSegregated ? 'line-through' : ''}`"
+                  >
+                    {{
+                      item?.independant ? SERIES.PR_COUNT : SERIES.CLOSURE_RATE
+                    }}
+                  </div>
+                </button>
+              </div>
+            </template>
+
             <!-- CUSTOM TOOLTIP -->
-            <template #tooltip="{ timeLabel }">
+            <template #tooltip="{ timeLabel, datapoint }">
               <div class="min-w-[220px] text-xs">
                 <div class="mb-2 font-medium text-gh-muted">
-                  {{ timeLabel.text }}
+                  {{ timeLabel.text }} - {{ datapoint[0]?.name }}
                 </div>
-
                 <div class="flex flex-col gap-1.5">
                   <div
-                    v-for="row in getTooltipRows(timeLabel)"
+                    v-for="(row, i) in getTooltipRows(timeLabel)"
                     :key="row.key"
                     class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2"
                   >
@@ -747,8 +791,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
                       aria-hidden="true"
                     />
                     <span class="min-w-0 truncate text-left">
-                      <span class="text-gh-muted"> {{ row.owner }}/ </span>
-                      <span>{{ row.repo }}</span>
+                      <span>{{ row.label }}</span>
                     </span>
                     <span class="text-gh-muted tabular-nums">
                       {{ row.detail }}

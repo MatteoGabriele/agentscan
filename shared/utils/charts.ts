@@ -1,6 +1,11 @@
 import type { VueUiHorizontalBarDatasetItem } from 'vue-data-ui/vue-ui-horizontal-bar'
 import type { VueUiXyDatasetItem } from 'vue-data-ui/vue-ui-xy'
 
+export const SERIES = {
+  PR_COUNT: 'PR count',
+  CLOSURE_RATE: 'PR closure rate',
+}
+
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
     return []
@@ -243,7 +248,7 @@ export function getClosedPrPercentageEvolutionByRepo(
   source: EcosystemHealthItem[] = [],
   scoreBounds: ScoreBounds = [0, 100],
   dateKey: keyof EcosystemHealthItem = 'created_at',
-): Array<Array<VueUiXyDatasetItem & { hasData: boolean }>> {
+): Array<Array<VueUiXyDatasetItem & { hasData?: boolean }>> {
   const dates = getUniqueDatesFromSource(source, dateKey)
 
   const repoMap = new Map<
@@ -289,6 +294,18 @@ export function getClosedPrPercentageEvolutionByRepo(
       type: 'line',
       smooth: true,
       hasData: data.percentages.some((value) => value !== null),
+      details: {
+        eligiblePrs: data.eligiblePrs,
+        closedPrs: data.closedPrs,
+      },
+    },
+    {
+      name: SERIES.PR_COUNT,
+      series: data.eligiblePrs,
+      type: 'line',
+      smooth: true,
+      dashed: true,
+      independant: true,
       details: {
         eligiblePrs: data.eligiblePrs,
         closedPrs: data.closedPrs,
@@ -456,12 +473,13 @@ export function createLastDatapointLabelsSvg({
     bottom?: number
   }
   colors: LastDatapointLabelColors
-  formatValue: (value: number) => string
+  formatValue: (value: number, series: LastDatapointLabelSerie) => string
   isDarkMode: boolean
   svgWidth?: number
   fontSize?: number
   labelOffset?: number
   labelHeight?: number
+  suffix?: string
 }) {
   const drawingAreaTop = Number(drawingArea.top ?? 0)
   const drawingAreaHeight = Number(
@@ -478,7 +496,7 @@ export function createLastDatapointLabelsSvg({
 
       const value = Number(lastPlot.value ?? 0)
       const safeValue = Number.isFinite(value) ? value : 0
-      const text = formatValue(safeValue)
+      const text = formatValue(safeValue, serie)
 
       return {
         x: Number(lastPlot.x ?? 0),
@@ -614,6 +632,7 @@ export type LastDatapointLabelSerie = {
     y?: number | null
     value?: number | null
   }[]
+  name: string
 }
 
 type LastDatapointLabel = {
