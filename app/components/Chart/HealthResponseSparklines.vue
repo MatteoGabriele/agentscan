@@ -781,7 +781,7 @@ function getTooltipRows(timeLabel: VueUiXyTooltipSlotProps['timeLabel']) {
                 </div>
                 <div class="flex flex-col gap-1.5">
                   <div
-                    v-for="(row, i) in getTooltipRows(timeLabel)"
+                    v-for="row in getTooltipRows(timeLabel)"
                     :key="row.key"
                     class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2"
                   >
