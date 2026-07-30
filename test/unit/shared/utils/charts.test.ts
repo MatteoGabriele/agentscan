@@ -10,6 +10,8 @@ import {
   getClosedPrPercentageTotal,
   getClosedPrDelta,
   createLastDatapointLabelsSvg,
+  SERIES,
+  type LastDatapointLabelSerie,
 } from '../../../../shared/utils/charts'
 import {
   EXPECTED_NB_UNIQUE_REPOS,
@@ -183,7 +185,7 @@ describe('getClosedPrPercentageEvolutionByRepo', () => {
 
     expect(result).toHaveLength(EXPECTED_NB_UNIQUE_REPOS)
     const flatResult = result.flat()
-    expect(flatResult).toHaveLength(EXPECTED_NB_UNIQUE_REPOS)
+    expect(flatResult).toHaveLength(EXPECTED_NB_UNIQUE_REPOS * 2)
 
     flatResult.forEach((item) => {
       expect(item).toEqual(
@@ -192,13 +194,28 @@ describe('getClosedPrPercentageEvolutionByRepo', () => {
           series: expect.any(Array),
           type: 'line',
           smooth: true,
-          hasData: expect.any(Boolean),
           details: expect.objectContaining({
             eligiblePrs: expect.any(Array),
             closedPrs: expect.any(Array),
           }),
         }),
       )
+
+      if (item.name === SERIES.PR_COUNT) {
+        expect(item).toEqual(
+          expect.objectContaining({
+            dashed: true,
+            independant: true,
+          }),
+        )
+        expect(item).not.toHaveProperty('hasData')
+      } else {
+        expect(item).toEqual(
+          expect.objectContaining({
+            hasData: expect.any(Boolean),
+          }),
+        )
+      }
 
       expect(item.series.every((value) => typeof value === 'number')).toBe(true)
       expect(
@@ -394,6 +411,13 @@ const colors = {
   fallbackSerieColor: '#999999',
 }
 
+function createSerie(
+  name: string,
+  serie: Omit<LastDatapointLabelSerie, 'name'> = {},
+): LastDatapointLabelSerie {
+  return { name, ...serie }
+}
+
 describe('createLastDatapointLabelsSvg', () => {
   it('returns an empty string when there are no series', () => {
     const result = createLastDatapointLabelsSvg({
@@ -409,7 +433,10 @@ describe('createLastDatapointLabelsSvg', () => {
 
   it('returns an empty string when no serie has plots', () => {
     const result = createLastDatapointLabelsSvg({
-      series: [{ color: '#FF0000' }, { color: '#00FF00', plots: [] }],
+      series: [
+        createSerie('First series', { color: '#FF0000' }),
+        createSerie('Second series', { color: '#00FF00', plots: [] }),
+      ],
       drawingArea: { top: 10, height: 100 },
       colors,
       formatValue: (value) => String(value),
@@ -422,8 +449,14 @@ describe('createLastDatapointLabelsSvg', () => {
   it('renders regular labels when there is no collision', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 20, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 90, value: 20 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 20, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 90, value: 20 }],
+        }),
       ],
       drawingArea: { top: 0, height: 120 },
       colors,
@@ -442,7 +475,11 @@ describe('createLastDatapointLabelsSvg', () => {
 
   it('uses custom font size, label offset, and colors in regular labels', () => {
     const result = createLastDatapointLabelsSvg({
-      series: [{ plots: [{ x: 10, y: 20, value: 42 }] }],
+      series: [
+        createSerie('First series', {
+          plots: [{ x: 10, y: 20, value: 42 }],
+        }),
+      ],
       drawingArea: { top: 0, height: 100 },
       colors,
       formatValue: (value) => `${value}`,
@@ -457,19 +494,21 @@ describe('createLastDatapointLabelsSvg', () => {
     expect(result).toContain('stroke="#FFFFFF"')
   })
 
-  it('uses only the last plot of each serie', () => {
-    const formatValue = vi.fn((value: number) => `${value}`)
+  it('uses only the last plot and passes its serie to formatValue', () => {
+    const formatValue = vi.fn(
+      (value: number, serie: LastDatapointLabelSerie) =>
+        `${serie.name}:${value}`,
+    )
+    const serie = createSerie('First series', {
+      color: '#FF0000',
+      plots: [
+        { x: 10, y: 10, value: 1 },
+        { x: 50, y: 50, value: 99 },
+      ],
+    })
 
     const result = createLastDatapointLabelsSvg({
-      series: [
-        {
-          color: '#FF0000',
-          plots: [
-            { x: 10, y: 10, value: 1 },
-            { x: 50, y: 50, value: 99 },
-          ],
-        },
-      ],
+      series: [serie],
       drawingArea: { top: 0, height: 100 },
       colors,
       formatValue,
@@ -477,33 +516,49 @@ describe('createLastDatapointLabelsSvg', () => {
     })
 
     expect(formatValue).toHaveBeenCalledTimes(1)
-    expect(formatValue).toHaveBeenCalledWith(99)
+    expect(formatValue).toHaveBeenCalledWith(99, serie)
+    expect(result).toContain('First series:99')
     expect(result).toContain('x="74"')
     expect(result).toContain('y="50"')
     expect(result).not.toContain('x="34"')
   })
 
   it('formats safe numeric values and falls back to zero for invalid values', () => {
-    const formatValue = vi.fn((value: number) => `value:${value}`)
+    const formatValue = vi.fn(
+      (value: number, serie: LastDatapointLabelSerie) =>
+        `${serie.name}:${value}`,
+    )
+    const serie = createSerie('Invalid value series', {
+      plots: [{ x: 10, y: 20, value: Number.NaN }],
+    })
 
     const result = createLastDatapointLabelsSvg({
-      series: [{ plots: [{ x: 10, y: 20, value: Number.NaN }] }],
+      series: [serie],
       drawingArea: { top: 0, height: 100 },
       colors,
       formatValue,
       isDarkMode: false,
     })
 
-    expect(formatValue).toHaveBeenCalledWith(0)
-    expect(result).toContain('value:0')
+    expect(formatValue).toHaveBeenCalledWith(0, serie)
+    expect(result).toContain('Invalid value series:0')
   })
 
   it('renders collision labels as a compact non-overlapping label rack', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 50, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 55, value: 30 }] },
-        { color: '#0000FF', plots: [{ x: 100, y: 60, value: 20 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 55, value: 30 }],
+        }),
+        createSerie('Third series', {
+          color: '#0000FF',
+          plots: [{ x: 100, y: 60, value: 20 }],
+        }),
       ],
       drawingArea: { top: 10, height: 120 },
       colors,
@@ -526,8 +581,14 @@ describe('createLastDatapointLabelsSvg', () => {
   it('uses drawingArea.bottom when height is not provided', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 50, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 55, value: 20 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 55, value: 20 }],
+        }),
       ],
       drawingArea: { top: 20, bottom: 120 },
       colors,
@@ -542,9 +603,18 @@ describe('createLastDatapointLabelsSvg', () => {
   it('keeps colliding labels close to their related points without overlapping', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 40, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 45, value: 20 }] },
-        { color: '#0000FF', plots: [{ x: 100, y: 95, value: 30 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 40, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 45, value: 20 }],
+        }),
+        createSerie('Third series', {
+          color: '#0000FF',
+          plots: [{ x: 100, y: 95, value: 30 }],
+        }),
       ],
       drawingArea: { top: 0, height: 120 },
       colors,
@@ -560,9 +630,18 @@ describe('createLastDatapointLabelsSvg', () => {
   it('shifts the label stack upward when it overflows the drawing area bottom', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 80, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 85, value: 20 }] },
-        { color: '#0000FF', plots: [{ x: 100, y: 90, value: 30 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 80, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 85, value: 20 }],
+        }),
+        createSerie('Third series', {
+          color: '#0000FF',
+          plots: [{ x: 100, y: 90, value: 30 }],
+        }),
       ],
       drawingArea: { top: 0, height: 120 },
       colors,
@@ -578,8 +657,14 @@ describe('createLastDatapointLabelsSvg', () => {
   it('uses dark-mode opacity in collision mode', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 50, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 50, value: 20 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 50, value: 20 }],
+        }),
       ],
       drawingArea: { top: 0, height: 100 },
       colors,
@@ -593,8 +678,12 @@ describe('createLastDatapointLabelsSvg', () => {
   it('uses the fallback serie color when no color is provided', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { plots: [{ x: 100, y: 50, value: 10 }] },
-        { plots: [{ x: 100, y: 50, value: 20 }] },
+        createSerie('First series', {
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+        createSerie('Second series', {
+          plots: [{ x: 100, y: 50, value: 20 }],
+        }),
       ],
       drawingArea: { top: 0, height: 100 },
       colors,
@@ -607,7 +696,11 @@ describe('createLastDatapointLabelsSvg', () => {
 
   it('supports null plot values from SSR slot data', () => {
     const result = createLastDatapointLabelsSvg({
-      series: [{ plots: [{ x: 10, y: 20, value: null }] }],
+      series: [
+        createSerie('First series', {
+          plots: [{ x: 10, y: 20, value: null }],
+        }),
+      ],
       drawingArea: { top: 0, height: 100 },
       colors,
       formatValue: (value) => `formatted:${value}`,
@@ -619,7 +712,11 @@ describe('createLastDatapointLabelsSvg', () => {
 
   it('uses zero defaults when plot coordinates are nullish', () => {
     const result = createLastDatapointLabelsSvg({
-      series: [{ plots: [{ x: null, y: null, value: undefined }] }],
+      series: [
+        createSerie('First series', {
+          plots: [{ x: null, y: null, value: undefined }],
+        }),
+      ],
       drawingArea: { top: 0, height: 100 },
       colors,
       formatValue: (value) => `value-${value}`,
@@ -634,8 +731,14 @@ describe('createLastDatapointLabelsSvg', () => {
   it('uses zero drawing area height when neither height nor bottom is provided', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 50, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 50, value: 20 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 50, value: 20 }],
+        }),
       ],
       drawingArea: { top: 20 },
       colors,
@@ -649,7 +752,11 @@ describe('createLastDatapointLabelsSvg', () => {
 
   it('renders a regular label when serie color is omitted', () => {
     const result = createLastDatapointLabelsSvg({
-      series: [{ plots: [{ x: 100, y: 50, value: 10 }] }],
+      series: [
+        createSerie('First series', {
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+      ],
       drawingArea: { top: 0, height: 100 },
       colors,
       formatValue: (value) => `${value}`,
@@ -665,8 +772,14 @@ describe('createLastDatapointLabelsSvg', () => {
   it('supports custom labelHeight in collision rack mode', () => {
     const result = createLastDatapointLabelsSvg({
       series: [
-        { color: '#FF0000', plots: [{ x: 100, y: 50, value: 10 }] },
-        { color: '#00FF00', plots: [{ x: 100, y: 50, value: 20 }] },
+        createSerie('First series', {
+          color: '#FF0000',
+          plots: [{ x: 100, y: 50, value: 10 }],
+        }),
+        createSerie('Second series', {
+          color: '#00FF00',
+          plots: [{ x: 100, y: 50, value: 20 }],
+        }),
       ],
       drawingArea: { top: 10, height: 110 },
       colors,
