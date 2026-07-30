@@ -34,6 +34,7 @@ export type RepoConfig = {
     organic: string
     mixed: string
     automation: string
+    'insufficient-data': string
     'community-flagged': string
   }
 }
@@ -60,6 +61,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
     mixed: '',
     automation: '',
     'community-flagged': '',
+    'insufficient-data': '',
   },
 }
 

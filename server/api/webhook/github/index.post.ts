@@ -25,6 +25,11 @@ type AutomationListItem = {
   issueUrl: string
 }
 
+type LabelMap = Record<
+  Exclude<IdentityClassification, 'organic' | 'insufficient-data'>,
+  string
+>
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
@@ -229,23 +234,10 @@ export default defineEventHandler(async (event) => {
     const userId: number | undefined = user.id
 
     const analysis: IdentifyResult = identify({
-      accountName: username,
-      reposCount: user.public_repos,
-      createdAt: user.created_at,
+      user,
       events,
     })
 
-    const isFlagged = hasCommunityFlag || analysis.classification !== 'organic'
-
-    const statusIndicators: Record<IdentityClassification, string> = {
-      organic: '✅',
-      mixed: '⚠️',
-      automation: '❌',
-    }
-
-    const indicator = hasCommunityFlag
-      ? '🚩'
-      : statusIndicators[analysis.classification]
     const details = hasCommunityFlag
       ? {
           label: 'Flagged by community',
@@ -344,12 +336,12 @@ export default defineEventHandler(async (event) => {
 
     const body = [
       MARKER,
-      `### ${indicator} ${details.label}`,
+      `### ${details.label}`,
       '',
       description,
       '',
       `[View full analysis →](https://agentscan.tools/user/${username})`,
-      ...(reportUrl ? ['', `[🚩 Report this account →](${reportUrl})`] : []),
+      ...(reportUrl ? ['', `[Report this account →](${reportUrl})`] : []),
       ...(evidenceLines.length > 0
         ? [
             '',
@@ -399,14 +391,15 @@ export default defineEventHandler(async (event) => {
 
         if (hasCommunityFlag) {
           labelsToAdd.push(repoConfig.labels['community-flagged'])
-        } else if (analysis.classification !== 'organic') {
-          const labelMap: Record<
-            Exclude<IdentityClassification, 'organic'>,
-            string
-          > = {
+        } else if (
+          analysis.classification !== 'organic' &&
+          analysis.classification !== 'insufficient-data'
+        ) {
+          const labelMap: LabelMap = {
             mixed: repoConfig.labels.mixed,
             automation: repoConfig.labels.automation,
           }
+
           labelsToAdd.push(labelMap[analysis.classification])
         }
 
@@ -441,7 +434,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       ok: true,
-      flagged: isFlagged,
+      flagged: hasCommunityFlag,
       classification: analysis.classification,
     }
   } catch (err) {
