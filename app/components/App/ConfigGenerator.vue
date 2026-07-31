@@ -389,16 +389,6 @@ const { copy, copied } = useClipboard({ source: yaml })
             <input v-model="honeypot" type="checkbox" class="accent-gh-green" />
             Post a honeypot comment on new PRs/issues
           </label>
-
-          <p v-if="honeypot" class="text-xs text-gh-muted mt-3 pl-6">
-            Requires the <span class="font-mono">Full</span> or
-            <span class="font-mono">Comment only</span> mode. When the code
-            comes back, the account is labelled as automated
-            <template v-if="autoClose">and the PR/issue is closed</template
-            ><template v-else>
-              — enable auto-close above to close it as well</template
-            >.
-          </p>
         </div>
       </fieldset>
 
