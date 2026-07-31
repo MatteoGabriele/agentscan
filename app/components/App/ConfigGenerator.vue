@@ -58,6 +58,7 @@ const trustedAuthorAssociations = ref<AuthorAssociation[]>([])
 const commentOnOrganic = ref(false)
 const autoClose = ref(false)
 const autoCloseClassifications = ref<Classification[]>(['automation'])
+const honeypot = ref(false)
 
 const labelCommunityFlagged = ref(DEFAULT_LABELS['community-flagged'])
 const labelMixed = ref(DEFAULT_LABELS.mixed)
@@ -130,6 +131,10 @@ const yaml = computed(() => {
     ) {
       config['auto-close-classifications'] = autoCloseClassifications.value
     }
+  }
+
+  if (honeypot.value) {
+    config.honeypot = true
   }
 
   if (mode.value !== 'full') {
@@ -361,6 +366,39 @@ const { copy, copied } = useClipboard({ source: yaml })
               {{ item.label }}
             </label>
           </div>
+        </div>
+      </fieldset>
+
+      <fieldset
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+      >
+        <legend class="sr-only">Honeypot</legend>
+        <div>
+          <p class="text-sm font-medium text-gh-text">Honeypot</p>
+          <p class="text-xs text-gh-muted mt-1">
+            Posts an ordinary thank-you comment with a one-off verification code
+            hidden in its raw Markdown, addressed only at language models. An
+            agent that reads the page source and replies with the code
+            identifies itself.
+          </p>
+        </div>
+        <div class="self-start">
+          <label
+            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+          >
+            <input v-model="honeypot" type="checkbox" class="accent-gh-green" />
+            Post a honeypot comment on new PRs/issues
+          </label>
+
+          <p v-if="honeypot" class="text-xs text-gh-muted mt-3 pl-6">
+            Requires the <span class="font-mono">Full</span> or
+            <span class="font-mono">Comment only</span> mode. When the code
+            comes back, the account is labelled as automated
+            <template v-if="autoClose">and the PR/issue is closed</template
+            ><template v-else>
+              — enable auto-close above to close it as well</template
+            >.
+          </p>
         </div>
       </fieldset>
 

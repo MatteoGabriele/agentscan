@@ -863,6 +863,318 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
+  describe('Honeypot', () => {
+    // The bait comment carries the code in a marker; replies are matched against it.
+    const HONEYPOT_COMMENT = {
+      id: 700,
+      body: '<!-- agentscan-honeypot:aabbccddeeff -->\n### Thanks for your contribution! 🎉',
+    }
+
+    function setupCommentEvent(commentBody: string, author = 'test-user') {
+      setupEvent({
+        action: 'created',
+        pull_request: undefined,
+        issue: {
+          number: 123,
+          user: { login: 'test-user' },
+          pull_request: { url: 'https://api.github.com/pulls/123' },
+        },
+        comment: { id: 800, body: commentBody, user: { login: author } },
+      })
+    }
+
+    describe('posting the bait', () => {
+      it('does not post a honeypot comment when the option is disabled', async () => {
+        await handler(MOCK_EVENT)
+
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('posts a honeypot comment on organic PRs, where the heuristics found nothing', async () => {
+        mockRepoConfig({ honeypot: true })
+
+        await handler(MOCK_EVENT)
+
+        const body =
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body
+        expect(body).toMatch(/<!-- agentscan-honeypot:[0-9a-f]{12} -->/)
+        expect(body).toContain('<!-- message_for_llms')
+        expect(body).toContain('@test-user')
+      })
+
+      it('generates a different code for every PR', async () => {
+        mockRepoConfig({ honeypot: true })
+        await handler(MOCK_EVENT)
+
+        mockRepoConfig({ honeypot: true })
+        await handler(MOCK_EVENT)
+
+        const [first, second] =
+          mockInstallationOctokit.rest.issues.createComment.mock.calls.map(
+            (call: [{ body: string }]) =>
+              call[0].body.match(
+                /<!-- agentscan-honeypot:([0-9a-f]{12}) -->/,
+              )[1],
+          )
+        expect(first).not.toBe(second)
+      })
+
+      it('hides the code from the rendered comment', async () => {
+        mockRepoConfig({ honeypot: true })
+
+        await handler(MOCK_EVENT)
+
+        const body =
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body
+        const token = body.match(
+          /<!-- agentscan-honeypot:([0-9a-f]{12}) -->/,
+        )[1]
+        const rendered = body.replace(/<!--[\s\S]*?-->/g, '')
+        expect(rendered).not.toContain(token)
+      })
+
+      it('does not post a second honeypot comment when one already exists', async () => {
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('does not post a honeypot comment when the PR is auto-closed anyway', async () => {
+        vi.mocked(identify).mockReturnValue({
+          ...MOCK_ANALYSIS,
+          classification: 'automation',
+        })
+        mockRepoConfig({
+          honeypot: true,
+          'auto-close': true,
+          'auto-close-classifications': ['automation'],
+        })
+
+        await handler(MOCK_EVENT)
+
+        const bodies =
+          mockInstallationOctokit.rest.issues.createComment.mock.calls.map(
+            (call: [{ body: string }]) => call[0].body,
+          )
+        expect(bodies.join('')).not.toContain('message_for_llms')
+      })
+
+      // The bait is the whole mechanism, so mode does not gate it — otherwise
+      // honeypot: true would silently do nothing.
+      it.each(['silent', 'labels'])(
+        'still posts the honeypot comment in %s mode',
+        async (mode) => {
+          mockRepoConfig({ honeypot: true, mode })
+
+          await handler(MOCK_EVENT)
+
+          expect(
+            mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+              .body,
+          ).toContain('<!-- message_for_llms')
+        },
+      )
+    })
+
+    describe('catching the reply', () => {
+      it('ignores comment events when the honeypot is disabled', async () => {
+        setupCommentEvent('aabbccddeeff')
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+        expect(
+          mockInstallationOctokit.rest.issues.listComments,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('flags the PR when the author replies with the code', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true, honeypot: 'triggered' })
+        expect(
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body,
+        ).toContain('Automated contributor detected')
+        expect(
+          mockInstallationOctokit.rest.issues.addLabels,
+        ).toHaveBeenCalledWith(
+          expect.objectContaining({ labels: ['agentscan:automation-signals'] }),
+        )
+      })
+
+      it('matches the code even when the agent wraps it in formatting', async () => {
+        setupCommentEvent('`aabbccddeeff`')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true, honeypot: 'triggered' })
+      })
+
+      it('does not flag an ordinary reply', async () => {
+        setupCommentEvent('Thanks! I have pushed a fix.')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('does not flag a contributor who quotes the bait comment back', async () => {
+        setupCommentEvent(
+          '> <!-- agentscan-honeypot:aabbccddeeff -->\n> Thanks for your contribution!\n\nNice try 🙂',
+        )
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('ignores the code coming from anyone other than the PR author', async () => {
+        setupCommentEvent('aabbccddeeff', 'a-maintainer')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('does nothing when the thread has no honeypot comment', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [{ id: 1, body: 'unrelated' }],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+      })
+
+      it('does not fire twice on the same thread', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [
+            HONEYPOT_COMMENT,
+            { id: 900, body: '<!-- agentscanapp-bot-honeypot -->' },
+          ],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('closes the PR when auto-close is enabled', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true, 'auto-close': true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalledWith(
+          {
+            owner: 'test-owner',
+            repo: 'test-repo',
+            issue_number: 123,
+            state: 'closed',
+            state_reason: 'not_planned',
+          },
+        )
+      })
+
+      it('does not close the PR when auto-close is disabled', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(
+          mockInstallationOctokit.rest.issues.update,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('closes without commenting in silent mode', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true, 'auto-close': true, mode: 'silent' })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(mockInstallationOctokit.rest.issues.update).toHaveBeenCalled()
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('does not run the full activity scan on comment events', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(identify).not.toHaveBeenCalled()
+        expect(
+          mockInstallationOctokit.rest.checks.create,
+        ).not.toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('Custom Messages (via repo config)', () => {
     it('uses the custom automation message in the posted comment', async () => {
       vi.mocked(identify).mockReturnValue({
