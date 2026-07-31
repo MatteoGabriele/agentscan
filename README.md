@@ -1,4 +1,4 @@
-# AgentScan
+# AgentScans
 
 An open experiment in detecting automation patterns on GitHub.
 
