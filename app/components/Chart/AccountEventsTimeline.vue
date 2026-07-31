@@ -121,17 +121,29 @@ function isActiveGitHubEventType(
   return activeGitHubEventTypes.includes(type as ActiveGitHubEventType)
 }
 
+/**
+ * A PullRequestEvent is emitted for the whole pull request lifecycle (opened, closed,
+ * reopened, ...), so counting all of them would tally the same pull request several
+ * times. Only "opened" marks a new pull request, which is also what the identity
+ * thresholds this chart plots against are computed on.
+ */
+function isTimelineEvent(event: GitHubEvent): boolean {
+  if (
+    !event.created_at ||
+    !isGitHubEventType(event.type) ||
+    !isActiveGitHubEventType(event.type)
+  ) {
+    return false
+  }
+
+  return event.type !== 'PullRequestEvent' || event.payload?.action === 'opened'
+}
+
 const eventDays = computed(() => {
   const days = Array.from(
     new Set(
       props.events
-        .filter((event) => {
-          return (
-            event.created_at &&
-            isGitHubEventType(event.type) &&
-            isActiveGitHubEventType(event.type)
-          )
-        })
+        .filter(isTimelineEvent)
         .map((event) => event.created_at!.slice(0, 10)),
     ),
   ).sort()
@@ -153,12 +165,7 @@ const limitedEvents = computed(() => {
     return []
   }
   return props.events.filter((event) => {
-    return (
-      event.created_at &&
-      isGitHubEventType(event.type) &&
-      isActiveGitHubEventType(event.type) &&
-      event.created_at.slice(0, 10) >= firstDay
-    )
+    return isTimelineEvent(event) && event.created_at!.slice(0, 10) >= firstDay
   })
 })
 
