@@ -19,6 +19,7 @@ export type RepoConfig = {
   'trusted-author-associations': AuthorAssociation[]
   'auto-close': boolean
   'auto-close-classifications': IdentityClassification[]
+  honeypot: boolean
   mode: ScanMode
   'comment-on-organic': boolean
   scan: {
@@ -44,6 +45,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
   'trusted-author-associations': [],
   'auto-close': false,
   'auto-close-classifications': ['automation'],
+  honeypot: false,
   mode: 'full',
   'comment-on-organic': false,
   scan: {

@@ -17,6 +17,14 @@ import {
   buildEvidenceLines,
   buildReportIssueUrl,
 } from '~~/shared/utils/report-issue'
+import {
+  buildHoneypotComment,
+  buildHoneypotResultComment,
+  createHoneypotToken,
+  extractHoneypotToken,
+  hasHoneypotToken,
+  HONEYPOT_RESULT_MARKER,
+} from './_honeypot'
 
 type AutomationListItem = {
   username: string
@@ -58,7 +66,16 @@ export default defineEventHandler(async (event) => {
 
   const payload = JSON.parse(rawBody)
 
-  if (payload.action !== 'opened' && payload.action !== 'reopened') {
+  // issue_comment events are only of interest to the honeypot, which needs to
+  // see the contributor's reply to the bait comment.
+  const isCommentEvent =
+    payload.action === 'created' && !!payload.comment && !!payload.issue
+
+  if (
+    payload.action !== 'opened' &&
+    payload.action !== 'reopened' &&
+    !isCommentEvent
+  ) {
     return { ok: true }
   }
 
@@ -66,8 +83,11 @@ export default defineEventHandler(async (event) => {
     return { ok: true }
   }
 
-  const isPR = !!payload.pull_request
-  const isIssue = !!payload.issue
+  // On issue_comment the PR lives under `issue`, distinguished by `pull_request`.
+  const isPR = isCommentEvent
+    ? !!payload.issue.pull_request
+    : !!payload.pull_request
+  const isIssue = isCommentEvent ? !payload.issue.pull_request : !!payload.issue
 
   const targetNumber: number | undefined =
     payload.pull_request?.number ?? payload.issue?.number
@@ -118,6 +138,100 @@ export default defineEventHandler(async (event) => {
     }
   } catch {
     // no config file — use defaults
+  }
+
+  if (isCommentEvent) {
+    if (!repoConfig.honeypot) {
+      return { ok: true }
+    }
+
+    // Only the author of the PR/issue can spring their own trap. A maintainer
+    // or third party quoting the code is not a signal about the contributor.
+    const commentAuthor: string | undefined = payload.comment.user?.login
+
+    if (
+      !commentAuthor ||
+      commentAuthor !== username ||
+      isKnownBot(commentAuthor)
+    ) {
+      return { ok: true }
+    }
+
+    const { data: comments } = await octokit.rest.issues.listComments({
+      owner,
+      repo,
+      issue_number: targetNumber,
+      per_page: 100,
+    })
+
+    if (comments.some((c) => c.body?.includes(HONEYPOT_RESULT_MARKER))) {
+      return { ok: true }
+    }
+
+    const token = comments
+      .map((c) => extractHoneypotToken(c.body))
+      .find((value): value is string => value !== null)
+
+    if (!token || !hasHoneypotToken(payload.comment.body, token)) {
+      return { ok: true }
+    }
+
+    const closed = repoConfig['auto-close']
+
+    if (closed) {
+      try {
+        await octokit.rest.issues.update({
+          owner,
+          repo,
+          issue_number: targetNumber,
+          state: 'closed',
+          state_reason: 'not_planned',
+        })
+      } catch (err: unknown) {
+        if (
+          err instanceof Error &&
+          !err.message.includes('Resource not accessible')
+        ) {
+          throw err
+        }
+      }
+    }
+
+    try {
+      if (repoConfig.mode === 'full' || repoConfig.mode === 'comment') {
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: targetNumber,
+          body: buildHoneypotResultComment({ username, isPR, closed }),
+        })
+      }
+
+      if (repoConfig.mode === 'full' || repoConfig.mode === 'labels') {
+        const label = repoConfig.labels.automation
+
+        await octokit.rest.issues
+          .createLabel({ owner, repo, name: label, color: 'ededed' })
+          .catch(() => {
+            // label already exists or no create permission — continue to addLabels
+          })
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: targetNumber,
+          labels: [label],
+        })
+      }
+    } catch (err: unknown) {
+      if (
+        err instanceof Error &&
+        !err.message.includes('Resource not accessible')
+      ) {
+        throw err
+      }
+    }
+
+    return { ok: true, honeypot: 'triggered' as const }
   }
 
   let checkRunId: number | undefined
@@ -206,6 +320,7 @@ export default defineEventHandler(async (event) => {
         }),
       ),
     )
+
     const events = responses.flatMap((r) => r.data)
 
     let verified: AutomationListItem[] = []
@@ -284,6 +399,47 @@ export default defineEventHandler(async (event) => {
           state: 'closed',
           state_reason: 'not_planned',
         })
+      } catch (err: unknown) {
+        if (
+          err instanceof Error &&
+          !err.message.includes('Resource not accessible')
+        ) {
+          throw err
+        }
+      }
+    }
+
+    // Posted before any early return: the honeypot exists precisely to catch
+    // the accounts that the activity heuristics read as organic.
+    //
+    // `mode` deliberately does not apply here. The bait *is* a comment — there
+    // is no honeypot without one — so honouring silent/labels mode would turn
+    // `honeypot: true` into a silent no-op. Enabling it is the opt-in.
+    if (repoConfig.honeypot && !shouldAutoClose) {
+      try {
+        const { data: comments } = await octokit.rest.issues.listComments({
+          owner,
+          repo,
+          issue_number: targetNumber,
+          per_page: 100,
+        })
+
+        const alreadyBaited = comments.some(
+          (c) => extractHoneypotToken(c.body) !== null,
+        )
+
+        if (!alreadyBaited) {
+          await octokit.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: targetNumber,
+            body: buildHoneypotComment({
+              token: createHoneypotToken(),
+              username,
+              isPR,
+            }),
+          })
+        }
       } catch (err: unknown) {
         if (
           err instanceof Error &&
