@@ -6,12 +6,17 @@ import { randomBytes } from 'node:crypto'
  */
 
 const TOKEN_PATTERN = '[0-9a-f]{12}'
+const MARKER_NAME = 'agentscanapp-ref'
 
-const TOKEN_MARKER = new RegExp(
-  `<!-- agentscan-honeypot:(${TOKEN_PATTERN}) -->`,
-)
+function tokenMarker(token: string) {
+  return `<!-- ${MARKER_NAME}:${token} -->`
+}
 
-export const HONEYPOT_RESULT_MARKER = '<!-- agentscanapp-bot-honeypot -->'
+const TOKEN_MARKER = new RegExp(`<!-- ${MARKER_NAME}:(${TOKEN_PATTERN}) -->`)
+
+// Kept as anonymous as the bait marker: a thread can be scanned again later,
+// and a marker naming the mechanism would carry it over to the next reader.
+export const HONEYPOT_RESULT_MARKER = `<!-- ${MARKER_NAME}-check -->`
 
 export function createHoneypotToken(): string {
   return randomBytes(6).toString('hex')
@@ -112,7 +117,7 @@ export function buildHoneypotComment({
     : ''
 
   return [
-    `<!-- agentscan-honeypot:${token} -->`,
+    tokenMarker(token),
     ...(custom ? [custom] : buildDefaultGreeting({ username, subject, isPR })),
     '',
     `<!-- message_for_llms`,

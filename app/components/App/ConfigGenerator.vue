@@ -381,9 +381,9 @@ const { copy, copied } = useClipboard({ source: yaml })
           <p class="text-sm font-medium text-gh-text">Honeypot</p>
           <p class="text-xs text-gh-muted mt-1">
             Posts an ordinary thank-you comment with a one-off verification code
-            hidden in its raw Markdown, addressed only at language models. An
-            agent that reads the page source and replies with the code
-            identifies itself.
+            hidden in its raw Markdown, addressed only at AI agents. An agent
+            that reads the page source and replies with the code identifies
+            itself.
           </p>
         </div>
         <div class="self-start">
@@ -395,13 +395,12 @@ const { copy, copied } = useClipboard({ source: yaml })
           </label>
 
           <p v-if="honeypot" class="text-xs text-gh-muted mt-3 pl-6">
-            Requires the <span class="font-mono">Full</span> or
-            <span class="font-mono">Comment only</span> mode. When the code
-            comes back, the account is labelled as automated
-            <template v-if="autoClose">and the PR/issue is closed</template
-            ><template v-else>
-              — enable auto-close above to close it as well</template
-            >.
+            <template v-if="autoClose"
+              >When the code comes back, the PR/issue is closed.</template
+            ><template v-else
+              >Enable auto-close above to close the PR/issue when the code comes
+              back.</template
+            >
           </p>
 
           <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-4 pl-6">

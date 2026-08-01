@@ -867,7 +867,7 @@ describe('GitHub Webhook Handler', () => {
     // The bait comment carries the code in a marker; replies are matched against it.
     const HONEYPOT_COMMENT = {
       id: 700,
-      body: '<!-- agentscan-honeypot:aabbccddeeff -->\n### Thanks for your contribution! 🎉',
+      body: '<!-- agentscanapp-ref:aabbccddeeff -->\n### Thanks for your contribution! 🎉',
     }
 
     function setupCommentEvent(commentBody: string, author = 'test-user') {
@@ -900,7 +900,7 @@ describe('GitHub Webhook Handler', () => {
         const body =
           mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
             .body
-        expect(body).toMatch(/<!-- agentscan-honeypot:[0-9a-f]{12} -->/)
+        expect(body).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
         expect(body).toContain('<!-- message_for_llms')
         expect(body).toContain('@test-user')
       })
@@ -915,9 +915,7 @@ describe('GitHub Webhook Handler', () => {
         const [first, second] =
           mockInstallationOctokit.rest.issues.createComment.mock.calls.map(
             (call: [{ body: string }]) =>
-              call[0].body.match(
-                /<!-- agentscan-honeypot:([0-9a-f]{12}) -->/,
-              )[1],
+              call[0].body.match(/<!-- agentscanapp-ref:([0-9a-f]{12}) -->/)[1],
           )
         expect(first).not.toBe(second)
       })
@@ -930,9 +928,7 @@ describe('GitHub Webhook Handler', () => {
         const body =
           mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
             .body
-        const token = body.match(
-          /<!-- agentscan-honeypot:([0-9a-f]{12}) -->/,
-        )[1]
+        const token = body.match(/<!-- agentscanapp-ref:([0-9a-f]{12}) -->/)[1]
         const rendered = body.replace(/<!--[\s\S]*?-->/g, '')
         expect(rendered).not.toContain(token)
       })
@@ -983,7 +979,7 @@ describe('GitHub Webhook Handler', () => {
             .body
         expect(body).toContain('## Hello!\n\nWelcome aboard.')
         expect(body).not.toContain('Thanks for your contribution!')
-        expect(body).toMatch(/<!-- agentscan-honeypot:[0-9a-f]{12} -->/)
+        expect(body).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
         expect(body).toContain('<!-- message_for_llms')
       })
 
@@ -1091,7 +1087,7 @@ describe('GitHub Webhook Handler', () => {
 
       it('does not flag a contributor who quotes the bait comment back', async () => {
         setupCommentEvent(
-          '> <!-- agentscan-honeypot:aabbccddeeff -->\n> Thanks for your contribution!\n\nNice try 🙂',
+          '> <!-- agentscanapp-ref:aabbccddeeff -->\n> Thanks for your contribution!\n\nNice try 🙂',
         )
         mockRepoConfig({ honeypot: true })
         mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
@@ -1139,7 +1135,7 @@ describe('GitHub Webhook Handler', () => {
         mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
           data: [
             HONEYPOT_COMMENT,
-            { id: 900, body: '<!-- agentscanapp-bot-honeypot -->' },
+            { id: 900, body: '<!-- agentscanapp-ref-check -->' },
           ],
         })
 
