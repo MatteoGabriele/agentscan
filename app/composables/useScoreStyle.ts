@@ -32,11 +32,11 @@ export function useScoreStyle(
       }
     }
 
-    if (!classificationValue) {
+    if (!classificationValue || classificationValue === 'insufficient-data') {
       return {
-        text: 'text-gray-500',
-        border: 'border-gray-500',
-        background: 'bg-gray-500',
+        text: 'text-gh-muted',
+        border: 'border-gh-border',
+        background: 'bg-gh-bg',
       }
     }
 

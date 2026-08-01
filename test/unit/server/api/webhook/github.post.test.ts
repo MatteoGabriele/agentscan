@@ -340,25 +340,28 @@ describe('GitHub Webhook Handler', () => {
 
       expect(identify).toHaveBeenCalledWith(
         expect.objectContaining({
-          accountName: 'test-user',
-          reposCount: 25,
-          createdAt: '2019-06-15T00:00:00Z',
+          user: {
+            created_at: '2019-06-15T00:00:00Z',
+            public_repos: 25,
+          },
         }),
       )
     })
 
-    it('returns classification and flagged status', async () => {
+    it('returns reported/flagged status', async () => {
       vi.mocked(identify).mockReturnValue({
         ...MOCK_ANALYSIS,
-        classification: 'automation',
+        classification: 'organic',
       })
+
+      mockVerifiedList(['test-user'])
 
       const result = await handler(MOCK_EVENT)
 
       expect(result).toMatchObject({
         ok: true,
         flagged: true,
-        classification: 'automation',
+        classification: 'organic',
       })
     })
 
@@ -1349,7 +1352,7 @@ describe('GitHub Webhook Handler', () => {
 
       const commentCall =
         mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
-      expect(commentCall.body).toContain('[🚩 Report this account →]')
+      expect(commentCall.body).toContain('[Report this account →]')
       expect(commentCall.body).toContain(
         'https://github.com/matteogabriele/agentscan/issues/new',
       )

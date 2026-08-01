@@ -8,6 +8,7 @@ import { Octokit } from 'octokit'
 import type { IdentifyResult } from '@unveil/identity'
 import { hashPrId } from './pr-hash'
 import { pack, unpack } from '../shared/utils/compactor'
+import { INSUFFICIENT_DATA_SCORE } from '../shared/utils/health-stats'
 import type { PrStatus } from '../shared/types/ecosystem-health'
 
 // Configuration
@@ -227,6 +228,11 @@ export async function main(options: ScanOptions = {}) {
     let score = scanData.analysis.score
     const eventsCount = scanData.eventsCount ?? 0
 
+    if (scanData.analysis.classification === 'insufficient-data') {
+      score = INSUFFICIENT_DATA_SCORE
+    }
+
+    // A confirmed automation stays an automation regardless of data volume.
     if (verifiedAutomations.has(user.id)) {
       score = 0
     }
@@ -243,8 +249,10 @@ export async function main(options: ScanOptions = {}) {
       is_bounty: scanData.analysis.isBountyHunter,
     })
 
-    const currentScore = repoScores.get(user.repo_name) ?? 0
-    repoScores.set(user.repo_name, currentScore + score)
+    if (score !== INSUFFICIENT_DATA_SCORE) {
+      const currentScore = repoScores.get(user.repo_name) ?? 0
+      repoScores.set(user.repo_name, currentScore + score)
+    }
 
     completedCount++
 

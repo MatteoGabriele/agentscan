@@ -44,20 +44,12 @@ export function isOwnComment(
 
 /**
  * Reads the verification code back out of a honeypot comment. Returns null for
- * any comment that isn't one of ours.
+ * any comment that doesn't have the matching marker.
  */
 export function extractHoneypotToken(body: string | null | undefined) {
   return body?.match(TOKEN_MARKER)?.[1] ?? null
 }
 
-/**
- * True when a contributor's reply reproduces the code.
- *
- * HTML comments and quoted lines are stripped first: a contributor who quotes
- * our comment back — raw Markdown and all — is echoing the trap, not falling
- * for it. What's left has to contain the code as a standalone word, which at 48
- * bits of entropy cannot happen by accident.
- */
 export function hasHoneypotToken(
   body: string | null | undefined,
   token: string,
@@ -73,10 +65,6 @@ export function hasHoneypotToken(
   return new RegExp(`\\b${token}\\b`).test(withoutQuotes)
 }
 
-/**
- * Fills the placeholders a maintainer can use in a custom greeting. Anything
- * else is left untouched.
- */
 function renderGreeting(
   greeting: string,
   { username, subject }: { username: string; subject: string },
@@ -111,14 +99,6 @@ function buildDefaultGreeting({
   ]
 }
 
-/**
- * The bait. Deliberately unbranded — naming AgentScan here would tell the agent
- * exactly what the hidden block is for.
- *
- * The visible greeting is the only part a maintainer can replace: the marker
- * and the hidden notice below it are what makes the trap work, so they are
- * always appended, whatever the greeting says.
- */
 export function buildHoneypotComment({
   token,
   username,
