@@ -36,12 +36,12 @@ const { trackEvent } = useSaEvent()
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
       <NuxtLink
         to="/app"
-        class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
+        class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap cta-glint"
         title="Install the GitHub App or use the GitHub Action"
         @click="trackEvent('get_agentscan_clicked')"
       >
         <span class="i-lucide-github"></span>
-        <span>Get AgentScan</span>
+        <span>Install AgentScan</span>
       </NuxtLink>
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
