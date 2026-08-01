@@ -45,6 +45,8 @@
   --event-automation-fork: #5b7c99;
   --event-automation-comment: #c4b5fd;
   --chart-dot: #c084fc;
+  --sheen: rgba(240, 240, 240, 0.16);
+  --glint: rgba(255, 255, 255, 0.85);
 }
 
 :root[data-theme='light'] {
@@ -86,10 +88,68 @@
   --event-automation-fork: #4b6584;
   --event-automation-comment: #8b5cf6;
   --chart-dot: #7c3aed;
+  --sheen: rgba(34, 34, 34, 0.09);
+  --glint: rgba(34, 34, 34, 0.55);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+}
+
+@property --glint-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.cta-glint {
+  position: relative;
+}
+
+.cta-glint::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--glint-angle),
+    transparent 0deg,
+    transparent 26deg,
+    var(--glint) 34deg,
+    transparent 42deg,
+    transparent 360deg
+  );
+  -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  -webkit-mask-clip: content-box, border-box;
+  mask-clip: content-box, border-box;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cta-glint::after {
+    animation: glint 5s linear infinite;
+  }
+}
+
+@keyframes glint {
+  0% {
+    --glint-angle: 236deg;
+    opacity: 1;
+    animation-timing-function: ease-in-out;
+  }
+  38% {
+    opacity: 1;
+  }
+  45%,
+  100% {
+    --glint-angle: 596deg;
+    opacity: 0;
+  }
 }

@@ -78,11 +78,11 @@ onBeforeUnmount(() => {
 
       <NuxtLink
         to="/app"
-        class="flex items-center px-4 gap-1 py-1 font-medium rounded-full border border-gh-border text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap"
+        class="flex items-center px-4 gap-1 py-1 font-medium rounded-full border border-gh-border text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap cta-glint"
         title="Install the GitHub App or use the GitHub Action"
       >
         <span class="i-lucide-github text-sm"></span>
-        <span>Get AgentScan</span>
+        <span>Install AgentScan</span>
       </NuxtLink>
 
       <LazyContributorsList class="my-12" />
