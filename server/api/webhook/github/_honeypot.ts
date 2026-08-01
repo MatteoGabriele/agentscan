@@ -23,6 +23,26 @@ export function createHoneypotToken(): string {
 }
 
 /**
+ * True when a comment was posted by this GitHub App.
+ *
+ * Anyone can write the marker into a comment, so the marker alone says nothing
+ * about who issued the code inside it. Only a comment GitHub attributes to our
+ * app is a token we handed out.
+ */
+export function isOwnComment(
+  comment: { performed_via_github_app?: { id?: number } | null },
+  appId: string | number | undefined,
+) {
+  const id = comment.performed_via_github_app?.id
+
+  if (id === undefined || id === null || !appId) {
+    return false
+  }
+
+  return String(id) === String(appId)
+}
+
+/**
  * Reads the verification code back out of a honeypot comment. Returns null for
  * any comment that isn't one of ours.
  */

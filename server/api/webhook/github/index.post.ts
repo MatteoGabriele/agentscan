@@ -24,6 +24,7 @@ import {
   extractHoneypotToken,
   hasHoneypotToken,
   HONEYPOT_RESULT_MARKER,
+  isOwnComment,
 } from './_honeypot'
 
 type AutomationListItem = {
@@ -162,18 +163,43 @@ export default defineEventHandler(async (event) => {
       return { ok: true }
     }
 
-    const { data: comments } = await octokit.rest.issues.listComments({
-      owner,
-      repo,
-      issue_number: targetNumber,
-      per_page: 100,
-    })
+    // Paginated: on a long thread the bait comment is not on the last page, and
+    // missing it would mean never matching the reply that sprang the trap.
+    const comments = await octokit
+      .paginate(octokit.rest.issues.listComments, {
+        owner,
+        repo,
+        issue_number: targetNumber,
+        per_page: 100,
+      })
+      .catch((err: unknown) => {
+        if (
+          err instanceof Error &&
+          !err.message.includes('Resource not accessible')
+        ) {
+          throw err
+        }
+        // thread unreadable — no way to tell whether the trap was sprung
+        return null
+      })
 
-    if (comments.some((c) => c.body?.includes(HONEYPOT_RESULT_MARKER))) {
+    if (!comments) {
       return { ok: true }
     }
 
-    const token = comments
+    // Only our own comments count: the code the reply is matched against has to
+    // be one we issued, or a third party could plant a marker holding a code the
+    // author is likely to type anyway (a short commit SHA is 12 hex characters
+    // too) and have their contribution closed for them.
+    const ownComments = comments.filter((c) =>
+      isOwnComment(c, config.githubAppId),
+    )
+
+    if (ownComments.some((c) => c.body?.includes(HONEYPOT_RESULT_MARKER))) {
+      return { ok: true }
+    }
+
+    const token = ownComments
       .map((c) => extractHoneypotToken(c.body))
       .find((value): value is string => value !== null)
 
@@ -181,9 +207,9 @@ export default defineEventHandler(async (event) => {
       return { ok: true }
     }
 
-    const closed = repoConfig['auto-close']
+    let closed = false
 
-    if (closed) {
+    if (repoConfig['auto-close']) {
       try {
         await octokit.rest.issues.update({
           owner,
@@ -192,6 +218,7 @@ export default defineEventHandler(async (event) => {
           state: 'closed',
           state_reason: 'not_planned',
         })
+        closed = true
       } catch (err: unknown) {
         if (
           err instanceof Error &&
@@ -409,15 +436,25 @@ export default defineEventHandler(async (event) => {
     // `honeypot: true` into a silent no-op. Enabling it is the opt-in.
     if (repoConfig.honeypot && !shouldAutoClose) {
       try {
-        const { data: comments } = await octokit.rest.issues.listComments({
-          owner,
-          repo,
-          issue_number: targetNumber,
-          per_page: 100,
-        })
+        // Paginated for the same reason as the reply path: an existing bait on
+        // an earlier page must still count, or we would post a second one.
+        const comments = await octokit.paginate(
+          octokit.rest.issues.listComments,
+          {
+            owner,
+            repo,
+            issue_number: targetNumber,
+            per_page: 100,
+          },
+        )
 
+        // Same reason as on the reply path: a marker in someone else's comment
+        // is not a bait we posted, and honouring it would let a contributor
+        // suppress the trap by writing one themselves.
         const alreadyBaited = comments.some(
-          (c) => extractHoneypotToken(c.body) !== null,
+          (c) =>
+            isOwnComment(c, config.githubAppId) &&
+            extractHoneypotToken(c.body) !== null,
         )
 
         if (!alreadyBaited) {
