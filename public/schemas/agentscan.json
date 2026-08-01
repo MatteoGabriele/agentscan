@@ -52,6 +52,11 @@
       },
       "examples": [["owner", "member", "collaborator"]]
     },
+    "honeypot": {
+      "description": "Create a bait comment to make agent come forward",
+      "type": "boolean",
+      "default": false
+    },
     "comment-on-organic": {
       "description": "Post a comment even when the analysis result is 'organic'. Organic accounts are silenced by default.",
       "type": "boolean",
