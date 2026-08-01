@@ -19,6 +19,7 @@ export type RepoConfig = {
   'trusted-author-associations': AuthorAssociation[]
   'auto-close': boolean
   'auto-close-classifications': IdentityClassification[]
+  honeypot: boolean
   mode: ScanMode
   'comment-on-organic': boolean
   scan: {
@@ -36,6 +37,12 @@ export type RepoConfig = {
     automation: string
     'insufficient-data': string
     'community-flagged': string
+    /**
+     * Replaces the visible greeting of the honeypot comment. The hidden
+     * verification block is always appended. It is what the trap is made of.
+     * Supports `{username}` and `{type}` placeholders.
+     */
+    honeypot: string
   }
 }
 
@@ -45,6 +52,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
   'trusted-author-associations': [],
   'auto-close': false,
   'auto-close-classifications': ['automation'],
+  honeypot: false,
   mode: 'full',
   'comment-on-organic': false,
   scan: {
@@ -62,6 +70,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
     automation: '',
     'community-flagged': '',
     'insufficient-data': '',
+    honeypot: '',
   },
 }
 

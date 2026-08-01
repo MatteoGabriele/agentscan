@@ -58,6 +58,7 @@ const trustedAuthorAssociations = ref<AuthorAssociation[]>([])
 const commentOnOrganic = ref(false)
 const autoClose = ref(false)
 const autoCloseClassifications = ref<Classification[]>(['automation'])
+const honeypot = ref(false)
 
 const labelCommunityFlagged = ref(DEFAULT_LABELS['community-flagged'])
 const labelMixed = ref(DEFAULT_LABELS.mixed)
@@ -67,6 +68,7 @@ const messageOrganic = ref('')
 const messageMixed = ref('')
 const messageAutomation = ref('')
 const messageCommunityFlagged = ref('')
+const messageHoneypot = ref('')
 
 function addAllowedUser() {
   const users = newAllowedUser.value
@@ -132,6 +134,10 @@ const yaml = computed(() => {
     }
   }
 
+  if (honeypot.value) {
+    config.honeypot = true
+  }
+
   if (mode.value !== 'full') {
     config.mode = mode.value
   }
@@ -160,6 +166,9 @@ const yaml = computed(() => {
   }
   if (messageCommunityFlagged.value) {
     messages['community-flagged'] = messageCommunityFlagged.value
+  }
+  if (honeypot.value && messageHoneypot.value) {
+    messages.honeypot = messageHoneypot.value
   }
 
   if (Object.keys(messages).length > 0) {
@@ -360,6 +369,53 @@ const { copy, copied } = useClipboard({ source: yaml })
               />
               {{ item.label }}
             </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+      >
+        <legend class="sr-only">Honeypot</legend>
+        <div>
+          <p class="text-sm font-medium text-gh-text">Honeypot</p>
+          <p class="text-xs text-gh-muted mt-1">
+            Posts an ordinary thank-you comment with a one-off verification code
+            hidden in its raw Markdown, addressed only at AI agents. An agent
+            that reads the page source and replies with the code identifies
+            itself.
+          </p>
+        </div>
+        <div class="self-start">
+          <label
+            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+          >
+            <input v-model="honeypot" type="checkbox" class="accent-gh-green" />
+            Post a honeypot comment on new PRs/issues
+          </label>
+
+          <p v-if="honeypot" class="text-xs text-gh-muted mt-3 pl-6">
+            <template v-if="autoClose"
+              >When the code comes back, the PR/issue is closed.</template
+            ><template v-else
+              >Enable auto-close above to close the PR/issue when the code comes
+              back.</template
+            >
+          </p>
+
+          <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-4 pl-6">
+            <span class="text-xs text-gh-muted">Greeting</span>
+            <CommonMarkdownEditor
+              v-model="messageHoneypot"
+              placeholder="Default greeting"
+            />
+            <p class="text-xs text-gh-muted">
+              Replaces the visible thank-you message. The hidden verification
+              code is always added underneath. Use
+              <span class="font-mono">{username}</span> and
+              <span class="font-mono">{type}</span> (pull request or issue) as
+              placeholders.
+            </p>
           </div>
         </div>
       </fieldset>

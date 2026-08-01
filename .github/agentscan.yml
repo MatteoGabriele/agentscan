@@ -11,6 +11,7 @@ allowed-users:
   - huang-julien
 
 auto-close: true
+honeypot: true
 auto-close-classifications:
   - automation
   - mixed
