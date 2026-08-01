@@ -93,15 +93,19 @@ export default defineEventHandler(async (event) => {
   const isPR = isCommentEvent
     ? !!payload.issue.pull_request
     : !!payload.pull_request
+
   const isIssue = isCommentEvent ? !payload.issue.pull_request : !!payload.issue
 
   const targetNumber: number | undefined =
     payload.pull_request?.number ?? payload.issue?.number
+
   const username: string | undefined =
     payload.pull_request?.user?.login ?? payload.issue?.user?.login
+
   const rawAuthorAssociation: string | undefined =
     payload.pull_request?.author_association ??
     payload.issue?.author_association
+
   const authorAssociation = rawAuthorAssociation?.toLowerCase() as
     | AuthorAssociation
     | undefined
@@ -137,13 +141,14 @@ export default defineEventHandler(async (event) => {
       repo,
       path: '.github/agentscan.yml',
     })
+
     if ('content' in data) {
       repoConfig = parseRepoConfig(
         Buffer.from(data.content, 'base64').toString('utf-8'),
       )
     }
   } catch {
-    // no config file — use defaults
+    // no config file. use defaults
   }
 
   if (isCommentEvent) {
@@ -179,7 +184,7 @@ export default defineEventHandler(async (event) => {
         ) {
           throw err
         }
-        // thread unreadable — no way to tell whether the trap was sprung
+        // thread unreadable. no way to tell whether the trap was sprung
         return null
       })
 
@@ -245,7 +250,7 @@ export default defineEventHandler(async (event) => {
         await octokit.rest.issues
           .createLabel({ owner, repo, name: label, color: 'ededed' })
           .catch(() => {
-            // label already exists or no create permission — continue to addLabels
+            // label already exists or no create permission
           })
         await octokit.rest.issues.addLabels({
           owner,
@@ -283,7 +288,7 @@ export default defineEventHandler(async (event) => {
       })
       checkRunId = checkRun.id
     } catch {
-      // checks:write permission not granted — continue without a check run
+      // checks:write permission not granted
     }
   }
 
@@ -309,7 +314,7 @@ export default defineEventHandler(async (event) => {
         output: { title, summary },
       })
       .catch(() => {
-        // check run update failed — nothing further we can do
+        // check run update failed
       })
   }
 
@@ -369,16 +374,13 @@ export default defineEventHandler(async (event) => {
         ) as AutomationListItem[]
       }
     } catch {
-      // list unavailable — continue without it
+      // list unavailable
     }
 
     const hasCommunityFlag = verified.some((a) => a.username === username)
     const userId: number | undefined = user.id
 
-    const analysis: IdentifyResult = identify({
-      user,
-      events,
-    })
+    const analysis: IdentifyResult = identify({ user, events })
 
     const details = hasCommunityFlag
       ? {
@@ -389,6 +391,7 @@ export default defineEventHandler(async (event) => {
       : getClassificationDetails(analysis.classification)
 
     let description = details.description
+
     if (hasCommunityFlag && repoConfig.messages['community-flagged']) {
       description = repoConfig.messages['community-flagged']
     } else if (
@@ -431,13 +434,10 @@ export default defineEventHandler(async (event) => {
     // Posted before any early return: the honeypot exists precisely to catch
     // the accounts that the activity heuristics read as organic.
     //
-    // `mode` deliberately does not apply here. The bait *is* a comment — there
-    // is no honeypot without one — so honouring silent/labels mode would turn
-    // `honeypot: true` into a silent no-op. Enabling it is the opt-in.
+    // `mode` deliberately does not apply here. The bait is a comment: there
+    // is no honeypot without one.
     if (repoConfig.honeypot && !shouldAutoClose) {
       try {
-        // Paginated for the same reason as the reply path: an existing bait on
-        // an earlier page must still count, or we would post a second one.
         const comments = await octokit.paginate(
           octokit.rest.issues.listComments,
           {
@@ -448,9 +448,6 @@ export default defineEventHandler(async (event) => {
           },
         )
 
-        // Same reason as on the reply path: a marker in someone else's comment
-        // is not a bait we posted, and honouring it would let a contributor
-        // suppress the trap by writing one themselves.
         const alreadyBaited = comments.some(
           (c) =>
             isOwnComment(c, config.githubAppId) &&
@@ -521,8 +518,7 @@ export default defineEventHandler(async (event) => {
           })
         : null
 
-    // Rendered inline (no sourceUrl - pointing back at the PR/issue it's already on is redundant)
-    // so a reviewer can see the evidence without leaving this page.
+    // Rendered inline so a reviewer can see the evidence without leaving this page.
     const evidenceLines =
       analysis.flags.length > 0
         ? buildEvidenceLines({ flags: analysis.flags })
@@ -603,7 +599,7 @@ export default defineEventHandler(async (event) => {
               octokit.rest.issues
                 .createLabel({ owner, repo, name, color: 'ededed' })
                 .catch(() => {
-                  // label already exists or no create permission — continue to addLabels
+                  // label already exists or no create permission
                 }),
             ),
           )
