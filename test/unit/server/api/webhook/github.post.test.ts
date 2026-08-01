@@ -18,6 +18,17 @@ const {
   const mockWebhooks = { verify: vi.fn() }
 
   const mockInstallationOctokit = {
+    // Mirrors octokit's paginate: calls the endpoint and unwraps `data`, so the
+    // per-test `listComments.mockResolvedValue({ data })` setups still apply.
+    paginate: vi.fn(
+      async (
+        endpoint: (params: unknown) => Promise<{ data: unknown[] }>,
+        params: unknown,
+      ) => {
+        const { data } = await endpoint(params)
+        return data
+      },
+    ),
     rest: {
       repos: { getContent: vi.fn() },
       users: { getByUsername: vi.fn() },
@@ -864,10 +875,14 @@ describe('GitHub Webhook Handler', () => {
   })
 
   describe('Honeypot', () => {
+    // Markers are only trusted on comments GitHub attributes to our app.
+    const OWN_APP = { performed_via_github_app: { id: 'test-app-id' } }
+
     // The bait comment carries the code in a marker; replies are matched against it.
     const HONEYPOT_COMMENT = {
       id: 700,
       body: '<!-- agentscanapp-ref:aabbccddeeff -->\n### Thanks for your contribution! 🎉',
+      ...OWN_APP,
     }
 
     function setupCommentEvent(commentBody: string, author = 'test-user') {
@@ -903,6 +918,17 @@ describe('GitHub Webhook Handler', () => {
         expect(body).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
         expect(body).toContain('<!-- message_for_llms')
         expect(body).toContain('@test-user')
+      })
+
+      it('reads every page of comments before deciding a bait already exists', async () => {
+        mockRepoConfig({ honeypot: true })
+
+        await handler(MOCK_EVENT)
+
+        expect(mockInstallationOctokit.paginate).toHaveBeenCalledWith(
+          mockInstallationOctokit.rest.issues.listComments,
+          expect.objectContaining({ issue_number: 123, per_page: 100 }),
+        )
       })
 
       it('generates a different code for every PR', async () => {
@@ -944,6 +970,20 @@ describe('GitHub Webhook Handler', () => {
         expect(
           mockInstallationOctokit.rest.issues.createComment,
         ).not.toHaveBeenCalled()
+      })
+
+      it('still posts the bait when the existing marker is not the app’s', async () => {
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [{ id: 700, body: HONEYPOT_COMMENT.body }],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body,
+        ).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
       })
 
       it('does not post a honeypot comment when the PR is auto-closed anyway', async () => {
@@ -1058,6 +1098,21 @@ describe('GitHub Webhook Handler', () => {
         )
       })
 
+      it('reads every page of comments when looking for the bait code', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [HONEYPOT_COMMENT],
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(mockInstallationOctokit.paginate).toHaveBeenCalledWith(
+          mockInstallationOctokit.rest.issues.listComments,
+          expect.objectContaining({ issue_number: 123, per_page: 100 }),
+        )
+      })
+
       it('matches the code even when the agent wraps it in formatting', async () => {
         setupCommentEvent('`aabbccddeeff`')
         mockRepoConfig({ honeypot: true })
@@ -1135,7 +1190,7 @@ describe('GitHub Webhook Handler', () => {
         mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
           data: [
             HONEYPOT_COMMENT,
-            { id: 900, body: '<!-- agentscanapp-ref-check -->' },
+            { id: 900, body: '<!-- agentscanapp-ref-check -->', ...OWN_APP },
           ],
         })
 
@@ -1145,6 +1200,39 @@ describe('GitHub Webhook Handler', () => {
         expect(
           mockInstallationOctokit.rest.issues.createComment,
         ).not.toHaveBeenCalled()
+      })
+
+      it('ignores a marker planted by someone other than the app', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true, 'auto-close': true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [{ id: 700, body: HONEYPOT_COMMENT.body }],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true })
+        expect(
+          mockInstallationOctokit.rest.issues.update,
+        ).not.toHaveBeenCalled()
+        expect(
+          mockInstallationOctokit.rest.issues.createComment,
+        ).not.toHaveBeenCalled()
+      })
+
+      it('ignores a result marker planted by someone else', async () => {
+        setupCommentEvent('aabbccddeeff')
+        mockRepoConfig({ honeypot: true })
+        mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
+          data: [
+            HONEYPOT_COMMENT,
+            { id: 900, body: '<!-- agentscanapp-ref-check -->' },
+          ],
+        })
+
+        const result = await handler(MOCK_EVENT)
+
+        expect(result).toEqual({ ok: true, honeypot: 'triggered' })
       })
 
       it('closes the PR when auto-close is enabled', async () => {
