@@ -160,12 +160,27 @@ export default defineEventHandler(async (event) => {
 
     // Paginated: on a long thread the bait comment is not on the last page, and
     // missing it would mean never matching the reply that sprang the trap.
-    const comments = await octokit.paginate(octokit.rest.issues.listComments, {
-      owner,
-      repo,
-      issue_number: targetNumber,
-      per_page: 100,
-    })
+    const comments = await octokit
+      .paginate(octokit.rest.issues.listComments, {
+        owner,
+        repo,
+        issue_number: targetNumber,
+        per_page: 100,
+      })
+      .catch((err: unknown) => {
+        if (
+          err instanceof Error &&
+          !err.message.includes('Resource not accessible')
+        ) {
+          throw err
+        }
+        // thread unreadable — no way to tell whether the trap was sprung
+        return null
+      })
+
+    if (!comments) {
+      return { ok: true }
+    }
 
     // Only our own comments count: the code the reply is matched against has to
     // be one we issued, or a third party could plant a marker holding a code the
