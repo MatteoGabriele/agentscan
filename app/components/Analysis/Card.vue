@@ -218,8 +218,6 @@ useSeoAnalysis(identifyAnalysis, {
               >
               from this account
             </p>
-
-            <!-- <AnalysisDataCoverage v-if="coverageLevel" :level="coverageLevel" /> -->
           </div>
         </template>
 
