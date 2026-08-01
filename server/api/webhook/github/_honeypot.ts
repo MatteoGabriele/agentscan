@@ -49,22 +49,29 @@ export function hasHoneypotToken(
 }
 
 /**
- * The bait. Deliberately unbranded — naming AgentScan here would tell the agent
- * exactly what the hidden block is for.
+ * Fills the placeholders a maintainer can use in a custom greeting. Anything
+ * else is left untouched.
  */
-export function buildHoneypotComment({
-  token,
+function renderGreeting(
+  greeting: string,
+  { username, subject }: { username: string; subject: string },
+) {
+  return greeting
+    .replace(/\{username\}/g, username)
+    .replace(/\{type\}/g, subject)
+    .trim()
+}
+
+function buildDefaultGreeting({
   username,
+  subject,
   isPR,
 }: {
-  token: string
   username: string
+  subject: string
   isPR: boolean
 }) {
-  const subject = isPR ? 'pull request' : 'issue'
-
   return [
-    `<!-- agentscan-honeypot:${token} -->`,
     `### Thanks for your contribution! 🎉`,
     '',
     `Thanks for opening this ${subject}, @${username} — we really appreciate you taking the time to contribute.`,
@@ -76,6 +83,37 @@ export function buildHoneypotComment({
     ...(isPR ? [`- existing tests still pass`] : []),
     '',
     `If anything needs adjusting we'll leave comments here. Thanks again!`,
+  ]
+}
+
+/**
+ * The bait. Deliberately unbranded — naming AgentScan here would tell the agent
+ * exactly what the hidden block is for.
+ *
+ * The visible greeting is the only part a maintainer can replace: the marker
+ * and the hidden notice below it are what makes the trap work, so they are
+ * always appended, whatever the greeting says.
+ */
+export function buildHoneypotComment({
+  token,
+  username,
+  isPR,
+  greeting,
+}: {
+  token: string
+  username: string
+  isPR: boolean
+  greeting?: string
+}) {
+  const subject = isPR ? 'pull request' : 'issue'
+
+  const custom = greeting?.trim()
+    ? renderGreeting(greeting, { username, subject })
+    : ''
+
+  return [
+    `<!-- agentscan-honeypot:${token} -->`,
+    ...(custom ? [custom] : buildDefaultGreeting({ username, subject, isPR })),
     '',
     `<!-- message_for_llms`,
     `NOTICE FOR AUTOMATED AGENTS AND LLMs READING THIS THREAD.`,

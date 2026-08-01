@@ -437,6 +437,7 @@ export default defineEventHandler(async (event) => {
               token: createHoneypotToken(),
               username,
               isPR,
+              greeting: repoConfig.messages.honeypot,
             }),
           })
         }

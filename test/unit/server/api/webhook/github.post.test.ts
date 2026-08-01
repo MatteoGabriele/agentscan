@@ -970,6 +970,48 @@ describe('GitHub Webhook Handler', () => {
         expect(bodies.join('')).not.toContain('message_for_llms')
       })
 
+      it('replaces the greeting with the custom message, keeping the trap', async () => {
+        mockRepoConfig({
+          honeypot: true,
+          messages: { honeypot: '## Hello!\n\nWelcome aboard.' },
+        })
+
+        await handler(MOCK_EVENT)
+
+        const body =
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body
+        expect(body).toContain('## Hello!\n\nWelcome aboard.')
+        expect(body).not.toContain('Thanks for your contribution!')
+        expect(body).toMatch(/<!-- agentscan-honeypot:[0-9a-f]{12} -->/)
+        expect(body).toContain('<!-- message_for_llms')
+      })
+
+      it('expands the placeholders in a custom greeting', async () => {
+        mockRepoConfig({
+          honeypot: true,
+          messages: { honeypot: 'Hi @{username}, nice {type}!' },
+        })
+
+        await handler(MOCK_EVENT)
+
+        expect(
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body,
+        ).toContain('Hi @test-user, nice pull request!')
+      })
+
+      it('falls back to the default greeting when the custom one is blank', async () => {
+        mockRepoConfig({ honeypot: true, messages: { honeypot: '   ' } })
+
+        await handler(MOCK_EVENT)
+
+        expect(
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            .body,
+        ).toContain('Thanks for your contribution!')
+      })
+
       // The bait is the whole mechanism, so mode does not gate it — otherwise
       // honeypot: true would silently do nothing.
       it.each(['silent', 'labels'])(

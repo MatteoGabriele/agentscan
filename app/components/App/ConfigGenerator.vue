@@ -68,6 +68,7 @@ const messageOrganic = ref('')
 const messageMixed = ref('')
 const messageAutomation = ref('')
 const messageCommunityFlagged = ref('')
+const messageHoneypot = ref('')
 
 function addAllowedUser() {
   const users = newAllowedUser.value
@@ -165,6 +166,9 @@ const yaml = computed(() => {
   }
   if (messageCommunityFlagged.value) {
     messages['community-flagged'] = messageCommunityFlagged.value
+  }
+  if (honeypot.value && messageHoneypot.value) {
+    messages.honeypot = messageHoneypot.value
   }
 
   if (Object.keys(messages).length > 0) {
@@ -399,6 +403,21 @@ const { copy, copied } = useClipboard({ source: yaml })
               — enable auto-close above to close it as well</template
             >.
           </p>
+
+          <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-4 pl-6">
+            <span class="text-xs text-gh-muted">Greeting</span>
+            <CommonMarkdownEditor
+              v-model="messageHoneypot"
+              placeholder="Default greeting"
+            />
+            <p class="text-xs text-gh-muted">
+              Replaces the visible thank-you message. The hidden verification
+              code is always added underneath. Use
+              <span class="font-mono">{username}</span> and
+              <span class="font-mono">{type}</span> (pull request or issue) as
+              placeholders.
+            </p>
+          </div>
         </div>
       </fieldset>
 

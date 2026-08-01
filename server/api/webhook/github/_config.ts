@@ -36,6 +36,12 @@ export type RepoConfig = {
     mixed: string
     automation: string
     'community-flagged': string
+    /**
+     * Replaces the visible greeting of the honeypot comment. The hidden
+     * verification block is always appended. It is what the trap is made of.
+     * Supports `{username}` and `{type}` placeholders.
+     */
+    honeypot: string
   }
 }
 
@@ -62,6 +68,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
     mixed: '',
     automation: '',
     'community-flagged': '',
+    honeypot: '',
   },
 }
 
