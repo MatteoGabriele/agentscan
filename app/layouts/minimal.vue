@@ -20,7 +20,7 @@ useHead({
     },
     {
       property: 'og:description',
-      content: 'An open experiment in detecting automation patterns on GitHub',
+      content: 'Automation pattern detection for open source maintainers',
     },
     { property: 'og:type', content: 'website' },
     { name: 'color-scheme', content: colorScheme },

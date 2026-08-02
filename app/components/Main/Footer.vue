@@ -16,8 +16,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
           <div>
             <h3 class="text-sm font-semibold text-gh-text mb-3">AgentScan</h3>
             <p class="text-xs text-gh-muted/80 leading-relaxed">
-              An experimental tool for analyzing GitHub activity patterns and
-              behavioral signals.
+              Automation pattern detection for open source maintainers.
             </p>
           </div>
         </div>

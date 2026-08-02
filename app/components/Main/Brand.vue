@@ -15,7 +15,7 @@ const { headingLevel = 'h1' } = defineProps<{
     </div>
 
     <p class="text-gh-muted text-pretty">
-      An open experiment in detecting automation patterns on GitHub
+      Automation pattern detection for open source maintainers
     </p>
   </div>
 </template>

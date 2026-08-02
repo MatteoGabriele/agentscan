@@ -32,7 +32,7 @@ function clear() {
     @submit.prevent="handleSubmit"
   >
     <label class="flex-1" for="userName">
-      <span class="sr-only">Enter account name</span>
+      <span class="sr-only">Enter a GitHub account name</span>
       <input
         id="userName"
         ref="inputRef"
@@ -44,7 +44,7 @@ function clear() {
         spellcheck="false"
         autocapitalize="none"
         name="userName"
-        placeholder="Search accounts (e.g. torvalds)"
+        placeholder="GitHub account (e.g. torvalds)"
       />
     </label>
     <div class="flex items-center gap-2">

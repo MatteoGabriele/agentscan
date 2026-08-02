@@ -11,7 +11,7 @@ useHead({
     {
       property: 'og:description',
       content:
-        'Install the AgentScan GitHub App, built for maintainers dealing with automated accounts on GitHub. Zero config.',
+        'Install the AgentScan GitHub App, built for open source maintainers against automation spam. Zero config.',
     },
     { property: 'og:type', content: 'website' },
   ],
@@ -37,12 +37,13 @@ const { trackEvent } = useSaEvent()
           <div>
             <h1 class="text-2xl font-semibold">AgentScan GitHub App</h1>
             <p class="mt-1 mb-6 text-gh-text/80">
-              Built for maintainers dealing with automated accounts on GitHub
+              Built for open source maintainers against automation spam
             </p>
 
             <p class="text-gh-muted mt-2 max-w-md mx-auto text-pretty">
               Zero config. Works instantly. Fully open-source. <br />Install it
-              on your repositories and let it scan for you.
+              on your repositories and let it handle the spam while you focus on
+              the project.
             </p>
           </div>
 
