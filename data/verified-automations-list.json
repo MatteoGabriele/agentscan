@@ -306,7 +306,7 @@
   {
     "username": "deepshekhardas",
     "id": 144223923,
-    "reason": "The account explicitly states it uses AI agent swarms to open pull requests daily in OSS projects. Recently, they opened 18 pull requests on the vercel/next.js project within two days. They have a strange goal of 8000+ OSS PRs.",
+    "reason": "The account explicitly states that it uses AI agent swarms to open pull requests daily for OSS projects. Recently, it opened 18 PRs for Next.js within two days and 44 PRs for Supabase at the same time. They have a strange goal of 8000+ OSS PRs.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/299",
     "reportedBy": "MatteoGabriele",
     "createdAt": "2026-08-02"
