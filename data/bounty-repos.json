@@ -21,7 +21,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "123a-bcd/nailstorm-bounty-forge-358",
@@ -69,7 +69,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "adrimg3196/lucidfence",
@@ -165,7 +165,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "BarryThePirate/ftl-ext-sdk",
@@ -253,7 +253,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "claude-builders-bounty/claude-builders-bounty",
@@ -344,6 +344,14 @@
     "last_updated": "2026-07-26T00:31:49.691Z"
   },
   {
+    "repo": "DanielIoni-creator/MyZubsterWeb",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
     "repo": "Dasharo/dasharo-issues",
     "sources": [
       "label:bounty"
@@ -389,7 +397,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "dextonai/agent-browser",
@@ -437,7 +445,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-23T00:28:47.931Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "earnestmant2/mysql",
@@ -517,7 +525,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "heathivorjocelyn6/go-redis",
@@ -525,7 +533,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "heathivorjocelyn6/jwt",
@@ -533,7 +541,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "heathivorjocelyn6/resty",
@@ -541,7 +549,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "hunki1488-a11y/AIgor",
@@ -565,7 +573,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-07T00:25:58.796Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Ikalus1988/MisakaNet",
@@ -573,7 +581,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-02T12:42:25.539Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "illbnm/homelab-stack",
@@ -597,7 +605,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "jaasielitaigq/pgx",
@@ -605,7 +613,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "jackjin1997/TentOfTrials",
@@ -622,6 +630,14 @@
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
     "last_updated": "2026-07-11T12:21:04.966Z"
+  },
+  {
+    "repo": "jahmeergnlt/traefik",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "jaxassistant55/TentOfTrials",
@@ -685,7 +701,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Kristywvs22/gin",
@@ -693,7 +709,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Kristywvs22/go-redis",
@@ -701,7 +717,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Kristywvs22/zap",
@@ -709,7 +725,15 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
+    "repo": "kyresehk190/vault",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "lakhman108/zeroeye",
@@ -744,6 +768,22 @@
     "last_updated": "2026-06-21T00:30:09.768Z"
   },
   {
+    "repo": "madalynerlge2/chi",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
+    "repo": "madalynerlge2/cli",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
     "repo": "maitebloger111/Apache-Arrow",
     "sources": [
       "label:bounty"
@@ -765,7 +805,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "MariauqmpsA333/go-redis",
@@ -797,7 +837,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-19T00:28:21.228Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/BeeAR",
@@ -805,7 +845,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/BloggerEasy",
@@ -813,7 +853,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/gazebo-mcp",
@@ -821,7 +861,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/gimp-mcp",
@@ -829,7 +869,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/Gomi",
@@ -845,7 +885,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/Lappa",
@@ -853,7 +893,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/Loru",
@@ -861,7 +901,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-12T12:20:55.765Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/mergeos",
@@ -901,7 +941,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/NeraJob",
@@ -909,7 +949,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-12T12:20:55.765Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/NokaMan",
@@ -917,7 +957,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-12T12:20:55.765Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/PoseGuide",
@@ -925,7 +965,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-12T12:20:55.765Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/ros2-mcp",
@@ -933,7 +973,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/rviz-mcp",
@@ -941,7 +981,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "mergeos-bounties/TrucVPN",
@@ -949,7 +989,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "midnightntwrk/contributor-hub",
@@ -965,7 +1005,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "MurphyThomas87/go-redis",
@@ -973,7 +1013,15 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-19T00:28:21.228Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
+    "repo": "MyZubster-Ecosystem/MyZubsterGateway",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "NashKara96/fx",
@@ -981,7 +1029,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "NashKara96/resty",
@@ -989,7 +1037,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Nexussyn/ai-growth-engine",
@@ -1013,7 +1061,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-10T00:25:21.920Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Paratii-Video/paratii-js",
@@ -1021,7 +1069,7 @@
       "label:💰 Bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Paratii-Video/paratii-mediaplayer",
@@ -1029,7 +1077,7 @@
       "label:💰 Bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Paratii-Video/paratii-portal",
@@ -1037,7 +1085,7 @@
       "label:💰 Bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "pci-tamper-protect/e-skimming-labs",
@@ -1133,7 +1181,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "rachelealicek/grpc-go",
@@ -1141,7 +1189,15 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
+    "repo": "raimeecas/mysql",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "relayhop/sn-monetization-runtime",
@@ -1149,7 +1205,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "remotion-dev/remotion",
@@ -1157,7 +1213,7 @@
       "bot:algora-io"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "renaudgenard/TentOfTrials",
@@ -1189,7 +1245,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "rethavonRueden3/go-github",
@@ -1197,7 +1253,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "ripgrim/ripgrim",
@@ -1221,7 +1277,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "rodrickparker11/TiKV",
@@ -1237,7 +1293,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "RoseMark45/echo",
@@ -1245,7 +1301,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "runxhq/runx",
@@ -1269,7 +1325,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Scottcjn/ardy-director",
@@ -1277,7 +1333,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Scottcjn/bottube",
@@ -1309,7 +1365,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Scottcjn/rustchain-dialup",
@@ -1341,7 +1397,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "shaiananvari8/zeroeye",
@@ -1357,7 +1413,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "skndash96/bountic",
@@ -1429,7 +1485,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "tari-project/minotari-cli",
@@ -1501,7 +1557,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "thanhle74/kickama",
@@ -1525,7 +1581,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "thaohuynh14zc/GORM",
@@ -1568,12 +1624,20 @@
     "last_updated": "2026-06-23T00:28:47.931Z"
   },
   {
+    "repo": "theselfish/SlopStation13",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
     "repo": "Tylerx3udv/cli",
     "sources": [
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "Tylerx3udv/go-github",
@@ -1581,7 +1645,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "UID9622/lh-standard-adapter",
@@ -1589,7 +1653,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-26T00:31:49.691Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "vedanshjainvj/Job-Hive",
@@ -1597,7 +1661,7 @@
       "label:💰 Bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "victorjones6awpg/Casbin",
@@ -1613,7 +1677,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-19T00:28:21.228Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "vpyr/mRL78",
@@ -1637,7 +1701,7 @@
       "label:💰 Bounty"
     ],
     "first_seen": "2026-06-20T20:56:48.349Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "waxeye7/screeps-bounty-arena",
@@ -1704,12 +1768,20 @@
     "last_updated": "2026-07-12T12:20:55.765Z"
   },
   {
+    "repo": "zamariyahg/go-jose",
+    "sources": [
+      "label:bounty"
+    ],
+    "first_seen": "2026-08-02T00:30:21.596Z",
+    "last_updated": "2026-08-02T00:30:21.596Z"
+  },
+  {
     "repo": "zhangjiayang6835-cyber/ai-research",
     "sources": [
       "label:bounty"
     ],
     "first_seen": "2026-06-30T00:27:36.837Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "zhangjiayang6835-cyber/bounty-plaza",
@@ -1717,7 +1789,7 @@
       "label:bounty"
     ],
     "first_seen": "2026-07-12T00:21:55.393Z",
-    "last_updated": "2026-07-26T00:31:49.691Z"
+    "last_updated": "2026-08-02T00:30:21.596Z"
   },
   {
     "repo": "zhuzhushiwojia/lobster-rewards",
