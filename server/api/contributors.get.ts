@@ -33,7 +33,7 @@ export default defineEventHandler(async () => {
       .filter((item) => item.login && !cibotList.includes(item.login))
       .map((item) => ({
         name: item.login,
-        avatar: item.avatar_url,
+        avatar: `${item.avatar_url}&s=50`,
         url: `https://github.com/${item.login}`,
         id: item.id,
       }))

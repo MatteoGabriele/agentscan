@@ -14,7 +14,7 @@ defineProps<{
       v-if="user.avatar_url"
       class="size-12 @lg:size-20 rounded-full overflow-hidden bg-gh-card shrink-0"
     >
-      <img :src="user.avatar_url" :alt="`Avatar of ${user.login}`" />
+      <img :src="`${user.avatar_url}&s=160`" :alt="`Avatar of ${user.login}`" />
     </div>
 
     <div class="w-full flex flex-col">
