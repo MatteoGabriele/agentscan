@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { stringify } from 'yaml'
 import { useClipboard } from '@vueuse/core'
+import {
+  buildDefaultHoneypotGreeting,
+  getDefaultMessages,
+} from '~~/shared/utils/agentscan-messages'
 
 type ScanMode = 'full' | 'comment' | 'labels' | 'silent'
 type AuthorAssociation =
@@ -12,14 +16,14 @@ type AuthorAssociation =
   | 'owner'
 type Classification = 'organic' | 'mixed' | 'automation'
 
-const MODES: { value: ScanMode; label: string }[] = [
+const modes: { value: ScanMode; label: string }[] = [
   { value: 'full', label: 'Full — comment and apply labels' },
   { value: 'comment', label: 'Comment only' },
   { value: 'labels', label: 'Labels only' },
   { value: 'silent', label: 'Silent — analysis only, no comment or labels' },
 ]
 
-const AUTHOR_ASSOCIATIONS: { value: AuthorAssociation; label: string }[] = [
+const authorAssociations: { value: AuthorAssociation; label: string }[] = [
   { value: 'owner', label: 'Owner' },
   { value: 'member', label: 'Member' },
   { value: 'collaborator', label: 'Collaborator' },
@@ -31,19 +35,21 @@ const AUTHOR_ASSOCIATIONS: { value: AuthorAssociation; label: string }[] = [
   },
 ]
 
-const CLASSIFICATIONS: { value: Classification; label: string }[] = [
+const classifications: { value: Classification; label: string }[] = [
   { value: 'organic', label: 'Organic' },
   { value: 'mixed', label: 'Mixed' },
   { value: 'automation', label: 'Automation' },
 ]
 
-const DEFAULT_LABELS = {
+const defaultLabels = {
   'community-flagged': 'agentscan:community-flagged',
   mixed: 'agentscan:mixed-signals',
-  automation: 'agentscan:automated-account',
+  automation: 'agentscan:automation-signals',
 }
 
-const DEFAULT_AUTO_CLOSE_CLASSIFICATIONS: Classification[] = ['automation']
+const defaultAutoCloseClassifications: Classification[] = ['automation']
+
+const defaultMessages = getDefaultMessages()
 
 function sameMembers<T>(a: T[], b: T[]): boolean {
   return a.length === b.length && a.every((item) => b.includes(item))
@@ -60,9 +66,9 @@ const autoClose = ref(false)
 const autoCloseClassifications = ref<Classification[]>(['automation'])
 const honeypot = ref(false)
 
-const labelCommunityFlagged = ref(DEFAULT_LABELS['community-flagged'])
-const labelMixed = ref(DEFAULT_LABELS.mixed)
-const labelAutomation = ref(DEFAULT_LABELS.automation)
+const labelCommunityFlagged = ref(defaultLabels['community-flagged'])
+const labelMixed = ref(defaultLabels.mixed)
+const labelAutomation = ref(defaultLabels.automation)
 
 const messageOrganic = ref('')
 const messageMixed = ref('')
@@ -127,7 +133,7 @@ const yaml = computed(() => {
     if (
       !sameMembers(
         autoCloseClassifications.value,
-        DEFAULT_AUTO_CLOSE_CLASSIFICATIONS,
+        defaultAutoCloseClassifications,
       )
     ) {
       config['auto-close-classifications'] = autoCloseClassifications.value
@@ -143,9 +149,9 @@ const yaml = computed(() => {
   }
 
   if (
-    labelCommunityFlagged.value !== DEFAULT_LABELS['community-flagged'] ||
-    labelMixed.value !== DEFAULT_LABELS.mixed ||
-    labelAutomation.value !== DEFAULT_LABELS.automation
+    labelCommunityFlagged.value !== defaultLabels['community-flagged'] ||
+    labelMixed.value !== defaultLabels.mixed ||
+    labelAutomation.value !== defaultLabels.automation
   ) {
     config.labels = {
       'community-flagged': labelCommunityFlagged.value,
@@ -178,6 +184,16 @@ const yaml = computed(() => {
   return stringify(config, { lineWidth: 0 })
 })
 
+const defaultHoneypotGreeting = computed(() =>
+  buildDefaultHoneypotGreeting({
+    username: '{username}',
+    subject: '{type}',
+    isPR: scanPullRequests.value,
+  })
+    .join('\n')
+    .trim(),
+)
+
 const { copy, copied } = useClipboard({ source: yaml })
 </script>
 
@@ -199,7 +215,7 @@ const { copy, copied } = useClipboard({ source: yaml })
             v-model="mode"
             class="w-full appearance-none px-3 py-2 pr-9 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text focus:outline-none focus:border-gh-green focus:ring-1 focus:ring-gh-green/30"
           >
-            <option v-for="item in MODES" :key="item.value" :value="item.value">
+            <option v-for="item in modes" :key="item.value" :value="item.value">
               {{ item.label }}
             </option>
           </select>
@@ -300,7 +316,7 @@ const { copy, copied } = useClipboard({ source: yaml })
         </div>
         <div class="flex flex-col gap-2 self-start">
           <label
-            v-for="item in AUTHOR_ASSOCIATIONS"
+            v-for="item in authorAssociations"
             :key="item.value"
             class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
           >
@@ -357,7 +373,7 @@ const { copy, copied } = useClipboard({ source: yaml })
 
           <div v-if="autoClose" class="flex flex-col gap-2 mt-3 pl-6">
             <label
-              v-for="item in CLASSIFICATIONS"
+              v-for="item in classifications"
               :key="item.value"
               class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
             >
@@ -404,10 +420,17 @@ const { copy, copied } = useClipboard({ source: yaml })
           </p>
 
           <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-4 pl-6">
-            <span class="text-xs text-gh-muted">Greeting</span>
+            <div class="text-xs text-gh-muted mb-2">
+              Default greeting
+              <pre
+                class="mt-2 px-3 py-2 bg-gh-bg border border-gh-border/60 rounded font-mono text-gh-text/90 whitespace-pre-wrap"
+                >{{ defaultHoneypotGreeting }}</pre
+              >
+            </div>
+
             <CommonMarkdownEditor
               v-model="messageHoneypot"
-              placeholder="Default greeting"
+              placeholder="Custom greeting"
             />
             <p class="text-xs text-gh-muted">
               Replaces the visible thank-you message. The hidden verification
@@ -461,7 +484,7 @@ const { copy, copied } = useClipboard({ source: yaml })
           <p class="text-sm font-medium text-gh-text">Messages</p>
           <p class="text-xs text-gh-muted mt-1">
             Custom comment messages per classification. Supports Markdown. Leave
-            blank to use the default message.
+            a field blank to post the default message shown in it.
           </p>
         </div>
         <div class="min-w-0 flex flex-col gap-4 self-start">
@@ -469,28 +492,28 @@ const { copy, copied } = useClipboard({ source: yaml })
             <span class="text-xs text-gh-muted">Organic</span>
             <CommonMarkdownEditor
               v-model="messageOrganic"
-              placeholder="Default message"
+              :placeholder="defaultMessages.organic"
             />
           </div>
           <div class="flex flex-col gap-1.5 text-sm">
             <span class="text-xs text-gh-muted">Mixed</span>
             <CommonMarkdownEditor
               v-model="messageMixed"
-              placeholder="Default message"
+              :placeholder="defaultMessages.mixed"
             />
           </div>
           <div class="flex flex-col gap-1.5 text-sm">
             <span class="text-xs text-gh-muted">Automation</span>
             <CommonMarkdownEditor
               v-model="messageAutomation"
-              placeholder="Default message"
+              :placeholder="defaultMessages.automation"
             />
           </div>
           <div class="flex flex-col gap-1.5 text-sm">
             <span class="text-xs text-gh-muted">Community-flagged</span>
             <CommonMarkdownEditor
               v-model="messageCommunityFlagged"
-              placeholder="Default message"
+              :placeholder="defaultMessages['community-flagged']"
             />
           </div>
         </div>

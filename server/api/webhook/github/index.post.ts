@@ -17,6 +17,7 @@ import {
   buildEvidenceLines,
   buildReportIssueUrl,
 } from '~~/shared/utils/report-issue'
+import { COMMUNITY_FLAGGED_DETAILS } from '~~/shared/utils/agentscan-messages'
 import {
   buildHoneypotComment,
   buildHoneypotResultComment,
@@ -383,11 +384,7 @@ export default defineEventHandler(async (event) => {
     const analysis: IdentifyResult = identify({ user, events })
 
     const details = hasCommunityFlag
-      ? {
-          label: 'Flagged by community',
-          description:
-            'This account has been flagged as potentially automated by the community.',
-        }
+      ? COMMUNITY_FLAGGED_DETAILS
       : getClassificationDetails(analysis.classification)
 
     let description = details.description
