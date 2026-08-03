@@ -5,20 +5,24 @@ import { isKnownBot } from '../shared/cicd-known-bots'
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { Octokit } from 'octokit'
-import type { IdentifyResult } from '@unveil/identity'
+import { identify } from '@unveil/identity'
+import type { GitHubEvent, IdentifyUser } from '@unveil/identity'
 import { hashPrId } from './pr-hash'
 import { pack, unpack } from '../shared/utils/compactor'
 import { INSUFFICIENT_DATA_SCORE } from '../shared/utils/health-stats'
 import type { PrStatus } from '../shared/types/ecosystem-health'
 
 // Configuration
-const API_TIMEOUT = 30000
-const API_BASE_URL = 'https://agentscan.tools'
 const DELAY_BETWEEN_SCANS = 1000
+// Mirrors MAX_API_ALLOWED_PAGES in server/api/identify-replicant/[username].get.ts
+// so local scores stay identical to the ones the site produces.
+const EVENT_PAGES = 3
+const EVENTS_PER_PAGE = 100
 const DELAY_BETWEEN_GITHUB_CALLS = 200
 const RETRY_DELAY_MS = 5000
 const RETRY_MAX_ATTEMPT = 2
 const PR_SCAN_AMOUNT = 10
+const DEFAULT_OUTPUT_FILE = 'scan-results.txt'
 
 interface ScanResult {
   created_at: string
@@ -35,6 +39,9 @@ interface ScanResult {
 interface ScanOptions {
   dryRun?: boolean
   prsPerRepo?: number
+  outputFile?: string
+  /** Keep only the N most recent scan runs in the output file (rolling window). */
+  maxScans?: number
 }
 
 async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
@@ -67,8 +74,8 @@ function loadVerifiedAutomations(): Set<number> {
   }
 }
 
-function loadScanResults(): ScanResult[] {
-  const filePath = join(process.cwd(), 'data', 'scan-results.txt')
+function loadScanResults(outputFile: string): ScanResult[] {
+  const filePath = join(process.cwd(), 'data', outputFile)
   try {
     return unpack(readFileSync(filePath, 'utf-8')) as ScanResult[]
   } catch (err) {
@@ -79,41 +86,47 @@ function loadScanResults(): ScanResult[] {
   }
 }
 
-function saveScanResults(results: ScanResult[], dryRun: boolean = false): void {
+function saveScanResults(
+  results: ScanResult[],
+  outputFile: string,
+  dryRun: boolean = false,
+): void {
   if (dryRun) {
     return
   }
-  const filePath = join(process.cwd(), 'data', 'scan-results.txt')
+  const filePath = join(process.cwd(), 'data', outputFile)
   writeFileSync(filePath, pack(results))
 }
 
-type ScanUserResponse = {
-  analysis: IdentifyResult
-  eventsCount: number
+// Drops the oldest scan runs so the file holds at most `maxScans` of them.
+// Entries written by the same run share a `created_at`, so runs are grouped by it.
+function trimToRecentScans(
+  results: ScanResult[],
+  maxScans: number,
+): ScanResult[] {
+  const runs = Array.from(new Set(results.map((r) => r.created_at))).sort()
+  if (runs.length <= maxScans) {
+    return results
+  }
+  const kept = new Set(runs.slice(-maxScans))
+  return results.filter((r) => kept.has(r.created_at))
 }
 
-async function scanUser(
+async function fetchUserEvents(
+  octokit: Octokit,
   username: string,
-  userCreatedAt: string,
-  publicRepos: number,
-): Promise<ScanUserResponse> {
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
+): Promise<GitHubEvent[]> {
+  const pages = await Promise.all(
+    Array.from({ length: EVENT_PAGES }, (_, index) =>
+      octokit.rest.activity.listPublicEventsForUser({
+        username,
+        per_page: EVENTS_PER_PAGE,
+        page: index + 1,
+      }),
+    ),
+  )
 
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/identify-replicant/${username}?created_at=${userCreatedAt}&repos_count=${publicRepos}&pages=3`,
-      { signal: controller.signal },
-    )
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} ${response.statusText}`)
-    }
-
-    return (await response.json()) as ScanUserResponse
-  } finally {
-    clearTimeout(timeoutId)
-  }
+  return pages.flatMap((page) => page.data) as GitHubEvent[]
 }
 
 async function searchUsers(
@@ -125,6 +138,7 @@ async function searchUsers(
     login: string
     created_at: string
     public_repos: number
+    profile: IdentifyUser
     repo_name: string
     pr_key: string
     pr_status: PrStatus
@@ -172,6 +186,7 @@ async function searchUsers(
         pr_key: hashPrId(repoFullName, pr.number),
         pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
         public_repos: fullProfile.data.public_repos,
+        profile: fullProfile.data,
         repo_name: repoFullName,
       })
 
@@ -194,11 +209,23 @@ async function searchUsers(
 }
 
 export async function main(options: ScanOptions = {}) {
-  const { dryRun = false, prsPerRepo = PR_SCAN_AMOUNT } = options
+  const {
+    dryRun = false,
+    prsPerRepo = PR_SCAN_AMOUNT,
+    outputFile = DEFAULT_OUTPUT_FILE,
+    maxScans,
+  } = options
 
-  const token = process.env.GITHUB_TOKEN ?? process.env.NUXT_GITHUB_TOKEN
+  // Scans run on a separate account's token so they draw from their own rate
+  // limit bucket, leaving the site's token untouched by automated traffic.
+  const token =
+    process.env.NUXT_GITHUB_TOKEN_ANASTELLINE ??
+    process.env.GITHUB_TOKEN ??
+    process.env.NUXT_GITHUB_TOKEN
   if (!token) {
-    throw new Error('GITHUB_TOKEN environment variable is not set')
+    throw new Error(
+      'NUXT_GITHUB_TOKEN_ANASTELLINE environment variable is not set',
+    )
   }
 
   if (!process.env.PR_HASH_SECRET) {
@@ -206,7 +233,7 @@ export async function main(options: ScanOptions = {}) {
   }
 
   const octokit = new Octokit({ auth: token })
-  const scanResults = dryRun ? [] : loadScanResults()
+  const scanResults = dryRun ? [] : loadScanResults(outputFile)
   const verifiedAutomations = loadVerifiedAutomations()
   const now = new Date().toISOString()
 
@@ -220,15 +247,17 @@ export async function main(options: ScanOptions = {}) {
       `Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`,
     )
 
-    const scanData = await withRetry(
-      () => scanUser(user.login, user.created_at, user.public_repos),
-      `scan user ${user.login}`,
+    const events = await withRetry(
+      () => fetchUserEvents(octokit, user.login),
+      `fetch events for ${user.login}`,
     )
 
-    let score = scanData.analysis.score
-    const eventsCount = scanData.eventsCount ?? 0
+    const analysis = identify({ user: user.profile, events })
 
-    if (scanData.analysis.classification === 'insufficient-data') {
+    let score = analysis.score
+    const eventsCount = events.length
+
+    if (analysis.classification === 'insufficient-data') {
       score = INSUFFICIENT_DATA_SCORE
     }
 
@@ -246,7 +275,7 @@ export async function main(options: ScanOptions = {}) {
       user_public_repos_count: user.public_repos,
       events_count: eventsCount,
       repo_name: user.repo_name,
-      is_bounty: scanData.analysis.isBountyHunter,
+      is_bounty: analysis.isBountyHunter,
     })
 
     if (score !== INSUFFICIENT_DATA_SCORE) {
@@ -260,7 +289,10 @@ export async function main(options: ScanOptions = {}) {
   }
 
   // Only reached if every repo and every user scan succeeded
-  saveScanResults(scanResults, dryRun)
+  const finalResults =
+    maxScans != null ? trimToRecentScans(scanResults, maxScans) : scanResults
+
+  saveScanResults(finalResults, outputFile, dryRun)
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
     (a, b) => b[1] - a[1],
@@ -278,7 +310,20 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ? parseInt(prsPerRepoArg.split('=')[1], PR_SCAN_AMOUNT)
     : undefined
 
-  main({ dryRun, ...(prsPerRepo != null && { prsPerRepo }) }).catch((error) => {
+  const outputArg = args.find((a) => a.startsWith('--output='))
+  const outputFile = outputArg ? outputArg.split('=')[1] : undefined
+
+  const maxScansArg = args.find((a) => a.startsWith('--max-scans='))
+  const maxScans = maxScansArg
+    ? parseInt(maxScansArg.split('=')[1], 10)
+    : undefined
+
+  main({
+    dryRun,
+    ...(prsPerRepo != null && { prsPerRepo }),
+    ...(outputFile && { outputFile }),
+    ...(maxScans != null && { maxScans }),
+  }).catch((error) => {
     console.error('Fatal error:', error.message)
     process.exit(1)
   })
