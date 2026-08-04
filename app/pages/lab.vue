@@ -38,6 +38,9 @@ const { data } = await useEcosystemHealth({ full: true })
       class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto pb-12 w-full px-4"
     >
       <div class="w-full">
+        <LazyChartHourlyEventsEvolution hydrate-on-visible />
+      </div>
+      <div class="w-full">
         <LazyChartHealthResponseSparklines />
       </div>
       <div class="w-full">
