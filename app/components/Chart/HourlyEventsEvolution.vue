@@ -270,10 +270,6 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
     }
   })
 }
-
-function log(n: any) {
-  console.log(n)
-}
 </script>
 
 <template>
