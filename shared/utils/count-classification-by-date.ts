@@ -57,15 +57,16 @@ function createEmptyClassificationStats(): ClassificationStats {
   }
 }
 
-export function getClassificationStatsByDate(
-  data: EcosystemHealthItem[] = [],
+function getClassificationStatsByBucket(
+  data: EcosystemHealthItem[],
+  getBucketKey: (createdAt: string) => string,
 ): getClassificationStatsByDateResults {
   const result: getClassificationStatsByDateResults = {}
 
   const scored = data.filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
 
   const dates = [
-    ...new Set(scored.map((item) => getDateKey(item.created_at))),
+    ...new Set(scored.map((item) => getBucketKey(item.created_at))),
   ].sort()
 
   dates.forEach((date) => {
@@ -73,7 +74,7 @@ export function getClassificationStatsByDate(
   })
 
   scored.forEach((item) => {
-    const dateCounts = result[getDateKey(item.created_at)]
+    const dateCounts = result[getBucketKey(item.created_at)]
 
     if (!dateCounts) {
       return
@@ -108,6 +109,20 @@ export function getClassificationStatsByDate(
   })
 
   return result
+}
+
+export function getClassificationStatsByDate(
+  data: EcosystemHealthItem[] = [],
+): getClassificationStatsByDateResults {
+  return getClassificationStatsByBucket(data, getDateKey)
+}
+
+// Entries written by the same scan run share a `created_at`, so a run is
+// already its own bucket — the hourly scan gives one bucket per hour.
+export function getClassificationStatsByScanTime(
+  data: EcosystemHealthItem[] = [],
+): getClassificationStatsByDateResults {
+  return getClassificationStatsByBucket(data, (createdAt) => createdAt)
 }
 
 function getTotalClassificationCount(
