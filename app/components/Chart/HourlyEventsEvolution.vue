@@ -3,6 +3,7 @@ import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
+  type VueUiXyDatasetLineItem,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useElementSize } from '@vueuse/core'
@@ -102,7 +103,7 @@ const axisTimeFormat = 'HH:mm'
 // A rolling day of scans is too many labels for one axis, so only every nth one
 // is drawn.
 const labelModulo = computed(() => {
-  const maxLabels = isMobile.value ? 4 : 8
+  const maxLabels = isMobile.value ? 4 : 12
   return Math.max(1, Math.ceil(scanTimes.value.length / maxLabels))
 })
 
@@ -111,14 +112,16 @@ const config = computed<VueUiXyConfig>(() => ({
   chart: {
     userOptions: { show: false },
     zoom: { show: false },
-    legend: { show: false },
+    legend: { show: false, position: 'top' },
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     width: Math.round(width.value),
-    height: 340,
+    height: 300,
     padding: {
-      right: 12,
-      bottom: 42,
+      top: 0,
+      right: 0,
+      left: 0,
+      bottom: 0,
     },
     highlighter: {
       opacity: 1,
@@ -138,7 +141,7 @@ const config = computed<VueUiXyConfig>(() => ({
       stroke: 'transparent',
       showVerticalLines: false,
       labels: {
-        show: true,
+        show: false,
         fontSize: 12,
         color: colors.value.textMuted,
         yAxis: {
@@ -227,6 +230,46 @@ function getScanDetails({
 
   return `${count} / ${total}`
 }
+
+type Datapoints = Array<VueUiXyDatasetLineItem & { alerts: boolean[] }>
+
+type PlotAlert = {
+  name: string
+  coordinates: Array<{
+    x: number
+    y: number
+    absoluteIndex: number
+    isAlert: boolean
+  }>
+}
+
+function isAlert(value: VueUiXyDatasetItem['series'][0], threshold: number) {
+  return value != null && (value as number) > threshold
+}
+
+function getZapIconPath({ x, y }: { x: number; y: number }) {
+  // ⚡ with relative coordinates from initial position
+  return `M ${x} ${y} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`
+}
+
+function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
+  return data.map((d) => {
+    return {
+      name: d.name,
+      coordinates: d.plots!.map((plot, index) => {
+        const absoluteIndex = index + zoomOffset
+
+        return {
+          ...plot,
+          absoluteIndex,
+          isAlert:
+            d.name === 'Automation' &&
+            isAlert(d.absoluteValues[absoluteIndex]!, 25),
+        }
+      }),
+    }
+  })
+}
 </script>
 
 <template>
@@ -246,6 +289,34 @@ function getScanDetails({
     <ClientOnly v-else>
       <div ref="chartContainer" class="w-full">
         <VueUiXy v-if="hasStableChartWidth" ref="chartRef" :dataset :config>
+          <template #svg="{ svg }">
+            <g
+              v-for="alerts in alertIcons(
+                svg.data as Datapoints,
+                svg.slicer.start,
+              )"
+              :key="alerts.name"
+            >
+              <template
+                v-for="plot in alerts.coordinates"
+                :key="`${alerts.name}-${plot.absoluteIndex}`"
+              >
+                <path
+                  v-show="plot.isAlert"
+                  class="zap-icon"
+                  :d="
+                    getZapIconPath({
+                      x: plot.x - 4,
+                      y: plot.y - 6,
+                    })
+                  "
+                  :fill="colors.amber"
+                  :stroke="colors.bg"
+                />
+              </template>
+            </g>
+          </template>
+
           <template #area-gradient="{ series, id }">
             <linearGradient :id x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
@@ -318,8 +389,6 @@ function getScanDetails({
                 v-for="item in legend"
                 :key="item.id"
                 class="flex flex-row gap-1.5 place-items-center"
-                :class="item.isSegregated ? 'opacity-50' : 'hover:underline'"
-                @click="item.segregate()"
               >
                 <div class="w-3 h-3">
                   <svg viewBox="0 0 2 2" class="w-full h-full">
