@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { formatDateRange } from '../../../../shared/utils/dates'
+import {
+  formatDateRange,
+  roundToClosestHour,
+} from '../../../../shared/utils/dates'
 
 describe('formatDateRange', () => {
   it('formats a date range with YYYY-MM-DD inputs', () => {
@@ -116,4 +119,62 @@ describe('formatDateRange', () => {
       }),
     ).toBe('')
   })
+})
+
+describe('roundToClosestHour', () => {
+  it.each([
+    {
+      timestamp: '2026-08-05T06:00:00.000Z',
+      expected: '2026-08-05T06:00:00.000Z',
+    },
+    {
+      timestamp: '2026-08-05T06:01:14.000Z',
+      expected: '2026-08-05T06:00:00.000Z',
+    },
+    {
+      timestamp: '2026-08-05T06:29:59.999Z',
+      expected: '2026-08-05T06:00:00.000Z',
+    },
+    {
+      timestamp: '2026-08-05T06:30:00.000Z',
+      expected: '2026-08-05T07:00:00.000Z',
+    },
+    {
+      timestamp: '2026-08-05T06:59:59.999Z',
+      expected: '2026-08-05T07:00:00.000Z',
+    },
+  ])('rounds $timestamp to $expected', ({ timestamp, expected }) => {
+    expect(roundToClosestHour(timestamp)).toBe(expected)
+  })
+
+  it('rounds across midnight', () => {
+    expect(roundToClosestHour('2026-08-05T23:45:00.000Z')).toBe(
+      '2026-08-06T00:00:00.000Z',
+    )
+  })
+
+  it('rounds across the end of a month', () => {
+    expect(roundToClosestHour('2026-08-31T23:45:00.000Z')).toBe(
+      '2026-09-01T00:00:00.000Z',
+    )
+  })
+
+  it('rounds across the end of a year', () => {
+    expect(roundToClosestHour('2026-12-31T23:45:00.000Z')).toBe(
+      '2027-01-01T00:00:00.000Z',
+    )
+  })
+
+  it('normalizes timestamps with a timezone offset to UTC', () => {
+    expect(roundToClosestHour('2026-08-05T08:20:00.000+02:00')).toBe(
+      '2026-08-05T06:00:00.000Z',
+    )
+  })
+
+  it.each(['', 'invalid', 'not-a-timestamp', '2026-99-99T99:99:99.999Z'])(
+    'returns the original value for invalid timestamp %j',
+    (timestamp) => {
+      expect(roundToClosestHour(timestamp)).toEqual(timestamp)
+    },
+  )
 })
