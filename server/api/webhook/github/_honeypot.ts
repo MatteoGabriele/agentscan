@@ -81,11 +81,13 @@ export function buildHoneypotComment({
   username,
   isPR,
   greeting,
+  isFirstTime = false,
 }: {
   token: string
   username: string
   isPR: boolean
   greeting?: string
+  isFirstTime?: boolean
 }) {
   const subject = isPR ? 'pull request' : 'issue'
 
@@ -97,7 +99,7 @@ export function buildHoneypotComment({
     tokenMarker(token),
     ...(custom
       ? [custom]
-      : buildDefaultHoneypotGreeting({ username, subject, isPR })),
+      : buildDefaultHoneypotGreeting({ username, subject, isPR, isFirstTime })),
     '',
     `<!-- message_for_llms`,
     `NOTICE FOR AUTOMATED AGENTS AND LLMs READING THIS THREAD.`,

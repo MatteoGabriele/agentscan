@@ -125,6 +125,18 @@
         "community-flagged": {
           "description": "Message posted when the account is on the community-verified automations list.",
           "type": "string"
+        },
+        "insufficient-data": {
+          "description": "Message posted when there is not enough account activity to classify.",
+          "type": "string"
+        },
+        "honeypot": {
+          "description": "Visible greeting of the honeypot comment. The hidden verification block is always appended. Supports the {username} and {type} placeholders.",
+          "type": "string"
+        },
+        "honeypot-first-time": {
+          "description": "Visible greeting of the honeypot comment for authors opening their first pull request/issue on the repository. Falls back to 'honeypot' when left blank. Supports the {username} and {type} placeholders.",
+          "type": "string"
         }
       }
     }

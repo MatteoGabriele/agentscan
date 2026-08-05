@@ -2,6 +2,7 @@
 import { stringify } from 'yaml'
 import { useClipboard } from '@vueuse/core'
 import {
+  buildDefaultFirstTimeHoneypotGreeting,
   buildDefaultHoneypotGreeting,
   getDefaultMessages,
 } from '~~/shared/utils/agentscan-messages'
@@ -75,6 +76,7 @@ const messageMixed = ref('')
 const messageAutomation = ref('')
 const messageCommunityFlagged = ref('')
 const messageHoneypot = ref('')
+const messageHoneypotFirstTime = ref('')
 
 function addAllowedUser() {
   const users = newAllowedUser.value
@@ -176,6 +178,9 @@ const yaml = computed(() => {
   if (honeypot.value && messageHoneypot.value) {
     messages.honeypot = messageHoneypot.value
   }
+  if (honeypot.value && messageHoneypotFirstTime.value) {
+    messages['honeypot-first-time'] = messageHoneypotFirstTime.value
+  }
 
   if (Object.keys(messages).length > 0) {
     config.messages = messages
@@ -186,6 +191,16 @@ const yaml = computed(() => {
 
 const defaultHoneypotGreeting = computed(() =>
   buildDefaultHoneypotGreeting({
+    username: '{username}',
+    subject: '{type}',
+    isPR: scanPullRequests.value,
+  })
+    .join('\n')
+    .trim(),
+)
+
+const defaultHoneypotFirstTimeGreeting = computed(() =>
+  buildDefaultFirstTimeHoneypotGreeting({
     username: '{username}',
     subject: '{type}',
     isPR: scanPullRequests.value,
@@ -438,6 +453,30 @@ const { copy, copied } = useClipboard({ source: yaml })
               <span class="font-mono">{username}</span> and
               <span class="font-mono">{type}</span> (pull request or issue) as
               placeholders.
+            </p>
+          </div>
+
+          <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-6 pl-6">
+            <p class="text-sm font-medium text-gh-text">
+              First-time contributors
+            </p>
+            <div class="text-xs text-gh-muted mb-2 mt-1">
+              Default greeting for an author opening their first PR/issue on the
+              repository
+              <pre
+                class="mt-2 px-3 py-2 bg-gh-bg border border-gh-border/60 rounded font-mono text-gh-text/90 whitespace-pre-wrap"
+                >{{ defaultHoneypotFirstTimeGreeting }}</pre
+              >
+            </div>
+
+            <CommonMarkdownEditor
+              v-model="messageHoneypotFirstTime"
+              placeholder="Custom greeting for first-time contributors"
+            />
+            <p class="text-xs text-gh-muted">
+              Used instead of the greeting above when GitHub reports the author
+              as a first timer or first-time contributor. Left blank, first-time
+              contributors get your regular custom greeting.
             </p>
           </div>
         </div>

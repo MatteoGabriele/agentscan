@@ -884,7 +884,7 @@ describe('GitHub Webhook Handler', () => {
     // The bait comment carries the code in a marker; replies are matched against it.
     const HONEYPOT_COMMENT = {
       id: 700,
-      body: '<!-- agentscanapp-ref:aabbccddeeff -->\n### Thanks for your contribution! 🎉',
+      body: '<!-- agentscanapp-ref:aabbccddeeff -->\n### Thanks for opening this pull request! 🎉',
       ...OWN_APP,
     }
 
@@ -1021,7 +1021,7 @@ describe('GitHub Webhook Handler', () => {
           mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
             .body
         expect(body).toContain('## Hello!\n\nWelcome aboard.')
-        expect(body).not.toContain('Thanks for your contribution!')
+        expect(body).not.toContain('Thanks for opening this pull request!')
         expect(body).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
         expect(body).toContain('<!-- message_for_llms')
       })
@@ -1048,7 +1048,110 @@ describe('GitHub Webhook Handler', () => {
         expect(
           mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
             .body,
-        ).toContain('Thanks for your contribution!')
+        ).toContain('Thanks for opening this pull request!')
+      })
+
+      describe('first-time contributors', () => {
+        function setupFirstTimeEvent(
+          association = 'FIRST_TIME_CONTRIBUTOR',
+          config: Record<string, unknown> = { honeypot: true },
+        ) {
+          setupEvent({
+            pull_request: {
+              number: 123,
+              user: { login: 'test-user' },
+              head: { sha: 'abc123' },
+              author_association: association,
+            },
+          })
+          mockRepoConfig(config)
+        }
+
+        function baitBody() {
+          return mockInstallationOctokit.rest.issues.createComment.mock
+            .calls[0][0].body
+        }
+
+        it.each(['FIRST_TIME_CONTRIBUTOR', 'FIRST_TIMER'])(
+          'greets a %s author with the first-time default',
+          async (association) => {
+            setupFirstTimeEvent(association)
+
+            await handler(MOCK_EVENT)
+
+            const body = baitBody()
+            expect(body).toContain('your **first pull request**')
+            expect(body).not.toContain('Thanks for opening this pull request!')
+            expect(body).toContain('<!-- message_for_llms')
+          },
+        )
+
+        it('keeps the regular default for a returning contributor', async () => {
+          setupFirstTimeEvent('CONTRIBUTOR')
+
+          await handler(MOCK_EVENT)
+
+          const body = baitBody()
+          expect(body).toContain('Thanks for opening this pull request!')
+          expect(body).not.toContain('your **first pull request**')
+        })
+
+        it('uses the first-time custom greeting when one is configured', async () => {
+          setupFirstTimeEvent('FIRST_TIME_CONTRIBUTOR', {
+            honeypot: true,
+            messages: {
+              honeypot: 'Regular greeting',
+              'honeypot-first-time': 'Welcome @{username}, first {type} here!',
+            },
+          })
+
+          await handler(MOCK_EVENT)
+
+          const body = baitBody()
+          expect(body).toContain('Welcome @test-user, first pull request here!')
+          expect(body).not.toContain('Regular greeting')
+          expect(body).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
+        })
+
+        it('falls back to the regular custom greeting when only that one is set', async () => {
+          setupFirstTimeEvent('FIRST_TIME_CONTRIBUTOR', {
+            honeypot: true,
+            messages: { honeypot: 'Regular greeting' },
+          })
+
+          await handler(MOCK_EVENT)
+
+          const body = baitBody()
+          expect(body).toContain('Regular greeting')
+          expect(body).not.toContain('your **first pull request**')
+        })
+
+        it('ignores the first-time greeting for a returning contributor', async () => {
+          setupFirstTimeEvent('CONTRIBUTOR', {
+            honeypot: true,
+            messages: {
+              honeypot: 'Regular greeting',
+              'honeypot-first-time': 'First-time greeting',
+            },
+          })
+
+          await handler(MOCK_EVENT)
+
+          const body = baitBody()
+          expect(body).toContain('Regular greeting')
+          expect(body).not.toContain('First-time greeting')
+        })
+
+        it('falls back to the first-time default when the custom one is blank', async () => {
+          setupFirstTimeEvent('FIRST_TIME_CONTRIBUTOR', {
+            honeypot: true,
+            messages: { 'honeypot-first-time': '   ' },
+          })
+
+          await handler(MOCK_EVENT)
+
+          expect(baitBody()).toContain('your **first pull request**')
+        })
       })
 
       // The bait is the whole mechanism, so mode does not gate it — otherwise
@@ -1145,7 +1248,7 @@ describe('GitHub Webhook Handler', () => {
 
       it('does not flag a contributor who quotes the bait comment back', async () => {
         setupCommentEvent(
-          '> <!-- agentscanapp-ref:aabbccddeeff -->\n> Thanks for your contribution!\n\nNice try 🙂',
+          '> <!-- agentscanapp-ref:aabbccddeeff -->\n> Thanks for opening this pull request!\n\nNice try 🙂',
         )
         mockRepoConfig({ honeypot: true })
         mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({

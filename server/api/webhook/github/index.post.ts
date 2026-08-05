@@ -111,6 +111,13 @@ export default defineEventHandler(async (event) => {
     | AuthorAssociation
     | undefined
 
+  // GitHub reports both for an author with no merged contribution here:
+  // `first_timer` is new to GitHub entirely, `first_time_contributor` is new
+  // to this repository. Either way it is their first PR/issue on the repo.
+  const isFirstTimeContributor =
+    authorAssociation === 'first_timer' ||
+    authorAssociation === 'first_time_contributor'
+
   if (!targetNumber || !username) {
     return { ok: true }
   }
@@ -452,6 +459,13 @@ export default defineEventHandler(async (event) => {
         )
 
         if (!alreadyBaited) {
+          // A blank first-time greeting falls back to the regular custom one,
+          // so a repo that only customised `honeypot` keeps a single voice.
+          const greeting = isFirstTimeContributor
+            ? repoConfig.messages['honeypot-first-time']?.trim() ||
+              repoConfig.messages.honeypot
+            : repoConfig.messages.honeypot
+
           await octokit.rest.issues.createComment({
             owner,
             repo,
@@ -460,7 +474,8 @@ export default defineEventHandler(async (event) => {
               token: createHoneypotToken(),
               username,
               isPR,
-              greeting: repoConfig.messages.honeypot,
+              greeting,
+              isFirstTime: isFirstTimeContributor,
             }),
           })
         }

@@ -43,6 +43,12 @@ export type RepoConfig = {
      * Supports `{username}` and `{type}` placeholders.
      */
     honeypot: string
+    /**
+     * Same, but for authors GitHub reports as opening their first PR/issue on
+     * the repository. Falls back to `honeypot` when left blank, so a repo that
+     * only customises the regular greeting keeps one voice.
+     */
+    'honeypot-first-time': string
   }
 }
 
@@ -71,6 +77,7 @@ export const DEFAULT_CONFIG: RepoConfig = {
     'community-flagged': '',
     'insufficient-data': '',
     honeypot: '',
+    'honeypot-first-time': '',
   },
 }
 
