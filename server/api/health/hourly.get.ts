@@ -2,6 +2,7 @@ import type { EcosystemHealthCategoryProgression } from '~~/shared/types/ecosyst
 
 import { unpack } from '~~/shared/utils/compactor'
 import { getClassificationStatsByScanTime } from '~~/shared/utils/count-classification-by-date'
+import { roundToClosestHour } from '~~/shared/utils/dates'
 
 export default defineEventHandler(async () => {
   try {
@@ -14,7 +15,10 @@ export default defineEventHandler(async () => {
     }
 
     const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
-    const results = unpack(content)
+    const results = unpack(content).map((entry) => ({
+      ...entry,
+      created_at: roundToClosestHour(entry.created_at),
+    }))
 
     const automationPercentages: number[] = []
     const mixedPercentages: number[] = []
