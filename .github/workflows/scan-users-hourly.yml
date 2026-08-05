@@ -1,15 +1,7 @@
 name: Hourly User Scan
 
 on:
-  schedule:
-    - cron: '15 * * * *' # Every hour at :15
   workflow_dispatch: # Allow manual trigger
-
-# A run can outlive the hour, so let an in-flight scan finish instead of
-# overlapping with the next one.
-concurrency:
-  group: hourly-user-scan
-  cancel-in-progress: false
 
 jobs:
   scan:
