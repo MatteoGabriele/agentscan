@@ -59,3 +59,11 @@ export function formatDateRange({
 
   return `${startLabel} - ${endLabel}`
 }
+
+export function roundToClosestHour(timestamp: string): string {
+  const date = dayjs(timestamp)
+  if (!date.isValid()) {
+    return timestamp
+  }
+  return date.utc().add(30, 'minute').startOf('hour').toISOString()
+}
