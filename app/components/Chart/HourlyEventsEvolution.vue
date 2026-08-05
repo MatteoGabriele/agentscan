@@ -97,6 +97,8 @@ const dataset = computed<VueUiXyDatasetItem[]>(() =>
   })),
 )
 
+const hasSingleEntry = computed(() => dataset.value[0]?.series.length === 1)
+
 // Axis labels stay short — the tooltip carries the full timestamp.
 const axisTimeFormat = 'HH:mm'
 
@@ -175,7 +177,7 @@ const config = computed<VueUiXyConfig>(() => ({
     },
   },
   line: {
-    radius: 0,
+    radius: hasSingleEntry.value ? 4 : 0,
     useGradient: false,
     strokeWidth: isMobile.value ? 1.5 : 2,
     dot: {
