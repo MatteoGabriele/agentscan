@@ -47,7 +47,9 @@ const { data } = await useEcosystemHealth({ full: true })
         <LazyChartScoreDistribution :data="data?.results" hydrate-on-visible />
       </div>
       <div class="w-full">
-        <LazyReportWeeklyClassification hydrate-on-visible />
+        <LazyReportWeeklyClassification
+          :hydrate-on-visible="{ rootMargin: '600px 0px' }"
+        />
       </div>
       <div class="w-full">
         <LazyChartFeaturedPackageHealthRanking hydrate-on-visible />
