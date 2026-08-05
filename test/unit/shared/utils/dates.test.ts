@@ -172,12 +172,9 @@ describe('roundToClosestHour', () => {
   })
 
   it.each(['', 'invalid', 'not-a-timestamp', '2026-99-99T99:99:99.999Z'])(
-    'throws for invalid timestamp %j',
+    'returns the original value for invalid timestamp %j',
     (timestamp) => {
-      expect(() => roundToClosestHour(timestamp)).toThrow(TypeError)
-      expect(() => roundToClosestHour(timestamp)).toThrow(
-        `Invalid timestamp: "${timestamp}"`,
-      )
+      expect(roundToClosestHour(timestamp)).toEqual(timestamp)
     },
   )
 })

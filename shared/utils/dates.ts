@@ -63,7 +63,7 @@ export function formatDateRange({
 export function roundToClosestHour(timestamp: string): string {
   const date = dayjs(timestamp)
   if (!date.isValid()) {
-    throw new TypeError(`Invalid timestamp: "${timestamp}"`)
+    return timestamp
   }
   return date.utc().add(30, 'minute').startOf('hour').toISOString()
 }
