@@ -14,9 +14,7 @@ import('vue-data-ui/style.css')
 
 const { data } = useEcosystemHealthHourly()
 
-const scanTimes = computed(() => {
-  return data.value?.scanTimes ?? []
-})
+const scanTimes = computed(() => data.value?.scanTimes ?? [])
 const countsByScanTime = computed(() => data.value?.countsByScanTime)
 const hasData = computed(() => scanTimes.value.length > 0)
 
