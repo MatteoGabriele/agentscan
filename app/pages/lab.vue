@@ -48,7 +48,7 @@ const { data } = await useEcosystemHealth({ full: true })
       </div>
       <div class="w-full">
         <LazyReportWeeklyClassification
-          :hydrate-on-visible="{ rootMargin: '600px 0px' }"
+          :hydrate-on-visible="{ rootMargin: '0px 0px 600px 0px' }"
         />
       </div>
       <div class="w-full">
