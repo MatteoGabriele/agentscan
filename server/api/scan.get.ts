@@ -1,7 +1,7 @@
 import { identify } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
-import { MAX_PR_USER_COUNT } from '~~/shared/scan'
+import { MAX_PR_COUNT } from '~~/shared/scan'
 import type { Endpoints } from '@octokit/types'
 
 export type AuthorAssociation =
@@ -17,7 +17,7 @@ const TRUSTED_ASSOCIATIONS: AuthorAssociation[] = [
   'COLLABORATOR',
 ] as const
 
-type Entry = {
+type PullRequestEntry = {
   login: string
   prUrl: string
   state: string
@@ -45,12 +45,12 @@ export default defineCachedEventHandler(
     const { owner, repo } = parsed
     const octokit = createOctokit(config.githubToken)
 
-    const entries: Entry[] = []
+    const pullRequests: PullRequestEntry[] = []
 
     try {
       for (
         let page = 1;
-        page <= MAX_PAGES && entries.length < MAX_PR_USER_COUNT;
+        page <= MAX_PAGES && pullRequests.length < MAX_PR_COUNT;
         page++
       ) {
         const { data: prs } = await octokit.rest.pulls.list({
@@ -64,7 +64,7 @@ export default defineCachedEventHandler(
         })
 
         for (const pr of prs) {
-          if (entries.length >= MAX_PR_USER_COUNT) {
+          if (pullRequests.length >= MAX_PR_COUNT) {
             break
           }
 
@@ -81,8 +81,8 @@ export default defineCachedEventHandler(
           }
 
           const username = pr.user.login.toLowerCase()
-          console.log(pr)
-          entries.push({
+
+          pullRequests.push({
             login: username,
             prUrl: pr.html_url,
             state: pr.state,
@@ -95,7 +95,7 @@ export default defineCachedEventHandler(
       }
 
       const results = await Promise.all(
-        entries.map(async (entry) => {
+        pullRequests.map(async (entry) => {
           const [profileRes, eventResponses] = await Promise.all([
             octokit.rest.users.getByUsername({ username: entry.login }),
             Promise.all(
@@ -131,7 +131,7 @@ export default defineCachedEventHandler(
         return a.analysis.score - b.analysis.score
       })
 
-      return { authors: results, repo: `${owner}/${repo}` }
+      return { pullRequests: results, repo: `${owner}/${repo}` }
     } catch (err: unknown) {
       const error = err as { status?: number; statusCode?: number }
       const status = error.status ?? error.statusCode
@@ -157,7 +157,7 @@ export default defineCachedEventHandler(
     maxAge: 60 * 60 * 2,
     getKey: (event) => {
       const repo = String(getQuery(event).repo ?? '')
-      return `scan:${repo}`
+      return `scan:v2:${repo}`
     },
   },
 )
