@@ -342,6 +342,11 @@ watch(
 
     const currentModel = normalizeModel(model.value)
     const previousHours = currentModel[previousTimezoneId]
+    const targetHours = model.value?.[timezoneId]
+
+    if (targetHours) {
+      return
+    }
 
     model.value = {
       ...currentModel,

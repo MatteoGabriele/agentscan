@@ -23,6 +23,9 @@ export const TIMEZONE_IDS = [
   'UTC+09:00',
   'UTC+10:00',
   'UTC+11:00',
+  'UTC+12:00',
+  'UTC+13:00',
+  'UTC+14:00',
 ] as const
 
 export type TimezoneId = (typeof TIMEZONE_IDS)[number]

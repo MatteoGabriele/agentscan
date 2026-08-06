@@ -12,7 +12,11 @@ import dayjs, { type Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import { round } from '~~/shared/utils/numbers'
-import type { TimezoneId, WorkHours } from '~~/shared/types/tz-work-hours'
+import type {
+  TimezoneId,
+  WorkHours,
+  TimezoneWorkHours,
+} from '~~/shared/types/tz-work-hours'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -205,7 +209,7 @@ function formatScanTime(index: number) {
     return ''
   }
 
-  return parseParisScanTime(scanTime).format('ddd, MMM D • HH:mm')
+  return dayjs(scanTime).format('ddd, MMM D • HH:mm')
 }
 
 function getScanDetails({
@@ -269,7 +273,7 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
 const SCAN_TIMEZONE = 'Europe/Paris'
 const EXPLICIT_TIMEZONE_PATTERN = /(?:Z|[+-]\d{2}:?\d{2})$/i
 
-function parseParisScanTime(scanTime: string) {
+function parseScanTime(scanTime: string) {
   const value = scanTime.trim()
 
   if (EXPLICIT_TIMEZONE_PATTERN.test(value)) {
@@ -281,7 +285,7 @@ function parseParisScanTime(scanTime: string) {
 
 function getHourIndex(parisTime: Dayjs) {
   const exactIndex = scanTimes.value.findIndex((scanTime) => {
-    const time = parseParisScanTime(scanTime)
+    const time = parseScanTime(scanTime)
 
     return time.isValid() && time.isSame(parisTime, 'hour')
   })
@@ -291,13 +295,11 @@ function getHourIndex(parisTime: Dayjs) {
   }
 
   return scanTimes.value.findIndex((scanTime) => {
-    const time = parseParisScanTime(scanTime)
+    const time = parseScanTime(scanTime)
 
     return time.isValid() && time.hour() === parisTime.hour()
   })
 }
-
-type TimezoneWorkHours = Record<string, WorkHours>
 
 type FogOfSleepRange = {
   start: number
@@ -368,7 +370,7 @@ function getScanTZ({
 }) {
   const parts = getTimeParts(localTime)
   const offsetMinutes = getUtcOffsetMinutes(timezoneId)
-  const referenceInParis = parseParisScanTime(referenceScanTime)
+  const referenceInParis = parseScanTime(referenceScanTime)
 
   if (!parts || offsetMinutes === null || !referenceInParis.isValid()) {
     return null
