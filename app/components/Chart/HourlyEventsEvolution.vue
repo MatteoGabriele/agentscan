@@ -25,8 +25,6 @@ const isMobile = useIsMobile()
 const chartRef = useTemplateRef('chartRef')
 const tooltipPosition = useTooltipPosition(chartRef)
 
-// Sizing the chart from its container keeps labels at their real pixel size
-// instead of letting the SVG scale them down on narrow screens.
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width } = useElementSize(chartContainer)
 const hasStableChartWidth = computed(() => width.value > 0)
@@ -78,8 +76,6 @@ const rawDataset = computed<HourlySerie[]>(() =>
   })),
 )
 
-// Percentages rarely fill the whole 0-100 range, so the scale stops at the next
-// round step above the highest value instead.
 const scaleMax = computed(() => {
   const values = rawDataset.value.flatMap((serie) =>
     (serie.series as Array<number | null>).map((point) => point ?? 0),
@@ -99,11 +95,8 @@ const dataset = computed<VueUiXyDatasetItem[]>(() =>
 
 const hasSingleEntry = computed(() => dataset.value[0]?.series.length === 1)
 
-// Axis labels stay short — the tooltip carries the full timestamp.
 const axisTimeFormat = 'HH:mm'
 
-// A rolling day of scans is too many labels for one axis, so only every nth one
-// is drawn.
 const labelModulo = computed(() => {
   const maxLabels = isMobile.value ? 4 : 2
   return Math.max(1, Math.ceil(scanTimes.value.length / maxLabels))
