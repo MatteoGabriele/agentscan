@@ -31,10 +31,10 @@ function clear() {
     class="flex items-center gap-2 mb-8 border border-gh-border/60 relative rounded-full pl-6 pr-4 py-3 focus-within:border-gh-border-light"
     @submit.prevent="handleSubmit"
   >
-    <label class="flex-1" for="userName">
+    <label class="flex-1" for="ghAccount">
       <span class="sr-only">Enter a GitHub account name</span>
       <input
-        id="userName"
+        id="ghAccount"
         ref="inputRef"
         v-model="accountName"
         class="outline-none w-full"
@@ -43,8 +43,13 @@ function clear() {
         autocorrect="off"
         spellcheck="false"
         autocapitalize="none"
-        name="userName"
+        name="ghAccount"
         placeholder="GitHub account (e.g. torvalds)"
+        data-1p-ignore
+        data-bwignore
+        data-lpignore="true"
+        data-protonpass-ignore
+        data-form-type="other"
       />
     </label>
     <div class="flex items-center gap-2">
