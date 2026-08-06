@@ -105,7 +105,7 @@ const axisTimeFormat = 'HH:mm'
 // A rolling day of scans is too many labels for one axis, so only every nth one
 // is drawn.
 const labelModulo = computed(() => {
-  const maxLabels = isMobile.value ? 4 : 12
+  const maxLabels = isMobile.value ? 4 : 2
   return Math.max(1, Math.ceil(scanTimes.value.length / maxLabels))
 })
 
@@ -120,7 +120,7 @@ const config = computed<VueUiXyConfig>(() => ({
     width: Math.round(width.value),
     height: 300,
     padding: {
-      top: 0,
+      top: 12,
       right: 0,
       left: 0,
       bottom: 0,
@@ -392,7 +392,7 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
                 :key="item.id"
                 class="flex flex-row gap-1.5 place-items-center"
               >
-                <div class="w-3 h-3">
+                <div class="w-2 h-2">
                   <svg viewBox="0 0 2 2" class="w-full h-full">
                     <circle :cx="1" :cy="1" :r="1" :fill="item.color" />
                   </svg>
@@ -401,7 +401,7 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
                   class="text-gh-muted text-sm"
                   :class="item.isSegregated && 'line-through'"
                 >
-                  {{ item.name }}
+                  {{ item.name.toLowerCase() }}
                 </span>
               </button>
             </div>
