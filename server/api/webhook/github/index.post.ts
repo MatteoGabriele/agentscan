@@ -320,35 +320,39 @@ export default defineEventHandler(async (event) => {
 
     checkRunSettled = true
 
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        await octokit.rest.checks.update({
-          owner,
-          repo,
-          check_run_id: checkRunId,
-          status: 'completed',
-          conclusion,
-          completed_at: new Date().toISOString(),
-          details_url: `https://agentscan.tools/user/${username}`,
-          output: { title, summary },
-        })
-        return
-      } catch {
-        // retry once, then give up
-      }
+    try {
+      await octokit.rest.checks.update({
+        owner,
+        repo,
+        check_run_id: checkRunId,
+        status: 'completed',
+        conclusion,
+        completed_at: new Date().toISOString(),
+        details_url: `https://agentscan.tools/user/${username}`,
+        output: { title, summary },
+      })
+    } catch (err: unknown) {
+      console.error(
+        `Failed to complete check run ${checkRunId} on ${owner}/${repo}:`,
+        err,
+      )
+      checkRunSettled = false
     }
   }
 
-  const deadline = checkRunId
-    ? setTimeout(() => {
-        void completeCheckRun(
-          'neutral',
-          'Analysis timed out',
-          'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
-          { fallback: true },
-        )
-      }, CHECK_RUN_DEADLINE_MS)
-    : undefined
+  // In case this takes too long, we're gonna timeout the process
+  let deadline: NodeJS.Timeout | undefined
+
+  if (checkRunId) {
+    deadline = setTimeout(() => {
+      completeCheckRun(
+        'neutral',
+        'Analysis timed out',
+        'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
+        { fallback: true },
+      )
+    }, CHECK_RUN_DEADLINE_MS)
+  }
 
   try {
     if (isPR && !repoConfig.scan['pull-requests']) {
@@ -459,9 +463,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Posted before any early return: the honeypot exists precisely to catch
-    // the accounts that the activity heuristics read as organic.
-    //
     // `mode` deliberately does not apply here. The bait is a comment: there
     // is no honeypot without one.
     if (repoConfig.honeypot && !shouldAutoClose) {

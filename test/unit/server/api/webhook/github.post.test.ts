@@ -1718,39 +1718,40 @@ describe('GitHub Webhook Handler', () => {
       expect(mockInstallationOctokit.rest.checks.update).not.toHaveBeenCalled()
     })
 
-    it('retries the completion once when the check run update fails transiently', async () => {
-      mockInstallationOctokit.rest.checks.update
-        .mockRejectedValueOnce(new Error('502 Bad Gateway'))
-        .mockResolvedValueOnce({})
-
-      await handler(MOCK_EVENT)
-
-      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
-        2,
-      )
-    })
-
-    it('does not throw when both completion attempts fail', async () => {
+    it('does not throw when the check run completion fails', async () => {
       mockInstallationOctokit.rest.checks.update.mockRejectedValue(
         new Error('502 Bad Gateway'),
       )
 
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
+      // No retry of the real conclusion, but the run must not be left at
+      // `in_progress`: the guard concludes it as neutral instead.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
         2,
+      )
+      expect(
+        mockInstallationOctokit.rest.checks.update,
+      ).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          conclusion: 'neutral',
+          output: expect.objectContaining({ title: 'Analysis incomplete' }),
+        }),
       )
     })
 
     it('concludes the check run as neutral when the analysis outruns the deadline', async () => {
       vi.useFakeTimers()
 
-      // Never settles: stands in for a scan slow enough to be killed by the
-      // function timeout before it can conclude the run itself.
+      // Stays pending past the deadline: stands in for a scan slow enough to be
+      // killed by the function timeout before it can conclude the run itself.
+      let resolveUser: (value: unknown) => void = () => {}
       mockInstallationOctokit.rest.users.getByUsername.mockReturnValue(
-        new Promise(() => {}),
+        new Promise((resolve) => {
+          resolveUser = resolve
+        }),
       )
 
-      void handler(MOCK_EVENT)
+      const pending = handler(MOCK_EVENT)
 
       // Let the handler reach the deadline setup before the timer fires.
       await vi.advanceTimersByTimeAsync(8_000)
@@ -1763,6 +1764,13 @@ describe('GitHub Webhook Handler', () => {
           output: expect.objectContaining({ title: 'Analysis timed out' }),
         }),
       )
+
+      // Let the handler run its cleanup before handing the clock back, so no
+      // in-flight work leaks into the next test.
+      resolveUser({
+        data: { public_repos: 10, created_at: '2020-01-01T00:00:00Z' },
+      })
+      await pending
 
       vi.useRealTimers()
     })
