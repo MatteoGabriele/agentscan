@@ -310,5 +310,13 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/299",
     "reportedBy": "MatteoGabriele",
     "createdAt": "2026-08-02"
+  },
+  {
+    "username": "waterWang",
+    "id": 6082925,
+    "reason": "The account created over 1,000 PRs across different projects within a few weeks, prompting several maintainers to complain about PR spam. There also seems to be a connection to bounties, which might explain the insane activity.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/307",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-06"
   }
 ]
