@@ -380,7 +380,7 @@ watch(
             :value="timezone.id"
           >
             {{ formatOffset(timezone.offsetMinutes) }}
-            — {{ timezone.label }}
+            - {{ timezone.label }}
           </option>
         </select>
       </label>
