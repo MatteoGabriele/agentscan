@@ -1717,5 +1717,70 @@ describe('GitHub Webhook Handler', () => {
       expect(result).toMatchObject({ ok: true })
       expect(mockInstallationOctokit.rest.checks.update).not.toHaveBeenCalled()
     })
+
+    it('retries the completion once when the check run update fails transiently', async () => {
+      mockInstallationOctokit.rest.checks.update
+        .mockRejectedValueOnce(new Error('502 Bad Gateway'))
+        .mockResolvedValueOnce({})
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
+        2,
+      )
+    })
+
+    it('does not throw when both completion attempts fail', async () => {
+      mockInstallationOctokit.rest.checks.update.mockRejectedValue(
+        new Error('502 Bad Gateway'),
+      )
+
+      await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
+        2,
+      )
+    })
+
+    it('concludes the check run as neutral when the analysis outruns the deadline', async () => {
+      vi.useFakeTimers()
+
+      // Never settles: stands in for a scan slow enough to be killed by the
+      // function timeout before it can conclude the run itself.
+      mockInstallationOctokit.rest.users.getByUsername.mockReturnValue(
+        new Promise(() => {}),
+      )
+
+      void handler(MOCK_EVENT)
+
+      // Let the handler reach the deadline setup before the timer fires.
+      await vi.advanceTimersByTimeAsync(8_000)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          check_run_id: 555,
+          status: 'completed',
+          conclusion: 'neutral',
+          output: expect.objectContaining({ title: 'Analysis timed out' }),
+        }),
+      )
+
+      vi.useRealTimers()
+    })
+
+    it('does not conclude the check run twice when the scan finishes before the deadline', async () => {
+      vi.useFakeTimers()
+
+      await handler(MOCK_EVENT)
+      await vi.advanceTimersByTimeAsync(30_000)
+
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
+        1,
+      )
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({ conclusion: 'success' }),
+      )
+
+      vi.useRealTimers()
+    })
   })
 })

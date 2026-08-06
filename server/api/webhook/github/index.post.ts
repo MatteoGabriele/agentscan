@@ -28,6 +28,10 @@ import {
   isOwnComment,
 } from './_honeypot'
 
+// Netlify's synchronous function timeout is 10s. Leave room to conclude the
+// check run before the process is killed.
+const CHECK_RUN_DEADLINE_MS = 8_000
+
 type AutomationListItem = {
   username: string
   reason: string
@@ -300,60 +304,80 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  type CheckConclusion = 'success' | 'action_required' | 'failure'
+  type CheckConclusion = 'success' | 'action_required' | 'failure' | 'neutral'
+
+  let checkRunSettled = false
 
   const completeCheckRun = async (
     conclusion: CheckConclusion,
     title: string,
     summary: string,
+    { fallback = false }: { fallback?: boolean } = {},
   ) => {
-    if (!checkRunId) {
+    if (!checkRunId || (fallback && checkRunSettled)) {
       return
     }
-    await octokit.rest.checks
-      .update({
-        owner,
-        repo,
-        check_run_id: checkRunId,
-        status: 'completed',
-        conclusion,
-        completed_at: new Date().toISOString(),
-        details_url: `https://agentscan.tools/user/${username}`,
-        output: { title, summary },
-      })
-      .catch(() => {
-        // check run update failed
-      })
+
+    checkRunSettled = true
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await octokit.rest.checks.update({
+          owner,
+          repo,
+          check_run_id: checkRunId,
+          status: 'completed',
+          conclusion,
+          completed_at: new Date().toISOString(),
+          details_url: `https://agentscan.tools/user/${username}`,
+          output: { title, summary },
+        })
+        return
+      } catch {
+        // retry once, then give up
+      }
+    }
   }
 
-  if (isPR && !repoConfig.scan['pull-requests']) {
-    await completeCheckRun(
-      'success',
-      'Analysis skipped',
-      'PR scanning is disabled for this repository.',
-    )
-    return { ok: true }
-  }
-
-  if (isIssue && !repoConfig.scan.issues) {
-    return { ok: true }
-  }
-
-  if (
-    repoConfig['allowed-users'].includes(username) ||
-    isKnownBot(username) ||
-    (authorAssociation &&
-      repoConfig['trusted-author-associations'].includes(authorAssociation))
-  ) {
-    await completeCheckRun(
-      'success',
-      'Analysis skipped',
-      'This contributor is exempt from analysis (allow-listed, a known automation, or a trusted author association).',
-    )
-    return { ok: true }
-  }
+  const deadline = checkRunId
+    ? setTimeout(() => {
+        void completeCheckRun(
+          'neutral',
+          'Analysis timed out',
+          'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
+          { fallback: true },
+        )
+      }, CHECK_RUN_DEADLINE_MS)
+    : undefined
 
   try {
+    if (isPR && !repoConfig.scan['pull-requests']) {
+      await completeCheckRun(
+        'success',
+        'Analysis skipped',
+        'PR scanning is disabled for this repository.',
+      )
+      return { ok: true }
+    }
+
+    if (isIssue && !repoConfig.scan.issues) {
+      return { ok: true }
+    }
+
+    if (
+      repoConfig['allowed-users'].includes(username) ||
+      isKnownBot(username) ||
+      (authorAssociation &&
+        repoConfig['trusted-author-associations'].includes(authorAssociation))
+    ) {
+      await completeCheckRun(
+        'success',
+        'Analysis skipped',
+        'This contributor is exempt from analysis (allow-listed, a known automation, or a trusted author association).',
+      )
+      return { ok: true }
+    }
+
     const { data: user } = await octokit.rest.users.getByUsername({ username })
 
     const responses = await Promise.all(
@@ -646,5 +670,16 @@ export default defineEventHandler(async (event) => {
       'AgentScan encountered an error while analyzing this contributor.',
     )
     throw err
+  } finally {
+    clearTimeout(deadline)
+
+    // Catches any exit that reached neither a conclusion nor the catch above —
+    // an early return added later, or a non-Error thrown past it.
+    await completeCheckRun(
+      'neutral',
+      'Analysis incomplete',
+      'AgentScan did not produce a result for this contributor.',
+      { fallback: true },
+    )
   }
 })
