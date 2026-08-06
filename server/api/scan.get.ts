@@ -20,6 +20,7 @@ const TRUSTED_ASSOCIATIONS: AuthorAssociation[] = [
 type Entry = {
   login: string
   prUrl: string
+  state: string
 }
 
 export default defineCachedEventHandler(
@@ -44,7 +45,6 @@ export default defineCachedEventHandler(
     const { owner, repo } = parsed
     const octokit = createOctokit(config.githubToken)
 
-    const seenEntries = new Set<string>()
     const entries: Entry[] = []
 
     try {
@@ -56,7 +56,7 @@ export default defineCachedEventHandler(
         const { data: prs } = await octokit.rest.pulls.list({
           owner,
           repo,
-          state: 'open',
+          state: 'all',
           sort: 'created',
           direction: 'desc',
           per_page: PER_PAGE,
@@ -80,16 +80,12 @@ export default defineCachedEventHandler(
             continue
           }
 
-          const lower = pr.user.login.toLowerCase()
-
-          if (seenEntries.has(lower)) {
-            continue
-          }
-
-          seenEntries.add(lower)
+          const username = pr.user.login.toLowerCase()
+          console.log(pr)
           entries.push({
-            login: lower,
+            login: username,
             prUrl: pr.html_url,
+            state: pr.state,
           })
         }
 
@@ -125,6 +121,7 @@ export default defineCachedEventHandler(
             user,
             analysis,
             prUrl: entry.prUrl,
+            prState: entry.state,
             eventsCount: events.length,
           }
         }),

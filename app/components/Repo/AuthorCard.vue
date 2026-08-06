@@ -4,6 +4,7 @@ import type { GitHubUser, IdentifyResult } from '@unveil/identity'
 const props = defineProps<{
   user: GitHubUser
   prUrl: string
+  prState: string
   analysis: IdentifyResult
 }>()
 
@@ -85,7 +86,7 @@ const { scoreStyle } = useScoreStyle(
 
     <div class="pt-4 flex gap-4 items-center justify-between">
       <div class="text-sm flex items-center gap-1">
-        <span class="text-gh-muted">Opened PR</span>
+        <span class="text-gh-muted">{{ prState }}</span>
         <NuxtLink
           class="text-gh-text/80 underline hover:text-gh-text"
           target="_blank"

@@ -90,6 +90,7 @@ async function handleSubmit(value: string) {
         :key="author.user.login"
         :user="author.user"
         :pr-url="author.prUrl"
+        :pr-state="author.prState"
         :analysis="author.analysis"
       />
     </ul>
