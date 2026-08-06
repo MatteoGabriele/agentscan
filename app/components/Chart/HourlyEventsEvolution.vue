@@ -97,11 +97,6 @@ const hasSingleEntry = computed(() => dataset.value[0]?.series.length === 1)
 
 const axisTimeFormat = 'HH:mm'
 
-const labelModulo = computed(() => {
-  const maxLabels = isMobile.value ? 4 : 2
-  return Math.max(1, Math.ceil(scanTimes.value.length / maxLabels))
-})
-
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
   chart: {
@@ -149,8 +144,8 @@ const config = computed<VueUiXyConfig>(() => ({
           show: true,
           color: colors.value.textMuted,
           fontSize: isMobile.value ? 10 : 12,
-          showOnlyAtModulo: labelModulo.value > 1,
-          modulo: labelModulo.value,
+          showOnlyAtModulo: true,
+          modulo: isMobile.value ? 4 : 12,
           values: scanTimes.value,
           datetimeFormatter: {
             enable: true,
