@@ -17,7 +17,10 @@ export type ClassificationStats = {
   createdAt: string | null
 }
 
-type getClassificationStatsByDateResults = Record<string, ClassificationStats>
+export type GetClassificationStatsByDateResults = Record<
+  string,
+  ClassificationStats
+>
 
 export const CLASSIFICATION_CATEGORIES = [
   'organic',
@@ -60,8 +63,8 @@ function createEmptyClassificationStats(): ClassificationStats {
 function getClassificationStatsByBucket(
   data: EcosystemHealthItem[],
   getBucketKey: (createdAt: string) => string,
-): getClassificationStatsByDateResults {
-  const result: getClassificationStatsByDateResults = {}
+): GetClassificationStatsByDateResults {
+  const result: GetClassificationStatsByDateResults = {}
 
   const scored = data.filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
 
@@ -113,7 +116,7 @@ function getClassificationStatsByBucket(
 
 export function getClassificationStatsByDate(
   data: EcosystemHealthItem[] = [],
-): getClassificationStatsByDateResults {
+): GetClassificationStatsByDateResults {
   return getClassificationStatsByBucket(data, getDateKey)
 }
 
@@ -121,7 +124,7 @@ export function getClassificationStatsByDate(
 // already its own bucket — the hourly scan gives one bucket per hour.
 export function getClassificationStatsByScanTime(
   data: EcosystemHealthItem[] = [],
-): getClassificationStatsByDateResults {
+): GetClassificationStatsByDateResults {
   return getClassificationStatsByBucket(data, (createdAt) => createdAt)
 }
 

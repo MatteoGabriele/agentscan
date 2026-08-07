@@ -4,6 +4,8 @@ definePageMeta({
 })
 
 const { data } = await useEcosystemHealth({ full: true })
+const { data: hourly } = await useEcosystemHealthHourly()
+const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
 </script>
 
 <template>
@@ -37,8 +39,21 @@ const { data } = await useEcosystemHealth({ full: true })
     <div
       class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto pb-12 w-full px-4"
     >
-      <div class="w-full">
-        <LazyChartHourlyEventsEvolution hydrate-on-visible />
+      <div v-if="hourly" class="w-full">
+        <LazyChartHourlyEventsEvolution
+          :scan-times="hourly.scanTimes"
+          :counts-by-scan-time="hourly.countsByScanTime"
+          :automation-threshold="25"
+          hydrate-on-visible
+        />
+      </div>
+      <div v-if="hourlyWindow" class="w-full">
+        <LazyChartHourlyEventsEvolution
+          :scan-times="hourlyWindow.scanTimes"
+          :counts-by-scan-time="hourlyWindow.countsByScanTime"
+          :automation-threshold="50"
+          hydrate-on-visible
+        />
       </div>
       <div class="w-full">
         <LazyChartHealthResponseSparklines />

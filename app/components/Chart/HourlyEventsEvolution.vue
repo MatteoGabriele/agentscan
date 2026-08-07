@@ -16,18 +16,23 @@ import type {
   TimezoneId,
   TimezoneWorkHours,
 } from '~~/shared/types/tz-work-hours'
+import type { GetClassificationStatsByDateResults } from '~~/shared/utils/count-classification-by-date'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
 import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealthHourly()
+const props = defineProps<{
+  scanTimes: string[]
+  countsByScanTime: GetClassificationStatsByDateResults
+  automationThreshold: number
+}>()
+
 const isDarkMode = usePreferredDark()
 
-const scanTimes = computed(() => data.value?.scanTimes ?? [])
-const countsByScanTime = computed(() => data.value?.countsByScanTime)
-const hasData = computed(() => scanTimes.value.length > 0)
+const countsByScanTime = computed(() => props.countsByScanTime)
+const hasData = computed(() => props.scanTimes.length > 0)
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
@@ -67,17 +72,17 @@ const rawDataset = computed<HourlySerie[]>(() =>
   SERIES.map(({ name, category }) => ({
     name,
     category,
-    series: scanTimes.value.map(
+    series: props.scanTimes.map(
       (scanTime) =>
         countsByScanTime.value?.[scanTime]?.[category].percentage ?? 0,
     ),
-    trends: scanTimes.value.map(
+    trends: props.scanTimes.map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.[category].trend ?? 0,
     ),
-    counts: scanTimes.value.map(
+    counts: props.scanTimes.map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.[category].count ?? 0,
     ),
-    totals: scanTimes.value.map(
+    totals: props.scanTimes.map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.total.count ?? 0,
     ),
     color: getSerieColor(category),
@@ -155,7 +160,7 @@ const config = computed<VueUiXyConfig>(() => ({
           show: true,
           color: colors.value.textMuted,
           fontSize: isMobile.value ? 10 : 12,
-          values: scanTimes.value,
+          values: props.scanTimes,
           datetimeFormatter: {
             enable: true,
             useUTC: false,
@@ -203,7 +208,7 @@ function getTrend({
 }
 
 function formatScanTime(index: number) {
-  const scanTime = scanTimes.value[index]
+  const scanTime = props.scanTimes[index]
 
   if (!scanTime) {
     return ''
@@ -263,7 +268,10 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
           absoluteIndex,
           isAlert:
             d.name === 'Automation' &&
-            isAlert(d.absoluteValues[absoluteIndex]!, 25),
+            isAlert(
+              d.absoluteValues[absoluteIndex]!,
+              props.automationThreshold,
+            ),
         }
       }),
     }
@@ -284,7 +292,7 @@ function parseScanTime(scanTime: string) {
 }
 
 function getHourIndex(parisTime: Dayjs) {
-  const exactIndex = scanTimes.value.findIndex((scanTime) => {
+  const exactIndex = props.scanTimes.findIndex((scanTime) => {
     const time = parseScanTime(scanTime)
 
     return time.isValid() && time.isSame(parisTime, 'hour')
@@ -294,7 +302,7 @@ function getHourIndex(parisTime: Dayjs) {
     return exactIndex
   }
 
-  return scanTimes.value.findIndex((scanTime) => {
+  return props.scanTimes.findIndex((scanTime) => {
     const time = parseScanTime(scanTime)
 
     return time.isValid() && time.hour() === parisTime.hour()
@@ -397,7 +405,7 @@ function getScanTZ({
 
 const fogOfSleep = computed<FogOfSleepRange | null>(() => {
   const hours = workHours.value[selectedTimezoneId.value]
-  const referenceScanTime = scanTimes.value.at(-1)
+  const referenceScanTime = props.scanTimes.at(-1)
 
   if (!hours || !referenceScanTime) {
     return null
