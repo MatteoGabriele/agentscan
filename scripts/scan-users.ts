@@ -23,6 +23,10 @@ const RETRY_DELAY_MS = 5000
 const RETRY_MAX_ATTEMPT = 2
 const PR_SCAN_AMOUNT = 10
 const DEFAULT_OUTPUT_FILE = 'scan-results.txt'
+const PRS_PER_PAGE = 50
+// Safety net for the hourly window: a repo that opened more than this many PRs
+// in a single hour is either enormous or under attack — either way, stop paging.
+const WINDOW_MAX_PAGES = 5
 
 interface ScanResult {
   created_at: string
@@ -42,6 +46,41 @@ interface ScanOptions {
   outputFile?: string
   /** Keep only the N most recent scan runs in the output file (rolling window). */
   maxScans?: number
+  /**
+   * When set, the same run also writes a second, time-windowed dataset here:
+   * every PR opened during the previous full hour, instead of the fixed
+   * top-N-per-repo sample. Omit to leave the run single-file.
+   */
+  windowOutputFile?: string
+  /** Rolling window for `windowOutputFile`, in scan runs. */
+  windowMaxScans?: number
+}
+
+type GitHubUser = Awaited<
+  ReturnType<Octokit['rest']['users']['getByUsername']>
+>['data']
+
+interface CollectedPr {
+  id: number
+  login: string
+  created_at: string
+  public_repos: number
+  profile: IdentifyUser
+  repo_name: string
+  pr_key: string
+  pr_status: PrStatus
+}
+
+/**
+ * The previous full clock hour: a run at 08:04 covers 07:00:00 → 07:59:59.
+ * Anchoring to the hour boundary rather than "now minus 60 minutes" keeps
+ * windows contiguous and gap-free even when a run starts late.
+ */
+export function previousHourWindow(now: Date): { start: Date; end: Date } {
+  const end = new Date(now)
+  end.setUTCMinutes(0, 0, 0)
+  const start = new Date(end.getTime() - 60 * 60 * 1000)
+  return { start, end }
 }
 
 async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
@@ -129,41 +168,103 @@ async function fetchUserEvents(
   return pages.flatMap((page) => page.data) as GitHubEvent[]
 }
 
-async function searchUsers(
+/**
+ * Walks each repo's PR list once and feeds two datasets from it:
+ *
+ *   `sample`   — the N most recent PRs per repo, whatever their age. Fixed size,
+ *                so the ecosystem graph compares like with like over time.
+ *   `windowed` — every PR *opened* inside `window`, however many that is (often
+ *                zero for quiet repos). Sized by real activity, not by quota.
+ *
+ * Both keep closed and merged PRs. The window filters on `created_at` only:
+ * a spam PR opened at 07:12 and closed at 07:15 was still opened in the window,
+ * and dropping it would delete exactly the population the window is measuring.
+ * `pr_status` is carried through so it can be sliced on later — inside a
+ * one-hour window a `closed` row means "closed within the hour", which is a
+ * signal in its own right rather than a reason to exclude the row.
+ */
+export async function collectPrs(
   octokit: Octokit,
   prsPerRepo: number = PR_SCAN_AMOUNT,
+  window: { start: Date; end: Date } | null = null,
 ) {
-  const users: Array<{
-    id: number
-    login: string
-    created_at: string
-    public_repos: number
-    profile: IdentifyUser
-    repo_name: string
-    pr_key: string
-    pr_status: PrStatus
-  }> = []
+  const sample: CollectedPr[] = []
+  const windowed: CollectedPr[] = []
+  // An account can author PRs in several tracked repos, and can land in both
+  // datasets in the same run — fetch its profile once.
+  const profiles = new Map<string, GitHubUser>()
+
+  async function getProfile(login: string, label: string) {
+    const cached = profiles.get(login)
+    if (cached) {
+      return cached
+    }
+
+    const fullProfile = await withRetry(
+      () => octokit.rest.users.getByUsername({ username: login }),
+      label,
+    )
+    profiles.set(login, fullProfile.data)
+
+    await new Promise((resolve) =>
+      setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
+    )
+
+    return fullProfile.data
+  }
 
   for (const repoFullName of libraries) {
     const [owner, repo] = repoFullName.split('/')
     let prsFromThisRepo = 0
+    let windowedFromThisRepo = 0
 
-    const prs = await withRetry(
-      () =>
-        octokit.rest.pulls.list({
-          owner,
-          repo,
-          state: 'all',
-          sort: 'created',
-          direction: 'desc',
-          per_page: 50,
-        }),
-      `${repoFullName}: fetch PRs`,
-    )
+    // Page 1 alone covers the fixed sample. The window may need more, so keep
+    // paging until a page ends before the window starts.
+    const prs: Awaited<ReturnType<typeof octokit.rest.pulls.list>>['data'] = []
 
-    for (const pr of prs.data) {
-      if (prsFromThisRepo >= prsPerRepo) {
+    for (let page = 1; page <= (window ? WINDOW_MAX_PAGES : 1); page++) {
+      const response = await withRetry(
+        () =>
+          octokit.rest.pulls.list({
+            owner,
+            repo,
+            state: 'all',
+            sort: 'created',
+            direction: 'desc',
+            per_page: PRS_PER_PAGE,
+            page,
+          }),
+        `${repoFullName}: fetch PRs (page ${page})`,
+      )
+
+      prs.push(...response.data)
+
+      const oldest = response.data.at(-1)
+      const exhausted = response.data.length < PRS_PER_PAGE
+      const reachedWindowStart =
+        !window || !oldest || new Date(oldest.created_at) < window.start
+
+      if (exhausted || reachedWindowStart) {
         break
+      }
+    }
+
+    for (const pr of prs) {
+      const createdAt = new Date(pr.created_at)
+      const olderThanWindow = !window || createdAt < window.start
+      const needsSample = prsFromThisRepo < prsPerRepo
+
+      // Sorted newest first, so once the sample is full and we are past the
+      // window there is nothing left in this repo worth reading.
+      if (!needsSample && olderThanWindow) {
+        break
+      }
+
+      const inWindow =
+        window != null && !olderThanWindow && createdAt < window.end
+
+      if (!needsSample && !inWindow) {
+        continue
       }
       if (!pr.user?.login) {
         continue
@@ -174,28 +275,32 @@ async function searchUsers(
         continue
       }
 
-      const fullProfile = await withRetry(
-        () => octokit.rest.users.getByUsername({ username: pr.user!.login }),
+      const profile = await getProfile(
+        pr.user.login,
         `${repoFullName}: fetch user ${pr.user.login}`,
       )
 
-      users.push({
-        id: fullProfile.data.id,
-        login: fullProfile.data.login,
-        created_at: fullProfile.data.created_at,
+      const collected: CollectedPr = {
+        id: profile.id,
+        login: profile.login,
+        created_at: profile.created_at,
         pr_key: hashPrId(repoFullName, pr.number),
         pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
-        public_repos: fullProfile.data.public_repos,
-        profile: fullProfile.data,
+        public_repos: profile.public_repos,
+        profile,
         repo_name: repoFullName,
-      })
+      }
 
-      prsFromThisRepo++
-      console.log(`  ${repoFullName}: ${prsFromThisRepo}/${prsPerRepo}`)
+      if (needsSample) {
+        sample.push(collected)
+        prsFromThisRepo++
+        console.log(`  ${repoFullName}: ${prsFromThisRepo}/${prsPerRepo}`)
+      }
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, DELAY_BETWEEN_GITHUB_CALLS),
-      )
+      if (inWindow) {
+        windowed.push(collected)
+        windowedFromThisRepo++
+      }
     }
 
     if (prsFromThisRepo < prsPerRepo) {
@@ -203,9 +308,14 @@ async function searchUsers(
         `${repoFullName}: only ${prsFromThisRepo}/${prsPerRepo} PRs collected — aborting scan`,
       )
     }
+
+    // No floor on the windowed count: an hour with no PRs is a real result.
+    if (window) {
+      console.log(`  ${repoFullName}: ${windowedFromThisRepo} in window`)
+    }
   }
 
-  return users
+  return { sample, windowed }
 }
 
 export async function main(options: ScanOptions = {}) {
@@ -214,6 +324,8 @@ export async function main(options: ScanOptions = {}) {
     prsPerRepo = PR_SCAN_AMOUNT,
     outputFile = DEFAULT_OUTPUT_FILE,
     maxScans,
+    windowOutputFile,
+    windowMaxScans,
   } = options
 
   // Scans run on a separate account's token so they draw from their own rate
@@ -235,57 +347,115 @@ export async function main(options: ScanOptions = {}) {
   const octokit = new Octokit({ auth: token })
   const scanResults = dryRun ? [] : loadScanResults(outputFile)
   const verifiedAutomations = loadVerifiedAutomations()
-  const now = new Date().toISOString()
+  const now = new Date()
+  const runAt = now.toISOString()
 
-  const users = await searchUsers(octokit, prsPerRepo)
+  const window = windowOutputFile ? previousHourWindow(now) : null
+  // The windowed rows are stamped with the hour they describe, not the moment
+  // the run started, so a bucket means "PRs opened during 07:00–08:00".
+  const windowAt = window?.start.toISOString()
 
-  let completedCount = 0
-  const repoScores: Map<string, number> = new Map()
-
-  for (const user of users) {
+  if (window) {
     console.log(
-      `Scanning (${completedCount + 1}/${users.length}) [${user.repo_name}]`,
+      `Window: ${window.start.toISOString()} → ${window.end.toISOString()}`,
     )
+  }
+
+  const { sample, windowed } = await collectPrs(octokit, prsPerRepo, window)
+
+  // Re-running the workflow inside the same hour rewrites that hour's bucket
+  // rather than appending a second copy of it.
+  const windowResults =
+    dryRun || !windowOutputFile
+      ? []
+      : loadScanResults(windowOutputFile).filter(
+          (result) => result.created_at !== windowAt,
+        )
+
+  // One score per account, reused across every PR it authored in this run —
+  // the analysis looks at the user's events, not at the individual PR.
+  const scoredUsers = new Map<
+    string,
+    { score: number; events_count: number; is_bounty: boolean }
+  >()
+
+  async function scoreUser(pr: CollectedPr) {
+    const cached = scoredUsers.get(pr.login)
+    if (cached) {
+      return cached
+    }
 
     const events = await withRetry(
-      () => fetchUserEvents(octokit, user.login),
-      `fetch events for ${user.login}`,
+      () => fetchUserEvents(octokit, pr.login),
+      `fetch events for ${pr.login}`,
     )
 
-    const analysis = identify({ user: user.profile, events })
+    const analysis = identify({ user: pr.profile, events })
 
     let score = analysis.score
-    const eventsCount = events.length
 
     if (analysis.classification === 'insufficient-data') {
       score = INSUFFICIENT_DATA_SCORE
     }
 
     // A confirmed automation stays an automation regardless of data volume.
-    if (verifiedAutomations.has(user.id)) {
+    if (verifiedAutomations.has(pr.id)) {
       score = 0
     }
 
-    scanResults.push({
-      created_at: now,
+    const scored = {
       score,
-      pr_key: user.pr_key,
-      pr_status: user.pr_status,
-      user_created_at: user.created_at,
-      user_public_repos_count: user.public_repos,
-      events_count: eventsCount,
-      repo_name: user.repo_name,
+      events_count: events.length,
       is_bounty: analysis.isBountyHunter,
-    })
-
-    if (score !== INSUFFICIENT_DATA_SCORE) {
-      const currentScore = repoScores.get(user.repo_name) ?? 0
-      repoScores.set(user.repo_name, currentScore + score)
     }
-
-    completedCount++
+    scoredUsers.set(pr.login, scored)
 
     await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_SCANS))
+
+    return scored
+  }
+
+  function toResult(
+    pr: CollectedPr,
+    createdAt: string,
+    scored: Awaited<ReturnType<typeof scoreUser>>,
+  ): ScanResult {
+    return {
+      created_at: createdAt,
+      score: scored.score,
+      pr_key: pr.pr_key,
+      pr_status: pr.pr_status,
+      user_created_at: pr.created_at,
+      user_public_repos_count: pr.public_repos,
+      events_count: scored.events_count,
+      repo_name: pr.repo_name,
+      is_bounty: scored.is_bounty,
+    }
+  }
+
+  let completedCount = 0
+  const total = sample.length + windowed.length
+  const repoScores: Map<string, number> = new Map()
+
+  for (const pr of sample) {
+    console.log(`Scanning (${++completedCount}/${total}) [${pr.repo_name}]`)
+
+    const scored = await scoreUser(pr)
+    scanResults.push(toResult(pr, runAt, scored))
+
+    if (scored.score !== INSUFFICIENT_DATA_SCORE) {
+      const currentScore = repoScores.get(pr.repo_name) ?? 0
+      repoScores.set(pr.repo_name, currentScore + scored.score)
+    }
+  }
+
+  for (const pr of windowed) {
+    console.log(
+      `Scanning window (${++completedCount}/${total}) [${pr.repo_name}]`,
+    )
+
+    const scored = await scoreUser(pr)
+    windowResults.push(toResult(pr, windowAt!, scored))
   }
 
   // Only reached if every repo and every user scan succeeded
@@ -293,6 +463,16 @@ export async function main(options: ScanOptions = {}) {
     maxScans != null ? trimToRecentScans(scanResults, maxScans) : scanResults
 
   saveScanResults(finalResults, outputFile, dryRun)
+
+  if (windowOutputFile) {
+    const finalWindowResults =
+      windowMaxScans != null
+        ? trimToRecentScans(windowResults, windowMaxScans)
+        : windowResults
+
+    saveScanResults(finalWindowResults, windowOutputFile, dryRun)
+    console.log(`Window: ${windowed.length} PRs opened in the previous hour`)
+  }
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
     (a, b) => b[1] - a[1],
@@ -318,11 +498,25 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ? parseInt(maxScansArg.split('=')[1], 10)
     : undefined
 
+  const windowOutputArg = args.find((a) => a.startsWith('--window-output='))
+  const windowOutputFile = windowOutputArg
+    ? windowOutputArg.split('=')[1]
+    : undefined
+
+  const windowMaxScansArg = args.find((a) =>
+    a.startsWith('--window-max-scans='),
+  )
+  const windowMaxScans = windowMaxScansArg
+    ? parseInt(windowMaxScansArg.split('=')[1], 10)
+    : undefined
+
   main({
     dryRun,
     ...(prsPerRepo != null && { prsPerRepo }),
     ...(outputFile && { outputFile }),
     ...(maxScans != null && { maxScans }),
+    ...(windowOutputFile && { windowOutputFile }),
+    ...(windowMaxScans != null && { windowMaxScans }),
   }).catch((error) => {
     console.error('Fatal error:', error.message)
     process.exit(1)

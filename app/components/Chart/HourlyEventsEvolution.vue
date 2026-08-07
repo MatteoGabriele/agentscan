@@ -505,7 +505,8 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
       <h2 class="text-center">Hourly ecosystem health</h2>
       <p class="text-sm text-gh-muted text-center text-pretty">
         Same classification split as the health page, but sampled every hour.
-        Only the last 24 scans are kept, so this is a rolling one-day window.
+        Only the last 25 scans are kept, so the first and last point sit exactly
+        one day apart.
       </p>
     </div>
 
