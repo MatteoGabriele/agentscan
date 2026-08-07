@@ -7,7 +7,7 @@ import {
   type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, usePreferredDark } from '@vueuse/core'
 import dayjs, { type Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -23,6 +23,7 @@ dayjs.extend(timezone)
 import('vue-data-ui/style.css')
 
 const { data } = useEcosystemHealthHourly()
+const isDarkMode = usePreferredDark()
 
 const scanTimes = computed(() => data.value?.scanTimes ?? [])
 const countsByScanTime = computed(() => data.value?.countsByScanTime)
@@ -313,7 +314,7 @@ type FogOfSleepRect = {
   height: number
 }
 
-const selectedTimezoneId = ref<TimezoneId>('UTC+00:00')
+const selectedTimezoneId = ref<TimezoneId>('UTC+02:00')
 const workHours = ref<TimezoneWorkHours>({})
 
 function getTimeParts(value: string) {
@@ -459,7 +460,7 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
   const left = svg.drawingArea.left
   const right = svg.drawingArea.right
   const top = svg.drawingArea.top
-  const bottom = svg.drawingArea.bottom
+  const bottom = svg.drawingArea.bottom + 20 // additional height to cover time labels
   const height = Math.max(0, bottom - top)
   const startX = Math.min(right, Math.max(left, startPlot.x))
   const endX = Math.min(right, Math.max(left, endPlot.x))
@@ -497,6 +498,8 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
     (rect): rect is FogOfSleepRect => rect !== null,
   )
 }
+
+const showTzSelector = shallowRef(false)
 </script>
 
 <template>
@@ -518,7 +521,7 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
       <div ref="chartContainer" class="w-full">
         <VueUiXy v-if="hasStableChartWidth" ref="chartRef" :dataset :config>
           <template #svg="{ svg }">
-            <g aria-hidden="true" pointer-events="none">
+            <g aria-hidden="true" pointer-events="none" v-if="showTzSelector">
               <rect
                 v-for="rect in getFogOfSleep(svg)"
                 :key="rect.id"
@@ -526,8 +529,8 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
                 :y="rect.y"
                 :width="rect.width"
                 :height="rect.height"
-                :fill="colors.bg"
-                fill-opacity="0.4"
+                fill="#0b0b0b"
+                :fill-opacity="isDarkMode ? 0.3 : 0.1"
                 style="transition: all 0.2s"
               />
             </g>
@@ -672,12 +675,41 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
       </div>
     </ClientOnly>
 
-    <CommonTimezoneWorkHoursSelector
-      v-if="hasData"
-      v-model="workHours"
-      v-model:timezone="selectedTimezoneId"
-      class="mx-auto mb-5"
-    />
+    <template v-if="hasData">
+      <div
+        class="mx-auto mb-5 overflow-hidden rounded-lg border border-current/10 transition-colors"
+      >
+        <label
+          class="flex cursor-pointer items-center justify-between gap-4 px-3 py-2.5 transition-colors hover:bg-current/[0.03]"
+        >
+          <div class="min-w-0">
+            <span class="block text-sm font-medium text-inherit">
+              Show activity hours
+            </span>
+
+            <span class="mt-0.5 block text-xs text-gh-muted">
+              Display activity hours by a selected timezone
+            </span>
+          </div>
+
+          <input
+            v-model="showTzSelector"
+            type="checkbox"
+            class="h-4 w-4 shrink-0 cursor-pointer accent-current"
+          />
+        </label>
+
+        <div
+          v-show="showTzSelector"
+          class="border-t border-current/10 px-3 py-3"
+        >
+          <CommonTimezoneWorkHoursSelector
+            v-model="workHours"
+            v-model:timezone="selectedTimezoneId"
+          />
+        </div>
+      </div>
+    </template>
   </section>
 </template>
 

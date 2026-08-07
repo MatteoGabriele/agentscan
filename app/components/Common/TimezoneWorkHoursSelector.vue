@@ -286,40 +286,6 @@ function formatOffset(offsetMinutes: number): string {
   return offset === '+00:00' ? 'UTC±00:00' : `UTC${offset}`
 }
 
-function formatUtcTime(
-  localTime: string,
-  offsetMinutes: number,
-  nextLocalDay = false,
-): string {
-  const [hour, minute] = localTime.split(':').map(Number)
-
-  const referenceDay = dayjs.utc('2000-01-02T00:00:00Z')
-
-  const localDateTime = referenceDay
-    .add(nextLocalDay ? 1 : 0, 'day')
-    .hour(hour!)
-    .minute(minute!)
-
-  const utcDateTime = localDateTime.subtract(offsetMinutes, 'minute')
-
-  const dayDifference = utcDateTime
-    .startOf('day')
-    .diff(referenceDay.startOf('day'), 'day')
-
-  let dayLabel = ''
-
-  if (dayDifference === -1) {
-    dayLabel = ' · previous day'
-  } else if (dayDifference === 1) {
-    dayLabel = ' · next day'
-  } else if (dayDifference !== 0) {
-    const prefix = dayDifference > 0 ? '+' : ''
-    dayLabel = ` · ${prefix}${dayDifference} days`
-  }
-
-  return `${utcDateTime.format('HH:mm')} UTC${dayLabel}`
-}
-
 watch(
   model,
   (value) => {
@@ -358,12 +324,11 @@ watch(
 </script>
 
 <template>
-  <section
-    class="w-full rounded-lg border border-current/10 bg-transparent p-3"
-    aria-label="Work hours by timezone"
-  >
-    <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-      <label class="grid min-w-0 gap-1 sm:col-span-2">
+  <section class="w-full" aria-label="Work hours by timezone">
+    <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+      <label
+        class="flex min-w-0 w-full flex-col gap-1 lg:w-[calc(50%_-_0.3125rem)]"
+      >
         <span
           class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
         >
@@ -385,32 +350,13 @@ watch(
         </select>
       </label>
 
-      <label class="grid min-w-0 gap-1">
+      <label
+        class="flex min-w-0 w-full flex-col gap-1 sm:w-[calc(50%_-_0.3125rem)] lg:w-[calc(25%_-_0.46875rem)]"
+      >
         <span
           class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
         >
-          Work starts
-        </span>
-
-        <select
-          v-model="selectedStart"
-          class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
-        >
-          <option
-            v-for="time in timeOptions"
-            :key="time.value"
-            :value="time.value"
-          >
-            {{ time.label }}
-          </option>
-        </select>
-      </label>
-
-      <label class="grid min-w-0 gap-1">
-        <span
-          class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
-        >
-          Work ends
+          Sleep starts
         </span>
 
         <select
@@ -426,35 +372,29 @@ watch(
           </option>
         </select>
       </label>
-    </div>
 
-    <div
-      class="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-current/10 pt-2 text-xs text-gh-muted"
-    >
-      <span class="min-w-0 truncate">
-        {{ selectedTimezone.examples }}
-      </span>
-
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 tabular-nums">
-        <span class="text-inherit">
-          {{ selectedStart }}–{{ selectedEnd }}
-          <span v-if="isOvernight">(+1 day)</span>
+      <label
+        class="flex min-w-0 w-full flex-col gap-1 sm:w-[calc(50%_-_0.3125rem)] lg:w-[calc(25%_-_0.46875rem)]"
+      >
+        <span
+          class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
+        >
+          Sleep ends
         </span>
 
-        <span aria-hidden="true" class="hidden opacity-40 sm:inline">·</span>
-
-        <span>
-          {{ formatUtcTime(selectedStart, selectedTimezone.offsetMinutes) }}
-          →
-          {{
-            formatUtcTime(
-              selectedEnd,
-              selectedTimezone.offsetMinutes,
-              isOvernight,
-            )
-          }}
-        </span>
-      </div>
+        <select
+          v-model="selectedStart"
+          class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
+        >
+          <option
+            v-for="time in timeOptions"
+            :key="time.value"
+            :value="time.value"
+          >
+            {{ time.label }}
+          </option>
+        </select>
+      </label>
     </div>
   </section>
 </template>
