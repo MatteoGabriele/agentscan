@@ -14,7 +14,6 @@ import timezone from 'dayjs/plugin/timezone'
 import { round } from '~~/shared/utils/numbers'
 import type {
   TimezoneId,
-  WorkHours,
   TimezoneWorkHours,
 } from '~~/shared/types/tz-work-hours'
 
