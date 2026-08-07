@@ -521,7 +521,7 @@ const showTzSelector = shallowRef(false)
       <div ref="chartContainer" class="w-full">
         <VueUiXy v-if="hasStableChartWidth" ref="chartRef" :dataset :config>
           <template #svg="{ svg }">
-            <g aria-hidden="true" pointer-events="none" v-if="showTzSelector">
+            <g v-if="showTzSelector" aria-hidden="true" pointer-events="none">
               <rect
                 v-for="rect in getFogOfSleep(svg)"
                 :key="rect.id"

@@ -184,13 +184,6 @@ const timeOptions = Array.from({ length: 24 }, (_, hour) => {
   }
 })
 
-const selectedTimezone = computed(() => {
-  return (
-    TIMEZONES.find((timezone) => timezone.id === selectedTimezoneId.value) ??
-    TIMEZONES[12]
-  )
-})
-
 const selectedWorkHours = computed<WorkHours>(() => {
   return (
     model.value?.[selectedTimezoneId.value] ?? {
@@ -217,10 +210,6 @@ const selectedEnd = computed({
   set(value: string): void {
     updateWorkHour('end', value)
   },
-})
-
-const isOvernight = computed(() => {
-  return selectedEnd.value <= selectedStart.value
 })
 
 function isValidTime(value: unknown): value is string {
