@@ -1,4 +1,4 @@
-REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.js,oven-sh/bun,react/react,sveltejs/svelte,rolldown/rolldown,freeCodeCamp/freeCodeCamp
+REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.js,oven-sh/bun,react/react,sveltejs/svelte,rolldown/rolldown,freeCodeCamp/freeCodeCamp,biomejs/biome,yt-dlp/yt-dlp,fastify/fastify,Automattic/mongoose,huggingface/diffusers
 1786082400,100,flTzADR4KZOPImN3WlPqgPOlA8FyfwRIQkrY-TS_-JY,o,1553843466,210,298,0,0
 1786082400,100,PPCEi3MDHcdJACGlwq1wxGFrJ5lLWIOIEBvURDJ4PC8,o,1370087155,214,300,1,0
 1786082400,47,0Q279cgRw8VQqwQqXha_ylb-r-xLGynZeplU7i6Lgmo,o,1729222866,23,107,2,0
@@ -21,3 +21,12 @@ REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.
 1786086000,40,nodJ-cM6XMtl9teCyufny7OUSvBxIqyZghomQCQz5Cw,m,1356177397,56,299,3,0
 1786086000,0,X_lYzW26MRtW-y3AJLeQlCinBCd9TeQaQYXvbe_OXqM,o,1693992011,69,300,4,0
 1786086000,0,2bQ1mh9t7_OrZjBwKbEaI890i6h1256rPHnIQH6d4vk,o,1693992011,69,300,4,0
+1786089600,100,fbVHrxohBHC_Pr0yydaAQpKgcHPN-cHWk8Pl--TriU4,o,1481517322,243,300,0,0
+1786089600,100,WYJLgkkZP4VU_rAg-IBstdkcWXriWJOyI0wfBo_rEis,o,1774330143,5,56,0,0
+1786089600,100,CZPT0fQ5IpfTP-DUl95M3lu3aX6JtB_mIJFLZ3VPsc4,o,1296942480,105,297,10,0
+1786089600,85,X5yF7GkLBdWlmORzhfVUKvMMXEhsmGGa5dguiVbNeFM,o,1361448881,21,300,2,0
+1786089600,100,ppxaHlFx2pyRlOCwxfBh2JpfWIafAN4aeSVPBztqBlM,o,1515945975,18,54,11,0
+1786089600,100,M0uvSRl73a4fOoJxsvPtBTa9gOhNENgtKADAIzvx3Ww,o,1426697761,20,300,12,0
+1786089600,0,Z0B78pD8mIXOOz-TGM6WVRx-pxntOYh5ktUPiQLt8fY,o,1732781337,83,236,13,0
+1786089600,100,Fe44JpoMzrzL9lAb0W3cugx3fuvq7FZxdT2LZC38RHA,o,1667590824,17,300,5,0
+1786089600,100,oahr8oXS3gfEgvQiBuOJP7_jiQ2kMlXIkEjeU5a042I,o,1436504569,38,177,14,0
