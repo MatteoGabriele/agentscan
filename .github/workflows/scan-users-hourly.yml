@@ -34,14 +34,16 @@ jobs:
           pnpm exec tsx scripts/scan-users.ts
           --output=hourly-scan-results.txt
           --max-scans=24
+          --window-output=hourly-window-scan-results.txt
+          --window-max-scans=24
 
       - name: Commit and push results
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          # Staged-diff check, so the first run picks up the still-untracked file.
-          git add data/hourly-scan-results.txt
+          # Staged-diff check, so the first run picks up the still-untracked files.
+          git add data/hourly-scan-results.txt data/hourly-window-scan-results.txt
 
           if git diff --cached --quiet; then
             echo "No changes detected"
