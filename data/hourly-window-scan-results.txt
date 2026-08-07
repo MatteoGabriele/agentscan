@@ -1,4 +1,4 @@
-REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.js,oven-sh/bun,react/react,sveltejs/svelte,rolldown/rolldown,freeCodeCamp/freeCodeCamp,biomejs/biome,yt-dlp/yt-dlp,fastify/fastify,Automattic/mongoose,huggingface/diffusers,bitwarden/server,vuejs/core,vitest-dev/vitest,withastro/astro,SerenityOS/serenity,yairm210/Unciv,microsoft/playwright,coollabsio/coolify
+REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.js,oven-sh/bun,react/react,sveltejs/svelte,rolldown/rolldown,freeCodeCamp/freeCodeCamp,biomejs/biome,yt-dlp/yt-dlp,fastify/fastify,Automattic/mongoose,huggingface/diffusers,bitwarden/server,vuejs/core,vitest-dev/vitest,withastro/astro,SerenityOS/serenity,yairm210/Unciv,microsoft/playwright,coollabsio/coolify,nuxt/nuxt,astral-sh/ruff
 1786082400,100,flTzADR4KZOPImN3WlPqgPOlA8FyfwRIQkrY-TS_-JY,o,1553843466,210,298,0,0
 1786082400,100,PPCEi3MDHcdJACGlwq1wxGFrJ5lLWIOIEBvURDJ4PC8,o,1370087155,214,300,1,0
 1786082400,47,0Q279cgRw8VQqwQqXha_ylb-r-xLGynZeplU7i6Lgmo,o,1729222866,23,107,2,0
@@ -90,3 +90,21 @@ REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.
 1786100400,100,iejfez3DWFMgEFNnqeduRPEyne1p-fY8qGABzm_cKSU,o,1667590824,17,300,5,0
 1786100400,100,62GEMcBu01-FZkvYY_bfrhMI9JeMO1lsmjeqglHGO2E,o,1667590824,17,300,5,0
 1786100400,75,zYF_NCCa0s7KRKHrPw0K8wjUYMKX0S8XsjcSpqgZnhA,o,1515546434,67,300,5,0
+1786104000,100,RbaTe3LSYP-fQ0Pi4S_vQkWqJG7crHgM7nocDtaqZTc,o,1520535703,105,265,23,0
+1786104000,100,g0Jx4D_GYxNM-sbNRw9_AYfoPpvipUt6DmQmyF_wtEU,o,1430986090,373,298,6,0
+1786104000,100,UddGquZWUpzIjr017iKQsQktg7WakvXAgs9WyoRZR58,o,1430986090,373,298,1,0
+1786104000,100,qNxWsUjhZf0ub2n674HfLIEHJhcU9lIkDbzYXn7YMM4,o,1430986090,373,298,1,0
+1786104000,100,c1FHeHpCIeTipHzjFSwZiVulES9eyj0u9NSUr1WJlTc,o,1370087155,214,300,1,0
+1786104000,51,UDgloBZ7hATtXJd-iE-ytuFGzE4XF6wSY5lf4Zq0dBI,o,1304241804,108,167,1,0
+1786104000,100,Zh47HiLE3nPNCy8uTo4SiTucit172kdpk_VWrfXiGK4,o,1719331067,62,67,2,0
+1786104000,65,YlFpKCYBNS7ggVzvgDtrgTjBj2we8N8gmTnlhsIvJRY,o,1361448881,21,300,2,0
+1786104000,65,n3jUAkwFFh1cCQxOFIgNVecoXTH-LeL-L5XNfO3yXYM,o,1361448881,21,300,2,0
+1786104000,65,prM9tgEuY_QAsDVktS65VRGDnHC-KBYojMsxH2ChqfI,o,1361448881,21,300,2,0
+1786104000,100,kgNu1qeIDNaJz-y0GeZFpu9VvsYQCzyPWFs4C526Obc,o,1477219590,203,162,2,0
+1786104000,0,SiOmnO8KT8RjOV9hoqI4eVRFzAtaHCmgfS2obxBy-Yo,o,1680181158,42,158,24,0
+1786104000,40,IILjGHtSX1Jk6z2qJ477FxkyogxtyWn2bTCCy8XeC0k,m,1325848456,57,299,24,0
+1786104000,66,KxKUXObKJZXHpL7QfJjp1FVQWKx_WX8Hwb5mNdQ0qeI,o,1724017335,197,67,9,0
+1786104000,100,JZmz5nrSh6DI0rY_cBa_tZD6VvboFoepPvxZ8qVUImc,o,1443638986,228,299,21,0
+1786104000,100,6bzT035GxtrfngmT9BnNhRO5QK9I2tR5tMyq_8FHlZw,o,1297178870,5,153,3,0
+1786104000,100,hixdKTQ6_Hg68z7cpoSsSTNotohhlPdnhODYQKXD6M0,m,1325695003,24,300,4,0
+1786104000,51,itHPY3LzDK4aH49qtWQuun0a3Lf3Jyq_VpcGPmZvUrQ,o,1383504818,61,300,22,0
