@@ -314,10 +314,8 @@ watch(
 
 <template>
   <section class="w-full" aria-label="Work hours by timezone">
-    <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
-      <label
-        class="flex min-w-0 w-full flex-col gap-1 lg:w-[calc(50%_-_0.3125rem)]"
-      >
+    <div class="flex flex-col gap-2.5 lg:flex-row">
+      <label class="flex min-w-0 w-full flex-col gap-1 lg:flex-1">
         <span
           class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
         >
@@ -339,51 +337,49 @@ watch(
         </select>
       </label>
 
-      <label
-        class="flex min-w-0 w-full flex-col gap-1 sm:w-[calc(50%_-_0.3125rem)] lg:w-[calc(25%_-_0.46875rem)]"
-      >
-        <span
-          class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
-        >
-          Sleep starts
-        </span>
-
-        <select
-          v-model="selectedEnd"
-          class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
-        >
-          <option
-            v-for="time in timeOptions"
-            :key="time.value"
-            :value="time.value"
+      <div class="flex w-full flex-col gap-2.5 sm:flex-row lg:flex-1">
+        <label class="flex min-w-0 w-full flex-col gap-1 sm:flex-1">
+          <span
+            class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
           >
-            {{ time.label }}
-          </option>
-        </select>
-      </label>
+            Sleep starts
+          </span>
 
-      <label
-        class="flex min-w-0 w-full flex-col gap-1 sm:w-[calc(50%_-_0.3125rem)] lg:w-[calc(25%_-_0.46875rem)]"
-      >
-        <span
-          class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
-        >
-          Sleep ends
-        </span>
-
-        <select
-          v-model="selectedStart"
-          class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
-        >
-          <option
-            v-for="time in timeOptions"
-            :key="time.value"
-            :value="time.value"
+          <select
+            v-model="selectedEnd"
+            class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
           >
-            {{ time.label }}
-          </option>
-        </select>
-      </label>
+            <option
+              v-for="time in timeOptions"
+              :key="time.value"
+              :value="time.value"
+            >
+              {{ time.label }}
+            </option>
+          </select>
+        </label>
+
+        <label class="flex min-w-0 w-full flex-col gap-1 sm:flex-1">
+          <span
+            class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
+          >
+            Sleep ends
+          </span>
+
+          <select
+            v-model="selectedStart"
+            class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
+          >
+            <option
+              v-for="time in timeOptions"
+              :key="time.value"
+              :value="time.value"
+            >
+              {{ time.label }}
+            </option>
+          </select>
+        </label>
+      </div>
     </div>
   </section>
 </template>
