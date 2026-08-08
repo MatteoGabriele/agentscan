@@ -306,55 +306,43 @@ export default defineEventHandler(async (event) => {
 
   type CheckConclusion = 'success' | 'action_required' | 'failure' | 'neutral'
 
-  // Resolves to whether the check run was settled. Held so a fallback can wait
-  // on a completion that is already in flight instead of racing it.
-  let completion: Promise<boolean> | undefined
+  // The check run gets a result only once. The first call below wins, and any
+  // later one does nothing, so the timeout and the finally block can safely try
+  // without overwriting a real result.
+  let isCheckRunSettled = false
 
-  const completeCheckRun = (
+  const completeCheckRun = async (
     conclusion: CheckConclusion,
     title: string,
     summary: string,
   ) => {
-    if (!checkRunId) {
-      return Promise.resolve(true)
+    if (!checkRunId || isCheckRunSettled) {
+      return
     }
 
-    const runId = checkRunId
+    // Set before the request, not after, so that a call arriving while this one
+    // is still waiting for GitHub skips instead of sending a second result.
+    isCheckRunSettled = true
 
-    completion = octokit.rest.checks
-      .update({
+    try {
+      await octokit.rest.checks.update({
         owner,
         repo,
-        check_run_id: runId,
+        check_run_id: checkRunId,
         status: 'completed',
         conclusion,
         completed_at: new Date().toISOString(),
         details_url: `https://agentscan.tools/user/${username}`,
         output: { title, summary },
       })
-      .then(() => true)
-      .catch((err: unknown) => {
-        console.error(
-          `Failed to complete check run ${runId} on ${owner}/${repo}:`,
-          err,
-        )
-        return false
-      })
-
-    return completion
-  }
-
-  // Last resort: only conclude the run if no other completion managed to.
-  const completeCheckRunIfUnsettled = async (
-    conclusion: CheckConclusion,
-    title: string,
-    summary: string,
-  ) => {
-    if (await completion) {
-      return
+    } catch (err: unknown) {
+      // The check run still has no result, so let a later call try again.
+      isCheckRunSettled = false
+      console.error(
+        `Failed to complete check run ${checkRunId} on ${owner}/${repo}:`,
+        err,
+      )
     }
-
-    await completeCheckRun(conclusion, title, summary)
   }
 
   // In case this takes too long, we're gonna timeout the process
@@ -362,7 +350,7 @@ export default defineEventHandler(async (event) => {
 
   if (checkRunId) {
     deadline = setTimeout(() => {
-      completeCheckRunIfUnsettled(
+      completeCheckRun(
         'neutral',
         'Analysis timed out',
         'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
@@ -690,9 +678,9 @@ export default defineEventHandler(async (event) => {
   } finally {
     clearTimeout(deadline)
 
-    // Catches any exit that reached neither a conclusion nor the catch above —
-    // an early return added later, or a non-Error thrown past it.
-    await completeCheckRunIfUnsettled(
+    // Safety net: if the code above returned early without giving the check run
+    // a result, close it here so it never stays stuck as "in progress".
+    await completeCheckRun(
       'neutral',
       'Analysis incomplete',
       'AgentScan did not produce a result for this contributor.',
