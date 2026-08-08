@@ -4,10 +4,12 @@ import type {
   ClassificationMetric,
 } from '../../../../shared/utils/count-classification-by-date'
 import {
+  fillEmptyHourlyBuckets,
   getClassificationStatsByDate,
   getCategoryDeltas,
   getClassificationByDateChunks,
   getClassificationForPreviousDays,
+  getClassificationStatsByScanTime,
   getWeeklyClassification,
 } from '../../../../shared/utils/count-classification-by-date'
 import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
@@ -757,6 +759,106 @@ describe('getWeeklyClassification', () => {
         trend: 0,
         percentage: 100,
       },
+    })
+  })
+})
+
+describe('fillEmptyHourlyBuckets', () => {
+  it('returns an empty result when there is nothing to fill', () => {
+    expect(fillEmptyHourlyBuckets({ countsByHour: {} })).toEqual({})
+  })
+
+  it('reinstates hours that recorded no entry as empty buckets', () => {
+    const countsByHour = getClassificationStatsByScanTime([
+      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
+      createEcosystemHealthItem('2026-08-08T08:00:00.000Z', 10),
+    ])
+
+    const result = fillEmptyHourlyBuckets({ countsByHour })
+
+    expect(Object.keys(result).sort()).toEqual([
+      '2026-08-08T05:00:00.000Z',
+      '2026-08-08T06:00:00.000Z',
+      '2026-08-08T07:00:00.000Z',
+      '2026-08-08T08:00:00.000Z',
+    ])
+
+    // Zeroed because there was nothing to classify, not because of a score.
+    expectClassificationCounts(result['2026-08-08T06:00:00.000Z']!, {
+      organic: { count: 0, trend: 0, percentage: 0 },
+      mixed: { count: 0, trend: 0, percentage: 0 },
+      automation: { count: 0, trend: 0, percentage: 0 },
+      total: { count: 0, trend: 0, percentage: 0 },
+    })
+  })
+
+  it('keeps the recorded buckets untouched', () => {
+    const countsByHour = getClassificationStatsByScanTime([
+      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
+      createEcosystemHealthItem('2026-08-08T07:00:00.000Z', 10),
+    ])
+
+    const result = fillEmptyHourlyBuckets({ countsByHour })
+
+    expectClassificationCounts(result['2026-08-08T07:00:00.000Z']!, {
+      organic: { count: 0, trend: 0, percentage: 0 },
+      mixed: { count: 0, trend: 0, percentage: 0 },
+      automation: { count: 1, trend: 0, percentage: 100 },
+      total: { count: 1, trend: 0, percentage: 100 },
+    })
+  })
+
+  it('caps the timeline to maxHours counted back from the latest bucket', () => {
+    const countsByHour = getClassificationStatsByScanTime([
+      createEcosystemHealthItem('2026-08-08T01:00:00.000Z', 90),
+      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
+    ])
+
+    const result = fillEmptyHourlyBuckets({ countsByHour, maxHours: 3 })
+
+    expect(Object.keys(result).sort()).toEqual([
+      '2026-08-08T03:00:00.000Z',
+      '2026-08-08T04:00:00.000Z',
+      '2026-08-08T05:00:00.000Z',
+    ])
+  })
+
+  it('keeps one bucket per clock hour when scan times drift off the hour', () => {
+    const countsByHour = getClassificationStatsByScanTime([
+      createEcosystemHealthItem('2026-08-08T05:00:12.000Z', 90),
+      createEcosystemHealthItem('2026-08-08T06:14:47.000Z', 10),
+      createEcosystemHealthItem('2026-08-08T06:41:03.000Z', 10),
+      createEcosystemHealthItem('2026-08-08T08:03:29.000Z', 50),
+    ])
+
+    const result = fillEmptyHourlyBuckets({ countsByHour })
+
+    expect(Object.keys(result).sort()).toEqual([
+      '2026-08-08T05:00:00.000Z',
+      '2026-08-08T06:00:00.000Z',
+      '2026-08-08T07:00:00.000Z',
+      '2026-08-08T08:00:00.000Z',
+    ])
+
+    // Both 06:xx scans belong to the same clock hour, so their counts add up
+    // instead of splitting into two buckets.
+    expectClassificationCounts(result['2026-08-08T06:00:00.000Z']!, {
+      organic: { count: 0, trend: 0, percentage: 0 },
+      mixed: { count: 0, trend: 0, percentage: 0 },
+      automation: { count: 2, trend: 0, percentage: 100 },
+      total: { count: 2, trend: 0, percentage: 100 },
+    })
+
+    expect(result['2026-08-08T06:00:00.000Z']!.createdAt).toBe(
+      '2026-08-08T06:14:47.000Z',
+    )
+
+    // The hour with no scan at all is still an empty placeholder.
+    expectClassificationCounts(result['2026-08-08T07:00:00.000Z']!, {
+      organic: { count: 0, trend: 0, percentage: 0 },
+      mixed: { count: 0, trend: 0, percentage: 0 },
+      automation: { count: 0, trend: 0, percentage: 0 },
+      total: { count: 0, trend: 0, percentage: 0 },
     })
   })
 })

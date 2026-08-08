@@ -1,5 +1,12 @@
 import { unpack } from '~~/shared/utils/compactor'
-import { getClassificationStatsByScanTime } from '~~/shared/utils/count-classification-by-date'
+import {
+  fillEmptyHourlyBuckets,
+  getClassificationStatsByScanTime,
+} from '~~/shared/utils/count-classification-by-date'
+
+// Same hours from the workflow script
+// @todo move to a shared file and make it default without options
+const WINDOW_MAX_HOURS = 25
 
 export default defineEventHandler(async () => {
   try {
@@ -22,7 +29,12 @@ export default defineEventHandler(async () => {
     const mixedPercentages: number[] = []
     const organicPercentages: number[] = []
 
-    const countsByScanTime = getClassificationStatsByScanTime(results)
+    // An hour with no PR opened writes no row at all, so it has to be
+    // added as an empty bucket instead of being skipped by the chart.
+    const countsByScanTime = fillEmptyHourlyBuckets({
+      countsByHour: getClassificationStatsByScanTime(results),
+      maxHours: WINDOW_MAX_HOURS,
+    })
     const scanTimes = Object.keys(countsByScanTime).sort()
 
     scanTimes.forEach((scanTime) => {
