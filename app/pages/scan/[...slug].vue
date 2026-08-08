@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
-import { MAX_PR_USER_COUNT } from '~~/shared/scan'
+import { MAX_PR_COUNT } from '~~/shared/scan'
 
 const route = useRoute()
 const router = useRouter()
@@ -53,7 +53,7 @@ async function handleSubmit(value: string) {
     </div>
 
     <ul class="mt-8 flex flex-col gap-4">
-      <RepoAuthorCardSkeleton v-for="n in MAX_PR_USER_COUNT" :key="n" />
+      <RepoAuthorCardSkeleton v-for="n in MAX_PR_COUNT" :key="n" />
     </ul>
   </div>
 
@@ -68,7 +68,7 @@ async function handleSubmit(value: string) {
   <div v-else-if="data">
     <div class="flex flex-col justify-between mb-2 ml-2 text-sm text-gh-muted">
       <p>
-        {{ data.authors.length }} unique authors with open PRs in
+        Last {{ data.pullRequests.length }} PRs in
         <NuxtLink
           :to="`https://github.com/${data.repo}`"
           external
@@ -86,11 +86,12 @@ async function handleSubmit(value: string) {
 
     <ul class="mt-8 flex flex-col gap-4">
       <RepoAuthorCard
-        v-for="author in data.authors"
-        :key="author.user.login"
-        :user="author.user"
-        :pr-url="author.prUrl"
-        :analysis="author.analysis"
+        v-for="pullRequest in data.pullRequests"
+        :key="pullRequest.prUrl"
+        :user="pullRequest.user"
+        :pr-url="pullRequest.prUrl"
+        :pr-state="pullRequest.prState"
+        :analysis="pullRequest.analysis"
       />
     </ul>
 

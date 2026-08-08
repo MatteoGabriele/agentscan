@@ -1,1 +1,1 @@
-export const MAX_PR_USER_COUNT = 10
+export const MAX_PR_COUNT = 10
