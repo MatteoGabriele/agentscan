@@ -558,7 +558,13 @@ const showTzSelector = shallowRef(false)
                 :height="rect.height"
                 style="transition: all 0.2s"
               >
-                <div class="w-full h-full blurred"></div>
+                <div
+                  class="w-full h-full"
+                  style="
+                    backdrop-filter: blur(5px);
+                    -webkit-backdrop-filter: blur(5px);
+                  "
+                ></div>
               </foreignObject>
             </g>
           </template>
@@ -722,10 +728,5 @@ const showTzSelector = shallowRef(false)
 }
 :deep(.vue-ui-xy-svg) {
   overflow: visible; /** for last time label cropping issue  */
-}
-
-.blurred {
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
 }
 </style>
