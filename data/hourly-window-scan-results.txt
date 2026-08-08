@@ -1,4 +1,4 @@
-REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.js,oven-sh/bun,react/react,sveltejs/svelte,rolldown/rolldown,freeCodeCamp/freeCodeCamp,biomejs/biome,yt-dlp/yt-dlp,fastify/fastify,Automattic/mongoose,huggingface/diffusers,bitwarden/server,vuejs/core,vitest-dev/vitest,withastro/astro,SerenityOS/serenity,yairm210/Unciv,microsoft/playwright,coollabsio/coolify,nuxt/nuxt,astral-sh/ruff,solidjs/solid,tanstack/query,immich-app/immich,shadcn-ui/ui,astral-sh/uv,helix-editor/helix,simplex-chat/simplex-chat,microsoft/TypeScript,makeplane/plane,GoogleChrome/lighthouse,projectdiscovery/nuclei
+REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.js,oven-sh/bun,react/react,sveltejs/svelte,rolldown/rolldown,freeCodeCamp/freeCodeCamp,biomejs/biome,yt-dlp/yt-dlp,fastify/fastify,Automattic/mongoose,huggingface/diffusers,bitwarden/server,vuejs/core,vitest-dev/vitest,withastro/astro,SerenityOS/serenity,yairm210/Unciv,microsoft/playwright,coollabsio/coolify,nuxt/nuxt,astral-sh/ruff,solidjs/solid,tanstack/query,immich-app/immich,shadcn-ui/ui,astral-sh/uv,helix-editor/helix,simplex-chat/simplex-chat,microsoft/TypeScript,makeplane/plane,GoogleChrome/lighthouse,projectdiscovery/nuclei,aquasecurity/trivy
 1786082400,100,flTzADR4KZOPImN3WlPqgPOlA8FyfwRIQkrY-TS_-JY,o,1553843466,210,298,0,0
 1786082400,100,PPCEi3MDHcdJACGlwq1wxGFrJ5lLWIOIEBvURDJ4PC8,o,1370087155,214,300,1,0
 1786082400,47,0Q279cgRw8VQqwQqXha_ylb-r-xLGynZeplU7i6Lgmo,o,1729222866,23,107,2,0
@@ -301,3 +301,14 @@ REPOS:vitejs/vite,vercel/next.js,python/cpython,supabase/supabase,processing/p5.
 1786143600,75,Wn2e_HVsR_mpS78zlAzNH8oflsMlgqDJaLmYPjO3flA,o,1667590824,17,300,5,0
 1786143600,75,6h1F3jlT-InKZf0SKoPgzxHbuwl-kJmvXvIprFNSTg0,o,1667590824,17,300,5,0
 1786143600,75,ZbjmC7ud8c3cOuruisFVQjCxAQH9__OG6HT3jucA-WE,o,1596015000,257,300,28,0
+1786147200,100,ryt4pzXECxrjvCZKid3Th6aqncyUo-mKW3PUPBdX2Q4,o,1481517322,243,300,0,0
+1786147200,0,yPO3xxbx-i98Xof_LcnYZWmWXXOt0j3BHxFiJFnDs9w,o,1468761224,143,297,0,0
+1786147200,100,UvU96BPCiLg2XsjTqCy4Bt3K5a9fvIgWersOzZnl2CE,o,1471121332,140,299,1,0
+1786147200,85,55n536pZ_qnr7YwnXuToufKdOKdj09amtSww5USBIyQ,o,1666780686,71,300,1,0
+1786147200,65,_wF8FBASPJfyhKW7T8vL2k0O9tpL2XZ61m7dE4WEY2s,o,1341772253,43,297,1,0
+1786147200,0,gNlXzsh8LKJvihOGlPYAYOFCREgGkqXc1RbcBgypiBY,o,1594374909,125,153,36,0
+1786147200,100,jhFd4vTxgUHmMvkpT00JHWHlK6ss-Dg1lKcg6VwrMlI,o,1503951848,19,26,27,0
+1786147200,0,hHTUkv3rBdiChelSraeXaLqZYGTja2V-vLs5p-v-Gkc,o,1594374909,125,153,35,0
+1786147200,75,WPBI2Dlw3s2aQZCvOvBT012JeQHp5mQQTWEKHniUf3o,o,1667590824,17,300,5,0
+1786147200,75,VkQXZVJfDXviy1-e_N3_VF3rC4exhQKutJjrfq2LMWQ,o,1667590824,17,300,5,0
+1786147200,100,vsm0rVCM6teerjmrDe4v_7IRET9yuNIHkm9_1SN5vl8,o,1727149368,4,15,14,0
