@@ -11,7 +11,7 @@
     "postinstall": "nuxt prepare",
     "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
     "scan:users": "pnpm exec tsx --env-file=.env scripts/scan-users.ts",
-    "scan:users:hourly": "pnpm exec tsx --env-file=.env scripts/scan-users.ts --output=hourly-scan-results.txt --max-scans=25 --window-output=hourly-window-scan-results.txt --window-max-scans=25",
+    "scan:users:hourly": "pnpm exec tsx --env-file=.env scripts/scan-users.ts --output=hourly-scan-results.txt --max-scans=25 --window-output=hourly-window-scan-results.txt --window-max-scans=30 --daily-output=daily-scan-results.json",
     "scan:bounty": "pnpm exec tsx --env-file=.env scripts/scan-bounty-repos.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

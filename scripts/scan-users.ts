@@ -9,6 +9,11 @@ import { identify } from '@unveil/identity'
 import type { GitHubEvent, IdentifyUser } from '@unveil/identity'
 import { hashPrId } from './pr-hash'
 import { pack, unpack } from '../shared/utils/compactor'
+import type { DailyScanEntry } from '../shared/utils/daily-rollup'
+import {
+  getCompletedDailyEntries,
+  mergeDailyEntries,
+} from '../shared/utils/daily-rollup'
 import { INSUFFICIENT_DATA_SCORE } from '../shared/utils/health-stats'
 import type { PrStatus } from '../shared/types/ecosystem-health'
 
@@ -54,6 +59,11 @@ interface ScanOptions {
   windowOutputFile?: string
   /** Rolling window for `windowOutputFile`, in scan runs. */
   windowMaxScans?: number
+  /**
+   * When set alongside `windowOutputFile`, every day the window has completed
+   * is appended here as a single entry. Days already in the file are kept.
+   */
+  dailyOutputFile?: string
 }
 
 type GitHubUser = Awaited<
@@ -135,6 +145,30 @@ function saveScanResults(
   }
   const filePath = join(process.cwd(), 'data', outputFile)
   writeFileSync(filePath, pack(results))
+}
+
+function loadDailyEntries(outputFile: string): DailyScanEntry[] {
+  const filePath = join(process.cwd(), 'data', outputFile)
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf-8'))
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      return []
+    }
+    throw err
+  }
+}
+
+function saveDailyEntries(
+  entries: DailyScanEntry[],
+  outputFile: string,
+  dryRun: boolean = false,
+): void {
+  if (dryRun) {
+    return
+  }
+  const filePath = join(process.cwd(), 'data', outputFile)
+  writeFileSync(filePath, `${JSON.stringify(entries, null, 2)}\n`)
 }
 
 // Drops the oldest scan runs so the file holds at most `maxScans` of them.
@@ -326,6 +360,7 @@ export async function main(options: ScanOptions = {}) {
     maxScans,
     windowOutputFile,
     windowMaxScans,
+    dailyOutputFile,
   } = options
 
   // Scans run on a separate account's token so they draw from their own rate
@@ -472,6 +507,17 @@ export async function main(options: ScanOptions = {}) {
 
     saveScanResults(finalWindowResults, windowOutputFile, dryRun)
     console.log(`Window: ${windowed.length} PRs opened in the previous hour`)
+
+    if (dailyOutputFile) {
+      const stored = dryRun ? [] : loadDailyEntries(dailyOutputFile)
+      const dailyEntries = mergeDailyEntries(
+        stored,
+        getCompletedDailyEntries(finalWindowResults),
+      )
+
+      saveDailyEntries(dailyEntries, dailyOutputFile, dryRun)
+      console.log(`Daily: ${dailyEntries.length - stored.length} day(s) added`)
+    }
   }
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
@@ -510,6 +556,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ? parseInt(windowMaxScansArg.split('=')[1], 10)
     : undefined
 
+  const dailyOutputArg = args.find((a) => a.startsWith('--daily-output='))
+  const dailyOutputFile = dailyOutputArg
+    ? dailyOutputArg.split('=')[1]
+    : undefined
+
   main({
     dryRun,
     ...(prsPerRepo != null && { prsPerRepo }),
@@ -517,6 +568,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ...(maxScans != null && { maxScans }),
     ...(windowOutputFile && { windowOutputFile }),
     ...(windowMaxScans != null && { windowMaxScans }),
+    ...(dailyOutputFile && { dailyOutputFile }),
   }).catch((error) => {
     console.error('Fatal error:', error.message)
     process.exit(1)
