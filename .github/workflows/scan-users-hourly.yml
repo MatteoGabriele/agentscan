@@ -3,6 +3,12 @@ name: Hourly User Scan
 on:
   workflow_dispatch: # Allow manual trigger
 
+# Both scans read, merge and rewrite data/daily-scan-results.json, so they have
+# to take turns: a queued run reads what the previous one already wrote.
+concurrency:
+  group: daily-scan-results
+  cancel-in-progress: false
+
 jobs:
   scan:
     if: github.repository == 'MatteoGabriele/agentscan'
