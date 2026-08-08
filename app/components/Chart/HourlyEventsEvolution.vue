@@ -4,22 +4,15 @@ import {
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
   type VueUiXyDatasetLineItem,
-  type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useElementSize } from '@vueuse/core'
-import dayjs, { type Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
 import { round } from '~~/shared/utils/numbers'
-import type {
-  TimezoneId,
-  TimezoneWorkHours,
-} from '~~/shared/types/tz-work-hours'
 import type { GetClassificationStatsByDateResults } from '~~/shared/utils/count-classification-by-date'
 
 dayjs.extend(utc)
-dayjs.extend(timezone)
 
 import('vue-data-ui/style.css')
 
@@ -275,233 +268,6 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
     }
   })
 }
-
-const SCAN_TIMEZONE = 'Europe/Paris'
-const EXPLICIT_TIMEZONE_PATTERN = /(?:Z|[+-]\d{2}:?\d{2})$/i
-
-function parseScanTime(scanTime: string) {
-  const value = scanTime.trim()
-
-  if (EXPLICIT_TIMEZONE_PATTERN.test(value)) {
-    return dayjs(value).tz(SCAN_TIMEZONE)
-  }
-
-  return dayjs.tz(value, SCAN_TIMEZONE)
-}
-
-function getHourIndex(parisTime: Dayjs) {
-  const exactIndex = props.scanTimes.findIndex((scanTime) => {
-    const time = parseScanTime(scanTime)
-
-    return time.isValid() && time.isSame(parisTime, 'hour')
-  })
-
-  if (exactIndex >= 0) {
-    return exactIndex
-  }
-
-  return props.scanTimes.findIndex((scanTime) => {
-    const time = parseScanTime(scanTime)
-
-    return time.isValid() && time.hour() === parisTime.hour()
-  })
-}
-
-type FogOfSleepRange = {
-  start: number
-  end: number
-}
-
-type FogRect = {
-  id: string
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
-const selectedTimezoneId = ref<TimezoneId>('UTC+02:00')
-const workHours = ref<TimezoneWorkHours>({})
-
-function getTimeParts(value: string) {
-  const match = /^(\d{2}):(\d{2})$/.exec(value)
-
-  if (!match) {
-    return null
-  }
-
-  const hour = Number(match[1])
-  const minute = Number(match[2])
-
-  if (hour > 23 || minute > 59) {
-    return null
-  }
-
-  return { hour, minute }
-}
-
-function getUtcOffsetMinutes(timezoneId: TimezoneId) {
-  const match = /^UTC([+-])(\d{2}):(\d{2})$/.exec(timezoneId)
-
-  if (!match) {
-    return null
-  }
-
-  const sign = match[1] === '+' ? 1 : -1
-  const hours = Number(match[2])
-  const minutes = Number(match[3])
-
-  return sign * (hours * 60 + minutes)
-}
-
-function formatUtcOffset(offsetMinutes: number) {
-  const sign = offsetMinutes >= 0 ? '+' : '-'
-  const absoluteMinutes = Math.abs(offsetMinutes)
-  const hours = Math.floor(absoluteMinutes / 60)
-  const minutes = absoluteMinutes % 60
-
-  return `${sign}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
-}
-
-function getScanTZ({
-  localTime,
-  timezoneId,
-  referenceScanTime,
-  nextDay = false,
-}: {
-  localTime: string
-  timezoneId: TimezoneId
-  referenceScanTime: string
-  nextDay?: boolean
-}) {
-  const parts = getTimeParts(localTime)
-  const offsetMinutes = getUtcOffsetMinutes(timezoneId)
-  const referenceInParis = parseScanTime(referenceScanTime)
-
-  if (!parts || offsetMinutes === null || !referenceInParis.isValid()) {
-    return null
-  }
-
-  const referenceInSelectedTimezone = referenceInParis.utcOffset(offsetMinutes)
-
-  const selectedDate = referenceInSelectedTimezone.format('YYYY-MM-DD')
-
-  const offset = formatUtcOffset(offsetMinutes)
-
-  let selectedDateTime = dayjs(
-    `${selectedDate}T${String(parts.hour).padStart(2, '0')}:${String(
-      parts.minute,
-    ).padStart(2, '0')}:00${offset}`,
-  )
-
-  if (nextDay) {
-    selectedDateTime = selectedDateTime.add(1, 'day')
-  }
-
-  return selectedDateTime.tz(SCAN_TIMEZONE)
-}
-
-const fogOfSleep = computed<FogOfSleepRange | null>(() => {
-  const hours = workHours.value[selectedTimezoneId.value]
-  const referenceScanTime = props.scanTimes.at(-1)
-
-  if (!hours || !referenceScanTime) {
-    return null
-  }
-
-  const startParts = getTimeParts(hours.start)
-  const endParts = getTimeParts(hours.end)
-
-  if (!startParts || !endParts) {
-    return null
-  }
-
-  const startTotalMinutes = startParts.hour * 60 + startParts.minute
-  const endTotalMinutes = endParts.hour * 60 + endParts.minute
-  const endsNextDay = endTotalMinutes <= startTotalMinutes
-
-  const startInParis = getScanTZ({
-    localTime: hours.start,
-    timezoneId: selectedTimezoneId.value,
-    referenceScanTime,
-  })
-  const endInParis = getScanTZ({
-    localTime: hours.end,
-    timezoneId: selectedTimezoneId.value,
-    referenceScanTime,
-    nextDay: endsNextDay,
-  })
-
-  if (!startInParis || !endInParis) {
-    return null
-  }
-
-  return {
-    start: getHourIndex(startInParis),
-    end: getHourIndex(endInParis),
-  }
-})
-
-function fog(svg: VueUiXySvgSlotProps['svg']): FogRect[] {
-  const range = fogOfSleep.value
-  const plots = svg.data[0]?.plots
-
-  if (!range || !plots?.length || range.start < 0 || range.end < 0) {
-    return []
-  }
-
-  // Equal boundaries represent a full 24-hour working day.
-  if (range.start === range.end) {
-    return []
-  }
-
-  const visibleStartIndex = svg.slicer.start
-  const startPlot = plots[range.start - visibleStartIndex]
-  const endPlot = plots[range.end - visibleStartIndex]
-
-  if (!startPlot || !endPlot) {
-    return []
-  }
-
-  const left = svg.drawingArea.left
-  const right = svg.drawingArea.right
-  const top = svg.drawingArea.top - 12
-  const bottom = svg.drawingArea.bottom + 20 // additional height to cover time labels
-  const height = Math.max(0, bottom - top - 12)
-  const startX = Math.min(right, Math.max(left, startPlot.x))
-  const endX = Math.min(right, Math.max(left, endPlot.x))
-
-  const createRect = (id: string, x: number, width: number): FogRect | null => {
-    const safeWidth = Math.max(0, width)
-
-    if (safeWidth === 0 || height === 0) {
-      return null
-    }
-
-    return {
-      id,
-      x,
-      y: top,
-      width: safeWidth,
-      height,
-    }
-  }
-
-  // The activity is in the middle of the visible window. Inactivity is on both sides.
-  if (startX < endX) {
-    return [
-      createRect('fog-before', left, startX - left),
-      createRect('fog-after', endX, right - endX),
-    ].filter((rect): rect is FogRect => rect !== null)
-  }
-
-  // The activity wraps around the left/right edges. Inactivity is in the middle.
-  return [createRect('fog-between', endX, startX - endX)].filter(
-    (rect): rect is FogRect => rect !== null,
-  )
-}
-
-const showTzSelector = shallowRef(false)
 </script>
 
 <template>
@@ -547,19 +313,6 @@ const showTzSelector = shallowRef(false)
                   :stroke="colors.bg"
                 />
               </template>
-            </g>
-            <g v-if="showTzSelector" aria-hidden="true" pointer-events="none">
-              <foreignObject
-                v-for="rect in fog(svg)"
-                :key="rect.id"
-                :x="rect.x"
-                :y="rect.y"
-                :width="rect.width"
-                :height="rect.height"
-                style="transition: all 0.2s"
-              >
-                <div class="w-full h-full blurred"></div>
-              </foreignObject>
             </g>
           </template>
 
@@ -676,42 +429,6 @@ const showTzSelector = shallowRef(false)
         </VueUiXy>
       </div>
     </ClientOnly>
-
-    <template v-if="hasData">
-      <div
-        class="mx-auto mb-5 overflow-hidden rounded-lg border border-current/10 transition-colors mt-2"
-      >
-        <label
-          class="flex cursor-pointer items-center justify-between gap-4 px-3 py-2.5 transition-colors hover:bg-current/[0.03]"
-        >
-          <div class="min-w-0">
-            <span class="block text-sm font-medium text-inherit">
-              Show activity hours
-            </span>
-
-            <span class="mt-0.5 block text-xs text-gh-muted">
-              Display activity hours by selected timezone
-            </span>
-          </div>
-
-          <input
-            v-model="showTzSelector"
-            type="checkbox"
-            class="h-4 w-4 shrink-0 cursor-pointer accent-current"
-          />
-        </label>
-
-        <div
-          v-show="showTzSelector"
-          class="border-t border-current/10 px-3 py-3"
-        >
-          <CommonTimezoneWorkHoursSelector
-            v-model="workHours"
-            v-model:timezone="selectedTimezoneId"
-          />
-        </div>
-      </div>
-    </template>
   </section>
 </template>
 
@@ -722,10 +439,5 @@ const showTzSelector = shallowRef(false)
 }
 :deep(.vue-ui-xy-svg) {
   overflow: visible; /** for last time label cropping issue  */
-}
-
-.blurred {
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
 }
 </style>
