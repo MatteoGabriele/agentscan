@@ -342,11 +342,11 @@ watch(
           <span
             class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
           >
-            Sleep starts
+            Active from
           </span>
 
           <select
-            v-model="selectedEnd"
+            v-model="selectedStart"
             class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
           >
             <option
@@ -363,11 +363,11 @@ watch(
           <span
             class="text-[11px] font-medium uppercase tracking-wide text-gh-muted"
           >
-            Sleep ends
+            Active to
           </span>
 
           <select
-            v-model="selectedStart"
+            v-model="selectedEnd"
             class="min-w-0 w-full rounded-md border border-current/20 bg-transparent px-2.5 py-1.5 text-sm tabular-nums text-inherit outline-none transition-colors hover:border-current/30 focus:border-current/40 focus:ring-2 focus:ring-current/10"
           >
             <option
