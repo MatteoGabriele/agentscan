@@ -822,4 +822,43 @@ describe('fillEmptyHourlyBuckets', () => {
       '2026-08-08T05:00:00.000Z',
     ])
   })
+
+  it('keeps one bucket per clock hour when scan times drift off the hour', () => {
+    const countsByHour = getClassificationStatsByScanTime([
+      createEcosystemHealthItem('2026-08-08T05:00:12.000Z', 90),
+      createEcosystemHealthItem('2026-08-08T06:14:47.000Z', 10),
+      createEcosystemHealthItem('2026-08-08T06:41:03.000Z', 10),
+      createEcosystemHealthItem('2026-08-08T08:03:29.000Z', 50),
+    ])
+
+    const result = fillEmptyHourlyBuckets({ countsByHour })
+
+    expect(Object.keys(result).sort()).toEqual([
+      '2026-08-08T05:00:00.000Z',
+      '2026-08-08T06:00:00.000Z',
+      '2026-08-08T07:00:00.000Z',
+      '2026-08-08T08:00:00.000Z',
+    ])
+
+    // Both 06:xx scans belong to the same clock hour, so their counts add up
+    // instead of splitting into two buckets.
+    expectClassificationCounts(result['2026-08-08T06:00:00.000Z']!, {
+      organic: { count: 0, trend: 0, percentage: 0 },
+      mixed: { count: 0, trend: 0, percentage: 0 },
+      automation: { count: 2, trend: 0, percentage: 100 },
+      total: { count: 2, trend: 0, percentage: 100 },
+    })
+
+    expect(result['2026-08-08T06:00:00.000Z']!.createdAt).toBe(
+      '2026-08-08T06:14:47.000Z',
+    )
+
+    // The hour with no scan at all is still an empty placeholder.
+    expectClassificationCounts(result['2026-08-08T07:00:00.000Z']!, {
+      organic: { count: 0, trend: 0, percentage: 0 },
+      mixed: { count: 0, trend: 0, percentage: 0 },
+      automation: { count: 0, trend: 0, percentage: 0 },
+      total: { count: 0, trend: 0, percentage: 0 },
+    })
+  })
 })

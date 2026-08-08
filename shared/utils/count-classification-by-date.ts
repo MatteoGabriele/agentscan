@@ -130,6 +130,31 @@ export function getClassificationStatsByScanTime(
 
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
 
+// The clock hour a timestamp belongs to, so a scan time and the placeholder
+// standing in for it can never end up under two different keys.
+function getHourTime(time: number): number {
+  return Math.floor(time / MILLISECONDS_PER_HOUR) * MILLISECONDS_PER_HOUR
+}
+
+function mergeClassificationStats(
+  current: ClassificationStats,
+  next: ClassificationStats,
+): ClassificationStats {
+  const merged = createEmptyClassificationStats()
+
+  CLASSIFICATION_CATEGORIES.forEach((category) => {
+    merged[category].count = current[category].count + next[category].count
+  })
+
+  merged.createdAt =
+    [current.createdAt, next.createdAt]
+      .filter((createdAt): createdAt is string => Boolean(createdAt))
+      .sort()
+      .at(0) ?? null
+
+  return applyClassificationPercentages(merged)
+}
+
 export function fillEmptyHourlyBuckets({
   countsByHour,
   maxHours,
@@ -152,31 +177,55 @@ export function fillEmptyHourlyBuckets({
     return countsByHour
   }
 
+  const firstHourTime = getHourTime(firstTime)
+  const lastHourTime = getHourTime(lastTime)
+
   const startTime =
     maxHours && maxHours > 0
-      ? Math.max(firstTime, lastTime - (maxHours - 1) * MILLISECONDS_PER_HOUR)
-      : firstTime
-
-  const result: GetClassificationStatsByDateResults = {}
-
-  for (let time = startTime; time <= lastTime; time += MILLISECONDS_PER_HOUR) {
-    result[new Date(time).toISOString()] = applyClassificationPercentages(
-      createEmptyClassificationStats(),
-    )
-  }
+      ? Math.max(
+          firstHourTime,
+          lastHourTime - (maxHours - 1) * MILLISECONDS_PER_HOUR,
+        )
+      : firstHourTime
 
   // Scan times that don't sit exactly on the hourly grid still belong to the
-  // window, so they overwrite the placeholders rather than being dropped.
+  // window, so they collapse onto their clock hour rather than being dropped
+  // next to the placeholder for that same hour.
+  const recorded: GetClassificationStatsByDateResults = {}
+
   hours.forEach((hour) => {
     const counts = countsByHour[hour]
     const time = new Date(hour).getTime()
 
-    if (!counts || Number.isNaN(time) || time < startTime) {
+    if (!counts || Number.isNaN(time)) {
       return
     }
 
-    result[hour] = counts
+    const hourTime = getHourTime(time)
+
+    if (hourTime < startTime) {
+      return
+    }
+
+    const key = new Date(hourTime).toISOString()
+    const current = recorded[key]
+
+    recorded[key] = current ? mergeClassificationStats(current, counts) : counts
   })
+
+  const result: GetClassificationStatsByDateResults = {}
+
+  for (
+    let time = startTime;
+    time <= lastHourTime;
+    time += MILLISECONDS_PER_HOUR
+  ) {
+    const key = new Date(time).toISOString()
+
+    result[key] =
+      recorded[key] ??
+      applyClassificationPercentages(createEmptyClassificationStats())
+  }
 
   return result
 }
