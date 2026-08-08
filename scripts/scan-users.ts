@@ -177,7 +177,7 @@ function saveDailyEntries(
 
 // Drops the oldest scan runs so the file holds at most `maxScans` of them.
 // Entries written by the same run share a `created_at`, so runs are grouped by it.
-function trimToRecentScans(
+export function trimToRecentScans(
   results: ScanResult[],
   maxScans: number,
 ): ScanResult[] {
@@ -516,14 +516,8 @@ export async function main(options: ScanOptions = {}) {
   if (dailyOutputFile) {
     const stored = dryRun ? [] : loadDailyEntries(dailyOutputFile)
 
-    // A window day is only stored once the window has moved past it, so it
-    // lands the morning after. A sample run is the entire measurement of the
-    // day it runs on — there is no later run to extend it — so its day is
-    // ready the moment the run finishes, and it reaches a date first while
-    // both scans are alive. That is what keeps this file and the sample the
-    // pages read from telling the same story during the switchover.
     const measured = windowOutputFile
-      ? getCompletedDailyEntries(finalWindowResults)
+      ? getCompletedDailyEntries(windowResults)
       : getSampleDailyEntries(finalResults)
 
     const dailyEntries = mergeDailyEntries(stored, measured)
