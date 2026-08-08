@@ -28,6 +28,10 @@ import {
   isOwnComment,
 } from './_honeypot'
 
+// Netlify's synchronous function timeout is 10s. Leave room to conclude the
+// check run before the process is killed.
+const CHECK_RUN_DEADLINE_MS = 8_000
+
 type AutomationListItem = {
   username: string
   reason: string
@@ -300,18 +304,28 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  type CheckConclusion = 'success' | 'action_required' | 'failure'
+  type CheckConclusion = 'success' | 'action_required' | 'failure' | 'neutral'
+
+  // The check run gets a result only once. The first call below wins, and any
+  // later one does nothing, so the timeout and the finally block can safely try
+  // without overwriting a real result.
+  let isCheckRunSettled = false
 
   const completeCheckRun = async (
     conclusion: CheckConclusion,
     title: string,
     summary: string,
   ) => {
-    if (!checkRunId) {
+    if (!checkRunId || isCheckRunSettled) {
       return
     }
-    await octokit.rest.checks
-      .update({
+
+    // Set before the request, not after, so that a call arriving while this one
+    // is still waiting for GitHub skips instead of sending a second result.
+    isCheckRunSettled = true
+
+    try {
+      await octokit.rest.checks.update({
         owner,
         repo,
         check_run_id: checkRunId,
@@ -321,39 +335,57 @@ export default defineEventHandler(async (event) => {
         details_url: `https://agentscan.tools/user/${username}`,
         output: { title, summary },
       })
-      .catch(() => {
-        // check run update failed
-      })
+    } catch (err: unknown) {
+      // The check run still has no result, so let a later call try again.
+      isCheckRunSettled = false
+      console.error(
+        `Failed to complete check run ${checkRunId} on ${owner}/${repo}:`,
+        err,
+      )
+    }
   }
 
-  if (isPR && !repoConfig.scan['pull-requests']) {
-    await completeCheckRun(
-      'success',
-      'Analysis skipped',
-      'PR scanning is disabled for this repository.',
-    )
-    return { ok: true }
-  }
+  // In case this takes too long, we're gonna timeout the process
+  let deadline: NodeJS.Timeout | undefined
 
-  if (isIssue && !repoConfig.scan.issues) {
-    return { ok: true }
-  }
-
-  if (
-    repoConfig['allowed-users'].includes(username) ||
-    isKnownBot(username) ||
-    (authorAssociation &&
-      repoConfig['trusted-author-associations'].includes(authorAssociation))
-  ) {
-    await completeCheckRun(
-      'success',
-      'Analysis skipped',
-      'This contributor is exempt from analysis (allow-listed, a known automation, or a trusted author association).',
-    )
-    return { ok: true }
+  if (checkRunId) {
+    deadline = setTimeout(() => {
+      completeCheckRun(
+        'neutral',
+        'Analysis timed out',
+        'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
+      )
+    }, CHECK_RUN_DEADLINE_MS)
   }
 
   try {
+    if (isPR && !repoConfig.scan['pull-requests']) {
+      await completeCheckRun(
+        'success',
+        'Analysis skipped',
+        'PR scanning is disabled for this repository.',
+      )
+      return { ok: true }
+    }
+
+    if (isIssue && !repoConfig.scan.issues) {
+      return { ok: true }
+    }
+
+    if (
+      repoConfig['allowed-users'].includes(username) ||
+      isKnownBot(username) ||
+      (authorAssociation &&
+        repoConfig['trusted-author-associations'].includes(authorAssociation))
+    ) {
+      await completeCheckRun(
+        'success',
+        'Analysis skipped',
+        'This contributor is exempt from analysis (allow-listed, a known automation, or a trusted author association).',
+      )
+      return { ok: true }
+    }
+
     const { data: user } = await octokit.rest.users.getByUsername({ username })
 
     const responses = await Promise.all(
@@ -435,9 +467,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Posted before any early return: the honeypot exists precisely to catch
-    // the accounts that the activity heuristics read as organic.
-    //
     // `mode` deliberately does not apply here. The bait is a comment: there
     // is no honeypot without one.
     if (repoConfig.honeypot && !shouldAutoClose) {
@@ -646,5 +675,15 @@ export default defineEventHandler(async (event) => {
       'AgentScan encountered an error while analyzing this contributor.',
     )
     throw err
+  } finally {
+    clearTimeout(deadline)
+
+    // Safety net: if the code above returned early without giving the check run
+    // a result, close it here so it never stays stuck as "in progress".
+    await completeCheckRun(
+      'neutral',
+      'Analysis incomplete',
+      'AgentScan did not produce a result for this contributor.',
+    )
   }
 })
