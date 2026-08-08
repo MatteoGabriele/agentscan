@@ -457,6 +457,7 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
     return []
   }
 
+  // haha
   const visibleStartIndex = svg.slicer.start
   const startPlot = plots[range.start - visibleStartIndex]
   const endPlot = plots[range.end - visibleStartIndex]
