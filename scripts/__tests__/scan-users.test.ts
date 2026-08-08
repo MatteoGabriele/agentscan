@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import type { Octokit } from 'octokit'
-import { collectPrs, previousHourWindow } from '../scan-users'
+import {
+  collectPrs,
+  previousHourWindow,
+  trimToRecentScans,
+} from '../scan-users'
+import type { EcosystemHealthItem } from '../../shared/types/ecosystem-health'
+import { getCompletedDailyEntries } from '../../shared/utils/daily-rollup'
 
 vi.mock('../../shared/daily-scan', () => ({ libraries: ['acme/lib'] }))
 vi.mock('../pr-hash', () => ({
@@ -230,5 +236,50 @@ describe('collectPrs', () => {
 
     expect(sample.map((pr) => pr.login)).toEqual(['ada', 'bob'])
     expect(windowed.map((pr) => pr.login)).toEqual(['ada', 'bob'])
+  })
+})
+
+describe('daily rollup at the first midnight rollover', () => {
+  const WINDOW_MAX_SCANS = 24
+
+  function hourlyRow(createdAt: string): EcosystemHealthItem {
+    return {
+      created_at: createdAt,
+      score: 90,
+      pr_key: `acme/lib#${createdAt}`,
+      pr_status: 'open',
+      user_created_at: '2020-01-01T00:00:00Z',
+      user_public_repos_count: 3,
+      events_count: 30,
+      repo_name: 'acme/lib',
+      is_bounty: false,
+    }
+  }
+
+  // The run that first completes a day: the file already holds a full day of
+  // hourly buckets, and this run appends the day's first bucket past midnight.
+  const windowResults = [
+    ...Array.from({ length: 24 }, (_, hour) =>
+      hourlyRow(`2026-06-10T${String(hour).padStart(2, '0')}:00:00.000Z`),
+    ),
+    hourlyRow('2026-06-11T00:00:00.000Z'),
+  ]
+
+  it('rolls the completed day up from the untrimmed window rows', () => {
+    const entries = getCompletedDailyEntries(windowResults)
+
+    expect(entries.map((entry) => [entry.date, entry.hours])).toEqual([
+      ['2026-06-10', 24],
+    ])
+  })
+
+  it('would lose that day for good if it rolled up the retained rows', () => {
+    // Retention drops 2026-06-10T00:00 on this very run, and a day missing its
+    // first hour reads as partly aged out — it is skipped now and on every run
+    // after, since the window only moves further past it.
+    const retained = trimToRecentScans(windowResults, WINDOW_MAX_SCANS)
+
+    expect(retained[0]?.created_at).toBe('2026-06-10T01:00:00.000Z')
+    expect(getCompletedDailyEntries(retained)).toEqual([])
   })
 })

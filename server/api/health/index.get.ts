@@ -1,13 +1,11 @@
-import type {
-  EcosystemHealthItem,
-  EcosystemHealthCategoryProgression,
-} from '~~/shared/types/ecosystem-health'
+import type { EcosystemHealthItem } from '~~/shared/types/ecosystem-health'
 
 import { unpack } from '~~/shared/utils/compactor'
-import { getClassificationStatsByDate } from '~~/shared/utils/count-classification-by-date'
-import { subtractMonths } from '~~/shared/utils/dates'
-
-const DEFAULT_HISTORY_MONTHS = 2
+import {
+  applyCumulativeTrends,
+  getClassificationStatsByDate,
+} from '~~/shared/utils/count-classification-by-date'
+import { getHistoryRangeStart } from '~~/shared/utils/health-history-window'
 
 function getRecentResults(
   results: EcosystemHealthItem[],
@@ -21,10 +19,7 @@ function getRecentResults(
     return results
   }
 
-  const rangeStart = subtractMonths({
-    date: latestCreatedAt,
-    months: DEFAULT_HISTORY_MONTHS,
-  })
+  const rangeStart = getHistoryRangeStart(latestCreatedAt)
 
   return results.filter((item) => item.created_at >= rangeStart)
 }
@@ -44,35 +39,9 @@ export default defineEventHandler(async (event) => {
     const allResults = unpack(content)
     const results = isFullHistory ? allResults : getRecentResults(allResults)
 
-    const automationPercentages: number[] = []
-    const mixedPercentages: number[] = []
-    const organicPercentages: number[] = []
-
     const countsByDate = getClassificationStatsByDate(results)
+    const categoryProgression = applyCumulativeTrends(countsByDate)
     const dates = Object.keys(countsByDate).sort()
-
-    dates.forEach((date) => {
-      const counts = countsByDate[date]
-      if (!counts) {
-        return
-      }
-
-      automationPercentages.push(counts.automation.percentage)
-      mixedPercentages.push(counts.mixed.percentage)
-      organicPercentages.push(counts.organic.percentage)
-
-      counts.automation.trend = calcLinearProgression(
-        automationPercentages,
-      ).trend
-      counts.mixed.trend = calcLinearProgression(mixedPercentages).trend
-      counts.organic.trend = calcLinearProgression(organicPercentages).trend
-    })
-
-    const categoryProgression: EcosystemHealthCategoryProgression = {
-      automation: calcLinearProgression(automationPercentages),
-      mixed: calcLinearProgression(mixedPercentages),
-      organic: calcLinearProgression(organicPercentages),
-    }
 
     const scanTimes = dates.map(
       (date) => countsByDate[date]?.createdAt ?? `${date}T00:00:00.000Z`,
