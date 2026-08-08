@@ -5,9 +5,7 @@ import {
   applyCumulativeTrends,
   getClassificationStatsByDate,
 } from '~~/shared/utils/count-classification-by-date'
-import { subtractMonths } from '~~/shared/utils/dates'
-
-const DEFAULT_HISTORY_MONTHS = 2
+import { getHistoryRangeStart } from '~~/shared/utils/health-history-window'
 
 function getRecentResults(
   results: EcosystemHealthItem[],
@@ -21,10 +19,7 @@ function getRecentResults(
     return results
   }
 
-  const rangeStart = subtractMonths({
-    date: latestCreatedAt,
-    months: DEFAULT_HISTORY_MONTHS,
-  })
+  const rangeStart = getHistoryRangeStart(latestCreatedAt)
 
   return results.filter((item) => item.created_at >= rangeStart)
 }

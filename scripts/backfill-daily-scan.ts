@@ -1,19 +1,5 @@
 /// <reference types="node" />
 
-/**
- * Fills `daily-scan-results.json` with the days that predate the hourly window.
- *
- * The daily rollup only ever sees the last ~30 hours of window scans, so every
- * day before it started has no entry and never will. The fixed daily sample in
- * `scan-results.txt` does reach back that far — one run per day since the scans
- * began — so each of those runs is folded into the same shape to give the
- * series a history. Those counts come from a capped top-N-per-repo sample
- * rather than the day's full PR traffic, so they are comparable to a window day
- * by percentage, not by raw count.
- *
- * Re-running is safe: days already in the file are left exactly as they are.
- */
-
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { unpack } from '../shared/utils/compactor'

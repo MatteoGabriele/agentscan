@@ -1,6 +1,10 @@
 import type { IdentityClassification } from '@unveil/identity'
-import type { EcosystemHealthItem, PrStatus } from '../types/ecosystem-health'
-import { classifyByScore } from './health-stats'
+import type {
+  EcosystemHealthCategory,
+  EcosystemHealthItem,
+  PrStatus,
+} from '../types/ecosystem-health'
+import { classifyByScore, formatPercentage } from './health-stats'
 import type { GetClassificationStatsByDateResults } from './count-classification-by-date'
 import {
   applyClassificationPercentages,
@@ -8,19 +12,12 @@ import {
   createEmptyClassificationStats,
 } from './count-classification-by-date'
 
-// What a day is made of, per classification. Percentages, trends and any other
-// chart shape follow from these counts, so nothing here is tied to a graph.
 export type DailyClassificationCounts = {
   count: number
   bountyCount: number
   prStatusCounts: Record<PrStatus, number>
 }
 
-// One entry per day, derived from the hourly window scans instead of a single
-// scan run. `hours` is how many of the day's 24 windows it was built from —
-// an hour with nothing to scan and an hour that never ran both leave no rows,
-// so under 24 is a hint to read the counts with care, not a defect. Days
-// backfilled from the daily sample predate the window entirely and report 0.
 export type DailyScanEntry = {
   date: string
   createdAt: string
@@ -127,12 +124,6 @@ export function getCompletedDailyEntries(
     .sort(byDate)
 }
 
-// Backfill for the days that predate the hourly window: the fixed sample writes
-// one run per day, and that run is the whole of what was measured that day —
-// there is no partial day to hold back and no later run that could extend it,
-// so every date present becomes an entry. It was never built from windows, so
-// it reports no hourly coverage, and its counts are capped by the run's
-// top-N-per-repo quota rather than by the day's real PR traffic.
 export function getSampleDailyEntries(
   results: EcosystemHealthItem[],
 ): DailyScanEntry[] {
@@ -141,14 +132,6 @@ export function getSampleDailyEntries(
     .sort(byDate)
 }
 
-// Stored days in the shape every health endpoint already returns.
-//
-// A day keeps the raw counts it was measured with — including the
-// `insufficient-data` bucket, which is worth storing — but the aggregate built
-// from them leaves that bucket out of the total and the percentages, exactly as
-// the scan pipeline has always done. Counting it would quietly reweight every
-// day already on the graph, so a backfilled day reads identically to the way it
-// reads today, and a window day is measured the same way for free.
 export function getDailyCountsByDate(
   entries: DailyScanEntry[],
 ): GetClassificationStatsByDateResults {
@@ -168,10 +151,49 @@ export function getDailyCountsByDate(
   return result
 }
 
-// Stored days keep their original counts: the hours they were derived from
-// have since left the window, so a second pass could only shrink them. The
-// same rule settles a date both sources can produce — whichever wrote it first
-// keeps it, and backfilling never overwrites a real window day.
+export function getDailyHealthStats(
+  entries: DailyScanEntry[],
+): Record<
+  EcosystemHealthCategory,
+  { count: number; percentage: string }
+> | null {
+  const counts: Record<EcosystemHealthCategory, number> = {
+    organic: 0,
+    mixed: 0,
+    automation: 0,
+  }
+
+  entries.forEach((entry) => {
+    CLASSIFICATION_CATEGORIES.forEach((category) => {
+      counts[category] += entry.classifications[category].count
+    })
+  })
+
+  const total = CLASSIFICATION_CATEGORIES.reduce(
+    (sum, category) => sum + counts[category],
+    0,
+  )
+
+  if (total === 0) {
+    return null
+  }
+
+  return {
+    organic: {
+      count: counts.organic,
+      percentage: formatPercentage((counts.organic / total) * 100),
+    },
+    mixed: {
+      count: counts.mixed,
+      percentage: formatPercentage((counts.mixed / total) * 100),
+    },
+    automation: {
+      count: counts.automation,
+      percentage: formatPercentage((counts.automation / total) * 100),
+    },
+  }
+}
+
 export function mergeDailyEntries(
   stored: DailyScanEntry[],
   entries: DailyScanEntry[],
