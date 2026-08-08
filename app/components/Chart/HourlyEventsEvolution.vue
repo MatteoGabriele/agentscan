@@ -124,7 +124,7 @@ const config = computed<VueUiXyConfig>(() => ({
     width: Math.round(width.value),
     height: 300,
     padding: {
-      top: 12,
+      top: 24,
       right: 0,
       left: 0,
       bottom: 0,
@@ -314,7 +314,7 @@ type FogOfSleepRange = {
   end: number
 }
 
-type FogOfSleepRect = {
+type FogRect = {
   id: string
   x: number
   y: number
@@ -444,7 +444,7 @@ const fogOfSleep = computed<FogOfSleepRange | null>(() => {
   }
 })
 
-function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
+function fog(svg: VueUiXySvgSlotProps['svg']): FogRect[] {
   const range = fogOfSleep.value
   const plots = svg.data[0]?.plots
 
@@ -467,17 +467,13 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
 
   const left = svg.drawingArea.left
   const right = svg.drawingArea.right
-  const top = svg.drawingArea.top
+  const top = svg.drawingArea.top - 12
   const bottom = svg.drawingArea.bottom + 20 // additional height to cover time labels
-  const height = Math.max(0, bottom - top)
+  const height = Math.max(0, bottom - top - 12)
   const startX = Math.min(right, Math.max(left, startPlot.x))
   const endX = Math.min(right, Math.max(left, endPlot.x))
 
-  const createRect = (
-    id: string,
-    x: number,
-    width: number,
-  ): FogOfSleepRect | null => {
+  const createRect = (id: string, x: number, width: number): FogRect | null => {
     const safeWidth = Math.max(0, width)
 
     if (safeWidth === 0 || height === 0) {
@@ -493,17 +489,17 @@ function getFogOfSleep(svg: VueUiXySvgSlotProps['svg']): FogOfSleepRect[] {
     }
   }
 
-  // The workday is in the middle of the visible window. Sleep is on both sides.
+  // The activity is in the middle of the visible window. Inactivity is on both sides.
   if (startX < endX) {
     return [
-      createRect('sleep-before-work', left, startX - left),
-      createRect('sleep-after-work', endX, right - endX),
-    ].filter((rect): rect is FogOfSleepRect => rect !== null)
+      createRect('fog-before', left, startX - left),
+      createRect('fog-after', endX, right - endX),
+    ].filter((rect): rect is FogRect => rect !== null)
   }
 
-  // The workday wraps around the left/right edges. Sleep is in the middle.
-  return [createRect('sleep-between-work-periods', endX, startX - endX)].filter(
-    (rect): rect is FogOfSleepRect => rect !== null,
+  // The activity wraps around the left/right edges. Inactivity is in the middle.
+  return [createRect('fog-between', endX, startX - endX)].filter(
+    (rect): rect is FogRect => rect !== null,
   )
 }
 
@@ -529,19 +525,6 @@ const showTzSelector = shallowRef(false)
       <div ref="chartContainer" class="w-full">
         <VueUiXy v-if="hasStableChartWidth" ref="chartRef" :dataset :config>
           <template #svg="{ svg }">
-            <g v-if="showTzSelector" aria-hidden="true" pointer-events="none">
-              <rect
-                v-for="rect in getFogOfSleep(svg)"
-                :key="rect.id"
-                :x="rect.x"
-                :y="rect.y"
-                :width="rect.width"
-                :height="rect.height"
-                fill="#0b0b0b"
-                :fill-opacity="isDarkMode ? 0.3 : 0.1"
-                style="transition: all 0.2s"
-              />
-            </g>
             <g
               v-for="alerts in alertIcons(
                 svg.data as Datapoints,
@@ -566,6 +549,19 @@ const showTzSelector = shallowRef(false)
                   :stroke="colors.bg"
                 />
               </template>
+            </g>
+            <g v-if="showTzSelector" aria-hidden="true" pointer-events="none">
+              <foreignObject
+                v-for="rect in fog(svg)"
+                :key="rect.id"
+                :x="rect.x"
+                :y="rect.y"
+                :width="rect.width"
+                :height="rect.height"
+                style="transition: all 0.2s"
+              >
+                <div class="w-full h-full blurred"></div>
+              </foreignObject>
             </g>
           </template>
 
@@ -671,9 +667,9 @@ const showTzSelector = shallowRef(false)
             <text
               v-if="absoluteIndex % (isMobile ? 4 : 2) === 0"
               :x="x"
-              :y="y + fontSize"
+              :y="y + fontSize * 2"
               :font-size="fontSize"
-              :fill="fill"
+              :fill
               :text-anchor="textAnchor"
             >
               {{ content }}
@@ -685,7 +681,7 @@ const showTzSelector = shallowRef(false)
 
     <template v-if="hasData">
       <div
-        class="mx-auto mb-5 overflow-hidden rounded-lg border border-current/10 transition-colors"
+        class="mx-auto mb-5 overflow-hidden rounded-lg border border-current/10 transition-colors mt-2"
       >
         <label
           class="flex cursor-pointer items-center justify-between gap-4 px-3 py-2.5 transition-colors hover:bg-current/[0.03]"
@@ -696,7 +692,7 @@ const showTzSelector = shallowRef(false)
             </span>
 
             <span class="mt-0.5 block text-xs text-gh-muted">
-              Display activity hours by a selected timezone
+              Display activity hours by selected timezone
             </span>
           </div>
 
@@ -725,5 +721,13 @@ const showTzSelector = shallowRef(false)
 :deep(.vue-data-ui-component path),
 :deep(.vue-data-ui-component circle) {
   transition: none !important;
+}
+:deep(.vue-ui-xy-svg) {
+  overflow: visible; /** for last time label cropping issue  */
+}
+
+.blurred {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 </style>
