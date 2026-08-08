@@ -12,6 +12,7 @@ import { pack, unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
   getCompletedDailyEntries,
+  getSampleDailyEntries,
   mergeDailyEntries,
 } from '../shared/utils/daily-rollup'
 import { INSUFFICIENT_DATA_SCORE } from '../shared/utils/health-stats'
@@ -60,8 +61,11 @@ interface ScanOptions {
   /** Rolling window for `windowOutputFile`, in scan runs. */
   windowMaxScans?: number
   /**
-   * When set alongside `windowOutputFile`, every day the window has completed
-   * is appended here as a single entry. Days already in the file are kept.
+   * Where this run appends its day entries. Both scan shapes feed the same
+   * file: alongside `windowOutputFile` it contributes every day the window has
+   * completed, and on its own the daily sample run contributes the day it just
+   * measured. Days already in the file are kept, so the two never fight over a
+   * date — whichever source reached it first owns it.
    */
   dailyOutputFile?: string
 }
@@ -499,25 +503,33 @@ export async function main(options: ScanOptions = {}) {
 
   saveScanResults(finalResults, outputFile, dryRun)
 
-  if (windowOutputFile) {
-    const finalWindowResults =
-      windowMaxScans != null
-        ? trimToRecentScans(windowResults, windowMaxScans)
-        : windowResults
+  const finalWindowResults =
+    windowMaxScans != null
+      ? trimToRecentScans(windowResults, windowMaxScans)
+      : windowResults
 
+  if (windowOutputFile) {
     saveScanResults(finalWindowResults, windowOutputFile, dryRun)
     console.log(`Window: ${windowed.length} PRs opened in the previous hour`)
+  }
 
-    if (dailyOutputFile) {
-      const stored = dryRun ? [] : loadDailyEntries(dailyOutputFile)
-      const dailyEntries = mergeDailyEntries(
-        stored,
-        getCompletedDailyEntries(finalWindowResults),
-      )
+  if (dailyOutputFile) {
+    const stored = dryRun ? [] : loadDailyEntries(dailyOutputFile)
 
-      saveDailyEntries(dailyEntries, dailyOutputFile, dryRun)
-      console.log(`Daily: ${dailyEntries.length - stored.length} day(s) added`)
-    }
+    // A window day is only stored once the window has moved past it, so it
+    // lands the morning after. A sample run is the entire measurement of the
+    // day it runs on — there is no later run to extend it — so its day is
+    // ready the moment the run finishes, and it reaches a date first while
+    // both scans are alive. That is what keeps this file and the sample the
+    // pages read from telling the same story during the switchover.
+    const measured = windowOutputFile
+      ? getCompletedDailyEntries(finalWindowResults)
+      : getSampleDailyEntries(finalResults)
+
+    const dailyEntries = mergeDailyEntries(stored, measured)
+
+    saveDailyEntries(dailyEntries, dailyOutputFile, dryRun)
+    console.log(`Daily: ${dailyEntries.length - stored.length} day(s) added`)
   }
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
