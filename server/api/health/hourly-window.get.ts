@@ -1,5 +1,6 @@
 import { unpack } from '~~/shared/utils/compactor'
 import {
+  applyCumulativeTrends,
   fillEmptyHourlyBuckets,
   getClassificationStatsByScanTime,
 } from '~~/shared/utils/count-classification-by-date'
@@ -25,41 +26,14 @@ export default defineEventHandler(async () => {
       created_at: roundToClosestHour(entry.created_at),
     }))
 
-    const automationPercentages: number[] = []
-    const mixedPercentages: number[] = []
-    const organicPercentages: number[] = []
-
     // An hour with no PR opened writes no row at all, so it has to be
     // added as an empty bucket instead of being skipped by the chart.
     const countsByScanTime = fillEmptyHourlyBuckets({
       countsByHour: getClassificationStatsByScanTime(results),
       maxHours: WINDOW_MAX_HOURS,
     })
+    const categoryProgression = applyCumulativeTrends(countsByScanTime)
     const scanTimes = Object.keys(countsByScanTime).sort()
-
-    scanTimes.forEach((scanTime) => {
-      const counts = countsByScanTime[scanTime]
-
-      if (!counts) {
-        return
-      }
-
-      automationPercentages.push(counts.automation.percentage)
-      mixedPercentages.push(counts.mixed.percentage)
-      organicPercentages.push(counts.organic.percentage)
-
-      counts.automation.trend = calcLinearProgression(
-        automationPercentages,
-      ).trend
-      counts.mixed.trend = calcLinearProgression(mixedPercentages).trend
-      counts.organic.trend = calcLinearProgression(organicPercentages).trend
-    })
-
-    const categoryProgression: EcosystemHealthCategoryProgression = {
-      automation: calcLinearProgression(automationPercentages),
-      mixed: calcLinearProgression(mixedPercentages),
-      organic: calcLinearProgression(organicPercentages),
-    }
 
     return {
       results,

@@ -1,7 +1,11 @@
 import { identityConfig } from '@unveil/identity'
-import type { EcosystemHealthCategory } from '../types/ecosystem-health'
+import type {
+  EcosystemHealthCategory,
+  EcosystemHealthCategoryProgression,
+} from '../types/ecosystem-health'
 import { round } from './numbers'
 import { INSUFFICIENT_DATA_SCORE } from './health-stats'
+import { calcLinearProgression } from './calc-linear-progression'
 
 export type ClassificationMetric = {
   count: number
@@ -50,7 +54,7 @@ function getDateKey(date: string): string {
   return new Date(date).toISOString().slice(0, 10)
 }
 
-function createEmptyClassificationStats(): ClassificationStats {
+export function createEmptyClassificationStats(): ClassificationStats {
   return {
     automation: { count: 0, trend: 0, percentage: 0 },
     mixed: { count: 0, trend: 0, percentage: 0 },
@@ -126,6 +130,39 @@ export function getClassificationStatsByScanTime(
   data: EcosystemHealthItem[] = [],
 ): GetClassificationStatsByDateResults {
   return getClassificationStatsByBucket(data, (createdAt) => createdAt)
+}
+
+export function applyCumulativeTrends(
+  countsByBucket: GetClassificationStatsByDateResults,
+): EcosystemHealthCategoryProgression {
+  const percentages: Record<EcosystemHealthCategory, number[]> = {
+    automation: [],
+    mixed: [],
+    organic: [],
+  }
+
+  Object.keys(countsByBucket)
+    .sort()
+    .forEach((bucket) => {
+      const counts = countsByBucket[bucket]
+
+      if (!counts) {
+        return
+      }
+
+      CLASSIFICATION_CATEGORIES.forEach((category) => {
+        percentages[category].push(counts[category].percentage)
+        counts[category].trend = calcLinearProgression(
+          percentages[category],
+        ).trend
+      })
+    })
+
+  return {
+    automation: calcLinearProgression(percentages.automation),
+    mixed: calcLinearProgression(percentages.mixed),
+    organic: calcLinearProgression(percentages.organic),
+  }
 }
 
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
@@ -417,7 +454,7 @@ function sumClassificationCountsByDates({
   return applyClassificationPercentages(result)
 }
 
-function applyClassificationPercentages(
+export function applyClassificationPercentages(
   counts: ClassificationStats,
 ): ClassificationStats {
   const total = CLASSIFICATION_CATEGORIES.reduce((total, category) => {
