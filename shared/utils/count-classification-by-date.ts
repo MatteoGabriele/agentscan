@@ -128,6 +128,59 @@ export function getClassificationStatsByScanTime(
   return getClassificationStatsByBucket(data, (createdAt) => createdAt)
 }
 
+const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
+
+export function fillEmptyHourlyBuckets({
+  countsByHour,
+  maxHours,
+}: {
+  countsByHour: GetClassificationStatsByDateResults
+  maxHours?: number
+}): GetClassificationStatsByDateResults {
+  const hours = Object.keys(countsByHour).sort()
+  const firstHour = hours.at(0)
+  const lastHour = hours.at(-1)
+
+  if (!firstHour || !lastHour) {
+    return {}
+  }
+
+  const firstTime = new Date(firstHour).getTime()
+  const lastTime = new Date(lastHour).getTime()
+
+  if (Number.isNaN(firstTime) || Number.isNaN(lastTime)) {
+    return countsByHour
+  }
+
+  const startTime =
+    maxHours && maxHours > 0
+      ? Math.max(firstTime, lastTime - (maxHours - 1) * MILLISECONDS_PER_HOUR)
+      : firstTime
+
+  const result: GetClassificationStatsByDateResults = {}
+
+  for (let time = startTime; time <= lastTime; time += MILLISECONDS_PER_HOUR) {
+    result[new Date(time).toISOString()] = applyClassificationPercentages(
+      createEmptyClassificationStats(),
+    )
+  }
+
+  // Scan times that don't sit exactly on the hourly grid still belong to the
+  // window, so they overwrite the placeholders rather than being dropped.
+  hours.forEach((hour) => {
+    const counts = countsByHour[hour]
+    const time = new Date(hour).getTime()
+
+    if (!counts || Number.isNaN(time) || time < startTime) {
+      return
+    }
+
+    result[hour] = counts
+  })
+
+  return result
+}
+
 function getTotalClassificationCount(
   counts: ClassificationStats | undefined,
 ): number | null {
@@ -160,7 +213,7 @@ function getCategoryPercentageComparison({
   category: EcosystemHealthCategory
   lastDate: string | undefined
   previousDate: string | undefined
-  countsByDate: getClassificationStatsByDateResults
+  countsByDate: GetClassificationStatsByDateResults
 }): CategoryPercentageComparison {
   const previousCounts = previousDate ? countsByDate[previousDate] : undefined
   const lastCounts = lastDate ? countsByDate[lastDate] : undefined
@@ -295,7 +348,7 @@ function sumClassificationCountsByDates({
   countsByDate,
   dates,
 }: {
-  countsByDate: getClassificationStatsByDateResults
+  countsByDate: GetClassificationStatsByDateResults
   dates: Set<string>
 }): ClassificationStats {
   const result = createEmptyClassificationStats()
