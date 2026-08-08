@@ -1,7 +1,8 @@
 /// <reference types="node" />
 
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, renameSync, writeFileSync } from 'fs'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import { unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
@@ -58,12 +59,19 @@ export function backfill(options: BackfillOptions = {}) {
     return entries
   }
 
-  writeFileSync(dataPath(outputFile), `${JSON.stringify(entries, null, 2)}\n`)
+  const destination = dataPath(outputFile)
+  const tempFile = `${destination}.${process.pid}.tmp`
+
+  writeFileSync(tempFile, `${JSON.stringify(entries, null, 2)}\n`)
+  renameSync(tempFile, destination)
 
   return entries
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   const args = process.argv.slice(2)
   const inputArg = args.find((a) => a.startsWith('--input='))
   const outputArg = args.find((a) => a.startsWith('--output='))
