@@ -7,7 +7,7 @@ import {
   type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
-import { useElementSize, usePreferredDark } from '@vueuse/core'
+import { useElementSize } from '@vueuse/core'
 import dayjs, { type Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -28,8 +28,6 @@ const props = defineProps<{
   countsByScanTime: GetClassificationStatsByDateResults
   automationThreshold: number
 }>()
-
-const isDarkMode = usePreferredDark()
 
 const countsByScanTime = computed(() => props.countsByScanTime)
 const hasData = computed(() => props.scanTimes.length > 0)
