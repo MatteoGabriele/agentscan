@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest'
 import type { IdentifyResult } from '@unveil/identity'
 import { getClassificationDetails, identify } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
@@ -1723,6 +1723,11 @@ describe('GitHub Webhook Handler', () => {
         new Error('502 Bad Gateway'),
       )
 
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {})
+      onTestFinished(() => consoleError.mockRestore())
+
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
       // No retry of the real conclusion, but the run must not be left at
       // `in_progress`: the guard concludes it as neutral instead.
@@ -1736,6 +1741,11 @@ describe('GitHub Webhook Handler', () => {
           conclusion: 'neutral',
           output: expect.objectContaining({ title: 'Analysis incomplete' }),
         }),
+      )
+      expect(consoleError).toHaveBeenCalledTimes(2)
+      expect(consoleError).toHaveBeenLastCalledWith(
+        expect.stringContaining('Failed to complete check run'),
+        expect.any(Error),
       )
     })
 

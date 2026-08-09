@@ -36,8 +36,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [makeFlag()],
         sourceUrl: 'https://github.com/owner/repo/pull/1',
       }),
@@ -59,8 +57,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: undefined,
-        classification: 'automation',
-        score: 5,
         flags: [makeFlag()],
         sourceUrl: 'https://github.com/owner/repo/pull/1',
       }),
@@ -69,30 +65,11 @@ describe('buildReportIssueUrl', () => {
     expect(url.searchParams.has('user-id')).toBe(false)
   })
 
-  it('reports the reason with classification, score, and flag count', () => {
-    const url = new URL(
-      buildReportIssueUrl({
-        username: 'bot-account',
-        userId: 123,
-        classification: 'automation',
-        score: 5,
-        flags: [makeFlag(), makeFlag()],
-        sourceUrl: 'https://github.com/owner/repo/pull/1',
-      }),
-    )
-
-    expect(url.searchParams.get('reason')).toBe(
-      'AgentScan classified this account as possible "automation" (score 5/100).',
-    )
-  })
-
   it('includes the source link plus each flag label and detail in the evidence', () => {
     const url = new URL(
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [
           makeFlag({
             label: 'Fork surge',
@@ -120,8 +97,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [makeFlag()],
         sourceUrl: 'https://github.com/owner/repo/pull/1',
       }),
@@ -137,8 +112,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [makeFlag()],
         sourceUrl: 'https://gitlab.example.com/owner/repo/-/merge_requests/1',
       }),
@@ -163,8 +136,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags,
         sourceUrl: 'https://github.com/owner/repo/pull/1',
       }),
@@ -185,8 +156,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [
           makeFlag({
             events: [
@@ -224,8 +193,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [
           makeFlag({ events }),
           makeFlag({
@@ -254,8 +221,6 @@ describe('buildReportIssueUrl', () => {
       buildReportIssueUrl({
         username: 'bot-account',
         userId: 123,
-        classification: 'automation',
-        score: 5,
         flags: [makeFlag({ events: [] })],
         sourceUrl: 'https://github.com/owner/repo/pull/1',
       }),

@@ -552,8 +552,6 @@ export default defineEventHandler(async (event) => {
         ? buildReportIssueUrl({
             username,
             userId,
-            classification: analysis.classification,
-            score: analysis.score,
             flags: analysis.flags,
             sourceUrl,
           })

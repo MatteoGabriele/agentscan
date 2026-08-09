@@ -8,8 +8,6 @@ const MAX_EXAMPLE_PRS = 5
 type ReportIssueParams = {
   username: string
   userId: number | undefined
-  classification: string
-  score: number
   flags: IdentifyFlag[]
   sourceUrl: string
 }
@@ -121,13 +119,9 @@ export function buildEvidenceLines({
 export function buildReportIssueUrl({
   username,
   userId,
-  classification,
-  score,
   flags,
   sourceUrl,
 }: ReportIssueParams): string {
-  const reason = `AgentScan classified this account as possible "${classification}" (score ${score}/100).`
-
   const evidenceLines = buildEvidenceLines({ flags, sourceUrl })
 
   const url = new URL(REPORT_ISSUE_URL)
@@ -139,7 +133,6 @@ export function buildReportIssueUrl({
     url.searchParams.set('user-id', String(userId))
   }
 
-  url.searchParams.set('reason', reason)
   url.searchParams.set('evidence', evidenceLines.join('\n'))
 
   return url.toString()

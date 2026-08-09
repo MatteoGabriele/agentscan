@@ -76,8 +76,6 @@ const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
     username: username.value || '',
     userId: props.user.id,
-    classification: classification.value ?? 'organic',
-    score: score.value ?? 0,
     flags: data.value?.analysis.flags ?? [],
     sourceUrl: `https://agentscan.tools/user/${username.value}`,
   })
