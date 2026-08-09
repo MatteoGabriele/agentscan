@@ -592,6 +592,33 @@ function getCalendarWeekStartDates(dates: string[]): string[] {
   return [...new Set(dates.map((date) => getMondayDateKey(date)))].sort()
 }
 
+function getContinuousDateKeys(dates: string[]): string[] {
+  const dateKeys = [...new Set(dates.map((date) => getDateKey(date)))].sort()
+
+  const firstDate = dateKeys.at(0)
+  const lastDate = dateKeys.at(-1)
+
+  if (!firstDate || !lastDate) {
+    return []
+  }
+
+  const millisecondsPerDay = 24 * 60 * 60 * 1000
+  const firstTime = new Date(`${firstDate}T00:00:00.000Z`).getTime()
+
+  const lastTime = new Date(`${lastDate}T00:00:00.000Z`).getTime()
+
+  return Array.from(
+    {
+      length: Math.floor((lastTime - firstTime) / millisecondsPerDay) + 1,
+    },
+    (_, dayOffset) => {
+      return getDateKey(
+        new Date(firstTime + dayOffset * millisecondsPerDay).toISOString(),
+      )
+    },
+  )
+}
+
 function getClassificationByCalendarWeekChunks({
   data = [],
   dates = [],
@@ -599,19 +626,19 @@ function getClassificationByCalendarWeekChunks({
   data?: EcosystemHealthItem[]
   dates?: string[]
 }): ClassificationChunk[] {
-  const availableDateKeys = new Set(dates.map((date) => getDateKey(date)))
+  const continuousDates = getContinuousDateKeys(dates)
+  const firstDate = continuousDates.at(0)
+  const lastDate = continuousDates.at(-1)
 
-  return getCalendarWeekStartDates(dates)
+  if (!firstDate || !lastDate) {
+    return []
+  }
+
+  return getCalendarWeekStartDates(continuousDates)
     .map((startDate) => {
-      const weekDays = getNextDays({
-        date: startDate,
-        length: 7,
-      })
-
       const endDate = getSundayDateKey(startDate)
-      const isCompleteWeek = [...weekDays].every((date) => {
-        return availableDateKeys.has(date)
-      })
+
+      const isCompleteWeek = startDate >= firstDate && endDate <= lastDate
 
       if (!isCompleteWeek) {
         return null
@@ -649,10 +676,12 @@ export function getClassificationByDateChunks({
     })
   }
 
-  const sortedDates = [...dates].sort()
+  const sortedDates = getContinuousDateKeys(dates)
 
   return Array.from(
-    { length: Math.ceil(sortedDates.length / days) },
+    {
+      length: Math.ceil(sortedDates.length / days),
+    },
     (_, chunkIndex) => {
       const chunk = sortedDates.slice(
         chunkIndex * days,

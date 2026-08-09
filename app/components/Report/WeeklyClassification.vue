@@ -110,7 +110,7 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
       A new weekly data point is added after each Sunday scan
     </p>
   </div>
-  <div class="flex flex-col gap-4 weekly-classification">
+  <div class="flex flex-col gap-4 weekly-classification min-h-6">
     <ClientOnly>
       <VueUiStackbar :dataset="stackbarDataset" :config="stackbarConfig">
         <template #legend="{ legend }">
