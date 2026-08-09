@@ -3,10 +3,9 @@ name: Hourly User Scan
 on:
   workflow_dispatch: # Allow manual trigger
 
-# Both scans read, merge and rewrite data/daily-scan-results.json, so they have
-# to take turns: a queued run reads what the previous one already wrote.
+# Both scans commit to main, so they take turns instead of racing to push.
 concurrency:
-  group: daily-scan-results
+  group: scan-results
   cancel-in-progress: false
 
 jobs:

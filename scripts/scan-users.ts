@@ -12,7 +12,6 @@ import { pack, unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
   getCompletedDailyEntries,
-  getSampleDailyEntries,
   mergeDailyEntries,
 } from '../shared/utils/daily-rollup'
 import { INSUFFICIENT_DATA_SCORE } from '../shared/utils/health-stats'
@@ -513,17 +512,15 @@ export async function main(options: ScanOptions = {}) {
     console.log(`Window: ${windowed.length} PRs opened in the previous hour`)
   }
 
-  if (dailyOutputFile) {
+  // Only the hourly window measures a full day. The sample scan sees a single
+  // moment of one, so it never writes a day.
+  if (dailyOutputFile && windowOutputFile) {
     const stored = dryRun ? [] : loadDailyEntries(dailyOutputFile)
-
-    const measured = windowOutputFile
-      ? getCompletedDailyEntries(windowResults)
-      : getSampleDailyEntries(finalResults)
-
+    const measured = getCompletedDailyEntries(windowResults, windowAt!)
     const dailyEntries = mergeDailyEntries(stored, measured)
 
     saveDailyEntries(dailyEntries, dailyOutputFile, dryRun)
-    console.log(`Daily: ${dailyEntries.length - stored.length} day(s) added`)
+    console.log(`Daily: ${measured.length} day(s) rolled up from the window`)
   }
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
