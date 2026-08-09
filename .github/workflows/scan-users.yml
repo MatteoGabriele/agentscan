@@ -11,10 +11,9 @@ on:
     - cron: '34 20 7,14,21,28 * *' # Days 7,14,21,28 → 20:34
   workflow_dispatch: # Allow manual trigger
 
-# Both scans read, merge and rewrite data/daily-scan-results.json, so they have
-# to take turns: a queued run reads what the previous one already wrote.
+# Both scans commit to main, so they take turns instead of racing to push.
 concurrency:
-  group: daily-scan-results
+  group: scan-results
   cancel-in-progress: false
 
 jobs:
@@ -44,9 +43,9 @@ jobs:
           # Separate account, so scans draw from their own rate limit bucket.
           NUXT_GITHUB_TOKEN_ANASTELLINE: ${{ secrets.NUXT_GITHUB_TOKEN_ANASTELLINE }}
           PR_HASH_SECRET: ${{ secrets.PR_HASH_SECRET }}
-        # The daily sample also rolls its run into the shared day file, so it
-        # stays in step with the sample for as long as both scans run.
-        run: pnpm exec tsx scripts/scan-users.ts --daily-output=daily-scan-results.json
+        # No --daily-output: this scan is a single snapshot, and the daily file
+        # only holds days the hourly window measured hour by hour.
+        run: pnpm exec tsx scripts/scan-users.ts
 
       - name: Commit and push results
         run: |
@@ -56,7 +55,7 @@ jobs:
           if git diff --quiet; then
             echo "No changes detected"
           else
-            git add data/scan-results.txt data/daily-scan-results.json
+            git add data/scan-results.txt
             git commit -m "chore: daily user scan - $(date -u +'%Y-%m-%d')"
             git fetch origin main
             git merge --no-edit origin/main

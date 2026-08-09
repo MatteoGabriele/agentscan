@@ -101,24 +101,41 @@ function byDate(a: DailyScanEntry, b: DailyScanEntry): number {
   return a.date.localeCompare(b.date)
 }
 
-// A day is rolled up once the window has moved past it and still reaches back
-// to its first hour, so a day is never stored while it is partly scanned or
-// partly aged out of the window.
+function getDayEnd(date: string): string {
+  return `${date}T23:00:00.000Z`
+}
+
+// An hour with no PR writes no row, so the rows alone cannot say how far the
+// scan got. The run passes in the hour it just scanned instead, and a day is
+// done once that hour reaches its last one, 23:00.
+function isFullyScanned(date: string, scannedHour: string): boolean {
+  return scannedHour >= getDayEnd(date)
+}
+
+// The window only keeps so many hours. A day that has lost its first one is
+// half gone, so it is left out.
+function isFullyRetained(date: string, firstBucket: string): boolean {
+  return firstBucket <= getDayStart(date)
+}
+
+// The days that are fully scanned and still fully inside the window.
 export function getCompletedDailyEntries(
   results: EcosystemHealthItem[],
+  scannedHour: string,
 ): DailyScanEntry[] {
-  const buckets = results.map((result) => result.created_at).sort()
-  const firstBucket = buckets.at(0)
-  const lastBucket = buckets.at(-1)
+  const firstBucket = results
+    .map((result) => result.created_at)
+    .sort()
+    .at(0)
 
-  if (!firstBucket || !lastBucket) {
+  if (!firstBucket) {
     return []
   }
 
   return [...collectBucketsByDate(results).entries()]
     .filter(
       ([date]) =>
-        firstBucket <= getDayStart(date) && getDate(lastBucket) > date,
+        isFullyRetained(date, firstBucket) && isFullyScanned(date, scannedHour),
     )
     .map(([date, bucket]) => toDailyEntry(date, bucket, bucket.hours.size))
     .sort(byDate)
@@ -194,14 +211,26 @@ export function getDailyHealthStats(
   }
 }
 
+// A seeded day (`hours: 0`) is one snapshot standing in for the whole day, so
+// a measured day replaces it. Otherwise the stored day wins and reruns change
+// nothing.
+function isReplacing(stored: DailyScanEntry, entry: DailyScanEntry): boolean {
+  return stored.hours === 0 && entry.hours > 0
+}
+
 export function mergeDailyEntries(
   stored: DailyScanEntry[],
   entries: DailyScanEntry[],
 ): DailyScanEntry[] {
-  const storedDates = new Set(stored.map((entry) => entry.date))
+  const byDateEntries = new Map(stored.map((entry) => [entry.date, entry]))
 
-  return [
-    ...stored,
-    ...entries.filter((entry) => !storedDates.has(entry.date)),
-  ].sort(byDate)
+  entries.forEach((entry) => {
+    const current = byDateEntries.get(entry.date)
+
+    if (!current || isReplacing(current, entry)) {
+      byDateEntries.set(entry.date, entry)
+    }
+  })
+
+  return [...byDateEntries.values()].sort(byDate)
 }

@@ -41,10 +41,13 @@ function createDailyScanEntry(entry: Partial<DailyScanEntry>): DailyScanEntry {
 
 describe('getCompletedDailyEntries', () => {
   it('returns one entry per completed day', () => {
-    const [entry, ...rest] = getCompletedDailyEntries([
-      ...createFullDay('2026-06-10', 90),
-      createEcosystemHealthItem({ created_at: '2026-06-11T00:00:00.000Z' }),
-    ])
+    const [entry, ...rest] = getCompletedDailyEntries(
+      [
+        ...createFullDay('2026-06-10', 90),
+        createEcosystemHealthItem({ created_at: '2026-06-11T00:00:00.000Z' }),
+      ],
+      '2026-06-11T00:00:00.000Z',
+    )
 
     expect(rest).toEqual([])
     expect(entry?.date).toBe('2026-06-10')
@@ -55,24 +58,27 @@ describe('getCompletedDailyEntries', () => {
   })
 
   it('counts bounty hunters, pr statuses and insufficient data apart', () => {
-    const [entry] = getCompletedDailyEntries([
-      createEcosystemHealthItem({
-        created_at: '2026-06-10T00:00:00.000Z',
-        score: 10,
-        pr_status: 'closed',
-        is_bounty: true,
-      }),
-      createEcosystemHealthItem({
-        created_at: '2026-06-10T01:00:00.000Z',
-        score: 10,
-        pr_status: 'merged',
-      }),
-      createEcosystemHealthItem({
-        created_at: '2026-06-10T02:00:00.000Z',
-        score: -1,
-      }),
-      createEcosystemHealthItem({ created_at: '2026-06-11T00:00:00.000Z' }),
-    ])
+    const [entry] = getCompletedDailyEntries(
+      [
+        createEcosystemHealthItem({
+          created_at: '2026-06-10T00:00:00.000Z',
+          score: 10,
+          pr_status: 'closed',
+          is_bounty: true,
+        }),
+        createEcosystemHealthItem({
+          created_at: '2026-06-10T01:00:00.000Z',
+          score: 10,
+          pr_status: 'merged',
+        }),
+        createEcosystemHealthItem({
+          created_at: '2026-06-10T02:00:00.000Z',
+          score: -1,
+        }),
+        createEcosystemHealthItem({ created_at: '2026-06-11T00:00:00.000Z' }),
+      ],
+      '2026-06-11T00:00:00.000Z',
+    )
 
     expect(entry?.classifications.automation).toEqual({
       count: 2,
@@ -83,17 +89,46 @@ describe('getCompletedDailyEntries', () => {
     expect(entry?.hours).toBe(3)
   })
 
-  it('skips the day still being scanned', () => {
-    expect(getCompletedDailyEntries(createFullDay('2026-06-10', 90))).toEqual(
-      [],
+  it('closes the day on the midnight run, which measures its 23:00 hour', () => {
+    const [entry, ...rest] = getCompletedDailyEntries(
+      createFullDay('2026-06-10', 90),
+      '2026-06-10T23:00:00.000Z',
     )
+
+    expect(rest).toEqual([])
+    expect(entry?.date).toBe('2026-06-10')
+    expect(entry?.hours).toBe(24)
+  })
+
+  it('closes the day even when its last hours saw no PR at all', () => {
+    // The last three hours were scanned but saw no PR, so no row was written
+    // for them and the rows stop at 20:00.
+    const [entry] = getCompletedDailyEntries(
+      createFullDay('2026-06-10', 90).slice(0, 21),
+      '2026-06-10T23:00:00.000Z',
+    )
+
+    expect(entry?.date).toBe('2026-06-10')
+    expect(entry?.hours).toBe(21)
+  })
+
+  it('skips the day still being scanned', () => {
+    expect(
+      getCompletedDailyEntries(
+        createFullDay('2026-06-10', 90).slice(0, 13),
+        '2026-06-10T12:00:00.000Z',
+      ),
+    ).toEqual([])
   })
 
   it('skips a day whose first hours already left the window', () => {
-    const result = getCompletedDailyEntries([
-      createEcosystemHealthItem({ created_at: '2026-06-10T12:00:00.000Z' }),
-      createEcosystemHealthItem({ created_at: '2026-06-11T00:00:00.000Z' }),
-    ])
+    const result = getCompletedDailyEntries(
+      [
+        createEcosystemHealthItem({ created_at: '2026-06-10T12:00:00.000Z' }),
+        createEcosystemHealthItem({ created_at: '2026-06-11T00:00:00.000Z' }),
+      ],
+      '2026-06-11T00:00:00.000Z',
+    )
 
     expect(result).toEqual([])
   })
@@ -182,7 +217,7 @@ describe('getDailyCountsByDate', () => {
 })
 
 describe('mergeDailyEntries', () => {
-  it('adds new days and keeps stored ones untouched', () => {
+  it('adds new days and keeps stored measured ones untouched', () => {
     const stored = [createDailyScanEntry({ date: '2026-06-10', hours: 24 })]
 
     const result = mergeDailyEntries(stored, [
@@ -208,5 +243,28 @@ describe('mergeDailyEntries', () => {
       ['2026-06-09', 0],
       ['2026-06-10', 24],
     ])
+  })
+
+  it('lets a window day take over the seeded day standing in for it', () => {
+    const stored = [
+      createDailyScanEntry({
+        date: '2026-06-10',
+        hours: 0,
+        createdAt: '2026-06-10T19:00:00.000Z',
+      }),
+    ]
+
+    const result = mergeDailyEntries(stored, [
+      createDailyScanEntry({
+        date: '2026-06-10',
+        hours: 24,
+        createdAt: '2026-06-10T00:00:00.000Z',
+      }),
+    ])
+
+    expect(result.map((entry) => [entry.date, entry.hours])).toEqual([
+      ['2026-06-10', 24],
+    ])
+    expect(result[0]?.createdAt).toBe('2026-06-10T00:00:00.000Z')
   })
 })

@@ -264,9 +264,10 @@ describe('daily rollup at the first midnight rollover', () => {
     ),
     hourlyRow('2026-06-11T00:00:00.000Z'),
   ]
+  const SCANNED_HOUR = '2026-06-11T00:00:00.000Z'
 
   it('rolls the completed day up from the untrimmed window rows', () => {
-    const entries = getCompletedDailyEntries(windowResults)
+    const entries = getCompletedDailyEntries(windowResults, SCANNED_HOUR)
 
     expect(entries.map((entry) => [entry.date, entry.hours])).toEqual([
       ['2026-06-10', 24],
@@ -280,6 +281,6 @@ describe('daily rollup at the first midnight rollover', () => {
     const retained = trimToRecentScans(windowResults, WINDOW_MAX_SCANS)
 
     expect(retained[0]?.created_at).toBe('2026-06-10T01:00:00.000Z')
-    expect(getCompletedDailyEntries(retained)).toEqual([])
+    expect(getCompletedDailyEntries(retained, SCANNED_HOUR)).toEqual([])
   })
 })
