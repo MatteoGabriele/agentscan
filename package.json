@@ -36,7 +36,7 @@
     "@tiptap/starter-kit": "^3.27.1",
     "@tiptap/vue-3": "^3.27.1",
     "@unocss/preset-icons": "^66.6.0",
-    "@unveil/identity": "2.0.1",
+    "@unveil/identity": "2.0.2",
     "@vueuse/core": "^14.2.1",
     "dayjs": "^1.11.19",
     "discord-interactions": "^4.4.0",
