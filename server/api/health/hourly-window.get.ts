@@ -4,10 +4,7 @@ import {
   fillEmptyHourlyBuckets,
   getClassificationStatsByScanTime,
 } from '~~/shared/utils/count-classification-by-date'
-
-// Same hours from the workflow script
-// @todo move to a shared file and make it default without options
-const WINDOW_MAX_HOURS = 25
+import { WINDOW_MAX_HOURS } from '~~/shared/utils/health-history-window'
 
 export default defineEventHandler(async () => {
   try {

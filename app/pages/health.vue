@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  DEFAULT_HISTORY_MONTHS,
+  WINDOW_MAX_HOURS,
+} from '~~/shared/utils/health-history-window'
+
 definePageMeta({
   layout: 'full',
 })
@@ -20,6 +25,32 @@ useHead({
     },
     { property: 'og:type', content: 'website' },
   ],
+})
+
+type ChartRange = 'daily' | 'hourly'
+type ChartRangeOption = {
+  value: ChartRange
+  label: string
+  caption: string
+}
+
+const rangeOptions: ChartRangeOption[] = [
+  {
+    value: 'daily',
+    label: 'Daily',
+    caption: `Daily totals from the last ${DEFAULT_HISTORY_MONTHS} months`,
+  },
+  {
+    value: 'hourly',
+    label: 'Hourly',
+    caption: `Last ${WINDOW_MAX_HOURS} hours, updated every hour`,
+  },
+]
+
+const range = ref<ChartRange>('daily')
+
+const activeRangeCaption = computed(() => {
+  return rangeOptions.find((option) => option.value === range.value)?.caption
 })
 </script>
 
@@ -49,17 +80,44 @@ useHead({
           </div>
         </header>
 
-        <div class="mt-6 mb-12">
+        <div class="mt-6">
           <HealthTrendItemList />
+        </div>
+
+        <div class="mt-8 mb-4 flex flex-col items-center gap-2 px-4">
+          <div
+            role="group"
+            aria-label="Chart time range"
+            class="inline-flex gap-1 rounded-full border border-gh-border/60 p-1"
+          >
+            <button
+              v-for="option in rangeOptions"
+              :key="option.value"
+              type="button"
+              :aria-pressed="range === option.value"
+              class="rounded-full px-4 py-1 text-xs transition-colors"
+              :class="
+                range === option.value
+                  ? 'bg-gh-card text-gh-text'
+                  : 'text-gh-muted hover:text-gh-text'
+              "
+              @click="range = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+
+          <p class="text-xs text-gh-muted/70">
+            {{ activeRangeCaption }}
+          </p>
         </div>
       </div>
 
       <div
         class="w-full min-h-0 shrink overflow-hidden basis-[300px] max-h-[300px] sm:basis-[500px] sm:max-h-[500px]"
       >
-        <!-- TODO: conditional display of daily / hourly -->
-        <ChartGlobalEventsEvolution />
-        <!-- <ChartHourlyEventsEvolutionNext v-else /> -->
+        <ChartHourlyEventsEvolutionNext v-if="range === 'hourly'" />
+        <ChartGlobalEventsEvolution v-else />
       </div>
     </div>
   </section>
