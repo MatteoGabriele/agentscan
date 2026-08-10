@@ -22,8 +22,6 @@ const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
 const automationThreshold = 50
 const mixedThreshold = 50
 
-const hasData = computed(() => scanTimes.value && scanTimes.value.length > 0)
-
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 const isMobile = useIsMobile()
