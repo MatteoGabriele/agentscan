@@ -8,15 +8,12 @@ import {
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
-import { getClosedPrPercentageEvolutionTotal } from '~~/shared/utils/charts'
-import { identityConfig } from '@unveil/identity'
 import { round } from '~~/shared/utils/numbers'
 
 import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
 const { data: ecosystemHealth } = await useEcosystemHealth()
-const data = computed(() => ecosystemHealth.value?.results ?? [])
 const dates = computed(() => ecosystemHealth.value?.dates)
 const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
@@ -36,17 +33,6 @@ onMounted(() => {
 })
 
 const colors = useColors(rootEl)
-
-const automatedClosureRateData = computed(() => ({
-  ...getClosedPrPercentageEvolutionTotal(data.value, [
-    0,
-    identityConfig.THRESHOLD_SUSPICIOUS,
-  ]),
-  scaleMin: 0,
-  scaleMax: 100,
-  color: 'grey',
-  dashed: true,
-}))
 
 type VueUiXyDatasetItemWithTrends = VueUiXyDatasetItem & {
   trends: number[]
@@ -117,7 +103,6 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
     ...datasetItem,
     scaleMax: max.value,
   })),
-  automatedClosureRateData.value,
 ])
 
 const tooltipPosition = useTooltipPosition(chartRef)

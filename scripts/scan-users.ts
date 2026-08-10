@@ -27,7 +27,6 @@ const DELAY_BETWEEN_GITHUB_CALLS = 200
 const RETRY_DELAY_MS = 5000
 const RETRY_MAX_ATTEMPT = 2
 const PR_SCAN_AMOUNT = 10
-const DEFAULT_OUTPUT_FILE = 'scan-results.txt'
 const PRS_PER_PAGE = 50
 // Safety net for the hourly window: a repo that opened more than this many PRs
 // in a single hour is either enormous or under attack — either way, stop paging.
@@ -48,7 +47,7 @@ interface ScanResult {
 interface ScanOptions {
   dryRun?: boolean
   prsPerRepo?: number
-  outputFile?: string
+  outputFile: string
   /** Keep only the N most recent scan runs in the output file (rolling window). */
   maxScans?: number
   /**
@@ -355,11 +354,11 @@ export async function collectPrs(
   return { sample, windowed }
 }
 
-export async function main(options: ScanOptions = {}) {
+export async function main(options: ScanOptions) {
   const {
     dryRun = false,
     prsPerRepo = PR_SCAN_AMOUNT,
-    outputFile = DEFAULT_OUTPUT_FILE,
+    outputFile,
     maxScans,
     windowOutputFile,
     windowMaxScans,
@@ -542,6 +541,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const outputArg = args.find((a) => a.startsWith('--output='))
   const outputFile = outputArg ? outputArg.split('=')[1] : undefined
 
+  // No default any more: every scan names the file it writes, so a missing
+  // flag is a mistake rather than a silent write to the wrong history.
+  if (!outputFile) {
+    console.error('Fatal error: --output=<file> is required')
+    process.exit(1)
+  }
+
   const maxScansArg = args.find((a) => a.startsWith('--max-scans='))
   const maxScans = maxScansArg
     ? parseInt(maxScansArg.split('=')[1], 10)
@@ -566,8 +572,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   main({
     dryRun,
+    outputFile,
     ...(prsPerRepo != null && { prsPerRepo }),
-    ...(outputFile && { outputFile }),
     ...(maxScans != null && { maxScans }),
     ...(windowOutputFile && { windowOutputFile }),
     ...(windowMaxScans != null && { windowMaxScans }),

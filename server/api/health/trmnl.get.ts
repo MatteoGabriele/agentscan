@@ -1,17 +1,18 @@
-import type { EcosystemHealthItem } from '~~/shared/types/ecosystem-health'
+import type { DailyScanEntry } from '~~/shared/utils/daily-rollup'
 
-import { unpack } from '~~/shared/utils/compactor'
+import { getDailyCountsByDate } from '~~/shared/utils/daily-rollup'
 import {
-  getCategoryDeltas,
-  getClassificationStatsByDate,
-  getWeeklyClassification,
+  getCategoryDeltasByDate,
+  getWeeklyClassificationByDate,
 } from '~~/shared/utils/count-classification-by-date'
 
 const TREND_DAYS = 14
 
 export default defineCachedEventHandler(
   async () => {
-    const raw = await useStorage('assets:data').getItemRaw('scan-results.txt')
+    const raw = await useStorage('assets:data').getItemRaw(
+      'daily-scan-results.json',
+    )
 
     if (!raw) {
       throw createError({
@@ -21,21 +22,26 @@ export default defineCachedEventHandler(
     }
 
     const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
-    const results: EcosystemHealthItem[] = unpack(content)
+    const entries = JSON.parse(content) as DailyScanEntry[]
 
-    const countsByDate = getClassificationStatsByDate(results)
+    const countsByDate = getDailyCountsByDate(entries)
     const dates = Object.keys(countsByDate).sort()
     const lastDate = dates.at(-1)
     const trendDates = dates.slice(-TREND_DAYS)
 
-    const week = lastDate ? getWeeklyClassification(results, lastDate) : null
-    const deltas = getCategoryDeltas(results)
+    const week = lastDate
+      ? getWeeklyClassificationByDate(countsByDate, lastDate)
+      : null
+    const deltas = getCategoryDeltasByDate(countsByDate)
 
     return {
       updated_at: lastDate
         ? (countsByDate[lastDate]?.createdAt ?? lastDate)
         : null,
-      total_scanned: results.length,
+      total_scanned: dates.reduce(
+        (total, date) => total + (countsByDate[date]?.total.count ?? 0),
+        0,
+      ),
       week: week
         ? {
             total: week.total.count,

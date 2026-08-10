@@ -7,7 +7,7 @@ import {
 } from 'vue-data-ui/vue-ui-stackbar'
 import {
   CLASSIFICATION_CATEGORIES,
-  getClassificationByDateChunks,
+  getClassificationByDateChunksByDate,
 } from '~~/shared/utils/count-classification-by-date'
 import { formatDateRange } from '~~/shared/utils/dates'
 
@@ -19,11 +19,11 @@ const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 
 const dates = computed(() => data.value?.dates ?? [])
-const results = computed(() => data.value?.results ?? [])
+const countsByDate = computed(() => data.value?.countsByDate ?? {})
 
 const classification = computed(() => {
-  return getClassificationByDateChunks({
-    data: results.value,
+  return getClassificationByDateChunksByDate({
+    countsByDate: countsByDate.value,
     dates: dates.value,
     days: 7,
     rolling: false, // true = rolling weeks; false = monday-sunday weeks (incomplete weeks won't show)

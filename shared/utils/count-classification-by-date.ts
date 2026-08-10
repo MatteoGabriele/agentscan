@@ -327,10 +327,9 @@ function getCategoryPercentageComparison({
   }
 }
 
-export function getCategoryDeltas(
-  results: EcosystemHealthItem[],
+export function getCategoryDeltasByDate(
+  countsByDate: GetClassificationStatsByDateResults,
 ): CategoryPercentageComparisons {
-  const countsByDate = getClassificationStatsByDate(results)
   const dates = Object.keys(countsByDate).sort()
   const previousDate = dates.at(-2)
   const lastDate = dates.at(-1)
@@ -343,6 +342,12 @@ export function getCategoryDeltas(
     })
     return comparisons
   }, {} as CategoryPercentageComparisons)
+}
+
+export function getCategoryDeltas(
+  results: EcosystemHealthItem[],
+): CategoryPercentageComparisons {
+  return getCategoryDeltasByDate(getClassificationStatsByDate(results))
 }
 
 function getPreviousDays({
@@ -489,20 +494,18 @@ function getClassificationPercentageTrend({
   )
 }
 
-export function getClassificationForPreviousDays({
-  data = [],
+export function getClassificationForPreviousDaysByDate({
+  countsByDate,
   date,
   days,
 }: {
-  data?: EcosystemHealthItem[]
+  countsByDate: GetClassificationStatsByDateResults
   date: string
   days: number
 }): ClassificationStats {
   if (!Number.isInteger(days) || days < 1) {
     return createEmptyClassificationStats()
   }
-
-  const countsByDate = getClassificationStatsByDate(data)
 
   const currentDays = getPreviousDays({
     date,
@@ -531,20 +534,34 @@ export function getClassificationForPreviousDays({
   })
 }
 
-export function getWeeklyClassification(
-  data: EcosystemHealthItem[] = [],
+export function getClassificationForPreviousDays({
+  data = [],
+  date,
+  days,
+}: {
+  data?: EcosystemHealthItem[]
+  date: string
+  days: number
+}): ClassificationStats {
+  return getClassificationForPreviousDaysByDate({
+    countsByDate: getClassificationStatsByDate(data),
+    date,
+    days,
+  })
+}
+
+export function getWeeklyClassificationByDate(
+  countsByDate: GetClassificationStatsByDateResults,
   date: string,
   rolling = true,
 ): ClassificationStats {
   if (rolling) {
-    return getClassificationForPreviousDays({
-      data,
+    return getClassificationForPreviousDaysByDate({
+      countsByDate,
       date,
       days: 7,
     })
   }
-
-  const countsByDate = getClassificationStatsByDate(data)
 
   const currentWeekDays = getNextDays({
     date: getMondayDateKey(date),
@@ -570,6 +587,18 @@ export function getWeeklyClassification(
     currentCounts,
     previousCounts,
   })
+}
+
+export function getWeeklyClassification(
+  data: EcosystemHealthItem[] = [],
+  date: string,
+  rolling = true,
+): ClassificationStats {
+  return getWeeklyClassificationByDate(
+    getClassificationStatsByDate(data),
+    date,
+    rolling,
+  )
 }
 
 type ClassificationChunk = {
@@ -619,11 +648,11 @@ function getContinuousDateKeys(dates: string[]): string[] {
   )
 }
 
-function getClassificationByCalendarWeekChunks({
-  data = [],
+function getClassificationByCalendarWeekChunksByDate({
+  countsByDate,
   dates = [],
 }: {
-  data?: EcosystemHealthItem[]
+  countsByDate: GetClassificationStatsByDateResults
   dates?: string[]
 }): ClassificationChunk[] {
   const continuousDates = getContinuousDateKeys(dates)
@@ -648,19 +677,23 @@ function getClassificationByCalendarWeekChunks({
         startDate,
         endDate,
         days: 7,
-        classification: getWeeklyClassification(data, endDate, false),
+        classification: getWeeklyClassificationByDate(
+          countsByDate,
+          endDate,
+          false,
+        ),
       }
     })
     .filter((chunk): chunk is ClassificationChunk => Boolean(chunk))
 }
 
-export function getClassificationByDateChunks({
-  data = [],
+export function getClassificationByDateChunksByDate({
+  countsByDate,
   dates = [],
   days = 7,
   rolling = true,
 }: {
-  data?: EcosystemHealthItem[]
+  countsByDate: GetClassificationStatsByDateResults
   dates?: string[]
   days?: number
   rolling?: boolean
@@ -670,8 +703,8 @@ export function getClassificationByDateChunks({
   }
 
   if (!rolling && days === 7) {
-    return getClassificationByCalendarWeekChunks({
-      data,
+    return getClassificationByCalendarWeekChunksByDate({
+      countsByDate,
       dates,
     })
   }
@@ -698,12 +731,31 @@ export function getClassificationByDateChunks({
         startDate,
         endDate,
         days: chunk.length,
-        classification: getClassificationForPreviousDays({
-          data,
+        classification: getClassificationForPreviousDaysByDate({
+          countsByDate,
           date: endDate,
           days: chunk.length,
         }),
       }
     },
   ).filter((chunk): chunk is ClassificationChunk => Boolean(chunk))
+}
+
+export function getClassificationByDateChunks({
+  data = [],
+  dates = [],
+  days = 7,
+  rolling = true,
+}: {
+  data?: EcosystemHealthItem[]
+  dates?: string[]
+  days?: number
+  rolling?: boolean
+}): ClassificationChunk[] {
+  return getClassificationByDateChunksByDate({
+    countsByDate: getClassificationStatsByDate(data),
+    dates,
+    days,
+    rolling,
+  })
 }
