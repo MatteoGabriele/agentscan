@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
+#
+# Every review run costs one unit of the hourly allowance — including the
+# automatic re-review after each push. The settings below spend that allowance
+# on hand-written source only, and on demand rather than on every push.
+
+language: en-US
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  collapse_walkthrough: true
+
+  # Walkthrough extras: each one is generated work on top of the review itself,
+  # and none of them say anything a small PR doesn't already make obvious.
+  changed_files_summary: false
+  sequence_diagrams: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  review_status: false
+  poem: false
+
+  auto_review:
+    enabled: true
+
+    # The main saving. Left on, every push to an open PR spends another review,
+    # so one PR polished over five commits costs six. Off, a PR is reviewed once
+    # when opened; ask for the re-review yourself with `@coderabbitai review`
+    # once the branch has settled.
+    auto_incremental_review: false
+
+    drafts: false
+    base_branches:
+      - main
+
+    # The scan workflow commits to main directly, but these keep any scan or
+    # backfill PR from spending a review on generated data.
+    ignore_title_keywords:
+      - 'chore: hourly user scan'
+      - 'chore: daily user scan'
+      - 'chore: backfill'
+      - wip
+
+  # Generated and vendored files. data/ alone is ~1MB of scan output that churns
+  # hourly on main, so it lands in any branch diff that merges main back in.
+  path_filters:
+    - '!data/**'
+    - '!mock-data/**'
+    - '!pnpm-lock.yaml'
+    - '!public/**'
+    - '!.nuxt/**'
+    - '!**/*.min.*'
+
+  path_instructions:
+    - path: 'shared/utils/**'
+      instructions: >-
+        Scoring and classification logic. INSUFFICIENT_DATA_SCORE (-1) is a
+        sentinel for missing data, never a classification bucket — flag any
+        code that compares it with a threshold, averages it, or counts it as
+        automation.
+    - path: 'app/components/**'
+      instructions: >-
+        Nuxt 4 / Vue 3 script-setup components styled with UnoCSS. Skip generic
+        style nits; focus on reactivity mistakes, missing null handling on
+        fetched data, and props mutated in place.
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+chat:
+  art: false
