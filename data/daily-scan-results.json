@@ -3183,43 +3183,43 @@
   },
   {
     "date": "2026-08-09",
-    "createdAt": "2026-08-09T03:57:54.214Z",
-    "hours": 0,
+    "createdAt": "2026-08-09T00:00:00.000Z",
+    "hours": 24,
     "classifications": {
       "organic": {
-        "count": 281,
+        "count": 161,
         "bountyCount": 0,
         "prStatusCounts": {
-          "open": 155,
-          "closed": 38,
-          "merged": 88
+          "open": 152,
+          "closed": 7,
+          "merged": 2
         }
       },
       "mixed": {
-        "count": 58,
+        "count": 27,
         "bountyCount": 0,
         "prStatusCounts": {
-          "open": 33,
-          "closed": 7,
-          "merged": 18
+          "open": 27,
+          "closed": 0,
+          "merged": 0
         }
       },
       "automation": {
-        "count": 98,
-        "bountyCount": 1,
+        "count": 44,
+        "bountyCount": 3,
         "prStatusCounts": {
-          "open": 61,
-          "closed": 22,
-          "merged": 15
+          "open": 38,
+          "closed": 3,
+          "merged": 3
         }
       },
       "insufficient-data": {
-        "count": 43,
+        "count": 14,
         "bountyCount": 0,
         "prStatusCounts": {
-          "open": 32,
-          "closed": 5,
-          "merged": 6
+          "open": 12,
+          "closed": 2,
+          "merged": 0
         }
       }
     }
