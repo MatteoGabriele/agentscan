@@ -57,9 +57,6 @@ const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
         />
       </div>
       <div class="w-full">
-        <LazyChartHealthResponseSparklines />
-      </div>
-      <div class="w-full">
         <LazyChartScoreDistribution
           :data="hourly?.results"
           hydrate-on-visible
@@ -69,12 +66,6 @@ const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
         <LazyReportWeeklyClassification
           :hydrate-on-visible="{ rootMargin: '0px 0px 600px 0px' }"
         />
-      </div>
-      <div class="w-full">
-        <LazyChartFeaturedPackageHealthRanking hydrate-on-visible />
-      </div>
-      <div class="w-full">
-        <LazyLabBountyRepoList hydrate-on-visible />
       </div>
     </div>
   </section>
