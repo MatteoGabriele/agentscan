@@ -80,26 +80,26 @@ const activeRangeCaption = computed(() => {
           </div>
         </header>
 
-        <div class="mt-6">
+        <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-gh-border/40">
           <HealthTrendItemList />
         </div>
 
-        <div class="mt-8 mb-4 flex flex-col items-center gap-2 px-4">
+        <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
           <div
             role="group"
             aria-label="Chart time range"
-            class="inline-flex gap-1 rounded-full border border-gh-border/60 p-1"
+            class="inline-flex gap-0.5 rounded-full border border-gh-border-light/40 p-0.5"
           >
             <button
               v-for="option in rangeOptions"
               :key="option.value"
               type="button"
               :aria-pressed="range === option.value"
-              class="rounded-full px-4 py-1 text-xs transition-colors"
+              class="rounded-full px-3 py-0.5 text-xs font-medium transition-colors"
               :class="
                 range === option.value
-                  ? 'bg-gh-card text-gh-text'
-                  : 'text-gh-muted hover:text-gh-text'
+                  ? 'bg-gh-border/30 text-gh-text'
+                  : 'text-gh-muted hover:bg-gh-border/15 hover:text-gh-text'
               "
               @click="range = option.value"
             >
