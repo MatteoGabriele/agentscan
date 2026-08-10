@@ -20,6 +20,7 @@ const props = defineProps<{
   scanTimes: string[]
   countsByScanTime: GetClassificationStatsByDateResults
   automationThreshold: number
+  mixedThreshold: number
 }>()
 
 const countsByScanTime = computed(() => props.countsByScanTime)
@@ -234,7 +235,8 @@ type PlotAlert = {
     x: number
     y: number
     absoluteIndex: number
-    isAlert: boolean
+    isAlertAutomation: boolean
+    isAlertMixed: boolean
   }>
 }
 
@@ -242,9 +244,16 @@ function isAlert(value: VueUiXyDatasetItem['series'][0], threshold: number) {
   return value != null && (value as number) > threshold
 }
 
-function getZapIconPath({ x, y }: { x: number; y: number }) {
+type Coordinates = { x: number; y: number }
+
+function getZapIconPath({ x, y }: Coordinates) {
   // ⚡ with relative coordinates from initial position
   return `M ${x} ${y} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`
+}
+
+function getWarningIconPath({ x, y }: Coordinates) {
+  // ⚠ with relative coordinates from initial position
+  return `m${x} ${y}l 0 5 m 0 -11 l -8 14 l 16 0 l -8 -14`
 }
 
 function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
@@ -257,12 +266,15 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
         return {
           ...plot,
           absoluteIndex,
-          isAlert:
+          isAlertAutomation:
             d.name === 'Automation' &&
             isAlert(
               d.absoluteValues[absoluteIndex]!,
               props.automationThreshold,
             ),
+          isAlertMixed:
+            d.name === 'Mixed' &&
+            isAlert(d.absoluteValues[absoluteIndex]!, props.mixedThreshold),
         }
       }),
     }
@@ -301,7 +313,7 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
                 :key="`${alerts.name}-${plot.absoluteIndex}`"
               >
                 <path
-                  v-show="plot.isAlert"
+                  v-show="plot.isAlertAutomation"
                   class="zap-icon"
                   :d="
                     getZapIconPath({
@@ -309,8 +321,22 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
                       y: plot.y - 6,
                     })
                   "
+                  :fill="colors.red"
+                  :stroke="colors.bg"
+                />
+                <path
+                  v-show="plot.isAlertMixed"
+                  class="zap-icon"
+                  :d="
+                    getWarningIconPath({
+                      x: plot.x,
+                      y: plot.y - 18,
+                    })
+                  "
                   :fill="colors.amber"
                   :stroke="colors.bg"
+                  stroke-linecap="round"
+                  stroke-width="1.5"
                 />
               </template>
             </g>

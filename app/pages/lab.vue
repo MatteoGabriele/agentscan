@@ -44,6 +44,7 @@ const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
           :scan-times="hourly.scanTimes"
           :counts-by-scan-time="hourly.countsByScanTime"
           :automation-threshold="25"
+          :mixed-threshold="25"
           hydrate-on-visible
         />
       </div>
@@ -52,6 +53,7 @@ const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
           :scan-times="hourlyWindow.scanTimes"
           :counts-by-scan-time="hourlyWindow.countsByScanTime"
           :automation-threshold="50"
+          :mixed-threshold="50"
           hydrate-on-visible
         />
       </div>
