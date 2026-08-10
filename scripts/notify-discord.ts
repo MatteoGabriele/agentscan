@@ -1,37 +1,34 @@
 /// <reference types="node" />
 import { readFileSync } from 'node:fs'
 import { formatTrend } from '../shared/utils/health-stats'
-import {
-  getClosedPrPercentageTotal,
-  getClosedPrDelta,
-} from '../shared/utils/charts'
 import { calcLinearProgression } from '../shared/utils/calc-linear-progression'
+import { getCategoryDeltasByDate } from '../shared/utils/count-classification-by-date'
+import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
-  getClassificationStatsByDate,
-  getCategoryDeltas,
-} from '../shared/utils/count-classification-by-date'
-import { unpack } from '../shared/utils/compactor'
+  getDailyClosureRateDelta,
+  getDailyClosureRateTotal,
+  getDailyCountsByDate,
+} from '../shared/utils/daily-rollup'
 import { formatDateRange } from '../shared/utils/dates'
 
 async function main() {
-  const results = unpack(readFileSync('data/scan-results.txt', 'utf-8'))
+  const entries: DailyScanEntry[] = JSON.parse(
+    readFileSync('data/daily-scan-results.json', 'utf-8'),
+  )
 
-  if (!results?.length) {
+  if (!entries?.length) {
     console.log('No data returned from API')
     return
   }
 
-  const closedAutomationPrPercentage = getClosedPrPercentageTotal(
-    results,
-    [0, 50],
-  )
-  const closedAutomationPrDelta = getClosedPrDelta(results, [0, 50])
+  const closedAutomationPrPercentage = getDailyClosureRateTotal(entries)
+  const closedAutomationPrDelta = getDailyClosureRateDelta(entries)
 
   const automation: number[] = []
   const mixed: number[] = []
   const organic: number[] = []
 
-  const countsByDate = getClassificationStatsByDate(results)
+  const countsByDate = getDailyCountsByDate(entries)
   const dates = Object.keys(countsByDate).sort()
 
   dates.forEach((date) => {
@@ -50,7 +47,7 @@ async function main() {
     organic: calcLinearProgression(organic),
   }
 
-  const categoryDeltas = getCategoryDeltas(results)
+  const categoryDeltas = getCategoryDeltasByDate(countsByDate)
 
   function trendLabel(trendValue: number): string {
     const arrow = trendValue > 0 ? '↑' : trendValue < 0 ? '↓' : '→'

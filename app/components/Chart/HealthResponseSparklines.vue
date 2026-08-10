@@ -9,12 +9,18 @@ import {
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { identityConfig } from '@unveil/identity'
 import { usePreferredDark } from '@vueuse/core'
-import { SERIES } from '~~/shared/utils/charts'
+import { getUniqueDatesFromSource, SERIES } from '~~/shared/utils/charts'
 
 import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealth()
-const dates = computed(() => data.value?.dates)
+// Closure rates are computed per repository and per PR, so they need the raw
+// scan rows the hourly sample keeps rather than the daily rollup.
+const { data } = useEcosystemHealthHourly()
+// The sparklines plot one point per day of the sample, so the axis has to be
+// the days those rows cover, not the hourly scan times.
+const dates = computed(() =>
+  getUniqueDatesFromSource(data.value?.results ?? []),
+)
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)

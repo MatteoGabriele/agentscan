@@ -8,7 +8,9 @@ import {
 import { interpolateHexColors } from '~/utils/colors'
 import('vue-data-ui/style.css')
 
-const { data } = useEcosystemHealth()
+// Per-repo scores only exist on the raw scan rows, which the hourly sample
+// keeps — the daily rollup counts classifications, not repositories.
+const { data } = useEcosystemHealthHourly()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)

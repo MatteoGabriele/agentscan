@@ -1,27 +1,21 @@
-import type { EcosystemHealthItem } from '~~/shared/types/ecosystem-health'
-
-import { unpack } from '~~/shared/utils/compactor'
-import {
-  applyCumulativeTrends,
-  getClassificationStatsByDate,
-} from '~~/shared/utils/count-classification-by-date'
+import type { DailyScanEntry } from '~~/shared/utils/daily-rollup'
+import { getDailyCountsByDate } from '~~/shared/utils/daily-rollup'
+import { applyCumulativeTrends } from '~~/shared/utils/count-classification-by-date'
 import { getHistoryRangeStart } from '~~/shared/utils/health-history-window'
 
-function getRecentResults(
-  results: EcosystemHealthItem[],
-): EcosystemHealthItem[] {
-  const latestCreatedAt = results.reduce(
-    (latest, item) => (item.created_at > latest ? item.created_at : latest),
+function getRecentEntries(entries: DailyScanEntry[]): DailyScanEntry[] {
+  const latestDate = entries.reduce(
+    (latest, entry) => (entry.date > latest ? entry.date : latest),
     '',
   )
 
-  if (!latestCreatedAt) {
-    return results
+  if (!latestDate) {
+    return entries
   }
 
-  const rangeStart = getHistoryRangeStart(latestCreatedAt)
+  const rangeStart = getHistoryRangeStart(latestDate).slice(0, 10)
 
-  return results.filter((item) => item.created_at >= rangeStart)
+  return entries.filter((entry) => entry.date >= rangeStart)
 }
 
 export default defineEventHandler(async (event) => {
@@ -29,36 +23,37 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event)
     const isFullHistory = String(query.full ?? 'false') === 'true'
 
-    const raw = await useStorage('assets:data').getItemRaw('scan-results.txt')
+    const raw = await useStorage('assets:data').getItemRaw(
+      'daily-scan-results.json',
+    )
 
     if (!raw) {
-      throw new Error('scan-results.txt not found')
+      throw new Error('daily-scan-results.json not found')
     }
 
     const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
-    const allResults = unpack(content)
-    const results = isFullHistory ? allResults : getRecentResults(allResults)
+    const allEntries = JSON.parse(content) as DailyScanEntry[]
+    const entries = isFullHistory ? allEntries : getRecentEntries(allEntries)
 
-    const countsByDate = getClassificationStatsByDate(results)
+    const countsByDate = getDailyCountsByDate(entries)
     const categoryProgression = applyCumulativeTrends(countsByDate)
     const dates = Object.keys(countsByDate).sort()
-
     const scanTimes = dates.map(
       (date) => countsByDate[date]?.createdAt ?? `${date}T00:00:00.000Z`,
     )
 
     return {
-      results,
+      entries,
       categoryProgression,
       countsByDate,
       dates,
       scanTimes,
     }
   } catch (error) {
-    console.error('Ecosystem health fetch error:', error)
+    console.error('Daily scan fetch error:', error)
     throw createError({
       statusCode: 500,
-      message: 'Failed to fetch verified automations list',
+      message: 'Failed to fetch daily scan results',
     })
   }
 })

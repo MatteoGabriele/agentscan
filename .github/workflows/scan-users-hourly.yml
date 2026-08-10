@@ -44,12 +44,21 @@ jobs:
           --daily-output=daily-scan-results.json
 
       - name: Commit and push results
+        id: commit
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
           # Staged-diff check, so the first run picks up the still-untracked files.
           git add data/hourly-scan-results.txt data/hourly-window-scan-results.txt data/daily-scan-results.json
+
+          # A day is only rolled up once its last hour is scanned, so this file
+          # changes once a day — that is the Discord notification's trigger.
+          if git diff --cached --quiet -- data/daily-scan-results.json; then
+            echo "daily-rolled-up=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "daily-rolled-up=true" >> "$GITHUB_OUTPUT"
+          fi
 
           if git diff --cached --quiet; then
             echo "No changes detected"
@@ -59,3 +68,9 @@ jobs:
             git merge --no-edit origin/main
             git push
           fi
+
+      - name: Notify Discord
+        if: steps.commit.outputs.daily-rolled-up == 'true'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.OSS_GUILD_DISCORD_WEBHOOK }}
+        run: pnpm exec tsx scripts/notify-discord.ts

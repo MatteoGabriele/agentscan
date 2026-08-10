@@ -3,7 +3,6 @@ definePageMeta({
   layout: 'default',
 })
 
-const { data } = await useEcosystemHealth({ full: true })
 const { data: hourly } = await useEcosystemHealthHourly()
 const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
 </script>
@@ -61,7 +60,10 @@ const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
         <LazyChartHealthResponseSparklines />
       </div>
       <div class="w-full">
-        <LazyChartScoreDistribution :data="data?.results" hydrate-on-visible />
+        <LazyChartScoreDistribution
+          :data="hourly?.results"
+          hydrate-on-visible
+        />
       </div>
       <div class="w-full">
         <LazyReportWeeklyClassification

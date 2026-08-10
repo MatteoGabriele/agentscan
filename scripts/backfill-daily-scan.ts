@@ -10,7 +10,7 @@ import {
   mergeDailyEntries,
 } from '../shared/utils/daily-rollup'
 
-const DEFAULT_INPUT_FILE = 'scan-results.txt'
+const DEFAULT_INPUT_FILE = 'hourly-scan-results.txt'
 const DEFAULT_OUTPUT_FILE = 'daily-scan-results.json'
 
 interface BackfillOptions {

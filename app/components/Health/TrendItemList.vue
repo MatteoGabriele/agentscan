@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import type { IdentityClassification } from '@unveil/identity'
+import type { EcosystemHealthCategory } from '~~/shared/types/ecosystem-health'
 
 type ClassificationStats = Record<
-  IdentityClassification,
+  EcosystemHealthCategory,
   { count: number; percentage: string }
 >
 
 const { data: ecosystemHealth } = await useEcosystemHealth()
-const data = computed(() => ecosystemHealth.value?.results)
+const entries = computed(() => ecosystemHealth.value?.entries ?? [])
 
 const categoryProgression = computed(() => {
   return ecosystemHealth.value?.categoryProgression
 })
 
 const latestDayStats = computed<ClassificationStats | null>(() => {
-  return getHealthStats(data.value)
-})
-
-const percentageClosureRate = computed<string | undefined>(() => {
-  return getClosedPrPercentageTotal(data.value, [0, 50])?.toString()
+  return getDailyHealthStats(entries.value)
 })
 </script>
 
@@ -51,10 +47,4 @@ const percentageClosureRate = computed<string | undefined>(() => {
       />
     </li>
   </ul>
-
-  <HealthTrend
-    class="mt-2 md:mt-4"
-    label="Automation PR closure rate"
-    :percentage="percentageClosureRate"
-  />
 </template>

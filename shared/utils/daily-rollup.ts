@@ -211,6 +211,86 @@ export function getDailyHealthStats(
   }
 }
 
+export type DailyClosureRate = {
+  date: string | undefined
+  eligiblePrs: number
+  closedPrs: number
+  percentage: number | null
+}
+
+export type DailyClosureRateComparison = {
+  previousSnapshot: DailyClosureRate
+  lastSnapshot: DailyClosureRate
+  percentagePointDifference: number | null
+}
+
+const EMPTY_CLOSURE_RATE: DailyClosureRate = {
+  date: undefined,
+  eligiblePrs: 0,
+  closedPrs: 0,
+  percentage: null,
+}
+
+// Merging is a positive outcome, not a rejection, so only `closed` counts as
+// closed — the same rule the per-PR closure rate uses.
+function toClosureRate(
+  entries: DailyScanEntry[],
+  category: EcosystemHealthCategory,
+  date?: string,
+): DailyClosureRate {
+  let eligiblePrs = 0
+  let closedPrs = 0
+
+  entries.forEach((entry) => {
+    const { open, closed, merged } =
+      entry.classifications[category].prStatusCounts
+
+    eligiblePrs += open + closed + merged
+    closedPrs += closed
+  })
+
+  return {
+    date,
+    eligiblePrs,
+    closedPrs,
+    // no eligible PRs = 100% closure rate
+    percentage:
+      eligiblePrs === 0 ? 100 : Math.round((closedPrs / eligiblePrs) * 100),
+  }
+}
+
+export function getDailyClosureRateTotal(
+  entries: DailyScanEntry[],
+  category: EcosystemHealthCategory = 'automation',
+): number | null {
+  return toClosureRate(entries, category).percentage
+}
+
+export function getDailyClosureRateDelta(
+  entries: DailyScanEntry[],
+  category: EcosystemHealthCategory = 'automation',
+): DailyClosureRateComparison {
+  const sorted = [...entries].sort(byDate)
+  const previous = sorted.at(-2)
+  const last = sorted.at(-1)
+
+  const previousSnapshot = previous
+    ? toClosureRate([previous], category, previous.date)
+    : EMPTY_CLOSURE_RATE
+  const lastSnapshot = last
+    ? toClosureRate([last], category, last.date)
+    : EMPTY_CLOSURE_RATE
+
+  return {
+    previousSnapshot,
+    lastSnapshot,
+    percentagePointDifference:
+      previousSnapshot.percentage === null || lastSnapshot.percentage === null
+        ? null
+        : lastSnapshot.percentage - previousSnapshot.percentage,
+  }
+}
+
 // A seeded day (`hours: 0`) is one snapshot standing in for the whole day, so
 // a measured day replaces it. Otherwise the stored day wins and reruns change
 // nothing.
