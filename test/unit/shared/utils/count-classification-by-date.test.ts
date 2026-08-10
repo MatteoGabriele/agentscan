@@ -424,8 +424,8 @@ describe('getClassificationByDateChunks', () => {
 
     expect(result).toHaveLength(3)
 
-    expect(result[0].startDate).toBe('2026-06-01T10:00:00.000Z')
-    expect(result[0].endDate).toBe('2026-06-03T10:00:00.000Z')
+    expect(result[0].startDate).toBe('2026-06-01')
+    expect(result[0].endDate).toBe('2026-06-03')
     expect(result[0].days).toBe(3)
     expectClassificationCounts(result[0].classification, {
       organic: {
@@ -450,8 +450,8 @@ describe('getClassificationByDateChunks', () => {
       },
     })
 
-    expect(result[1].startDate).toBe('2026-06-04T10:00:00.000Z')
-    expect(result[1].endDate).toBe('2026-06-06T10:00:00.000Z')
+    expect(result[1].startDate).toBe('2026-06-04')
+    expect(result[1].endDate).toBe('2026-06-06')
     expect(result[1].days).toBe(3)
     expectClassificationCounts(result[1].classification, {
       organic: {
@@ -476,8 +476,8 @@ describe('getClassificationByDateChunks', () => {
       },
     })
 
-    expect(result[2].startDate).toBe('2026-06-07T10:00:00.000Z')
-    expect(result[2].endDate).toBe('2026-06-08T10:00:00.000Z')
+    expect(result[2].startDate).toBe('2026-06-07')
+    expect(result[2].endDate).toBe('2026-06-08')
     expect(result[2].days).toBe(2)
     expectClassificationCounts(result[2].classification, {
       organic: {
@@ -521,14 +521,61 @@ describe('getClassificationByDateChunks', () => {
     })
 
     expect(result.map((chunk) => chunk.startDate)).toEqual([
-      '2026-06-01T10:00:00.000Z',
-      '2026-06-03T10:00:00.000Z',
+      '2026-06-01',
+      '2026-06-03',
     ])
 
     expect(result.map((chunk) => chunk.endDate)).toEqual([
-      '2026-06-02T10:00:00.000Z',
-      '2026-06-04T10:00:00.000Z',
+      '2026-06-02',
+      '2026-06-04',
     ])
+  })
+
+  it('keeps calendar chunk boundaries stable when a day is missing', () => {
+    const result = getClassificationByDateChunks({
+      days: 3,
+      dates: [
+        '2026-06-01T10:00:00.000Z',
+        '2026-06-02T10:00:00.000Z',
+        '2026-06-03T10:00:00.000Z',
+        // June 4 is intentionally missing.
+        '2026-06-05T10:00:00.000Z',
+        '2026-06-06T10:00:00.000Z',
+      ],
+      data: [
+        createEcosystemHealthItem('2026-06-01T10:00:00.000Z', 90),
+        createEcosystemHealthItem('2026-06-02T10:00:00.000Z', 50),
+        createEcosystemHealthItem('2026-06-03T10:00:00.000Z', 10),
+        createEcosystemHealthItem('2026-06-05T10:00:00.000Z', 90),
+        createEcosystemHealthItem('2026-06-06T10:00:00.000Z', 10),
+      ],
+    })
+
+    expect(result).toHaveLength(2)
+
+    expect(
+      result.map(({ startDate, endDate, days }) => ({
+        startDate,
+        endDate,
+        days,
+      })),
+    ).toEqual([
+      {
+        startDate: '2026-06-01',
+        endDate: '2026-06-03',
+        days: 3,
+      },
+      {
+        startDate: '2026-06-04',
+        endDate: '2026-06-06',
+        days: 3,
+      },
+    ])
+
+    expect(result[1].classification.organic.count).toBe(1)
+    expect(result[1].classification.mixed.count).toBe(0)
+    expect(result[1].classification.automation.count).toBe(1)
+    expect(result[1].classification.total.count).toBe(2)
   })
 
   it('returns an empty array when dates are empty', () => {
@@ -549,6 +596,36 @@ describe('getClassificationByDateChunks', () => {
     })
 
     expect(result).toEqual([])
+  })
+
+  it('keeps a complete calendar week when one dataset day is missing', () => {
+    const result = getClassificationByDateChunks({
+      days: 7,
+      rolling: false,
+      dates: [
+        '2026-06-08T10:00:00.000Z',
+        '2026-06-09T10:00:00.000Z',
+        '2026-06-10T10:00:00.000Z',
+        // June 11 is intentionally missing.
+        '2026-06-12T10:00:00.000Z',
+        '2026-06-13T10:00:00.000Z',
+        '2026-06-14T10:00:00.000Z',
+      ],
+      data: [
+        createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 90),
+        createEcosystemHealthItem('2026-06-09T10:00:00.000Z', 50),
+        createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 10),
+        createEcosystemHealthItem('2026-06-12T10:00:00.000Z', 90),
+        createEcosystemHealthItem('2026-06-13T10:00:00.000Z', 50),
+        createEcosystemHealthItem('2026-06-14T10:00:00.000Z', 10),
+      ],
+    })
+
+    expect(result).toHaveLength(1)
+    expect(result[0].startDate).toBe('2026-06-08')
+    expect(result[0].endDate).toBe('2026-06-14')
+    expect(result[0].days).toBe(7)
+    expect(result[0].classification.total.count).toBe(6)
   })
 
   it('returns only complete Monday to Sunday calendar week chunks when rolling is false', () => {
