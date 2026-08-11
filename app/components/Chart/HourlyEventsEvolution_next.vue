@@ -171,7 +171,7 @@ const config = computed<VueUiXyConfig>(() => ({
   line: {
     radius: hasSingleEntry.value ? 4 : 0,
     useGradient: false,
-    strokeWidth: isMobile.value ? 1.5 : 2,
+    strokeWidth: isMobile.value ? 1 : 2,
     dot: {
       useSerieColor: true,
       fill: colors.value.bg,
@@ -251,7 +251,7 @@ function getZapIconPath({ x, y }: Coordinates) {
 
 function getWarningIconPath({ x, y }: Coordinates) {
   // ⚠ with relative coordinates from initial position
-  return `m${x} ${y}l 0 5 m 0 -11 l -8 14 l 16 0 l -8 -14`
+  return `m${x} ${y}l 0 5 m 0 -12 l -9 16 l 18 0 l -9 -16`
 }
 
 function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
@@ -341,7 +341,7 @@ const isChartHovered = shallowRef(false)
                     :d="
                       getWarningIconPath({
                         x: plot.x,
-                        y: plot.y - 18,
+                        y: plot.y - 20,
                       })
                     "
                     :fill="colors.amber"
@@ -442,7 +442,7 @@ const isChartHovered = shallowRef(false)
             >
               <text
                 v-if="
-                  absoluteIndex % (isMobile ? 4 : 6) === 0 &&
+                  absoluteIndex % 6 === 0 &&
                   ![0, (scanTimes?.length ?? 1) - 1].includes(absoluteIndex)
                 "
                 :x="x"
@@ -450,7 +450,7 @@ const isChartHovered = shallowRef(false)
                 :font-size="fontSize"
                 :fill
                 :text-anchor="textAnchor"
-                :opacity="isChartHovered ? 1 : 0"
+                :opacity="isChartHovered || isMobile ? 1 : 0"
                 class="time-label"
               >
                 {{ content }}
