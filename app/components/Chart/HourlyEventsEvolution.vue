@@ -10,32 +10,44 @@ import { useElementSize } from '@vueuse/core'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { round } from '~~/shared/utils/numbers'
-import type { GetClassificationStatsByDateResults } from '~~/shared/utils/count-classification-by-date'
 
 dayjs.extend(utc)
 
 import('vue-data-ui/style.css')
 
-const props = defineProps<{
-  scanTimes: string[]
-  countsByScanTime: GetClassificationStatsByDateResults
-  automationThreshold: number
-  mixedThreshold: number
-}>()
+const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
 
-const countsByScanTime = computed(() => props.countsByScanTime)
-const hasData = computed(() => props.scanTimes.length > 0)
+const automationThreshold = 50
+const mixedThreshold = 50
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 const isMobile = useIsMobile()
 
+const MOBILE_SLICE_HOURS = 13
+
+const scanTimes = computed(() =>
+  hourlyWindow.value?.scanTimes.slice(isMobile.value ? -MOBILE_SLICE_HOURS : 0),
+)
+const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
+
+const scanTimesOffset = computed(() => {
+  if (!isMobile.value) {
+    return 0
+  }
+  const total = hourlyWindow.value?.scanTimes.length ?? 0
+  return Math.max(0, total - MOBILE_SLICE_HOURS)
+})
+
 const chartRef = useTemplateRef('chartRef')
 const tooltipPosition = useTooltipPosition(chartRef)
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
-const { width } = useElementSize(chartContainer)
-const hasStableChartWidth = computed(() => width.value > 0)
+const { width, height } = useElementSize(chartContainer)
+
+const hasStableChartDimensions = computed(
+  () => width.value > 0 && height.value > 0,
+)
 
 type HourlySerie = VueUiXyDatasetItem & {
   category: EcosystemHealthCategory
@@ -44,7 +56,7 @@ type HourlySerie = VueUiXyDatasetItem & {
   totals: number[]
 }
 
-const SERIES: Array<{ name: string; category: EcosystemHealthCategory }> = [
+const series: Array<{ name: string; category: EcosystemHealthCategory }> = [
   { name: 'Organic', category: 'organic' },
   { name: 'Mixed', category: 'mixed' },
   { name: 'Automation', category: 'automation' },
@@ -61,20 +73,20 @@ function getSerieColor(category: EcosystemHealthCategory) {
 }
 
 const rawDataset = computed<HourlySerie[]>(() =>
-  SERIES.map(({ name, category }) => ({
+  series.map(({ name, category }) => ({
     name,
     category,
-    series: props.scanTimes.map(
+    series: (scanTimes.value ?? []).map(
       (scanTime) =>
         countsByScanTime.value?.[scanTime]?.[category].percentage ?? 0,
     ),
-    trends: props.scanTimes.map(
+    trends: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.[category].trend ?? 0,
     ),
-    counts: props.scanTimes.map(
+    counts: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.[category].count ?? 0,
     ),
-    totals: props.scanTimes.map(
+    totals: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.total.count ?? 0,
     ),
     color: getSerieColor(category),
@@ -110,16 +122,15 @@ const config = computed<VueUiXyConfig>(() => ({
   chart: {
     userOptions: { show: false },
     zoom: { show: false },
-    legend: { show: false, position: 'top' },
+    legend: { show: false },
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     width: Math.round(width.value),
-    height: 300,
+    height: Math.round(height.value),
     padding: {
-      top: 24,
-      right: 0,
-      left: 0,
-      bottom: 0,
+      left: viewBoxPadding.value.left,
+      right: viewBoxPadding.value.right,
+      bottom: 36,
     },
     highlighter: {
       opacity: 1,
@@ -137,7 +148,6 @@ const config = computed<VueUiXyConfig>(() => ({
     },
     grid: {
       stroke: 'transparent',
-      showVerticalLines: false,
       labels: {
         show: false,
         fontSize: 12,
@@ -152,7 +162,7 @@ const config = computed<VueUiXyConfig>(() => ({
           show: true,
           color: colors.value.textMuted,
           fontSize: isMobile.value ? 10 : 12,
-          values: props.scanTimes,
+          values: scanTimes.value,
           datetimeFormatter: {
             enable: true,
             useUTC: false,
@@ -173,7 +183,7 @@ const config = computed<VueUiXyConfig>(() => ({
   line: {
     radius: hasSingleEntry.value ? 4 : 0,
     useGradient: false,
-    strokeWidth: isMobile.value ? 1.5 : 2,
+    strokeWidth: isMobile.value ? 1 : 2,
     dot: {
       useSerieColor: true,
       fill: colors.value.bg,
@@ -200,7 +210,7 @@ function getTrend({
 }
 
 function formatScanTime(index: number) {
-  const scanTime = props.scanTimes[index]
+  const scanTime = scanTimes.value?.[index]
 
   if (!scanTime) {
     return ''
@@ -253,14 +263,14 @@ function getZapIconPath({ x, y }: Coordinates) {
 
 function getWarningIconPath({ x, y }: Coordinates) {
   // ⚠ with relative coordinates from initial position
-  return `m${x} ${y}l 0 5 m 0 -11 l -8 14 l 16 0 l -8 -14`
+  return `m${x} ${y}l 0 5 m 0 -12 l -9 16 l 18 0 l -9 -16`
 }
 
 function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
   return data.map((d) => {
     return {
       name: d.name,
-      coordinates: d.plots!.map((plot, index) => {
+      coordinates: (d.plots || []).map((plot, index) => {
         const absoluteIndex = index + zoomOffset
 
         return {
@@ -268,194 +278,202 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
           absoluteIndex,
           isAlertAutomation:
             d.name === 'Automation' &&
-            isAlert(
-              d.absoluteValues[absoluteIndex]!,
-              props.automationThreshold,
-            ),
+            isAlert(d.absoluteValues[absoluteIndex]!, automationThreshold),
           isAlertMixed:
             d.name === 'Mixed' &&
-            isAlert(d.absoluteValues[absoluteIndex]!, props.mixedThreshold),
+            isAlert(d.absoluteValues[absoluteIndex]!, mixedThreshold),
         }
       }),
     }
   })
 }
+const progressionLabelOffsetX = 0
+
+const viewBoxPadding = computed(() => {
+  const maxSeries = scanTimes.value?.length ?? 0
+
+  if (maxSeries <= 1 || width.value <= 0) {
+    return { left: 0, right: 0 }
+  }
+
+  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1))
+
+  return {
+    left: -halfVueUiXyDatapointStep,
+    right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
+  }
+})
+
+const isChartHovered = shallowRef(false)
 </script>
 
 <template>
-  <section ref="rootEl">
-    <div class="mb-5">
-      <h2 class="text-center">Hourly ecosystem health</h2>
-      <p class="text-sm text-gh-muted text-center text-pretty">
-        Same classification split as the health page, but sampled every hour.
-        Only the last 25 scans are kept, so the first and last point sit exactly
-        one day apart.
-      </p>
-    </div>
-
-    <p v-if="!hasData" class="text-sm text-gh-muted text-center py-12">
-      No hourly scan has been recorded yet.
-    </p>
-
-    <ClientOnly v-else>
-      <div ref="chartContainer" class="w-full">
-        <VueUiXy v-if="hasStableChartWidth" ref="chartRef" :dataset :config>
-          <template #svg="{ svg }">
-            <g
-              v-for="alerts in alertIcons(
-                svg.data as Datapoints,
-                svg.slicer.start,
-              )"
-              :key="alerts.name"
-            >
-              <template
-                v-for="plot in alerts.coordinates"
-                :key="`${alerts.name}-${plot.absoluteIndex}`"
+  <div class="relative h-full w-full flex flex-col">
+    <div
+      ref="chartContainer"
+      class="flex-1 h-full no-chart-transition"
+      @mouseenter="isChartHovered = true"
+      @mouseleave="isChartHovered = false"
+    >
+      <ClientOnly>
+        <Transition name="chart-fade" appear>
+          <VueUiXy
+            v-if="hasStableChartDimensions"
+            ref="chartRef"
+            :dataset
+            :config
+          >
+            <template #svg="{ svg }">
+              <g
+                v-for="alerts in alertIcons(
+                  svg.data as Datapoints,
+                  svg.slicer.start,
+                )"
+                :key="alerts.name"
               >
-                <path
-                  v-show="plot.isAlertAutomation"
-                  class="zap-icon"
-                  :d="
-                    getZapIconPath({
-                      x: plot.x - 4,
-                      y: plot.y - 6,
-                    })
-                  "
-                  :fill="colors.red"
-                  :stroke="colors.bg"
-                />
-                <path
-                  v-show="plot.isAlertMixed"
-                  class="zap-icon"
-                  :d="
-                    getWarningIconPath({
-                      x: plot.x,
-                      y: plot.y - 18,
-                    })
-                  "
-                  :fill="colors.amber"
-                  :stroke="colors.bg"
-                  stroke-linecap="round"
-                  stroke-width="1.5"
-                />
-              </template>
-            </g>
-          </template>
-
-          <template #area-gradient="{ series, id }">
-            <linearGradient :id x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" :stop-color="series.color" stop-opacity="0.3" />
-              <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-            </linearGradient>
-          </template>
-
-          <template #tooltip="{ datapoint, timeLabel }">
-            <div class="flex flex-col text-xs">
-              <div :style="{ color: colors.textMuted }" class="mb-1">
-                {{ formatScanTime(timeLabel.absoluteIndex) }}
-              </div>
-              <div
-                v-for="dp in datapoint"
-                :key="`${dp.name}-${dp.absoluteIndex}`"
-                class="flex flex-row gap-2 place-items-center"
-              >
-                <div class="h-2 w-2 shrink-0">
-                  <svg viewBox="0 0 2 2" class="w-full h-full">
-                    <circle cx="1" cy="1" r="1" :fill="dp.color" />
-                  </svg>
-                </div>
-                <span :style="{ color: colors.text }">{{ dp.name }}</span>
-                <span :style="{ color: colors.textMuted }" class="tabular-nums">
-                  {{ round(dp.value ?? 0, 1) + '%' }}
-                </span>
-                <span :style="{ color: colors.textMuted }" class="tabular-nums">
-                  {{
-                    getScanDetails({
-                      serieIndex: dp.slotAbsoluteIndex,
-                      index: timeLabel.absoluteIndex,
-                    })
-                  }}
-                </span>
-
-                <!-- No trend is possible on the first datapoint -->
-                <span
-                  v-if="timeLabel.absoluteIndex > 0"
-                  :class="[
-                    getTrend({
-                      serieIndex: dp.slotAbsoluteIndex,
-                      index: timeLabel.absoluteIndex,
-                    }).color,
-                  ]"
+                <template
+                  v-for="plot in alerts.coordinates"
+                  :key="`${alerts.name}-${plot.absoluteIndex}`"
                 >
+                  <path
+                    v-show="plot.isAlertAutomation"
+                    class="zap-icon"
+                    :d="
+                      getZapIconPath({
+                        x: plot.x - 4,
+                        y: plot.y - 6,
+                      })
+                    "
+                    :fill="colors.red"
+                    :stroke="colors.bg"
+                  />
+                  <path
+                    v-show="plot.isAlertMixed"
+                    class="zap-icon"
+                    :d="
+                      getWarningIconPath({
+                        x: plot.x,
+                        y: plot.y - 20,
+                      })
+                    "
+                    :fill="colors.amber"
+                    :stroke="colors.bg"
+                    stroke-linecap="round"
+                    stroke-width="1.5"
+                  />
+                </template>
+              </g>
+            </template>
+
+            <template #area-gradient="{ series, id }">
+              <linearGradient :id x1="0" x2="0" y1="0" y2="1">
+                <stop
+                  offset="0%"
+                  :stop-color="series.color"
+                  stop-opacity="0.3"
+                />
+                <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+              </linearGradient>
+            </template>
+
+            <template #tooltip="{ datapoint, timeLabel }">
+              <div class="flex flex-col">
+                <div :style="{ color: colors.textMuted }" class="mb-1">
+                  {{ formatScanTime(timeLabel.absoluteIndex) }}
+                </div>
+                <div
+                  v-for="dp in datapoint"
+                  :key="`${dp.name}-${dp.absoluteIndex}`"
+                  class="flex flex-row gap-2 place-items-center"
+                >
+                  <div class="h-2 w-2 shrink-0">
+                    <svg viewBox="0 0 2 2" class="w-full h-full">
+                      <circle cx="1" cy="1" r="1" :fill="dp.color" />
+                    </svg>
+                  </div>
+                  <span :style="{ color: colors.text }">{{ dp.name }}</span>
                   <span
+                    :style="{ color: colors.textMuted }"
+                    class="tabular-nums"
+                  >
+                    {{ round(dp.value ?? 0, 1) + '%' }}
+                  </span>
+                  <span
+                    :style="{ color: colors.textMuted }"
+                    class="tabular-nums"
+                  >
+                    {{
+                      getScanDetails({
+                        serieIndex: dp.slotAbsoluteIndex,
+                        index: timeLabel.absoluteIndex,
+                      })
+                    }}
+                  </span>
+
+                  <!-- No trend is possible on the first datapoint -->
+                  <span
+                    v-if="timeLabel.absoluteIndex > 0"
                     :class="[
                       getTrend({
                         serieIndex: dp.slotAbsoluteIndex,
                         index: timeLabel.absoluteIndex,
-                      }).arrow,
+                      }).color,
                     ]"
-                    class="shrink-0"
-                    style="vertical-align: middle"
-                  />
-                  {{
-                    getTrend({
-                      serieIndex: dp.slotAbsoluteIndex,
-                      index: timeLabel.absoluteIndex,
-                    }).formattedValue
-                  }}
-                </span>
-              </div>
-            </div>
-          </template>
-
-          <template #legend="{ legend }">
-            <div class="flex flex-row flex-wrap gap-4 justify-center mt-2">
-              <button
-                v-for="item in legend"
-                :key="item.id"
-                class="flex flex-row gap-1.5 place-items-center"
-              >
-                <div class="w-2 h-2">
-                  <svg viewBox="0 0 2 2" class="w-full h-full">
-                    <circle :cx="1" :cy="1" :r="1" :fill="item.color" />
-                  </svg>
+                  >
+                    <span
+                      :class="[
+                        getTrend({
+                          serieIndex: dp.slotAbsoluteIndex,
+                          index: timeLabel.absoluteIndex,
+                        }).arrow,
+                      ]"
+                      class="shrink-0"
+                      style="vertical-align: middle"
+                    />
+                    {{
+                      getTrend({
+                        serieIndex: dp.slotAbsoluteIndex,
+                        index: timeLabel.absoluteIndex,
+                      }).formattedValue
+                    }}
+                  </span>
                 </div>
-                <span
-                  class="text-gh-muted text-sm"
-                  :class="item.isSegregated && 'line-through'"
-                >
-                  {{ item.name.toLowerCase() }}
-                </span>
-              </button>
-            </div>
-          </template>
+              </div>
+            </template>
 
-          <template
-            #time-label="{
-              x,
-              y,
-              content,
-              fontSize,
-              fill,
-              textAnchor,
-              absoluteIndex,
-            }"
-          >
-            <text
-              v-if="absoluteIndex % (isMobile ? 4 : 2) === 0"
-              :x="x"
-              :y="y + fontSize * 2"
-              :font-size="fontSize"
-              :fill
-              :text-anchor="textAnchor"
+            <template
+              #time-label="{
+                x,
+                y,
+                content,
+                fontSize,
+                fill,
+                textAnchor,
+                absoluteIndex,
+              }"
             >
-              {{ content }}
-            </text>
-          </template>
-        </VueUiXy>
-      </div>
-    </ClientOnly>
-  </section>
+              <text
+                v-if="
+                  (absoluteIndex + scanTimesOffset) % (isMobile ? 3 : 6) ===
+                    0 &&
+                  ![0, (scanTimes?.length ?? 1) - 1].includes(absoluteIndex)
+                "
+                :x="x"
+                :y="y + fontSize * 2"
+                :font-size="fontSize"
+                :fill
+                :text-anchor="textAnchor"
+                :opacity="isChartHovered || isMobile ? 1 : 0"
+                class="time-label"
+              >
+                {{ content }}
+              </text>
+            </template>
+          </VueUiXy>
+        </Transition>
+      </ClientOnly>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -465,5 +483,27 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
 }
 :deep(.vue-ui-xy-svg) {
   overflow: visible; /** for last time label cropping issue  */
+}
+
+.chart-fade-enter-active {
+  transition: opacity 300ms ease;
+}
+
+.chart-fade-enter-from {
+  opacity: 0;
+}
+
+.chart-fade-enter-to {
+  opacity: 1;
+}
+
+.no-chart-transition path,
+.no-chart-transition circle {
+  transition: none !important;
+  animation: none !important;
+}
+
+.time-label {
+  transition: all 250ms ease !important;
 }
 </style>

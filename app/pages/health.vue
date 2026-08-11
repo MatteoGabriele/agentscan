@@ -138,7 +138,7 @@ const activeRangeCaption = computed(() => {
       <div
         class="w-full min-h-0 shrink overflow-hidden basis-[300px] max-h-[300px] sm:basis-[500px] sm:max-h-[500px]"
       >
-        <LazyChartHourlyEventsEvolutionNext v-if="range === 'hourly'" />
+        <LazyChartHourlyEventsEvolution v-if="range === 'hourly'" />
         <LazyChartGlobalEventsEvolution v-else />
       </div>
     </div>
