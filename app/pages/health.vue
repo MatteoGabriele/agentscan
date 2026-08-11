@@ -67,7 +67,7 @@ const activeRangeCaption = computed(() => {
               A snapshot of community contribution patterns across the ecosystem
             </p>
             <p class="text-xs text-gh-muted/70 mt-1 text-pretty">
-              Every hour, we analyze the newest pull requests from a curated
+              Every hour, we scan new pull requests from a curated
               <NuxtLink
                 class="underline hover:text-gh-text"
                 external
@@ -78,8 +78,7 @@ const activeRangeCaption = computed(() => {
               >.
             </p>
             <p class="text-xs text-gh-muted/70 text-pretty">
-              Each daily total is the sum of that day's 24 hourly scans, added
-              once the day is fully scanned
+              Daily totals combine every hourly scan from that day
             </p>
           </div>
         </header>
