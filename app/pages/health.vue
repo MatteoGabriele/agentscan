@@ -34,23 +34,27 @@ type ChartRangeOption = {
   caption: string
 }
 
-const rangeOptions: ChartRangeOption[] = [
+const isMobile = useIsMobile()
+
+const rangeOptions = computed<ChartRangeOption[]>(() => [
   {
     value: 'daily',
     label: 'Daily',
-    caption: `Daily totals from the last ${DEFAULT_HISTORY_MONTHS} months`,
+    caption: `Daily totals from the last ${isMobile.value ? 2 : DEFAULT_HISTORY_MONTHS} ${isMobile.value ? 'weeks' : 'months'}`,
   },
   {
     value: 'hourly',
     label: 'Hourly',
-    caption: `Last ${WINDOW_MAX_HOURS} hours, updated every hour`,
+    // In mobile we actually show 13 datapoints, but saying 12 looks better on the UI
+    caption: `Last ${isMobile.value ? 12 : WINDOW_MAX_HOURS} hours, updated every hour`,
   },
-]
+])
 
 const range = ref<ChartRange>('daily')
 
 const activeRangeCaption = computed(() => {
-  return rangeOptions.find((option) => option.value === range.value)?.caption
+  return rangeOptions.value.find((option) => option.value === range.value)
+    ?.caption
 })
 </script>
 

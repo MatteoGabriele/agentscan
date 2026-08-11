@@ -25,7 +25,7 @@ const colors = useColors(rootEl)
 const isMobile = useIsMobile()
 
 const scanTimes = computed(() =>
-  hourlyWindow.value?.scanTimes.slice(isMobile.value ? -12 : 0),
+  hourlyWindow.value?.scanTimes.slice(isMobile.value ? -13 : 0),
 )
 const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
 
