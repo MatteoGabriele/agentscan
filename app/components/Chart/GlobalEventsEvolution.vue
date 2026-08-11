@@ -14,12 +14,16 @@ import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
 const { data: ecosystemHealth } = await useEcosystemHealth()
-const dates = computed(() => ecosystemHealth.value?.dates)
-const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
 const isMobile = useIsMobile()
+
+const dates = computed(() =>
+  ecosystemHealth.value?.dates.slice(isMobile.value ? -14 : 0),
+)
+
+const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
 const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,

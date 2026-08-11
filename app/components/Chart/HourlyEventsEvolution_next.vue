@@ -17,14 +17,17 @@ import('vue-data-ui/style.css')
 
 const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
 
-const scanTimes = computed(() => hourlyWindow.value?.scanTimes)
-const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
 const automationThreshold = 50
 const mixedThreshold = 50
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 const isMobile = useIsMobile()
+
+const scanTimes = computed(() =>
+  hourlyWindow.value?.scanTimes.slice(isMobile.value ? -12 : 0),
+)
+const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
 
 const chartRef = useTemplateRef('chartRef')
 const tooltipPosition = useTooltipPosition(chartRef)
@@ -441,7 +444,7 @@ const isChartHovered = shallowRef(false)
             >
               <text
                 v-if="
-                  absoluteIndex % 6 === 0 &&
+                  absoluteIndex % (isMobile ? 3 : 6) === 0 &&
                   ![0, (scanTimes?.length ?? 1) - 1].includes(absoluteIndex)
                 "
                 :x="x"
