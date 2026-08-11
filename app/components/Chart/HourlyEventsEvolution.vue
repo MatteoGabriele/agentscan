@@ -3,7 +3,6 @@ import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
-  type VueUiXyDatasetLineItem,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useElementSize } from '@vueuse/core'
@@ -16,9 +15,6 @@ dayjs.extend(utc)
 import('vue-data-ui/style.css')
 
 const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
-
-const automationThreshold = 50
-const mixedThreshold = 50
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
@@ -56,7 +52,10 @@ type HourlySerie = VueUiXyDatasetItem & {
   totals: number[]
 }
 
-const series: Array<{ name: string; category: EcosystemHealthCategory }> = [
+const classifications: Array<{
+  name: string
+  category: EcosystemHealthCategory
+}> = [
   { name: 'Organic', category: 'organic' },
   { name: 'Mixed', category: 'mixed' },
   { name: 'Automation', category: 'automation' },
@@ -73,7 +72,7 @@ function getSerieColor(category: EcosystemHealthCategory) {
 }
 
 const rawDataset = computed<HourlySerie[]>(() =>
-  series.map(({ name, category }) => ({
+  classifications.map(({ name, category }) => ({
     name,
     category,
     series: (scanTimes.value ?? []).map(
@@ -237,56 +236,6 @@ function getScanDetails({
   return `${count} / ${total}`
 }
 
-type Datapoints = Array<VueUiXyDatasetLineItem & { alerts: boolean[] }>
-
-type PlotAlert = {
-  name: string
-  coordinates: Array<{
-    x: number
-    y: number
-    absoluteIndex: number
-    isAlertAutomation: boolean
-    isAlertMixed: boolean
-  }>
-}
-
-function isAlert(value: VueUiXyDatasetItem['series'][0], threshold: number) {
-  return value != null && (value as number) > threshold
-}
-
-type Coordinates = { x: number; y: number }
-
-function getZapIconPath({ x, y }: Coordinates) {
-  // ⚡ with relative coordinates from initial position
-  return `M ${x} ${y} l 12 -17 l -6 0 l 3 -13 l -11 17 l 6 0 l -4 13`
-}
-
-function getWarningIconPath({ x, y }: Coordinates) {
-  // ⚠ with relative coordinates from initial position
-  return `m${x} ${y}l 0 5 m 0 -12 l -9 16 l 18 0 l -9 -16`
-}
-
-function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
-  return data.map((d) => {
-    return {
-      name: d.name,
-      coordinates: (d.plots || []).map((plot, index) => {
-        const absoluteIndex = index + zoomOffset
-
-        return {
-          ...plot,
-          absoluteIndex,
-          isAlertAutomation:
-            d.name === 'Automation' &&
-            isAlert(d.absoluteValues[absoluteIndex]!, automationThreshold),
-          isAlertMixed:
-            d.name === 'Mixed' &&
-            isAlert(d.absoluteValues[absoluteIndex]!, mixedThreshold),
-        }
-      }),
-    }
-  })
-}
 const progressionLabelOffsetX = 0
 
 const viewBoxPadding = computed(() => {
@@ -323,48 +272,6 @@ const isChartHovered = shallowRef(false)
             :dataset
             :config
           >
-            <template #svg="{ svg }">
-              <g
-                v-for="alerts in alertIcons(
-                  svg.data as Datapoints,
-                  svg.slicer.start,
-                )"
-                :key="alerts.name"
-              >
-                <template
-                  v-for="plot in alerts.coordinates"
-                  :key="`${alerts.name}-${plot.absoluteIndex}`"
-                >
-                  <path
-                    v-show="plot.isAlertAutomation"
-                    class="zap-icon"
-                    :d="
-                      getZapIconPath({
-                        x: plot.x - 4,
-                        y: plot.y - 6,
-                      })
-                    "
-                    :fill="colors.red"
-                    :stroke="colors.bg"
-                  />
-                  <path
-                    v-show="plot.isAlertMixed"
-                    class="zap-icon"
-                    :d="
-                      getWarningIconPath({
-                        x: plot.x,
-                        y: plot.y - 20,
-                      })
-                    "
-                    :fill="colors.amber"
-                    :stroke="colors.bg"
-                    stroke-linecap="round"
-                    stroke-width="1.5"
-                  />
-                </template>
-              </g>
-            </template>
-
             <template #area-gradient="{ series, id }">
               <linearGradient :id x1="0" x2="0" y1="0" y2="1">
                 <stop
