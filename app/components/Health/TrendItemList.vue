@@ -20,7 +20,7 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
 
 <template>
   <ul
-    class="text-center flex flex-col md:flex-row gap-2 items-center md:text-left w-full justify-evenly px-4 md:py-4 md:border-y md:border-y-gh-border/40"
+    class="text-center flex flex-col md:flex-row gap-2 items-center md:text-left w-full justify-evenly"
   >
     <li>
       <HealthTrend

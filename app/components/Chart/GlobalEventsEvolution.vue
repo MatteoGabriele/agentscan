@@ -14,12 +14,24 @@ import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
 const { data: ecosystemHealth } = await useEcosystemHealth()
-const dates = computed(() => ecosystemHealth.value?.dates)
-const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
 const isMobile = useIsMobile()
+
+const MOBILE_SLICE_DAYS = 14
+
+const dates = computed(() =>
+  ecosystemHealth.value?.dates.slice(isMobile.value ? -MOBILE_SLICE_DAYS : 0),
+)
+
+const scanTimes = computed(() =>
+  ecosystemHealth.value?.scanTimes.slice(
+    isMobile.value ? -MOBILE_SLICE_DAYS : 0,
+  ),
+)
+
+const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
 
 const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,
@@ -162,7 +174,7 @@ const config = computed<VueUiXyConfig>(() => ({
         },
         xAxisLabels: {
           show: false,
-          values: ecosystemHealth.value?.scanTimes,
+          values: scanTimes.value,
           datetimeFormatter: {
             enable: true,
             useUTC: false,
