@@ -258,7 +258,7 @@ function alertIcons(data: Datapoints, zoomOffset = 0): PlotAlert[] {
   return data.map((d) => {
     return {
       name: d.name,
-      coordinates: d.plots!.map((plot, index) => {
+      coordinates: (d.plots || []).map((plot, index) => {
         const absoluteIndex = index + zoomOffset
 
         return {
@@ -365,7 +365,7 @@ const isChartHovered = shallowRef(false)
             </template>
 
             <template #tooltip="{ datapoint, timeLabel }">
-              <div class="flex flex-col text-xs">
+              <div class="flex flex-col">
                 <div :style="{ color: colors.textMuted }" class="mb-1">
                   {{ formatScanTime(timeLabel.absoluteIndex) }}
                 </div>
