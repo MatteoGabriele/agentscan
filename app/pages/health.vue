@@ -3,6 +3,7 @@ import {
   DEFAULT_HISTORY_MONTHS,
   WINDOW_MAX_HOURS,
 } from '~~/shared/utils/health-history-window'
+import { useLocalStorage } from '@vueuse/core'
 
 definePageMeta({
   layout: 'full',
@@ -50,7 +51,9 @@ const rangeOptions = computed<ChartRangeOption[]>(() => [
   },
 ])
 
-const range = ref<ChartRange>('daily')
+const range = useLocalStorage<ChartRange>('daily-range', 'daily', {
+  initOnMounted: true,
+})
 
 const activeRangeCaption = computed(() => {
   return rangeOptions.value.find((option) => option.value === range.value)
@@ -92,27 +95,33 @@ const activeRangeCaption = computed(() => {
         </div>
 
         <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
-          <div
-            role="group"
-            aria-label="Chart time range"
-            class="inline-flex gap-0.5 rounded-full border border-gh-border-light/40 p-0.5"
-          >
-            <button
-              v-for="option in rangeOptions"
-              :key="option.value"
-              type="button"
-              :aria-pressed="range === option.value"
-              class="rounded-full px-3 py-0.5 text-xs font-medium transition-colors"
-              :class="
-                range === option.value
-                  ? 'bg-gh-border/30 text-gh-text'
-                  : 'text-gh-muted hover:bg-gh-border/15 hover:text-gh-text'
-              "
-              @click="range = option.value"
+          <ClientOnly>
+            <div
+              role="group"
+              aria-label="Chart time range"
+              class="inline-flex gap-0.5 rounded-full border border-gh-border-light/40 p-0.5"
             >
-              {{ option.label }}
-            </button>
-          </div>
+              <button
+                v-for="option in rangeOptions"
+                :key="option.value"
+                type="button"
+                :aria-pressed="range === option.value"
+                class="rounded-full px-3 py-0.5 text-xs font-medium transition-colors"
+                :class="
+                  range === option.value
+                    ? 'bg-gh-border/30 text-gh-text'
+                    : 'text-gh-muted hover:bg-gh-border/15 hover:text-gh-text'
+                "
+                @click="range = option.value"
+              >
+                {{ option.label }}
+              </button>
+            </div>
+
+            <template #fallback>
+              <Skeleton width="w-[122px]" height="h-[26px]" rounded="full" />
+            </template>
+          </ClientOnly>
 
           <p class="text-xs text-gh-muted/70">
             {{ activeRangeCaption }}
@@ -123,8 +132,8 @@ const activeRangeCaption = computed(() => {
       <div
         class="w-full min-h-0 shrink overflow-hidden basis-[300px] max-h-[300px] sm:basis-[500px] sm:max-h-[500px]"
       >
-        <ChartHourlyEventsEvolutionNext v-if="range === 'hourly'" />
-        <ChartGlobalEventsEvolution v-else />
+        <LazyChartHourlyEventsEvolutionNext v-if="range === 'hourly'" />
+        <LazyChartGlobalEventsEvolution v-else />
       </div>
     </div>
   </section>

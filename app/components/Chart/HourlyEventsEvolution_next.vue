@@ -56,7 +56,7 @@ type HourlySerie = VueUiXyDatasetItem & {
   totals: number[]
 }
 
-const SERIES: Array<{ name: string; category: EcosystemHealthCategory }> = [
+const series: Array<{ name: string; category: EcosystemHealthCategory }> = [
   { name: 'Organic', category: 'organic' },
   { name: 'Mixed', category: 'mixed' },
   { name: 'Automation', category: 'automation' },
@@ -73,7 +73,7 @@ function getSerieColor(category: EcosystemHealthCategory) {
 }
 
 const rawDataset = computed<HourlySerie[]>(() =>
-  SERIES.map(({ name, category }) => ({
+  series.map(({ name, category }) => ({
     name,
     category,
     series: (scanTimes.value ?? []).map(
