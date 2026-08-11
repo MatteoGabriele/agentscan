@@ -118,14 +118,20 @@ const activeRangeCaption = computed(() => {
               </button>
             </div>
 
+            <p class="text-xs text-gh-muted/70">
+              {{ activeRangeCaption }}
+            </p>
+
             <template #fallback>
-              <Skeleton width="w-[122px]" height="h-[26px]" rounded="full" />
+              <Skeleton
+                class="mb-1"
+                width="w-[122px]"
+                height="h-[26px]"
+                rounded="full"
+              />
+              <Skeleton width="w-[192px]" height="h-[10px]" rounded="full" />
             </template>
           </ClientOnly>
-
-          <p class="text-xs text-gh-muted/70">
-            {{ activeRangeCaption }}
-          </p>
         </div>
       </div>
 
