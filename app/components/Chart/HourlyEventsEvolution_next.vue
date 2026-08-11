@@ -24,10 +24,20 @@ const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
 const isMobile = useIsMobile()
 
+const MOBILE_SLICE_HOURS = 13
+
 const scanTimes = computed(() =>
-  hourlyWindow.value?.scanTimes.slice(isMobile.value ? -13 : 0),
+  hourlyWindow.value?.scanTimes.slice(isMobile.value ? -MOBILE_SLICE_HOURS : 0),
 )
 const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
+
+const scanTimesOffset = computed(() => {
+  if (!isMobile.value) {
+    return 0
+  }
+  const total = hourlyWindow.value?.scanTimes.length ?? 0
+  return Math.max(0, total - MOBILE_SLICE_HOURS)
+})
 
 const chartRef = useTemplateRef('chartRef')
 const tooltipPosition = useTooltipPosition(chartRef)
@@ -444,7 +454,8 @@ const isChartHovered = shallowRef(false)
             >
               <text
                 v-if="
-                  absoluteIndex % (isMobile ? 3 : 6) === 0 &&
+                  (absoluteIndex + scanTimesOffset) % (isMobile ? 3 : 6) ===
+                    0 &&
                   ![0, (scanTimes?.length ?? 1) - 1].includes(absoluteIndex)
                 "
                 :x="x"

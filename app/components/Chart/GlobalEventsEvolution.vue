@@ -19,8 +19,16 @@ const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
 const isMobile = useIsMobile()
 
+const MOBILE_SLICE_DAYS = 14
+
 const dates = computed(() =>
-  ecosystemHealth.value?.dates.slice(isMobile.value ? -14 : 0),
+  ecosystemHealth.value?.dates.slice(isMobile.value ? -MOBILE_SLICE_DAYS : 0),
+)
+
+const scanTimes = computed(() =>
+  ecosystemHealth.value?.scanTimes.slice(
+    isMobile.value ? -MOBILE_SLICE_DAYS : 0,
+  ),
 )
 
 const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
@@ -166,7 +174,7 @@ const config = computed<VueUiXyConfig>(() => ({
         },
         xAxisLabels: {
           show: false,
-          values: ecosystemHealth.value?.scanTimes,
+          values: scanTimes.value,
           datetimeFormatter: {
             enable: true,
             useUTC: false,
