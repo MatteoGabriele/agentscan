@@ -67,15 +67,19 @@ const activeRangeCaption = computed(() => {
               A snapshot of community contribution patterns across the ecosystem
             </p>
             <p class="text-xs text-gh-muted/70 mt-1 text-pretty">
-              Each day, we analyze 10 PRs from a curated
+              Every hour, we analyze the newest pull requests from a curated
               <NuxtLink
                 class="underline hover:text-gh-text"
                 external
                 target="_blank"
                 to="https://github.com/MatteoGabriele/agentscan/tree/main/shared/daily-scan.ts"
               >
-                list of repositories
-              </NuxtLink>
+                list of repositories </NuxtLink
+              >.
+            </p>
+            <p class="text-xs text-gh-muted/70 text-pretty">
+              Each daily total is the sum of that day's 24 hourly scans, added
+              once the day is fully scanned
             </p>
           </div>
         </header>
