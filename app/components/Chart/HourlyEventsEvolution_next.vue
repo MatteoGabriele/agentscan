@@ -109,7 +109,7 @@ const config = computed<VueUiXyConfig>(() => ({
   chart: {
     userOptions: { show: false },
     zoom: { show: false },
-    legend: { show: false, position: 'top' },
+    legend: { show: false },
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     width: Math.round(width.value),
@@ -135,7 +135,6 @@ const config = computed<VueUiXyConfig>(() => ({
     },
     grid: {
       stroke: 'transparent',
-      showVerticalLines: false,
       labels: {
         show: false,
         fontSize: 12,
