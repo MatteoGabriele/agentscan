@@ -417,7 +417,7 @@ function placeLandmark({
                   <!-- No trend is possible on the first datapoint -->
                   <template v-if="timeLabel.absoluteIndex > 0">
                     <span
-                      v-if="dp.slotAbsoluteIndex < series.length - 1"
+                      v-if="dp.slotAbsoluteIndex < series.length"
                       :class="[
                         getTrend({
                           item: dp,
