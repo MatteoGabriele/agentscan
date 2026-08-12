@@ -192,23 +192,6 @@ const config = computed<VueUiXyConfig>(() => ({
   },
 }))
 
-function getTrend({
-  serieIndex,
-  index,
-}: {
-  serieIndex: number
-  index: number
-}) {
-  const serie = rawDataset.value[serieIndex]
-  const trend = serie?.trends[index]
-
-  return {
-    formattedValue: formatTrend(trend),
-    color: getTrendColor({ value: trend, reversed: serie?.name !== 'Organic' }),
-    arrow: getTrendArrow(trend),
-  }
-}
-
 function formatScanTime(index: number) {
   const scanTime = scanTimes.value?.[index]
 
@@ -217,24 +200,6 @@ function formatScanTime(index: number) {
   }
 
   return dayjs(scanTime).format('ddd, MMM D • HH:mm')
-}
-
-function getScanDetails({
-  serieIndex,
-  index,
-}: {
-  serieIndex: number
-  index: number
-}) {
-  const serie = rawDataset.value[serieIndex]
-  const count = serie?.counts[index]
-  const total = serie?.totals[index]
-
-  if (count === undefined || !total) {
-    return ''
-  }
-
-  return `${count} / ${total}`
 }
 
 const progressionLabelOffsetX = 0
@@ -294,7 +259,7 @@ const isChartHovered = shallowRef(false)
                   :tooltip-slot-props="{ datapoint, timeLabel, series }"
                   :colors
                   :can-compare="timeLabel.absoluteIndex > 0"
-                  :rawDataset
+                  :raw-dataset="rawDataset"
                 >
                   <template #thead>
                     <th class="px-2 text-center">vs Hour-1</th>

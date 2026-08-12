@@ -12,7 +12,7 @@ import { useColors } from '~/composables/useColors'
 import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
-import { type VueUiXyDatasetItemWithTrends } from '~~/shared/types/ecosystem-health'
+import type { VueUiXyDatasetItemWithTrends } from '~~/shared/types/ecosystem-health'
 import EventsEvolutionTooltipTable from './EventsEvolutionTooltipTable.vue'
 const { data: ecosystemHealth } = await useEcosystemHealth()
 
@@ -385,7 +385,7 @@ function placeLandmark({
                   :tooltip-slot-props="{ datapoint, timeLabel, series }"
                   :colors
                   :can-compare="timeLabel.absoluteIndex > 0"
-                  :rawDataset
+                  :raw-dataset="rawDataset"
                 >
                   <template #thead>
                     <th class="px-2 text-center">vs Day-1</th>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VueUiXyTooltipSlotProps } from 'vue-data-ui/vue-ui-xy'
+import type { VueUiXyDatasetItemWithTrends } from '~~/shared/types/ecosystem-health'
 import { formatProgressionPoints } from '~~/shared/utils/health-stats'
-import { type VueUiXyDatasetItemWithTrends } from '~~/shared/types/ecosystem-health'
 import { round } from '~~/shared/utils/numbers'
 
 const props = defineProps<{
