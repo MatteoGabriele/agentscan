@@ -96,4 +96,13 @@ export const landmarks: Landmark[] = [
     icon: 'i-lucide:shield-check',
     iconSvg: SVG_ICON.shieldCheck,
   },
+
+  {
+    date: '2026-08-11',
+    name: 'Scan update',
+    description:
+      'Daily numbers are no longer a single random snapshot of the day. They are now derived from hourly scans across all 24 hours.',
+    icon: 'i-lucide:info',
+    iconSvg: SVG_ICON.info,
+  },
 ]
