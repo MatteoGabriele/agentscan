@@ -98,7 +98,7 @@ export const landmarks: Landmark[] = [
   },
 
   {
-    date: '2026-08-11',
+    date: '2026-08-10',
     name: 'Scan update',
     description:
       'Daily numbers are no longer a single random snapshot of the day. They are now derived from hourly scans across all 24 hours.',
