@@ -27,6 +27,7 @@ function getTrend({ item, index }: DatapointItem) {
   }
 }
 
+// TEST
 function getProgressionVsPrevious({ item, index }: DatapointItem) {
   const valueCurrent = props.rawDataset[item.slotAbsoluteIndex]?.series[index]
 
