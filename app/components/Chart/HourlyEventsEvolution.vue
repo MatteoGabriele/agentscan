@@ -9,6 +9,7 @@ import { useElementSize } from '@vueuse/core'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { round } from '~~/shared/utils/numbers'
+import EventsEvolutionTooltipTable from './EventsEvolutionTooltipTable.vue'
 
 dayjs.extend(utc)
 
@@ -283,68 +284,23 @@ const isChartHovered = shallowRef(false)
               </linearGradient>
             </template>
 
-            <template #tooltip="{ datapoint, timeLabel }">
+            <template #tooltip="{ datapoint, timeLabel, series }">
               <div class="flex flex-col">
                 <div :style="{ color: colors.textMuted }" class="mb-1">
                   {{ formatScanTime(timeLabel.absoluteIndex) }}
                 </div>
-                <div
-                  v-for="dp in datapoint"
-                  :key="`${dp.name}-${dp.absoluteIndex}`"
-                  class="flex flex-row gap-2 place-items-center"
-                >
-                  <div class="h-2 w-2 shrink-0">
-                    <svg viewBox="0 0 2 2" class="w-full h-full">
-                      <circle cx="1" cy="1" r="1" :fill="dp.color" />
-                    </svg>
-                  </div>
-                  <span :style="{ color: colors.text }">{{ dp.name }}</span>
-                  <span
-                    :style="{ color: colors.textMuted }"
-                    class="tabular-nums"
-                  >
-                    {{ round(dp.value ?? 0, 1) + '%' }}
-                  </span>
-                  <span
-                    :style="{ color: colors.textMuted }"
-                    class="tabular-nums"
-                  >
-                    {{
-                      getScanDetails({
-                        serieIndex: dp.slotAbsoluteIndex,
-                        index: timeLabel.absoluteIndex,
-                      })
-                    }}
-                  </span>
 
-                  <!-- No trend is possible on the first datapoint -->
-                  <span
-                    v-if="timeLabel.absoluteIndex > 0"
-                    :class="[
-                      getTrend({
-                        serieIndex: dp.slotAbsoluteIndex,
-                        index: timeLabel.absoluteIndex,
-                      }).color,
-                    ]"
-                  >
-                    <span
-                      :class="[
-                        getTrend({
-                          serieIndex: dp.slotAbsoluteIndex,
-                          index: timeLabel.absoluteIndex,
-                        }).arrow,
-                      ]"
-                      class="shrink-0"
-                      style="vertical-align: middle"
-                    />
-                    {{
-                      getTrend({
-                        serieIndex: dp.slotAbsoluteIndex,
-                        index: timeLabel.absoluteIndex,
-                      }).formattedValue
-                    }}
-                  </span>
-                </div>
+                <EventsEvolutionTooltipTable
+                  :tooltip-slot-props="{ datapoint, timeLabel, series }"
+                  :colors
+                  :can-compare="timeLabel.absoluteIndex > 0"
+                  :rawDataset
+                >
+                  <template #thead>
+                    <th class="px-2 text-center">vs Hour-1</th>
+                    <th class="px-2 text-left">Trend</th>
+                  </template>
+                </EventsEvolutionTooltipTable>
               </div>
             </template>
 

@@ -31,6 +31,13 @@ export function formatTrend(value: number = 0) {
   return `${round(value * 100, 1)}%`
 }
 
+export function formatProgressionPoints(value: number) {
+  const rounded = round(value, 1)
+  const sign = value > 0 ? '+' : ''
+  const unit = Math.abs(rounded) === 1 ? 'pt' : 'pts'
+  return `${sign}${rounded}${unit}`
+}
+
 export function getHealthStats(
   data: EcosystemHealthItem[] = [],
 ): Record<

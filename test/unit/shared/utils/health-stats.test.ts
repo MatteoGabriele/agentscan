@@ -4,6 +4,7 @@ import {
   classifyByScore,
   formatTrend,
   getHealthStats,
+  formatProgressionPoints,
   INSUFFICIENT_DATA_SCORE,
 } from '../../../../shared/utils/health-stats'
 import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from '../../mocks/ecosystemHealthItems'
@@ -69,5 +70,17 @@ describe('getHealthStats', () => {
     ] as EcosystemHealthItem[]
 
     expect(getHealthStats(items)).toBeNull()
+  })
+})
+
+describe('formatProgressionPoints', () => {
+  it('formats a value into a signed string with a suffix', () => {
+    expect(formatProgressionPoints(0)).toBe('0pts')
+    expect(formatProgressionPoints(-1)).toBe('-1pt')
+    expect(formatProgressionPoints(1)).toBe('+1pt')
+    expect(formatProgressionPoints(-1.49)).toBe('-1.5pts')
+    expect(formatProgressionPoints(1.49)).toBe('+1.5pts')
+    expect(formatProgressionPoints(1.99)).toBe('+2pts')
+    expect(formatProgressionPoints(-1.99)).toBe('-2pts')
   })
 })
