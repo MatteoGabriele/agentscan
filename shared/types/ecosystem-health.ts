@@ -1,3 +1,4 @@
+import type { VueUiXyDatasetItem } from 'vue-data-ui/vue-ui-xy'
 import type { calcLinearProgression } from '../utils/calc-linear-progression'
 import type { IdentityClassification } from '@unveil/identity'
 
@@ -32,3 +33,7 @@ export type EcosystemHealthCategoryProgression = Record<
   EcosystemHealthCategory,
   ReturnType<typeof calcLinearProgression>
 >
+
+export type VueUiXyDatasetItemWithTrends = VueUiXyDatasetItem & {
+  trends: number[]
+}

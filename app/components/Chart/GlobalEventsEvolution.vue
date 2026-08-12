@@ -8,11 +8,12 @@ import {
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useColors } from '~/composables/useColors'
-import { round } from '~~/shared/utils/numbers'
 
 import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
+import type { VueUiXyDatasetItemWithTrends } from '~~/shared/types/ecosystem-health'
+import EventsEvolutionTooltipTable from './EventsEvolutionTooltipTable.vue'
 const { data: ecosystemHealth } = await useEcosystemHealth()
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
@@ -45,10 +46,6 @@ onMounted(() => {
 })
 
 const colors = useColors(rootEl)
-
-type VueUiXyDatasetItemWithTrends = VueUiXyDatasetItem & {
-  trends: number[]
-}
 
 function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
   return [
@@ -208,22 +205,6 @@ const config = computed<VueUiXyConfig>(() => ({
     zoom: { show: false },
   },
 }))
-
-function getTrend({
-  item,
-  index,
-}: {
-  item: { slotAbsoluteIndex: number; name: string }
-  index: number
-}) {
-  const trend = rawDataset.value[item.slotAbsoluteIndex]?.trends[index]
-
-  return {
-    formattedValue: formatTrend(trend),
-    color: getTrendColor({ value: trend, reversed: item.name !== 'Organic' }),
-    arrow: getTrendArrow(trend),
-  }
-}
 
 const keyDates = computed(() => {
   const dateList = dates.value ?? []
@@ -395,55 +376,22 @@ function placeLandmark({
             </template>
 
             <template #tooltip="{ datapoint, timeLabel, series }">
-              <div class="flex flex-col">
+              <div class="flex flex-col tabular-nums">
                 <div :style="{ color: colors.textMuted }" class="mb-1">
                   {{ timeLabel.text }}
                 </div>
-                <div
-                  v-for="dp in datapoint"
-                  :key="`${dp.name}-${dp.absoluteIndex}`"
-                  class="flex flex-row gap-2 place-items-center"
-                >
-                  <div class="h-2 w-2">
-                    <svg viewBox="0 0 2 2" class="w-full h-full">
-                      <circle cx="1" cy="1" r="1" :fill="dp.color" />
-                    </svg>
-                  </div>
-                  <span :style="{ color: colors.text }">{{ dp.name }}</span>
-                  <span :style="{ color: colors.textMuted }">
-                    {{ round(dp.value ?? 0, 1) + '%' }}
-                  </span>
 
-                  <!-- No trend is possible on the first datapoint -->
-                  <template v-if="timeLabel.absoluteIndex > 0">
-                    <span
-                      v-if="dp.slotAbsoluteIndex < series.length"
-                      :class="[
-                        getTrend({
-                          item: dp,
-                          index: timeLabel.absoluteIndex,
-                        }).color,
-                      ]"
-                    >
-                      <span
-                        :class="[
-                          getTrend({
-                            item: dp,
-                            index: timeLabel.absoluteIndex,
-                          }).arrow,
-                        ]"
-                        class="shrink-0"
-                        style="vertical-align: middle"
-                      />
-                      {{
-                        getTrend({
-                          item: dp,
-                          index: timeLabel.absoluteIndex,
-                        }).formattedValue
-                      }}
-                    </span>
+                <EventsEvolutionTooltipTable
+                  :tooltip-slot-props="{ datapoint, timeLabel, series }"
+                  :colors
+                  :can-compare="timeLabel.absoluteIndex > 0"
+                  :raw-dataset="rawDataset"
+                >
+                  <template #thead>
+                    <th class="px-2 text-center">vs Day-1</th>
+                    <th class="px-2 text-left">Trend</th>
                   </template>
-                </div>
+                </EventsEvolutionTooltipTable>
 
                 <!-- LANDMARK INFO -->
                 <div
@@ -455,7 +403,7 @@ function placeLandmark({
                       timeLabel.absoluteIndex,
                     ) ?? []"
                     :key="`${landmark.date}-${landmark.name}-${landmark.series ?? 'global'}`"
-                    class="flex flex-row gap-2 max-w-[240px]"
+                    class="flex flex-row gap-2 max-w-[280px]"
                   >
                     <span class="w-6 shrink-0" :class="landmark.icon" />
 
@@ -495,5 +443,9 @@ function placeLandmark({
 
 .landmark-label {
   transition: all 250ms ease !important;
+}
+
+.vue-data-ui-tooltip {
+  min-width: fit-content !important;
 }
 </style>
