@@ -206,6 +206,10 @@ const activeRangeCaption = computed(() => {
           JavaScript, Go, Python, and Rust to toolchains, frameworks, testing
           libraries, learning websites, and even AI-related projects.
         </p>
+        <p>
+          The list keeps growing. We would love to cover many more projects, but
+          we have to stay within GitHub's API rate limits.
+        </p>
         <ul>
           <li v-for="name in libraries" :key="name">
             <NuxtLink
