@@ -49,9 +49,11 @@ useHead({
     <div class="min-h-svh flex flex-col @container">
       <MainHeader class="mx-auto w-full max-w-screen-xl" />
 
-      <main class="main-height">
-        <slot />
+      <main v-if="$slots.hero" class="main-height">
+        <slot name="hero" />
       </main>
+
+      <slot />
     </div>
 
     <MainFooter />

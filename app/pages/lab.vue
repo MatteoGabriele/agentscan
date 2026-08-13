@@ -1,8 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default',
-})
-
 const { data: hourly } = await useEcosystemHealthHourly()
 </script>
 
