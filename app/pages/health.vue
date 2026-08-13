@@ -147,42 +147,37 @@ const activeRangeCaption = computed(() => {
 
     <section id="learn-more" class="mx-auto max-w-2xl px-4 py-16 md:py-24">
       <h2 class="text-xl font-semibold">What is the Ecosystem Health chart?</h2>
-      <div class="mt-4 flex flex-col gap-4 text-gh-muted text-pretty">
+      <div class="mt-4 flex flex-col gap-4 text-gh-text/80 text-pretty">
         <p>
-          This page aims at showing the current state of the GitHub community by
-          analyzing its public activity patterns. Of all the accounts on GitHub,
-          we want to see how many are coding without the help of heavy
-          automation.
+          This page gives you a look into the current state of the GitHub
+          community by analyzing public activity. We want to understand how many
+          accounts are coding on their own, how many are genuinely supporting
+          others, and how many are just flooding the space.
         </p>
         <p>
-          We do not hate AI. We are simply tired of seeing open source projects
-          spammed day after day.
+          We don't dislike AI. We're just growing tired of seeing open source
+          projects overwhelmed by constant spam.
         </p>
 
         <h3 class="mt-6 font-semibold text-gh-text">How a scan works</h3>
         <p>
-          Every hour we walk each of our
+          Every hour, we check each of our
           <NuxtLink to="#repositories" class="underline">repositories</NuxtLink>
           and collect 10 of the most recent pull request opened during the hour
-          before — however many that turns out to be.
+          before, or however many there are.
         </p>
         <p>
-          Accounts matching a known bot are skipped before anything is measured:
-          Copilot, Dependabot, Renovate, GitHub Actions, Snyk, Codecov and the
-          rest of the usual CI crowd. For every remaining author we read up to
-          300 of their most recent public GitHub events and analyze using the
+          We skip accounts that match known bots, like Copilot, Dependabot,
+          Renovate, GitHub Actions, and other common automation tools. For every
+          PR author, we review up to 300 of their recent public GitHub events,
+          using the same
           <NuxtLink
             external
             href="https://github.com/unveil-project/identity"
             class="underline"
             >identity</NuxtLink
           >
-          library, the same one that powers every profile scan on AgentScan.
-        </p>
-        <p>
-          That produces a score from 0 to 100, where 100 looks organic and 0
-          looks automated. Accounts with too little public activity to judge are
-          left out of the chart entirely rather than pushed into a bucket.
+          library that powers every AgentScan profile scan.
         </p>
 
         <h3 class="mt-6 font-semibold text-gh-text">From hours to days</h3>
@@ -205,11 +200,11 @@ const activeRangeCaption = computed(() => {
           Which repositories
         </h3>
         <p>
-          We track, for now, {{ libraries.length }} repositories. We selected
-          them manually, the ones we more closely cared about, and others just
-          randomly from trending GitHub repositories. They go from TypeScript,
-          JavaScript, Go, Python and Rust to toolchains, frameworks, testing
-          libraries, learning websites, even AI-related projects.
+          For now, we track {{ libraries.length }} repositories. Some we picked
+          by hand because we care about them; others were chosen at random from
+          the GitHub trending repositories page. They go from TypeScript,
+          JavaScript, Go, Python, and Rust to toolchains, frameworks, testing
+          libraries, learning websites, and even AI-related projects.
         </p>
         <ul>
           <li v-for="name in libraries" :key="name">
