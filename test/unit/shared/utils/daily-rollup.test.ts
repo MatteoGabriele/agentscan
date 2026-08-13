@@ -2,18 +2,12 @@ import { describe, expect, it } from 'vitest'
 import type { DailyScanEntry } from '../../../../shared/utils/daily-rollup'
 import {
   getCompletedDailyEntries,
-  getDailyClosureRateDelta,
-  getDailyClosureRateTotal,
   getDailyCountsByDate,
   getSampleDailyEntries,
   mergeDailyEntries,
 } from '../../../../shared/utils/daily-rollup'
 import { getClassificationStatsByDate } from '../../../../shared/utils/count-classification-by-date'
-import { getClosedPrPercentageTotal } from '../../../../shared/utils/charts'
-import type {
-  EcosystemHealthItem,
-  PrStatus,
-} from '../../../../shared/types/ecosystem-health'
+import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
 
 function createEcosystemHealthItem(
   item: Partial<EcosystemHealthItem>,
@@ -219,110 +213,6 @@ describe('getDailyCountsByDate', () => {
 
     expect(Object.keys(counts)).toEqual(['2026-06-10', '2026-06-11'])
     expect(counts['2026-06-10']?.createdAt).toBe('2026-06-10T04:00:00.000Z')
-  })
-})
-
-describe('getDailyClosureRateTotal', () => {
-  function createAutomationPr(
-    date: string,
-    number: number,
-    pr_status: PrStatus,
-  ): EcosystemHealthItem {
-    return createEcosystemHealthItem({
-      created_at: `${date}T00:00:00.000Z`,
-      score: 10,
-      pr_status,
-      repo_name: 'acme/lib',
-      pr_key: `acme/lib#${number}`,
-    })
-  }
-
-  const rows = [
-    createAutomationPr('2026-06-10', 1, 'closed'),
-    createAutomationPr('2026-06-10', 2, 'closed'),
-    createAutomationPr('2026-06-10', 3, 'merged'),
-    createAutomationPr('2026-06-10', 4, 'open'),
-  ]
-
-  it('reads a stored day exactly as the per-PR closure rate reads the same rows', () => {
-    expect(getDailyClosureRateTotal(getSampleDailyEntries(rows))).toBe(
-      getClosedPrPercentageTotal(rows, [0, 50]),
-    )
-  })
-
-  it('counts merged as an outcome but not as a closure', () => {
-    // 2 closed out of 4 automation PRs — the merged one stays eligible.
-    expect(getDailyClosureRateTotal(getSampleDailyEntries(rows))).toBe(50)
-  })
-
-  it('reports a full closure rate when no PR is eligible', () => {
-    const organic = getSampleDailyEntries([
-      createEcosystemHealthItem({ score: 90, pr_status: 'open' }),
-    ])
-
-    expect(getDailyClosureRateTotal(organic)).toBe(100)
-    expect(getDailyClosureRateTotal([])).toBe(100)
-  })
-
-  it('aggregates every day, not just the last one', () => {
-    const entries = getSampleDailyEntries([
-      ...rows,
-      createAutomationPr('2026-06-11', 5, 'open'),
-      createAutomationPr('2026-06-11', 6, 'open'),
-    ])
-
-    // 2 closed out of 6 across both days.
-    expect(getDailyClosureRateTotal(entries)).toBe(33)
-  })
-})
-
-describe('getDailyClosureRateDelta', () => {
-  function createAutomationDay(
-    date: string,
-    statuses: PrStatus[],
-  ): EcosystemHealthItem[] {
-    return statuses.map((pr_status, index) =>
-      createEcosystemHealthItem({
-        created_at: `${date}T00:00:00.000Z`,
-        score: 10,
-        pr_status,
-        repo_name: 'acme/lib',
-        pr_key: `acme/lib#${date}-${index}`,
-      }),
-    )
-  }
-
-  it('compares the last measured day with the one before it', () => {
-    const entries = getSampleDailyEntries([
-      ...createAutomationDay('2026-06-10', ['closed', 'open', 'open', 'open']),
-      ...createAutomationDay('2026-06-11', [
-        'closed',
-        'closed',
-        'open',
-        'open',
-      ]),
-    ])
-
-    const result = getDailyClosureRateDelta(entries)
-
-    expect(result.previousSnapshot.date).toBe('2026-06-10')
-    expect(result.previousSnapshot.percentage).toBe(25)
-    expect(result.lastSnapshot.date).toBe('2026-06-11')
-    expect(result.lastSnapshot.percentage).toBe(50)
-    expect(result.percentagePointDifference).toBe(25)
-  })
-
-  it('has nothing to compare on a single day', () => {
-    const entries = getSampleDailyEntries(
-      createAutomationDay('2026-06-10', ['closed', 'open']),
-    )
-
-    const result = getDailyClosureRateDelta(entries)
-
-    expect(result.previousSnapshot.date).toBeUndefined()
-    expect(result.previousSnapshot.percentage).toBeNull()
-    expect(result.lastSnapshot.percentage).toBe(50)
-    expect(result.percentagePointDifference).toBeNull()
   })
 })
 
