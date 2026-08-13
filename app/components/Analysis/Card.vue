@@ -56,21 +56,7 @@ const { scoreStyle } = useScoreStyle(
   computed(() => ({ hasCommunityFlag: hasCommunityFlag.value })),
 )
 
-const classificationIcon = computed<string>(() => {
-  if (classification.value === 'insufficient-data') {
-    return 'i-lucide:circle-slash'
-  }
-
-  if (classification.value === 'organic') {
-    return 'i-lucide:heart-handshake'
-  }
-
-  if (classification.value === 'mixed') {
-    return 'i-lucide:blend'
-  }
-
-  return 'i-lucide:shield-alert'
-})
+const { classificationIcon } = useClassificationIcons(classification)
 
 const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
