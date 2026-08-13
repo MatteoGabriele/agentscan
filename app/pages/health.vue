@@ -4,7 +4,6 @@ import {
   WINDOW_MAX_HOURS,
 } from '~~/shared/utils/health-history-window'
 import { libraries } from '~~/shared/daily-scan'
-import { identityConfig } from '@unveil/identity'
 import { useLocalStorage } from '@vueuse/core'
 
 definePageMeta({
@@ -160,20 +159,12 @@ const activeRangeCaption = computed(() => {
           spammed day after day.
         </p>
 
-        <h3 class="mt-6 font-semibold text-gh-text">Which repositories</h3>
-        <p>
-          We track {{ libraries.length }} repositories. We selected them
-          manually, the ones we more closely cared about, and others just
-          randomly from trending GitHub repositories. They go from TypeScript,
-          JavaScript, Go, Python and Rust to toolchains, frameworks, testing
-          libraries, learning websites, even AI-related projects.
-        </p>
-
         <h3 class="mt-6 font-semibold text-gh-text">How a scan works</h3>
         <p>
-          Every hour we walk each of those repositories and collect 10 of the
-          most recent pull request opened during the hour before — however many
-          that turns out to be.
+          Every hour we walk each of our
+          <NuxtLink to="#repositories" class="underline">repositories</NuxtLink>
+          and collect 10 of the most recent pull request opened during the hour
+          before — however many that turns out to be.
         </p>
         <p>
           Accounts matching a known bot are skipped before anything is measured:
@@ -183,7 +174,7 @@ const activeRangeCaption = computed(() => {
           <NuxtLink
             external
             href="https://github.com/unveil-project/identity"
-            class="text-gh-text underline"
+            class="underline"
             >identity</NuxtLink
           >
           library, the same one that powers every profile scan on AgentScan.
@@ -209,6 +200,27 @@ const activeRangeCaption = computed(() => {
           as a trend over time rather than as a measurement of GitHub as a
           whole.
         </p>
+
+        <h3 id="repositories" class="mt-6 font-semibold text-gh-text">
+          Which repositories
+        </h3>
+        <p>
+          We track, for now, {{ libraries.length }} repositories. We selected
+          them manually, the ones we more closely cared about, and others just
+          randomly from trending GitHub repositories. They go from TypeScript,
+          JavaScript, Go, Python and Rust to toolchains, frameworks, testing
+          libraries, learning websites, even AI-related projects.
+        </p>
+        <ul>
+          <li v-for="name in libraries" :key="name">
+            <NuxtLink
+              class="underline"
+              external
+              :href="`https://github.com/${name}`"
+              >{{ name }}</NuxtLink
+            >
+          </li>
+        </ul>
       </div>
     </section>
   </NuxtLayout>
