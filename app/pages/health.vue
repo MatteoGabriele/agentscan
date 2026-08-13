@@ -72,13 +72,13 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           <div class="mx-auto max-w-2xl w-full">
             <header class="text-center mt-16 md:mt-24 px-4">
               <h1 class="text-2xl font-semibold">GitHub Ecosystem Health</h1>
-              <div class="text-gh-muted mt-1 flex flex-col text-pretty">
+              <div class="text-ui-muted mt-1 flex flex-col text-pretty">
                 <p>
                   A snapshot of community contribution patterns across the
                   ecosystem
                 </p>
               </div>
-              <p class="text-gh-muted text-sm">
+              <p class="text-ui-muted text-sm">
                 <NuxtLink to="#learn-more" class="underline"
                   >Learn more</NuxtLink
                 >
@@ -86,7 +86,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
               </p>
             </header>
 
-            <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-gh-border/40">
+            <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-ui-border/40">
               <HealthTrendItemList />
             </div>
 
@@ -125,7 +125,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
 
     <section id="learn-more" class="mx-auto max-w-2xl px-4 py-16 md:py-24">
       <h2 class="text-xl font-semibold">What is the Ecosystem Health chart?</h2>
-      <div class="mt-4 flex flex-col gap-2 text-gh-text/80 text-pretty">
+      <div class="mt-4 flex flex-col gap-2 text-ui-text/80 text-pretty">
         <p>
           This page gives you a look into the current state of the GitHub
           community by analyzing public activity. We want to understand how many
@@ -137,7 +137,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           projects overwhelmed by constant spam.
         </p>
 
-        <h3 class="mt-6 font-semibold text-gh-text">How a scan works</h3>
+        <h3 class="mt-6 font-semibold text-ui-text">How a scan works</h3>
         <p>
           Every hour, we check each of our
           <NuxtLink to="#repositories" class="underline">repositories</NuxtLink>
@@ -158,7 +158,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           library that powers every AgentScan profile scan.
         </p>
 
-        <h3 class="mt-6 font-semibold text-gh-text">From hours to days</h3>
+        <h3 class="mt-6 font-semibold text-ui-text">From hours to days</h3>
         <p>
           The hourly view shows the last {{ WINDOW_MAX_HOURS }} hours, one point
           per scan. Once a day is complete, we compound its hours into a single
@@ -166,7 +166,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           {{ DEFAULT_HISTORY_MONTHS }} months of history.
         </p>
 
-        <h3 class="mt-6 font-semibold text-gh-text">How to read it</h3>
+        <h3 class="mt-6 font-semibold text-ui-text">How to read it</h3>
         <p>
           These are indicators, not definitive verdicts. The chart describes a
           sample of pull requests from a fixed list of repositories, so read it
@@ -174,7 +174,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           whole.
         </p>
 
-        <h3 id="repositories" class="mt-6 font-semibold text-gh-text">
+        <h3 id="repositories" class="mt-6 font-semibold text-ui-text">
           Which repositories
         </h3>
         <p>

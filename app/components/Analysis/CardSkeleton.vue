@@ -3,7 +3,7 @@
 <template>
   <div class="flex flex-col gap-6">
     <div
-      class="flex h-[140px] gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid border-gh-border flex-col @lg:flex-row animate-pulse"
+      class="flex h-[140px] gap-6 bg-ui-card p-6 rounded-2 border-2 border-solid border-ui-border flex-col @lg:flex-row animate-pulse"
     >
       <div class="w-full">
         <div class="mb-4">

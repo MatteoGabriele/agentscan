@@ -49,7 +49,7 @@ function getProgressionVsPrevious({ item, index }: DatapointItem) {
 <template>
   <table class="text-left">
     <thead class="text-left text-xs">
-      <tr class="text-gh-muted">
+      <tr class="text-ui-muted">
         <th class="px-2 text-right"></th>
         <template v-if="canCompare">
           <th class="px-2 text-right"></th>
@@ -84,7 +84,7 @@ function getProgressionVsPrevious({ item, index }: DatapointItem) {
         </td>
 
         <template v-if="canCompare">
-          <td class="px-2 text-right border-l border-solid border-gh-border">
+          <td class="px-2 text-right border-l border-solid border-ui-border">
             <template v-if="canCompare">
               <span
                 :class="[
@@ -104,7 +104,7 @@ function getProgressionVsPrevious({ item, index }: DatapointItem) {
             </template>
           </td>
 
-          <td class="px-2 text-left border-l border-solid border-gh-border">
+          <td class="px-2 text-left border-l border-solid border-ui-border">
             <template v-if="tooltipSlotProps.timeLabel.absoluteIndex > 0">
               <span
                 :class="[

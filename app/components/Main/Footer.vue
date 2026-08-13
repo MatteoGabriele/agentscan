@@ -5,51 +5,49 @@ const unveilIdentityVersion = unveilIdentityPackage.version
 </script>
 
 <template>
-  <footer
-    class="border-t border-gh-border bg-gradient-to-b from-transparent to-gh-bg-subtle"
-  >
+  <footer class="border-t border-ui-border">
     <div class="max-w-screen-lg mx-auto px-4 py-12">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
-          class="border border-gh-border/50 rounded-lg bg-white/1 p-6 hover:border-gh-border transition-colors"
+          class="border border-ui-border/50 rounded-lg bg-white/1 p-6 hover:border-ui-border transition-colors"
         >
           <div>
-            <h3 class="text-sm font-semibold text-gh-text mb-3">AgentScan</h3>
-            <p class="text-xs text-gh-muted/80 leading-relaxed">
+            <h3 class="text-sm font-semibold text-ui-text mb-3">AgentScan</h3>
+            <p class="text-xs text-ui-muted/80 leading-relaxed">
               Automation pattern detection for open source maintainers.
             </p>
           </div>
         </div>
 
         <div
-          class="border border-gh-border/50 rounded-lg bg-white/1 p-6 hover:border-gh-border transition-colors"
+          class="border border-ui-border/50 rounded-lg bg-white/1 p-6 hover:border-ui-border transition-colors"
         >
           <div class="flex-1">
             <h4
-              class="text-xs font-semibold text-gh-text mb-3 uppercase tracking-wider"
+              class="text-xs font-semibold text-ui-text mb-3 uppercase tracking-wider"
             >
               Disclaimer
             </h4>
-            <p class="text-xs text-gh-muted/80 leading-relaxed mb-3">
+            <p class="text-xs text-ui-muted/80 leading-relaxed mb-3">
               Results are based on pattern analysis and should be interpreted as
               <span class="font-medium">possible signals</span>, not
               conclusions.
             </p>
-            <p class="text-xs text-gh-muted/70 mb-3">
+            <p class="text-xs text-ui-muted/70 mb-3">
               Always verify findings with additional context.
             </p>
-            <p class="text-xs text-gh-muted/70">
+            <p class="text-xs text-ui-muted/70">
               GitHub has no association with this website.
             </p>
           </div>
         </div>
 
         <div
-          class="border border-gh-border/50 rounded-lg bg-white/1 p-6 hover:border-gh-border transition-colors"
+          class="border border-ui-border/50 rounded-lg bg-white/1 p-6 hover:border-ui-border transition-colors"
         >
           <div class="flex-1">
             <h4
-              class="text-xs font-semibold text-gh-text mb-4 uppercase tracking-wider"
+              class="text-xs font-semibold text-ui-text mb-4 uppercase tracking-wider"
             >
               Links
             </h4>
@@ -59,7 +57,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
                   external
                   target="_blank"
                   to="https://github.com/matteogabriele/agentscan"
-                  class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
                 >
                   AgentScan
                 </NuxtLink>
@@ -70,7 +68,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
                   external
                   target="_blank"
                   to="https://github.com/unveil-project"
-                  class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
                 >
                   The Unveil Project
                 </NuxtLink>
@@ -81,7 +79,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
                   external
                   target="_blank"
                   to="https://github.com/matteogabriele/agentscan-action"
-                  class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
                 >
                   AgentScan Action
                 </NuxtLink>
@@ -93,7 +91,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
                   target="_blank"
                   title="RSS feed"
                   to="/feed.xml"
-                  class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
                 >
                   Community flags RSS feed
                 </NuxtLink>
@@ -104,28 +102,28 @@ const unveilIdentityVersion = unveilIdentityPackage.version
       </div>
 
       <div
-        class="border-t border-gh-border/50 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        class="border-t border-ui-border/50 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
       >
-        <p class="text-xs text-gh-muted/60">
+        <p class="text-xs text-ui-muted/60">
           Made with <span class="text-red-400">♥</span> ·
           <NuxtLink
             external
             target="_blank"
             title="GitHub repository"
             to="https://github.com/MatteoGabriele/agentscan"
-            class="underline hover:text-gh-text transition-colors"
+            class="underline hover:text-ui-text transition-colors"
           >
             Contributions
           </NuxtLink>
           welcome
         </p>
-        <p class="text-xs text-gh-muted/60">
+        <p class="text-xs text-ui-muted/60">
           Powered by
           <NuxtLink
             external
             target="_blank"
             to="https://www.netlify.com"
-            class="text-gh-muted/80 hover:text-gh-text transition-colors underline"
+            class="text-ui-muted/80 hover:text-ui-text transition-colors underline"
           >
             Netlify
           </NuxtLink>
@@ -133,15 +131,15 @@ const unveilIdentityVersion = unveilIdentityPackage.version
       </div>
 
       <div
-        class="border-t border-gh-border/50 mt-6 pt-6 flex flex-col md:items-center md:justify-center gap-4"
+        class="border-t border-ui-border/50 mt-6 pt-6 flex flex-col md:items-center md:justify-center gap-4"
       >
         <div class="flex gap-2">
-          <span class="text-xs text-gh-muted/60">Detection using</span>
+          <span class="text-xs text-ui-muted/60">Detection using</span>
           <NuxtLink
             external
             target="_blank"
             to="https://github.com/unveil-project/identity"
-            class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+            class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
             :title="`@unveil/identity v${unveilIdentityVersion}`"
           >
             @unveil/identity v{{ unveilIdentityVersion }}
@@ -150,7 +148,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
 
         <NuxtLink
           to="/privacy-policy"
-          class="text-xs text-gh-muted/80 hover:text-gh-text transition-colors underline"
+          class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
         >
           Privacy Policy
         </NuxtLink>

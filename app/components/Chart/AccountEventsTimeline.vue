@@ -282,7 +282,7 @@ function createLineDataset(events: GitHubEvent[]): VueUiXyDatasetItem[] {
     useArea: true,
     smooth: true,
     name: 'Combined activity',
-    color: colors.value.textTransparent,
+    color: colors.value.textFaint,
     series: timeLabels.value.map((_, index) => {
       return individualEvents.reduce((total, event) => {
         return total + Number(event.series[index])
@@ -567,7 +567,7 @@ onMounted(pauseChartAnimations)
               >
                 <path
                   :d="getZapIconPath({ x: 2, y: 30 })"
-                  :fill="colors.amber"
+                  :fill="colors.mixed"
                   :stroke="colors.bg"
                 />
               </svg>
@@ -621,7 +621,7 @@ onMounted(pauseChartAnimations)
                     y: plot.y - 6,
                   })
                 "
-                :fill="colors.amber"
+                :fill="colors.mixed"
                 :stroke="colors.bg"
               />
             </template>
@@ -630,10 +630,10 @@ onMounted(pauseChartAnimations)
       </VueUiXy>
       <div v-else class="w-full h-40 flex place-items-center justify-center">
         <div class="flex flex-col items-center gap-4">
-          <span class="i-lucide:circle-dashed text-gh-muted"></span>
+          <span class="i-lucide:circle-dashed text-ui-muted"></span>
           <div class="flex flex-col items-center">
-            <p class="text-gh-muted text-base">Insufficient activity data</p>
-            <p class="text-gh-muted/50 text-sm">
+            <p class="text-ui-muted text-base">Insufficient activity data</p>
+            <p class="text-ui-muted/50 text-sm">
               Not enough events to display a timeline
             </p>
           </div>

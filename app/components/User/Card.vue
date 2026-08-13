@@ -8,18 +8,18 @@ defineProps<{
 
 <template>
   <div
-    class="flex @lg:items-center gap-4 @lg:gap-6 bg-gh-card p-4 @md:p-6 rounded-2 border-1 border-solid border-gh-border"
+    class="flex @lg:items-center gap-4 @lg:gap-6 bg-ui-card p-4 @md:p-6 rounded-2 border-1 border-solid border-ui-border"
   >
     <div
       v-if="user.avatar_url"
-      class="size-12 @lg:size-20 rounded-full overflow-hidden bg-gh-card shrink-0"
+      class="size-12 @lg:size-20 rounded-full overflow-hidden bg-ui-card shrink-0"
     >
       <img :src="`${user.avatar_url}&s=160`" :alt="`Avatar of ${user.login}`" />
     </div>
 
     <div class="w-full flex flex-col">
       <div class="flex items-start justify-between gap-4">
-        <h2 class="text-gh-text text-xl font-mono">
+        <h2 class="text-ui-text text-xl font-mono">
           {{ user.name || user.login }}
         </h2>
         <UserBookmarkButton :user />
@@ -28,7 +28,7 @@ defineProps<{
         :external="true"
         target="_blank"
         :to="`https://github.com/${user.login}`"
-        class="text-gh-muted underline text-sm"
+        class="text-ui-muted underline text-sm"
       >
         @{{ user.login }}
       </NuxtLink>
@@ -36,7 +36,7 @@ defineProps<{
         {{ user.bio }}
       </p>
       <ul
-        class="text-gh-muted @md:mt-4 text-sm hidden @xl:flex flex-wrap gap-4 flex-row"
+        class="text-ui-muted @md:mt-4 text-sm hidden @xl:flex flex-wrap gap-4 flex-row"
       >
         <li class="flex items-center gap-1">
           <span

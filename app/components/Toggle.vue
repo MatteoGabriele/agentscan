@@ -20,7 +20,7 @@ const selectedToggleCaption = computed<string | undefined>(() => {
   <div
     role="group"
     aria-label="Chart time range"
-    class="inline-flex gap-0.5 rounded-full border border-gh-border-light/40 p-0.5"
+    class="inline-flex gap-0.5 rounded-full border border-ui-border-subtle/40 p-0.5"
   >
     <button
       v-for="option in options"
@@ -30,8 +30,8 @@ const selectedToggleCaption = computed<string | undefined>(() => {
       class="rounded-full px-3 py-0.5 text-xs font-medium transition-colors"
       :class="
         selected === option.value
-          ? 'bg-gh-border/30 text-gh-text'
-          : 'text-gh-muted hover:bg-gh-border/15 hover:text-gh-text'
+          ? 'bg-ui-border/30 text-ui-text'
+          : 'text-ui-muted hover:bg-ui-border/15 hover:text-ui-text'
       "
       @click="selected = option.value"
     >
@@ -39,7 +39,7 @@ const selectedToggleCaption = computed<string | undefined>(() => {
     </button>
   </div>
 
-  <p v-if="selectedToggleCaption" class="text-xs text-gh-muted/70">
+  <p v-if="selectedToggleCaption" class="text-xs text-ui-muted/70">
     {{ selectedToggleCaption }}
   </p>
 </template>

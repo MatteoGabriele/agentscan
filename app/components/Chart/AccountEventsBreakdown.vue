@@ -48,8 +48,8 @@ function createDataset(events: GitHubEvent[]): VueUiHorizontalBarDatasetItem[] {
 
     const color =
       taxonomyEntry && 'color' in taxonomyEntry
-        ? (taxonomyEntry.color ?? colors.value.cardLight)
-        : colors.value.cardLight
+        ? (taxonomyEntry.color ?? colors.value.cardStrong)
+        : colors.value.cardStrong
 
     return {
       name: taxonomyEntry?.name ?? eventType,
@@ -111,12 +111,12 @@ function toggleExpanded() {
 <template>
   <div v-if="events.length">
     <button
-      class="mx-auto flex w-fit flex-wrap items-center gap-2 mb-1 text-left text-sm text-gh-muted"
+      class="mx-auto flex w-fit flex-wrap items-center gap-2 mb-1 text-left text-sm text-ui-muted"
       @click="toggleExpanded"
     >
       <span>Events breakdown</span>
       <span
-        class="i-lucide:chevron-down ml-auto mt-0.5 shrink-0 text-sm text-gh-muted transition-transform"
+        class="i-lucide:chevron-down ml-auto mt-0.5 shrink-0 text-sm text-ui-muted transition-transform"
         :class="isExpanded && 'rotate-180'"
       />
     </button>

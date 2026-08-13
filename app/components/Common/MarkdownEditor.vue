@@ -116,15 +116,15 @@ function setLink() {
 
 <template>
   <div
-    class="min-w-0 border border-gh-border/60 rounded overflow-hidden focus-within:border-gh-border-light"
+    class="min-w-0 border border-ui-border/60 rounded overflow-hidden focus-within:border-ui-border-subtle"
   >
     <div
-      class="flex items-center gap-0.5 px-1.5 py-1 border-b border-gh-border/60 bg-gh-muted/10"
+      class="flex items-center gap-0.5 px-1.5 py-1 border-b border-ui-border/60 bg-ui-muted/10"
     >
       <button
         type="button"
-        class="p-1.5 rounded hover:bg-gh-muted/20"
-        :class="{ 'bg-gh-muted/30 text-gh-text': isActive('bold') }"
+        class="p-1.5 rounded hover:bg-ui-muted/20"
+        :class="{ 'bg-ui-muted/30 text-ui-text': isActive('bold') }"
         @mousedown.prevent="toggleBold"
       >
         <span class="i-lucide:bold text-sm" aria-hidden="true" />
@@ -132,8 +132,8 @@ function setLink() {
       </button>
       <button
         type="button"
-        class="p-1.5 rounded hover:bg-gh-muted/20"
-        :class="{ 'bg-gh-muted/30 text-gh-text': isActive('italic') }"
+        class="p-1.5 rounded hover:bg-ui-muted/20"
+        :class="{ 'bg-ui-muted/30 text-ui-text': isActive('italic') }"
         @mousedown.prevent="toggleItalic"
       >
         <span class="i-lucide:italic text-sm" aria-hidden="true" />
@@ -141,8 +141,8 @@ function setLink() {
       </button>
       <button
         type="button"
-        class="p-1.5 rounded hover:bg-gh-muted/20"
-        :class="{ 'bg-gh-muted/30 text-gh-text': isActive('bulletList') }"
+        class="p-1.5 rounded hover:bg-ui-muted/20"
+        :class="{ 'bg-ui-muted/30 text-ui-text': isActive('bulletList') }"
         @mousedown.prevent="toggleBulletList"
       >
         <span class="i-lucide:list text-sm" aria-hidden="true" />
@@ -150,8 +150,8 @@ function setLink() {
       </button>
       <button
         type="button"
-        class="p-1.5 rounded hover:bg-gh-muted/20"
-        :class="{ 'bg-gh-muted/30 text-gh-text': isActive('orderedList') }"
+        class="p-1.5 rounded hover:bg-ui-muted/20"
+        :class="{ 'bg-ui-muted/30 text-ui-text': isActive('orderedList') }"
         @mousedown.prevent="toggleOrderedList"
       >
         <span class="i-lucide:list-ordered text-sm" aria-hidden="true" />
@@ -159,8 +159,8 @@ function setLink() {
       </button>
       <button
         type="button"
-        class="p-1.5 rounded hover:bg-gh-muted/20"
-        :class="{ 'bg-gh-muted/30 text-gh-text': isActive('link') }"
+        class="p-1.5 rounded hover:bg-ui-muted/20"
+        :class="{ 'bg-ui-muted/30 text-ui-text': isActive('link') }"
         @mousedown.prevent="setLink"
       >
         <span class="i-lucide:link text-sm" aria-hidden="true" />
@@ -170,7 +170,7 @@ function setLink() {
 
     <EditorContent
       :editor="editor"
-      class="markdown-editor-content px-3 py-2 text-sm text-gh-text"
+      class="markdown-editor-content px-3 py-2 text-sm text-ui-text"
     />
   </div>
 </template>

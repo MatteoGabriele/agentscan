@@ -29,7 +29,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     :class="{
-      'fixed flex flex-col inset-0 bg-gh-bg z-40 p-4': isMenuOpen,
+      'fixed flex flex-col inset-0 bg-ui-bg z-40 p-4': isMenuOpen,
     }"
   >
     <div class="flex justify-end">
@@ -74,11 +74,11 @@ onBeforeUnmount(() => {
         </li>
       </ul>
 
-      <div class="w-1/2 border-b h-px border-gh-border-light/80"></div>
+      <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
 
       <NuxtLink
         to="/app"
-        class="flex items-center px-4 gap-1 py-1 font-medium rounded-full border border-gh-border text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap cta-glint"
+        class="flex items-center px-4 gap-1 py-1 font-medium rounded-full border border-ui-border text-ui-muted hover:text-ui-text hover:border-ui-border/60 transition-colors whitespace-nowrap cta-glint"
         title="Install the GitHub App or use the GitHub Action"
       >
         <span class="i-lucide-github text-sm"></span>

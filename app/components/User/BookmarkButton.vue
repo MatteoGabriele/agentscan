@@ -13,11 +13,11 @@ const bookmarked = computed(() => isBookmarked(props.user.login))
 <template>
   <button
     type="button"
-    class="shrink-0 size-9 flex items-center justify-center rounded-full hover:bg-gh-border-light/20 transition-colors"
+    class="shrink-0 size-9 flex items-center justify-center rounded-full hover:bg-ui-border-subtle/20 transition-colors"
     :class="
       bookmarked
-        ? 'text-gh-text border-gh-text/40'
-        : 'text-gh-muted border-gh-border hover:text-gh-text hover:border-gh-text/40'
+        ? 'text-ui-text border-ui-text/40'
+        : 'text-ui-muted border-ui-border hover:text-ui-text hover:border-ui-text/40'
     "
     :aria-pressed="bookmarked"
     :aria-label="

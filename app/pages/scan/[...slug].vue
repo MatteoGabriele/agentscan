@@ -57,28 +57,28 @@ async function handleSubmit(value: string) {
     </ul>
   </div>
 
-  <div v-else-if="error" class="text-center py-12 text-gh-muted">
+  <div v-else-if="error" class="text-center py-12 text-ui-muted">
     <p v-if="error.status === 404" class="text-sm">
-      Repository <span class="text-gh-text font-medium">{{ repo }}</span> was
+      Repository <span class="text-ui-text font-medium">{{ repo }}</span> was
       not found. Check the name and try again.
     </p>
     <p v-else class="text-sm">{{ error.message }}</p>
   </div>
 
   <div v-else-if="data">
-    <div class="flex flex-col justify-between mb-2 ml-2 text-sm text-gh-muted">
+    <div class="flex flex-col justify-between mb-2 ml-2 text-sm text-ui-muted">
       <p>
         Last {{ data.pullRequests.length }} PRs in
         <NuxtLink
           :to="`https://github.com/${data.repo}`"
           external
           target="_blank"
-          class="underline hover:text-gh-text"
+          class="underline hover:text-ui-text"
         >
           {{ data.repo }}
         </NuxtLink>
       </p>
-      <p class="text-xs text-gh-muted/80 mt-1">
+      <p class="text-xs text-ui-muted/80 mt-1">
         Members, collaborators, and owners are excluded from the scan, as
         they're trusted by default.
       </p>
@@ -96,7 +96,7 @@ async function handleSubmit(value: string) {
     </ul>
 
     <p
-      class="mt-8 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
+      class="mt-8 mx-auto max-w-lg text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
     >
       Results are based on pattern analysis and should be interpreted as
       possible signals, not conclusions. Always verify findings with additional
