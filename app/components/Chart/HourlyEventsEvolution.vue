@@ -130,7 +130,10 @@ const config = computed<VueUiXyConfig>(() => ({
     padding: {
       left: viewBoxPadding.value.left,
       right: viewBoxPadding.value.right,
-      bottom: 36,
+      /**
+       * Extra padding bottom is added on desktop to compensate the illusion of height difference between the daily and hourly charts, and avoid a CLS impression when switching between them; but not on mobile, where we need all the real estate we can use.
+       */
+      bottom: isMobile.value ? 0 : 36,
     },
     highlighter: {
       opacity: 1,
