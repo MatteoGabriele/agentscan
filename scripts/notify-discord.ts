@@ -4,25 +4,27 @@ import { formatTrend } from '../shared/utils/health-stats'
 import { calcLinearProgression } from '../shared/utils/calc-linear-progression'
 import { getCategoryDeltasByDate } from '../shared/utils/count-classification-by-date'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
-import {
-  getDailyClosureRateDelta,
-  getDailyClosureRateTotal,
-  getDailyCountsByDate,
-} from '../shared/utils/daily-rollup'
+import { getDailyCountsByDate } from '../shared/utils/daily-rollup'
+import { getRecentDailyEntries } from '../shared/utils/health-history-window'
 import { formatDateRange } from '../shared/utils/dates'
 
-async function main() {
-  const entries: DailyScanEntry[] = JSON.parse(
+type MainOptions = {
+  dryRun?: boolean
+}
+
+async function main({ dryRun = false }: MainOptions = {}) {
+  const allEntries: DailyScanEntry[] = JSON.parse(
     readFileSync('data/daily-scan-results.json', 'utf-8'),
   )
 
-  if (!entries?.length) {
+  if (!allEntries?.length) {
     console.log('No data returned from API')
     return
   }
 
-  const closedAutomationPrPercentage = getDailyClosureRateTotal(entries)
-  const closedAutomationPrDelta = getDailyClosureRateDelta(entries)
+  // Same history window the health page reads, so the trends reported here are
+  // the trends the site shows.
+  const entries = getRecentDailyEntries(allEntries)
 
   const automation: number[] = []
   const mixed: number[] = []
@@ -85,19 +87,19 @@ async function main() {
       `   today: ${percentageLabel(categoryDeltas.automation.lastPercentage)}, ${statLabel(categoryDeltas.automation.percentagePointDifference, ' pts')}`,
       `   overall trend: ${trendLabel(categoryProgression.automation.trend)}`,
       '',
-      '',
-      `⚫ Automation PR closure rate`,
-      `   today: ${percentageLabel(closedAutomationPrDelta.lastSnapshot.percentage)}, ${statLabel(closedAutomationPrDelta.percentagePointDifference, ' pts')}`,
-      `   overall: ${percentageLabel(closedAutomationPrPercentage)}`,
-      '',
     ].join('\n'),
   }
 
   const webhook = process.env.DISCORD_WEBHOOK
 
+  if (dryRun) {
+    console.log('Dry run — nothing sent to Discord:\n')
+    console.log(payload.content)
+    return
+  }
+
   if (!webhook) {
     console.log('Discord webhook URL not found!')
-    console.log(JSON.stringify(payload, null, 2))
     console.log(payload.content)
     return
   }
@@ -117,9 +119,11 @@ async function main() {
   console.log('Discord notification sent')
 }
 
-// Only run main if this script is executed directly (not imported)
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((err) => {
+  const args = process.argv.slice(2)
+  const dryRun = args.includes('--dry-run')
+
+  main({ dryRun }).catch((err) => {
     console.error('Error:', err.message)
     process.exit(1)
   })
