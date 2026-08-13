@@ -4,7 +4,7 @@ import {
   WINDOW_MAX_HOURS,
 } from '~~/shared/utils/health-history-window'
 import { libraries } from '~~/shared/daily-scan'
-import { useLocalStorage } from '@vueuse/core'
+import { useUrlSearchParams } from '@vueuse/core'
 
 definePageMeta({
   layout: false,
@@ -52,14 +52,14 @@ const rangeOptions = computed<ChartRangeOption[]>(() => [
   },
 ])
 
-const range = useLocalStorage<ChartRange>('daily-range', 'daily', {
-  initOnMounted: true,
-})
-
-const activeRangeCaption = computed(() => {
-  return rangeOptions.value.find((option) => option.value === range.value)
-    ?.caption
-})
+const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
+  'history',
+  {
+    initialValue: {
+      view: 'daily',
+    },
+  },
+)
 </script>
 
 <template>
@@ -79,7 +79,7 @@ const activeRangeCaption = computed(() => {
                 </p>
               </div>
               <p class="text-gh-muted text-sm">
-                <NuxtLink href="#learn-more" class="underline"
+                <NuxtLink to="#learn-more" class="underline"
                   >Learn more</NuxtLink
                 >
                 about how it works.
@@ -92,31 +92,7 @@ const activeRangeCaption = computed(() => {
 
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
               <ClientOnly>
-                <div
-                  role="group"
-                  aria-label="Chart time range"
-                  class="inline-flex gap-0.5 rounded-full border border-gh-border-light/40 p-0.5"
-                >
-                  <button
-                    v-for="option in rangeOptions"
-                    :key="option.value"
-                    type="button"
-                    :aria-pressed="range === option.value"
-                    class="rounded-full px-3 py-0.5 text-xs font-medium transition-colors"
-                    :class="
-                      range === option.value
-                        ? 'bg-gh-border/30 text-gh-text'
-                        : 'text-gh-muted hover:bg-gh-border/15 hover:text-gh-text'
-                    "
-                    @click="range = option.value"
-                  >
-                    {{ option.label }}
-                  </button>
-                </div>
-
-                <p class="text-xs text-gh-muted/70">
-                  {{ activeRangeCaption }}
-                </p>
+                <Toggle v-model="urlParams.view" :options="rangeOptions" />
 
                 <template #fallback>
                   <Skeleton
@@ -138,7 +114,9 @@ const activeRangeCaption = computed(() => {
           <div
             class="w-full min-h-0 shrink overflow-hidden basis-[300px] max-h-[300px] sm:basis-[500px] sm:max-h-[500px]"
           >
-            <LazyChartHourlyEventsEvolution v-if="range === 'hourly'" />
+            <LazyChartHourlyEventsEvolution
+              v-if="urlParams.view === 'hourly'"
+            />
             <LazyChartGlobalEventsEvolution v-else />
           </div>
         </div>
