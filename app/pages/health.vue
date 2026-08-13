@@ -147,7 +147,7 @@ const activeRangeCaption = computed(() => {
 
     <section id="learn-more" class="mx-auto max-w-2xl px-4 py-16 md:py-24">
       <h2 class="text-xl font-semibold">What is the Ecosystem Health chart?</h2>
-      <div class="mt-4 flex flex-col gap-4 text-gh-text/80 text-pretty">
+      <div class="mt-4 flex flex-col gap-2 text-gh-text/80 text-pretty">
         <p>
           This page gives you a look into the current state of the GitHub
           community by analyzing public activity. We want to understand how many
