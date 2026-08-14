@@ -44,6 +44,12 @@ const { data: hourly } = await useEcosystemHealthHourly()
           :hydrate-on-visible="{ rootMargin: '0px 0px 600px 0px' }"
         />
       </div>
+      <div class="w-full">
+        <LazyChartGlobalEventsHourlyHeatmap />
+      </div>
+      <div class="w-full">
+        <LazyChartGlobalEventsHeatmap />
+      </div>
     </div>
   </section>
 </template>
