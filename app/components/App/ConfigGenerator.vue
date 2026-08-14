@@ -216,56 +216,56 @@ const { copy, copied } = useClipboard({ source: yaml })
   <div class="flex flex-col gap-10">
     <form class="flex flex-col" @submit.prevent>
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Mode</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Mode</p>
-          <p class="text-xs text-gh-muted mt-1">
+          <p class="text-sm font-medium text-ui-text">Mode</p>
+          <p class="text-xs text-ui-muted mt-1">
             Controls what actions AgentScan takes on each PR/issue.
           </p>
         </div>
         <div class="relative self-start">
           <select
             v-model="mode"
-            class="w-full appearance-none px-3 py-2 pr-9 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text focus:outline-none focus:border-gh-green focus:ring-1 focus:ring-gh-green/30"
+            class="w-full appearance-none px-3 py-2 pr-9 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
           >
             <option v-for="item in modes" :key="item.value" :value="item.value">
               {{ item.label }}
             </option>
           </select>
           <span
-            class="i-lucide:chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gh-muted pointer-events-none"
+            class="i-lucide:chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-ui-muted pointer-events-none"
             aria-hidden="true"
           />
         </div>
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Scan triggers</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Scan triggers</p>
+          <p class="text-sm font-medium text-ui-text">Scan triggers</p>
         </div>
         <div class="flex flex-col gap-2 self-start">
           <label
-            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
           >
             <input
               v-model="scanPullRequests"
               type="checkbox"
-              class="accent-gh-green"
+              class="accent-ui-accent"
             />
             Pull requests
           </label>
           <label
-            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
           >
             <input
               v-model="scanIssues"
               type="checkbox"
-              class="accent-gh-green"
+              class="accent-ui-accent"
             />
             Issues
           </label>
@@ -273,29 +273,29 @@ const { copy, copied } = useClipboard({ source: yaml })
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Allowed users</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Allowed users</p>
-          <p class="text-xs text-gh-muted mt-1">
+          <p class="text-sm font-medium text-ui-text">Allowed users</p>
+          <p class="text-xs text-ui-muted mt-1">
             GitHub usernames to exclude from scanning. Major known CI bots (e.g.
             dependabot[bot]) are already excluded by default.
           </p>
         </div>
         <div class="self-start">
           <div
-            class="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-gh-bg border border-gh-border/60 rounded focus-within:border-gh-green focus-within:ring-1 focus-within:ring-gh-green/30"
+            class="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-ui-bg border border-ui-border/60 rounded focus-within:border-ui-accent focus-within:ring-1 focus-within:ring-ui-accent/30"
           >
             <span
               v-for="(user, index) in allowedUsersList"
               :key="user"
-              class="flex items-center gap-1 pl-2 pr-1 py-1 rounded bg-gh-muted/20 text-xs font-mono text-gh-text"
+              class="flex items-center gap-1 pl-2 pr-1 py-1 rounded bg-ui-muted/20 text-xs font-mono text-ui-text"
             >
               {{ user }}
               <button
                 type="button"
-                class="flex rounded hover:bg-gh-muted/30 p-0.5"
+                class="flex rounded hover:bg-ui-muted/30 p-0.5"
                 @click="removeAllowedUser(index)"
               >
                 <span class="i-lucide:x text-xs" aria-hidden="true" />
@@ -306,26 +306,26 @@ const { copy, copied } = useClipboard({ source: yaml })
               v-model="newAllowedUser"
               type="text"
               placeholder="Add username"
-              class="flex-1 min-w-32 px-1 py-1 bg-transparent text-sm text-gh-text font-mono placeholder:text-gh-muted/60 focus:outline-none"
+              class="flex-1 min-w-32 px-1 py-1 bg-transparent text-sm text-ui-text font-mono placeholder:text-ui-muted/60 focus:outline-none"
               @keydown.enter.prevent="addAllowedUser"
               @keydown.,.prevent="addAllowedUser"
               @keydown.backspace="removeLastAllowedUser"
               @blur="addAllowedUser"
             />
           </div>
-          <p class="text-xs text-gh-muted mt-1">Press Enter or comma to add.</p>
+          <p class="text-xs text-ui-muted mt-1">Press Enter or comma to add.</p>
         </div>
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Trusted author associations</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">
+          <p class="text-sm font-medium text-ui-text">
             Trusted author associations
           </p>
-          <p class="text-xs text-gh-muted mt-1">
+          <p class="text-xs text-ui-muted mt-1">
             Author associations to exclude from scanning.
           </p>
         </div>
@@ -333,13 +333,13 @@ const { copy, copied } = useClipboard({ source: yaml })
           <label
             v-for="item in authorAssociations"
             :key="item.value"
-            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
           >
             <input
               v-model="trustedAuthorAssociations"
               type="checkbox"
               :value="item.value"
-              class="accent-gh-green"
+              class="accent-ui-accent"
             />
             {{ item.label }}
           </label>
@@ -347,20 +347,20 @@ const { copy, copied } = useClipboard({ source: yaml })
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Comments</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Comments</p>
+          <p class="text-sm font-medium text-ui-text">Comments</p>
         </div>
         <div class="self-start">
           <label
-            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
           >
             <input
               v-model="commentOnOrganic"
               type="checkbox"
-              class="accent-gh-green"
+              class="accent-ui-accent"
             />
             Comment even when the result is organic
           </label>
@@ -368,20 +368,20 @@ const { copy, copied } = useClipboard({ source: yaml })
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Auto-close</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Auto-close</p>
+          <p class="text-sm font-medium text-ui-text">Auto-close</p>
         </div>
         <div class="self-start">
           <label
-            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
           >
             <input
               v-model="autoClose"
               type="checkbox"
-              class="accent-gh-green"
+              class="accent-ui-accent"
             />
             Automatically close PRs/issues opened by flagged accounts
           </label>
@@ -390,13 +390,13 @@ const { copy, copied } = useClipboard({ source: yaml })
             <label
               v-for="item in classifications"
               :key="item.value"
-              class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+              class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
             >
               <input
                 v-model="autoCloseClassifications"
                 type="checkbox"
                 :value="item.value"
-                class="accent-gh-green"
+                class="accent-ui-accent"
               />
               {{ item.label }}
             </label>
@@ -405,12 +405,12 @@ const { copy, copied } = useClipboard({ source: yaml })
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Honeypot</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Honeypot</p>
-          <p class="text-xs text-gh-muted mt-1">
+          <p class="text-sm font-medium text-ui-text">Honeypot</p>
+          <p class="text-xs text-ui-muted mt-1">
             Posts an ordinary thank-you comment with a one-off verification code
             hidden in its raw Markdown, addressed only at AI agents. An agent
             that reads the page source and replies with the code identifies
@@ -419,13 +419,17 @@ const { copy, copied } = useClipboard({ source: yaml })
         </div>
         <div class="self-start">
           <label
-            class="flex items-center gap-2 text-sm hover:text-gh-text text-gh-text/90"
+            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
           >
-            <input v-model="honeypot" type="checkbox" class="accent-gh-green" />
+            <input
+              v-model="honeypot"
+              type="checkbox"
+              class="accent-ui-accent"
+            />
             Post a honeypot comment on new PRs/issues
           </label>
 
-          <p v-if="honeypot" class="text-xs text-gh-muted mt-3 pl-6">
+          <p v-if="honeypot" class="text-xs text-ui-muted mt-3 pl-6">
             <template v-if="autoClose"
               >When the code comes back, the PR/issue is closed.</template
             ><template v-else
@@ -435,10 +439,10 @@ const { copy, copied } = useClipboard({ source: yaml })
           </p>
 
           <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-4 pl-6">
-            <div class="text-xs text-gh-muted mb-2">
+            <div class="text-xs text-ui-muted mb-2">
               Default greeting
               <pre
-                class="mt-2 px-3 py-2 bg-gh-bg border border-gh-border/60 rounded font-mono text-gh-text/90 whitespace-pre-wrap"
+                class="mt-2 px-3 py-2 bg-ui-bg border border-ui-border/60 rounded font-mono text-ui-text/90 whitespace-pre-wrap"
                 >{{ defaultHoneypotGreeting }}</pre
               >
             </div>
@@ -447,7 +451,7 @@ const { copy, copied } = useClipboard({ source: yaml })
               v-model="messageHoneypot"
               placeholder="Custom greeting"
             />
-            <p class="text-xs text-gh-muted">
+            <p class="text-xs text-ui-muted">
               Replaces the visible thank-you message. The hidden verification
               code is always added underneath. Use
               <span class="font-mono">{username}</span> and
@@ -457,14 +461,14 @@ const { copy, copied } = useClipboard({ source: yaml })
           </div>
 
           <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-6 pl-6">
-            <p class="text-sm font-medium text-gh-text">
+            <p class="text-sm font-medium text-ui-text">
               First-time contributors
             </p>
-            <div class="text-xs text-gh-muted mb-2 mt-1">
+            <div class="text-xs text-ui-muted mb-2 mt-1">
               Default greeting for an author opening their first PR/issue on the
               repository
               <pre
-                class="mt-2 px-3 py-2 bg-gh-bg border border-gh-border/60 rounded font-mono text-gh-text/90 whitespace-pre-wrap"
+                class="mt-2 px-3 py-2 bg-ui-bg border border-ui-border/60 rounded font-mono text-ui-text/90 whitespace-pre-wrap"
                 >{{ defaultHoneypotFirstTimeGreeting }}</pre
               >
             </div>
@@ -473,7 +477,7 @@ const { copy, copied } = useClipboard({ source: yaml })
               v-model="messageHoneypotFirstTime"
               placeholder="Custom greeting for first-time contributors"
             />
-            <p class="text-xs text-gh-muted">
+            <p class="text-xs text-ui-muted">
               Used instead of the greeting above when GitHub reports the author
               as a first timer or first-time contributor. Left blank, first-time
               contributors get your regular custom greeting.
@@ -483,35 +487,35 @@ const { copy, copied } = useClipboard({ source: yaml })
       </fieldset>
 
       <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-gh-border-light/20 first:pt-0"
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
       >
         <legend class="sr-only">Labels</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Labels</p>
+          <p class="text-sm font-medium text-ui-text">Labels</p>
         </div>
         <div class="flex flex-col gap-3 self-start">
           <label class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Community-flagged</span>
+            <span class="text-xs text-ui-muted">Community-flagged</span>
             <input
               v-model="labelCommunityFlagged"
               type="text"
-              class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-green focus:ring-1 focus:ring-gh-green/30"
+              class="px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
             />
           </label>
           <label class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Mixed signals</span>
+            <span class="text-xs text-ui-muted">Mixed signals</span>
             <input
               v-model="labelMixed"
               type="text"
-              class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-green focus:ring-1 focus:ring-gh-green/30"
+              class="px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
             />
           </label>
           <label class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Automated account</span>
+            <span class="text-xs text-ui-muted">Automated account</span>
             <input
               v-model="labelAutomation"
               type="text"
-              class="px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono focus:outline-none focus:border-gh-green focus:ring-1 focus:ring-gh-green/30"
+              class="px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
             />
           </label>
         </div>
@@ -520,36 +524,36 @@ const { copy, copied } = useClipboard({ source: yaml })
       <fieldset class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6">
         <legend class="sr-only">Messages</legend>
         <div>
-          <p class="text-sm font-medium text-gh-text">Messages</p>
-          <p class="text-xs text-gh-muted mt-1">
+          <p class="text-sm font-medium text-ui-text">Messages</p>
+          <p class="text-xs text-ui-muted mt-1">
             Custom comment messages per classification. Supports Markdown. Leave
             a field blank to post the default message shown in it.
           </p>
         </div>
         <div class="min-w-0 flex flex-col gap-4 self-start">
           <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Organic</span>
+            <span class="text-xs text-ui-muted">Organic</span>
             <CommonMarkdownEditor
               v-model="messageOrganic"
               :placeholder="defaultMessages.organic"
             />
           </div>
           <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Mixed</span>
+            <span class="text-xs text-ui-muted">Mixed</span>
             <CommonMarkdownEditor
               v-model="messageMixed"
               :placeholder="defaultMessages.mixed"
             />
           </div>
           <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Automation</span>
+            <span class="text-xs text-ui-muted">Automation</span>
             <CommonMarkdownEditor
               v-model="messageAutomation"
               :placeholder="defaultMessages.automation"
             />
           </div>
           <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-gh-muted">Community-flagged</span>
+            <span class="text-xs text-ui-muted">Community-flagged</span>
             <CommonMarkdownEditor
               v-model="messageCommunityFlagged"
               :placeholder="defaultMessages['community-flagged']"
@@ -561,10 +565,10 @@ const { copy, copied } = useClipboard({ source: yaml })
 
     <div class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gh-muted">.github/agentscan.yml</p>
+        <p class="text-sm text-ui-muted">.github/agentscan.yml</p>
         <button
           type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-gh-border/60 hover:bg-gh-muted/20 transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-ui-border/60 hover:bg-ui-muted/20 transition-colors"
           @click="copy()"
         >
           <span
@@ -580,7 +584,7 @@ const { copy, copied } = useClipboard({ source: yaml })
         readonly
         rows="16"
         spellcheck="false"
-        class="px-4 py-3 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text font-mono resize-y focus:outline-none"
+        class="px-4 py-3 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono resize-y focus:outline-none"
       />
     </div>
   </div>

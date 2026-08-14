@@ -9,8 +9,8 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-gh-card p-6 rounded-2 border-1 border-solid border-gh-border">
-    <h3 class="text-gh-text text-xl font-mono">Activity Signals</h3>
+  <div class="bg-ui-card p-6 rounded-2 border-1 border-solid border-ui-border">
+    <h3 class="text-ui-text text-xl font-mono">Activity Signals</h3>
     <ul>
       <AnalysisFlagItem v-for="flag in flags" :key="flag.label" :flag="flag" />
     </ul>

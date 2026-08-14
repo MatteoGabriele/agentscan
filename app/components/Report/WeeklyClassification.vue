@@ -39,9 +39,9 @@ const classification = computed(() => {
 })
 
 const palette = computed(() => ({
-  organic: colors.value.green,
-  mixed: colors.value.amber,
-  automation: colors.value.red,
+  organic: colors.value.organic,
+  mixed: colors.value.mixed,
+  automation: colors.value.automation,
 }))
 
 const stackbarDataset = computed<VueUiStackbarDatasetItem[]>(() => {
@@ -122,7 +122,7 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
     }"
   >
     <h2 class="text-center">Weekly classification breakdown</h2>
-    <p class="text-sm text-gh-muted text-center">
+    <p class="text-sm text-ui-muted text-center">
       A new weekly data point is added after each Sunday scan
     </p>
   </div>
@@ -149,7 +149,7 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
                 </svg>
               </div>
               <div
-                :class="`text-gh-muted text-sm ${item.isSegregated ? 'line-through' : ''}`"
+                :class="`text-ui-muted text-sm ${item.isSegregated ? 'line-through' : ''}`"
               >
                 {{ item.name }}
               </div>

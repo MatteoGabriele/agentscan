@@ -8,7 +8,7 @@ export type Landmark = {
   description: string
   icon: string
   iconSvg: string
-  series?: IdentityClassification | typeof AUTOMATION_PR_CLOSURE_RATE
+  series?: IdentityClassification
   offsetY?: number
 }
 

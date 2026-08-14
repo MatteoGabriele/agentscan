@@ -52,24 +52,24 @@ useHead({
 <template>
   <header class="text-center md:text-left">
     <h1 class="text-2xl font-semibold">Community reports</h1>
-    <p class="text-gh-muted mt-2">
+    <p class="text-ui-muted mt-2">
       Accounts reported by the community as showing automation signals. These
       are not definitive verdicts: if something looks wrong,
       <NuxtLink
         to="https://github.com/MatteoGabriele/agentscan/issues"
         target="_blank"
         external
-        class="underline hover:text-gh-text"
+        class="underline hover:text-ui-text"
       >
         let us know</NuxtLink
       >.
     </p>
-    <p v-if="lastUpdateDate" class="mt-6 text-sm text-gh-text">
+    <p v-if="lastUpdateDate" class="mt-6 text-sm text-ui-text">
       Last updated:
 
       <span
         v-if="status === 'pending'"
-        class="h-2.5 bg-gh-border rounded w-20 inline-block animate-pulse"
+        class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
       />
       <NuxtTime v-else :datetime="lastUpdateDate" />
     </p>
@@ -78,7 +78,7 @@ useHead({
       v-model="search"
       type="text"
       placeholder="Search by username..."
-      class="mt-12 w-full px-3 py-2 bg-gh-bg border border-gh-border/60 rounded text-sm text-gh-text placeholder:text-gh-muted focus:outline-none focus:border-gh-border/80"
+      class="mt-12 w-full px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:border-ui-border/80"
     />
   </header>
 
@@ -87,23 +87,23 @@ useHead({
       <li
         v-for="item in 3"
         :key="item"
-        class="not-last:border-b border-gh-border-light pb-6 mb-2"
+        class="not-last:border-b border-ui-border-subtle pb-6 mb-2"
       >
         <article>
           <div class="w-full animate-pulse">
             <div class="mb-4">
-              <div class="h-6 bg-gh-border rounded w-1/3" />
+              <div class="h-6 bg-ui-border rounded w-1/3" />
             </div>
             <div class="space-y-4">
-              <div class="h-3 bg-gh-border rounded w-5/6" />
-              <div class="h-3 bg-gh-border rounded w-4/6" />
+              <div class="h-3 bg-ui-border rounded w-5/6" />
+              <div class="h-3 bg-ui-border rounded w-4/6" />
             </div>
           </div>
           <footer
             class="flex items-baseline justify-between mt-4 animate-pulse"
           >
-            <div class="h-3 bg-gh-border rounded w-20" />
-            <div class="h-3 bg-gh-border rounded w-20" />
+            <div class="h-3 bg-ui-border rounded w-20" />
+            <div class="h-3 bg-ui-border rounded w-20" />
           </footer>
         </article>
       </li>
@@ -120,13 +120,13 @@ useHead({
       <li
         v-for="item in filteredItems"
         :key="item.username"
-        class="not-last:border-b border-gh-border-light/40 pb-6 mb-2"
+        class="not-last:border-b border-ui-border-subtle/40 pb-6 mb-2"
       >
         <article>
           <h2>
             <NuxtLink
               :to="`/user/${item.username}`"
-              class="text-xl font-mono underline hover:text-gh-muted"
+              class="text-xl font-mono underline hover:text-ui-muted"
             >
               {{ item.username }}
             </NuxtLink>
@@ -141,7 +141,7 @@ useHead({
               :to="item.issueUrl"
               target="_blank"
               external
-              class="underline inline text-xs hover:text-gh-muted"
+              class="underline inline text-xs hover:text-ui-muted"
             >
               View issue
             </NuxtLink>

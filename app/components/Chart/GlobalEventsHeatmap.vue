@@ -90,17 +90,17 @@ const heatmapSeries = computed(
     {
       key: 'organic',
       name: 'Organic',
-      color: colors.value.greenLine!,
+      color: colors.value.organic!,
     },
     {
       key: 'mixed',
       name: 'Mixed',
-      color: colors.value.amber!,
+      color: colors.value.mixed!,
     },
     {
       key: 'automation',
       name: 'Automation',
-      color: colors.value.dangerHover!,
+      color: colors.value.automation!,
     },
   ],
 )

@@ -49,6 +49,8 @@ const activeCellEl = shallowRef<SVGRectElement | null>(null)
 
 const ready = shallowRef(false)
 
+console.log(colors.value)
+
 useTimeout(300, {
   callback: () => (ready.value = true),
 })
@@ -73,17 +75,17 @@ const heatmapSeries = computed(
     {
       key: 'organic',
       name: 'Organic',
-      color: colors.value.greenLine!,
+      color: colors.value.organic!,
     },
     {
       key: 'mixed',
       name: 'Mixed',
-      color: colors.value.amber!,
+      color: colors.value.mixed!,
     },
     {
       key: 'automation',
       name: 'Automation',
-      color: colors.value.dangerHover!,
+      color: colors.value.automation!,
     },
   ],
 )
@@ -143,6 +145,9 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
           color: colors.value.textMuted,
           values: hourLabels.value,
           rotation: -30,
+          autoRotate: {
+            enable: false,
+          },
         },
         yAxis: {
           show: false,

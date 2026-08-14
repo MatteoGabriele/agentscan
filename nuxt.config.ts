@@ -72,6 +72,8 @@ export default defineNuxtConfig({
     },
   },
 
+  router: { options: { scrollBehaviorType: 'smooth' } },
+
   routeRules: {
     '/privacy-policy': { prerender: true },
 

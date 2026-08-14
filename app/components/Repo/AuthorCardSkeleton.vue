@@ -2,7 +2,7 @@
 
 <template>
   <li
-    class="p-4 rounded-lg bg-gh-card border border-gh-border/50 animate-pulse"
+    class="p-4 rounded-lg bg-ui-card border border-ui-border/50 animate-pulse"
   >
     <div class="flex items-center gap-4">
       <Skeleton

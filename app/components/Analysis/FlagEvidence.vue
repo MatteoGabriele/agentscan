@@ -116,8 +116,8 @@ const hiddenCount = computed(() => {
 </script>
 
 <template>
-  <div class="pt-2 border-t border-gh-border-light/20 space-y-3">
-    <p class="text-gh-muted text-xs">Evidence</p>
+  <div class="pt-2 border-t border-ui-border-subtle/20 space-y-3">
+    <p class="text-ui-muted text-xs">Evidence</p>
 
     <template v-if="hasConnections">
       <LazyAnalysisFlagEvidenceFast
@@ -129,9 +129,9 @@ const hiddenCount = computed(() => {
             <div class="flex flex-col items-center shrink-0">
               <span
                 :class="getEventIcon(fastestConnection.conn.from)"
-                class="text-xs text-gh-muted"
+                class="text-xs text-ui-muted"
               />
-              <div class="w-px flex-1 bg-gh-danger-hover/30 my-1" />
+              <div class="w-px flex-1 bg-ui-automation/30 my-1" />
             </div>
             <div class="min-w-0 pb-1">
               <a
@@ -139,18 +139,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(fastestConnection.conn.from)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-gh-text hover:underline inline-flex items-center gap-1"
+                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(fastestConnection.conn.from) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60 shrink-0"
+                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">
+              <p v-else class="text-sm text-ui-text">
                 {{ getEventDescription(fastestConnection.conn.from) }}
               </p>
-              <p class="text-xs text-gh-muted">
+              <p class="text-xs text-ui-muted">
                 {{ formatEventTime(fastestConnection.conn.from.created_at) }}
               </p>
             </div>
@@ -158,7 +158,7 @@ const hiddenCount = computed(() => {
           <div class="flex gap-3">
             <span
               :class="getEventIcon(fastestConnection.conn.to)"
-              class="text-xs text-gh-muted shrink-0"
+              class="text-xs text-ui-muted shrink-0"
             />
             <div class="min-w-0">
               <a
@@ -166,18 +166,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(fastestConnection.conn.to)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-gh-text hover:underline inline-flex items-center gap-1"
+                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(fastestConnection.conn.to) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60 shrink-0"
+                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">
+              <p v-else class="text-sm text-ui-text">
                 {{ getEventDescription(fastestConnection.conn.to) }}
               </p>
-              <p class="text-xs text-gh-muted">
+              <p class="text-xs text-ui-muted">
                 {{ formatEventTime(fastestConnection.conn.to.created_at) }}
               </p>
             </div>
@@ -192,10 +192,10 @@ const hiddenCount = computed(() => {
             <div class="flex flex-col items-center shrink-0">
               <span
                 :class="getEventIcon(conn.from)"
-                class="text-xs text-gh-muted"
+                class="text-xs text-ui-muted"
               />
               <!-- vertical connector line -->
-              <div class="w-px flex-1 bg-gh-border-light/40 my-1" />
+              <div class="w-px flex-1 bg-ui-border-subtle/40 my-1" />
             </div>
             <div class="min-w-0 pb-2">
               <a
@@ -203,18 +203,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(conn.from)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-gh-text hover:underline inline-flex items-center gap-1"
+                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(conn.from) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60 shrink-0"
+                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">
+              <p v-else class="text-sm text-ui-text">
                 {{ getEventDescription(conn.from) }}
               </p>
-              <p class="text-xs text-gh-muted">
+              <p class="text-xs text-ui-muted">
                 {{ formatEventTime(conn.from.created_at) }} ·
                 {{ conn.from.repo?.name?.split('/')[1] }}
               </p>
@@ -224,7 +224,7 @@ const hiddenCount = computed(() => {
           <div class="flex gap-3">
             <span
               :class="getEventIcon(conn.to)"
-              class="text-xs text-gh-muted shrink-0"
+              class="text-xs text-ui-muted shrink-0"
             />
             <div class="min-w-0">
               <a
@@ -232,18 +232,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(conn.to)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-gh-text hover:underline inline-flex items-center gap-1"
+                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(conn.to) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60 shrink-0"
+                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">
+              <p v-else class="text-sm text-ui-text">
                 {{ getEventDescription(conn.to) }}
               </p>
-              <p class="text-xs text-gh-muted">
+              <p class="text-xs text-ui-muted">
                 {{ formatEventTime(conn.to.created_at) }} ·
                 {{ conn.to.repo?.name?.split('/')[1] }}
               </p>
@@ -254,7 +254,7 @@ const hiddenCount = computed(() => {
 
       <button
         v-if="hiddenCount > 0 || showAllEvidence"
-        class="text-gh-muted text-xs hover:text-gh-text transition-colors"
+        class="text-ui-muted text-xs hover:text-ui-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
         {{ showAllEvidence ? 'Show less' : `Show ${hiddenCount} more pairs` }}
@@ -274,7 +274,7 @@ const hiddenCount = computed(() => {
           >
             <span
               :class="getEventIcon(ev)"
-              class="text-xs text-gh-muted shrink-0 mt-0.5"
+              class="text-xs text-ui-muted shrink-0 mt-0.5"
             />
             <div class="min-w-0">
               <a
@@ -282,18 +282,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(ev)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-gh-text hover:underline inline-flex items-center gap-1"
+                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(ev) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60"
+                  class="i-lucide:external-link text-ui-muted opacity-60"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">
+              <p v-else class="text-sm text-ui-text">
                 {{ getEventDescription(ev) }}
               </p>
-              <p class="text-xs text-gh-muted">
+              <p class="text-xs text-ui-muted">
                 {{ formatEventTime(ev.created_at) }} ·
                 {{ ev.repo?.name?.split('/')[1] }}
               </p>
@@ -302,8 +302,8 @@ const hiddenCount = computed(() => {
         </div>
       </LazyAnalysisFlagEvidenceFast>
 
-      <div class="rounded-lg border border-gh-border-light/30 overflow-hidden">
-        <div class="divide-y divide-gh-border-light/15">
+      <div class="rounded-lg border border-ui-border-subtle/30 overflow-hidden">
+        <div class="divide-y divide-ui-border-subtle/15">
           <div
             v-for="(ev, i) in visibleSortedEvents"
             :key="i"
@@ -311,7 +311,7 @@ const hiddenCount = computed(() => {
           >
             <span
               :class="getEventIcon(ev)"
-              class="text-xs text-gh-muted shrink-0 mt-0.5"
+              class="text-xs text-ui-muted shrink-0 mt-0.5"
             />
             <div class="min-w-0 flex-1">
               <a
@@ -319,18 +319,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(ev)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-gh-text hover:underline inline-flex items-center gap-1"
+                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(ev) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60"
+                  class="i-lucide:external-link text-ui-muted opacity-60"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <p v-else class="text-sm text-gh-text">
+              <p v-else class="text-sm text-ui-text">
                 {{ getEventDescription(ev) }}
               </p>
-              <p class="text-xs text-gh-muted">
+              <p class="text-xs text-ui-muted">
                 {{ formatEventTime(ev.created_at) }} ·
                 {{ ev.repo?.name?.split('/')[1] }}
               </p>
@@ -341,7 +341,7 @@ const hiddenCount = computed(() => {
 
       <button
         v-if="hiddenCount > 0 || showAllEvidence"
-        class="text-gh-muted text-xs hover:text-gh-text transition-colors"
+        class="text-ui-muted text-xs hover:text-ui-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
         {{ showAllEvidence ? 'Show less' : `Show ${hiddenCount} more` }}
@@ -362,7 +362,7 @@ const hiddenCount = computed(() => {
           >
             <span
               :class="getEventIcon(ev)"
-              class="text-xs text-gh-muted shrink-0 mt-0.5"
+              class="text-xs text-ui-muted shrink-0 mt-0.5"
             />
             <div class="flex-1 flex flex-col gap-0.5">
               <a
@@ -370,18 +370,18 @@ const hiddenCount = computed(() => {
                 :href="getEventUrl(ev)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-gh-text text-sm hover:underline inline-flex items-center gap-1"
+                class="text-ui-text text-sm hover:underline inline-flex items-center gap-1"
               >
                 {{ getEventDescription(ev) }}
                 <span
-                  class="i-lucide:external-link text-gh-muted opacity-60"
+                  class="i-lucide:external-link text-ui-muted opacity-60"
                   style="font-size: 0.6rem"
                 />
               </a>
-              <span v-else class="text-gh-text text-sm">{{
+              <span v-else class="text-ui-text text-sm">{{
                 getEventDescription(ev)
               }}</span>
-              <div class="flex gap-2 text-gh-muted text-xs">
+              <div class="flex gap-2 text-ui-muted text-xs">
                 <span>{{ formatEventTime(ev.created_at) }}</span>
                 <span>{{ ev.repo?.name }}</span>
               </div>
@@ -397,7 +397,7 @@ const hiddenCount = computed(() => {
       >
         <span
           :class="group.icon"
-          class="text-xs text-gh-muted shrink-0 sticky top-4 self-start mt-1"
+          class="text-xs text-ui-muted shrink-0 sticky top-4 self-start mt-1"
         />
         <div class="flex-1 space-y-3">
           <div
@@ -410,18 +410,18 @@ const hiddenCount = computed(() => {
               :href="getEventUrl(ev)"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-gh-text text-sm hover:underline inline-flex items-center gap-1"
+              class="text-ui-text text-sm hover:underline inline-flex items-center gap-1"
             >
               {{ getEventDescription(ev) }}
               <span
-                class="i-lucide:external-link text-gh-muted opacity-60"
+                class="i-lucide:external-link text-ui-muted opacity-60"
                 style="font-size: 0.6rem"
               />
             </a>
-            <span v-else class="text-gh-text text-sm">
+            <span v-else class="text-ui-text text-sm">
               {{ getEventDescription(ev) }}
             </span>
-            <div class="flex gap-2 text-gh-muted text-xs">
+            <div class="flex gap-2 text-ui-muted text-xs">
               <span>{{ formatEventTime(ev.created_at) }}</span>
               <span>{{ ev.repo?.name }}</span>
             </div>
@@ -431,7 +431,7 @@ const hiddenCount = computed(() => {
 
       <button
         v-if="hiddenCount > 0 || showAllEvidence"
-        class="text-gh-muted text-xs hover:text-gh-text transition-colors"
+        class="text-ui-muted text-xs hover:text-ui-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
         {{ showAllEvidence ? 'Show less' : `Show ${hiddenCount} more` }}

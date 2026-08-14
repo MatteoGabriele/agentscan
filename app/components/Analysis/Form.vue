@@ -28,7 +28,7 @@ function clear() {
 
 <template>
   <form
-    class="flex items-center gap-2 mb-8 border border-gh-border/60 relative rounded-full pl-6 pr-4 py-3 focus-within:border-gh-border-light"
+    class="flex items-center gap-2 mb-8 border border-ui-border/60 relative rounded-full pl-6 pr-4 py-3 focus-within:border-ui-border-subtle"
     @submit.prevent="handleSubmit"
   >
     <label class="flex-1" for="ghAccount">
@@ -56,7 +56,7 @@ function clear() {
       <button
         v-if="accountName"
         type="button"
-        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all"
+        class="flex rounded-full p-1.5 hover:bg-ui-muted/20 transition-all"
         @click="clear"
       >
         <span class="i-lucide:x" />
@@ -65,7 +65,7 @@ function clear() {
 
       <button
         type="submit"
-        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all"
+        class="flex rounded-full p-1.5 hover:bg-ui-muted/20 transition-all"
       >
         <span class="i-lucide-search" aria-hidden="true" />
         <span class="sr-only">Analyze</span>

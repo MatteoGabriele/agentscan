@@ -14,14 +14,14 @@ const errorMessage = computed<string>(() => {
 
 <template>
   <div
-    class="bg-gh-card p-6 rounded-2 border-2 border-solid border-gh-border text-center"
+    class="bg-ui-card p-6 rounded-2 border-2 border-solid border-ui-border text-center"
   >
     <span
-      class="i-lucide:badge-x text-xl text-gh-muted mx-auto mb-4 block"
+      class="i-lucide:badge-x text-xl text-ui-muted mx-auto mb-4 block"
       aria-hidden="true"
     />
 
-    <p class="text-gh-muted">
+    <p class="text-ui-muted">
       {{ errorMessage }}
     </p>
   </div>

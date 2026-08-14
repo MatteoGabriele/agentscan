@@ -35,7 +35,7 @@ function clear() {
 
 <template>
   <form
-    class="flex items-center gap-2 border border-gh-border/60 relative rounded-full pl-6 pr-4 py-3 focus-within:border-gh-border-light"
+    class="flex items-center gap-2 border border-ui-border/60 relative rounded-full pl-6 pr-4 py-3 focus-within:border-ui-border-subtle"
     @submit.prevent="handleSubmit"
   >
     <label class="flex-1" for="repoUrl">
@@ -44,7 +44,7 @@ function clear() {
         id="repoUrl"
         ref="inputRef"
         v-model="repoInput"
-        class="outline-none w-full placeholder:text-gh-muted/60"
+        class="outline-none w-full placeholder:text-ui-muted/60"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
@@ -57,7 +57,7 @@ function clear() {
       <button
         v-if="repoInput"
         type="button"
-        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all"
+        class="flex rounded-full p-1.5 hover:bg-ui-muted/20 transition-all"
         @click="clear"
       >
         <span class="i-lucide:x" />
@@ -66,7 +66,7 @@ function clear() {
 
       <button
         type="submit"
-        class="flex rounded-full p-1.5 hover:bg-gh-muted/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        class="flex rounded-full p-1.5 hover:bg-ui-muted/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span class="i-lucide:scan-search" aria-hidden="true" />
         <span class="sr-only">Scan repository</span>

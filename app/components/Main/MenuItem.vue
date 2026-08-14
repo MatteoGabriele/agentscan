@@ -13,11 +13,11 @@ const isPathActive = computed(() => {
 <template>
   <NuxtLink
     :to
-    class="inline-flex items-center text-gh-muted hover:text-gh-text transition-colors text-sm"
+    class="inline-flex items-center text-ui-muted hover:text-ui-text transition-colors text-sm"
   >
     <span
-      class="text-gh-muted hover:text-gh-text transition-colors"
-      :class="{ 'text-gh-text': isPathActive }"
+      class="text-ui-muted hover:text-ui-text transition-colors"
+      :class="{ 'text-ui-text': isPathActive }"
     >
       {{ label }}
     </span>

@@ -1,22 +1,7 @@
 import type { DailyScanEntry } from '~~/shared/utils/daily-rollup'
 import { getDailyCountsByDate } from '~~/shared/utils/daily-rollup'
 import { applyCumulativeTrends } from '~~/shared/utils/count-classification-by-date'
-import { getHistoryRangeStart } from '~~/shared/utils/health-history-window'
-
-function getRecentEntries(entries: DailyScanEntry[]): DailyScanEntry[] {
-  const latestDate = entries.reduce(
-    (latest, entry) => (entry.date > latest ? entry.date : latest),
-    '',
-  )
-
-  if (!latestDate) {
-    return entries
-  }
-
-  const rangeStart = getHistoryRangeStart(latestDate).slice(0, 10)
-
-  return entries.filter((entry) => entry.date >= rangeStart)
-}
+import { getRecentDailyEntries } from '~~/shared/utils/health-history-window'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -33,7 +18,9 @@ export default defineEventHandler(async (event) => {
 
     const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
     const allEntries = JSON.parse(content) as DailyScanEntry[]
-    const entries = isFullHistory ? allEntries : getRecentEntries(allEntries)
+    const entries = isFullHistory
+      ? allEntries
+      : getRecentDailyEntries(allEntries)
 
     const countsByDate = getDailyCountsByDate(entries)
     const categoryProgression = applyCumulativeTrends(countsByDate)

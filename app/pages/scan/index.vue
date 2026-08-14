@@ -41,7 +41,7 @@ async function handleSubmit(value: string) {
 <template>
   <header class="text-center mb-8 max-w-lg mx-auto">
     <h1 class="text-2xl font-semibold">Repository scan</h1>
-    <p class="text-gh-muted mt-2 text-pretty">
+    <p class="text-ui-muted mt-2 text-pretty">
       Analyze the most recent PR authors of any public GitHub repository.
     </p>
   </header>
@@ -53,7 +53,7 @@ async function handleSubmit(value: string) {
   />
 
   <p
-    class="mt-4 mx-auto max-w-lg text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
+    class="mt-4 mx-auto max-w-lg text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
   >
     Results are based on pattern analysis and should be interpreted as possible
     signals, not conclusions. Always verify findings with additional context.
