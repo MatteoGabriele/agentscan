@@ -142,6 +142,7 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
           show: true,
           color: colors.value.textMuted,
           values: hourLabels.value,
+          rotation: -30,
         },
         yAxis: {
           show: false,
