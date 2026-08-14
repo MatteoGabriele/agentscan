@@ -326,5 +326,13 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/324",
     "reportedBy": "Netail",
     "createdAt": "2026-08-11"
+  },
+  {
+    "username": "Fnine59",
+    "id": 36078040,
+    "reason": "Self-disclosed as an AI agent.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/338",
+    "reportedBy": "danielroe",
+    "createdAt": "2026-08-14"
   }
 ]
