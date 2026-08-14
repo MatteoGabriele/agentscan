@@ -127,14 +127,14 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
       <h2 class="text-xl font-semibold">What is the Ecosystem Health chart?</h2>
       <div class="mt-4 flex flex-col gap-2 text-gh-text/80 text-pretty">
         <p>
-          This page gives you a look into the current state of the GitHub
-          community by analyzing public activity. We want to understand how many
-          accounts are coding on their own, how many are genuinely supporting
-          others, and how many are just flooding the space.
+          This page tracks the state of the GitHub community by analyzing public
+          activity. The question we're trying to answer: how many accounts are
+          genuinely contributing to open source, and how many are just flooding
+          it with noise?
         </p>
         <p>
-          We don't dislike AI. We're just growing tired of seeing open source
-          projects overwhelmed by constant spam.
+          This isn't an anti-AI project, though we do have our opinions. We're
+          simply tired of watching open source maintainers drown in spam.
         </p>
 
         <h3 class="mt-6 font-semibold text-gh-text">How a scan works</h3>
