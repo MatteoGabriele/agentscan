@@ -172,7 +172,7 @@ function createHeatmapConfig(
       style: {
         backgroundColor: 'transparent',
         layout: {
-          height: index === 0 ? 60 : 32,
+          height: index === 0 ? 72 : 32,
           cells: {
             spacing: 0,
             colors: {
