@@ -9,11 +9,13 @@
 :root {
   /* Destructive user action (delete), distinct from the automation verdict. */
   --destructive: #ea580c;
-  /* Classification: human-driven activity. */
+
+  /* Classifications */
   --organic: #22c55e;
-  /* Classification: automated activity. */
+  --mixed: #e7b416;
   --automation: #cc3232;
 
+  /* PR graph colors */
   --event-automation-pr: var(--event-mixed-pr);
   --event-automation-branch: var(--event-mixed-branch);
   --event-automation-fork: var(--event-mixed-fork);
@@ -32,7 +34,6 @@
   --text-faint: rgba(240, 240, 240, 0.25);
   --accent: #238636;
   --accent-hover: #2ea043;
-  --mixed: #e7b416;
   --glint: rgba(255, 255, 255, 0.85);
   --event-organic-pr: #3fb950;
   --event-organic-branch: #2dd4bf;
@@ -55,7 +56,6 @@
   --text-faint: rgba(34, 34, 34, 0.25);
   --accent: #1a7f37;
   --accent-hover: #15682d;
-  --mixed: #f59e0b;
   --glint: rgba(34, 34, 34, 0.55);
   --event-organic-pr: #15803d;
   --event-organic-branch: #0d9488;
