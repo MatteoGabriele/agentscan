@@ -56,6 +56,10 @@
   --text-faint: rgba(34, 34, 34, 0.25);
   --accent: #1a7f37;
   --accent-hover: #15682d;
+
+  /* mixed for a light background needs to be darker or is hard to see */
+  --mixed: #f59e0b;
+
   --glint: rgba(34, 34, 34, 0.55);
   --event-organic-pr: #15803d;
   --event-organic-branch: #0d9488;
