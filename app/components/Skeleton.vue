@@ -23,7 +23,7 @@ const roundedClasses = {
 <template>
   <div
     :class="[
-      'bg-gradient-to-r from-gh-border/30 via-gh-border/50 to-gh-border/30 animate-shimmer',
+      'bg-gradient-to-r from-ui-border/30 via-ui-border/50 to-ui-border/30 animate-shimmer',
       props.width,
       props.height,
       roundedClasses[props.rounded],

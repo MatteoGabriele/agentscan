@@ -26,40 +26,40 @@ export function useScoreStyle(
 
     if (opts?.hasCommunityFlag) {
       return {
-        text: 'text-gh-danger-hover',
-        border: 'border-gh-danger-hover',
-        background: 'bg-gh-danger-hover',
+        text: 'text-ui-automation',
+        border: 'border-ui-automation',
+        background: 'bg-ui-automation',
       }
     }
 
     if (!classificationValue || classificationValue === 'insufficient-data') {
       return {
-        text: 'text-gh-muted',
-        border: 'border-gh-border',
-        background: 'bg-gh-bg',
+        text: 'text-ui-muted',
+        border: 'border-ui-border',
+        background: 'bg-ui-bg',
       }
     }
 
     if (classificationValue === 'automation') {
       return {
-        text: 'text-gh-danger-hover',
-        border: 'border-gh-danger-hover',
-        background: 'bg-gh-danger-hover',
+        text: 'text-ui-automation',
+        border: 'border-ui-automation',
+        background: 'bg-ui-automation',
       }
     }
 
     if (classificationValue === 'mixed' || opts?.hasActivityReport) {
       return {
-        text: 'text-amber-500',
-        border: 'border-amber-500',
-        background: 'bg-amber-500',
+        text: 'text-ui-mixed',
+        border: 'border-ui-mixed',
+        background: 'bg-ui-mixed',
       }
     }
 
     return {
-      text: 'text-green-500',
-      border: 'border-green-500',
-      background: 'bg-green-500',
+      text: 'text-ui-organic',
+      border: 'border-ui-organic',
+      background: 'bg-ui-organic',
     }
   })
 

@@ -119,15 +119,15 @@ useSeoAnalysis(identifyAnalysis, {
   <LazyErrorCardGeneric v-else-if="error" :error />
   <template v-else-if="data">
     <div
-      class="flex gap-6 bg-gh-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
+      class="flex gap-6 bg-ui-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
       :class="scoreStyle.border"
     >
       <div class="w-full">
         <section v-if="verifiedAutomation">
-          <h3 class="text-xl font-mono mb-2 text-gh-danger-hover">
+          <h3 class="text-xl font-mono mb-2 text-ui-automation">
             Community reported
           </h3>
-          <p class="text-gh-text text-sm mb-2">
+          <p class="text-ui-text text-sm mb-2">
             {{ verifiedAutomation.reason }}
           </p>
           <footer class="flex items-baseline justify-between">
@@ -137,7 +137,7 @@ useSeoAnalysis(identifyAnalysis, {
               :to="verifiedAutomation.issueUrl"
               target="_blank"
               external
-              class="text-gh-muted underline inline text-xs"
+              class="text-ui-muted underline inline text-xs"
             >
               View issue
             </NuxtLink>
@@ -149,7 +149,7 @@ useSeoAnalysis(identifyAnalysis, {
               <div class="mb-2 flex flex-col">
                 <div
                   v-if="warnings.length"
-                  class="flex items-start gap-2 text-sm text-gh-muted mb-2"
+                  class="flex items-start gap-2 text-sm text-ui-muted mb-2"
                 >
                   <span class="i-lucide:megaphone text-xs shrink-0"></span>
                   <ul class="flex flex-col gap-1">
@@ -170,14 +170,14 @@ useSeoAnalysis(identifyAnalysis, {
                   </h3>
                 </div>
               </div>
-              <p class="mt-1 text-gh-text">
+              <p class="mt-1 text-ui-text">
                 {{ classificationDetails.description }}
               </p>
             </div>
           </header>
 
           <div
-            class="text-sm text-gh-muted flex flex-wrap items-center gap-x-3 gap-y-2"
+            class="text-sm text-ui-muted flex flex-wrap items-center gap-x-3 gap-y-2"
           >
             <p v-if="data.eventsCount > 0">
               Analyzed from the last {{ data.eventsCount }} public GitHub
@@ -207,9 +207,9 @@ useSeoAnalysis(identifyAnalysis, {
 
         <section
           v-if="!verifiedAutomation"
-          class="mt-4 pt-4 border-t border-gh-border-light"
+          class="mt-4 pt-4 border-t border-ui-border-subtle"
         >
-          <p class="text-gh-muted text-sm">
+          <p class="text-ui-muted text-sm">
             Know something about this account? Help the community.
           </p>
           <NuxtLink
@@ -246,7 +246,7 @@ useSeoAnalysis(identifyAnalysis, {
     </template>
 
     <p
-      class="mt-8 mx-auto max-w-md text-xs text-gh-muted/60 leading-relaxed text-pretty text-center"
+      class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
     >
       Results are based on pattern analysis and should be interpreted as
       possible signals, not conclusions. Always verify findings with additional

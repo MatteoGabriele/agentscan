@@ -59,7 +59,7 @@ function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
         dates.value?.map(
           (date) => countsByDate.value?.[date]?.organic.trend ?? 0,
         ) ?? [],
-      color: colors.value.greenLine,
+      color: colors.value.organic,
       type: 'line',
       smooth: true,
       useArea: true,
@@ -74,7 +74,7 @@ function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
         dates.value?.map(
           (date) => countsByDate.value?.[date]?.mixed.trend ?? 0,
         ) ?? [],
-      color: colors.value.amber,
+      color: colors.value.mixed,
       type: 'line',
       smooth: true,
       useArea: true,
@@ -89,7 +89,7 @@ function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
         dates.value?.map(
           (date) => countsByDate.value?.[date]?.automation.trend ?? 0,
         ) ?? [],
-      color: colors.value.dangerHover,
+      color: colors.value.automation,
       type: 'line',
       smooth: true,
       useArea: true,
@@ -396,7 +396,7 @@ function placeLandmark({
                 <!-- LANDMARK INFO -->
                 <div
                   v-if="visibleLandmarksByIndex.has(timeLabel.absoluteIndex)"
-                  class="mt-2 flex flex-col gap-2 text-xs text-gh-muted"
+                  class="mt-2 flex flex-col gap-2 text-xs text-ui-muted"
                 >
                   <div
                     v-for="landmark in visibleLandmarksByIndex.get(

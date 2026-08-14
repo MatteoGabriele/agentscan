@@ -5,14 +5,14 @@ defineProps<{
 </script>
 
 <template>
-  <p class="flex gap-1 items-baseline text-gh-muted text-xs">
+  <p class="flex gap-1 items-baseline text-ui-muted text-xs">
     <span>
       Reported by
       <NuxtLink
         :external="true"
         target="_blank"
         :to="`https://github.com/${report.reportedBy}`"
-        class="text-gh-muted underline hover:text-gh-text"
+        class="text-ui-muted underline hover:text-ui-text"
       >
         {{ report.reportedBy }}
       </NuxtLink>

@@ -14,10 +14,10 @@ const counter = computed<number>(() => {
     <button
       :aria-expanded="isDisclosureOpen"
       aria-controls="disclosure-external-analysis"
-      class="w-full bg-gh-amber/10 text-gh-amber rounded-lg border-gh-amber/40 border px-3 py-2 text-left transition-colors"
+      class="w-full bg-ui-mixed/10 text-ui-mixed rounded-lg border-ui-mixed/40 border px-3 py-2 text-left transition-colors"
       :class="{
         'border-b-none rounded-b-none': isDisclosureOpen,
-        'hover:border-gh-amber': !isDisclosureOpen,
+        'hover:border-ui-mixed': !isDisclosureOpen,
       }"
       @click="isDisclosureOpen = !isDisclosureOpen"
     >
@@ -28,7 +28,7 @@ const counter = computed<number>(() => {
         </h3>
         <div class="flex items-center gap-3">
           <span
-            class="bg-gh-amber/20 text-gh-amber text-xs font-semibold px-2 py-1 rounded"
+            class="bg-ui-mixed/20 text-ui-mixed text-xs font-semibold px-2 py-1 rounded"
           >
             {{ counter }}
           </span>
@@ -45,21 +45,21 @@ const counter = computed<number>(() => {
     <ul
       v-if="isDisclosureOpen"
       id="disclosure-external-analysis"
-      class="bg-gh-amber/5 border border-t-gh-amber/30 rounded-b-md border-gh-amber/40 p-4 space-y-4"
+      class="bg-ui-mixed/5 border border-t-ui-mixed/30 rounded-b-md border-ui-mixed/40 p-4 space-y-4"
     >
       <li
         v-for="item in items"
         :key="`${item.username}-${item.link}`"
         class="p-3 space-y-2"
       >
-        <h4 class="text-gh-text/90 text-sm">{{ item.label }}</h4>
-        <p class="text-gh-text/70 text-sm">
+        <h4 class="text-ui-text/90 text-sm">{{ item.label }}</h4>
+        <p class="text-ui-text/70 text-sm">
           {{ item.reason }}
         </p>
         <NuxtLink
           external
           :to="item.link"
-          class="inline-block text-gh-text/80 underline text-xs font-semibold hover:text-gh-text"
+          class="inline-block text-ui-text/80 underline text-xs font-semibold hover:text-ui-text"
           target="_blank"
         >
           View Report

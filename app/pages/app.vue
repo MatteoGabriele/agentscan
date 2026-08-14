@@ -36,11 +36,11 @@ const { trackEvent } = useSaEvent()
 
           <div>
             <h1 class="text-2xl font-semibold">AgentScan GitHub App</h1>
-            <p class="mt-1 mb-6 text-gh-text/80">
+            <p class="mt-1 mb-6 text-ui-text/80">
               Built for open source maintainers against automation spam
             </p>
 
-            <p class="text-gh-muted mt-2 max-w-md mx-auto text-pretty">
+            <p class="text-ui-muted mt-2 max-w-md mx-auto text-pretty">
               Zero config. Works instantly. Fully open-source. <br />Install it
               on your repositories and let it handle the spam while you focus on
               the project.
@@ -50,20 +50,20 @@ const { trackEvent } = useSaEvent()
           <NuxtLink
             external
             to="https://github.com/apps/agentscanapp/installations/new"
-            class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gh-green hover:bg-gh-green-hover transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-ui-accent hover:bg-ui-accent-hover transition-colors"
             @click="trackEvent('github_app_install_button_clicked')"
           >
             <span class="i-lucide-github text-lg" aria-hidden="true" />
             Install the GitHub App
           </NuxtLink>
 
-          <p class="text-xs text-gh-muted/70">
+          <p class="text-xs text-ui-muted/70">
             Prefer running it in CI? Try the
             <NuxtLink
               external
               target="_blank"
               to="https://github.com/marketplace/actions/agentscan"
-              class="underline hover:text-gh-text transition-colors"
+              class="underline hover:text-ui-text transition-colors"
             >
               GitHub Action
             </NuxtLink>
@@ -77,7 +77,7 @@ const { trackEvent } = useSaEvent()
           >
             <button
               type="button"
-              class="text-sm text-gh-muted hover:text-gh-text transition-colors flex items-center justify-center gap-2.5 mt-4 flex-col"
+              class="text-sm text-ui-muted hover:text-ui-text transition-colors flex items-center justify-center gap-2.5 mt-4 flex-col"
               @click="scrollToConfig"
             >
               <span
@@ -99,7 +99,7 @@ const { trackEvent } = useSaEvent()
 
     <section
       ref="configGenerator"
-      class="flex items-center py-12 border-t border-gh-border-light/60 w-full"
+      class="flex items-center py-12 border-t border-ui-border-subtle/60 w-full"
     >
       <div class="w-full max-w-2xl text-left mx-auto px-6">
         <AppConfigGenerator />

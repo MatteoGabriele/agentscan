@@ -48,7 +48,7 @@ function isBetween({
 }
 
 const colorRange = computed(() => {
-  return [colors.value.red!, colors.value.amber!, colors.value.green!]
+  return [colors.value.automation!, colors.value.mixed!, colors.value.organic!]
 })
 
 const scoreDistributionRanges = computed<ScoreDistributionRange[]>(() => {

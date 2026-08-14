@@ -64,12 +64,12 @@ const classifications: Array<{
 
 function getSerieColor(category: EcosystemHealthCategory) {
   if (category === 'organic') {
-    return colors.value.greenLine
+    return colors.value.organic
   }
   if (category === 'mixed') {
-    return colors.value.amber
+    return colors.value.mixed
   }
-  return colors.value.dangerHover
+  return colors.value.automation
 }
 
 const rawDataset = computed<HourlySerie[]>(() =>

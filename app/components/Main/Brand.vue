@@ -9,12 +9,12 @@ const { headingLevel = 'h1' } = defineProps<{
     <div class="flex items-center justify-center gap-2 mb-2">
       <MainLogo />
 
-      <Component :is="headingLevel" class="text-3xl text-gh-text font-mono">
+      <Component :is="headingLevel" class="text-3xl text-ui-text font-mono">
         AgentScan
       </Component>
     </div>
 
-    <p class="text-gh-muted text-pretty">
+    <p class="text-ui-muted text-pretty">
       Automation pattern detection for open source maintainers
     </p>
   </div>

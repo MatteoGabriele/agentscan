@@ -10,7 +10,7 @@ const { trackEvent } = useSaEvent()
   <header class="flex justify-between items-center gap-6 px-4 @4xl:px-6 py-4">
     <div class="flex-1">
       <NuxtLink
-        class="flex gap-2 items-center text-gh-text"
+        class="flex gap-2 items-center text-ui-text"
         to="/"
         aria-label="Homepage"
       >
@@ -36,7 +36,7 @@ const { trackEvent } = useSaEvent()
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
       <NuxtLink
         to="/app"
-        class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-gh-border/80 text-gh-muted hover:text-gh-text hover:border-gh-border/60 transition-colors whitespace-nowrap cta-glint"
+        class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-ui-border/80 text-ui-muted hover:text-ui-text hover:border-ui-border/60 transition-colors whitespace-nowrap cta-glint"
         title="Install the GitHub App or use the GitHub Action"
         @click="trackEvent('get_agentscan_clicked')"
       >

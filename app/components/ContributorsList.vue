@@ -5,7 +5,7 @@ const { data: contributors } = await useContributorsList()
 <template>
   <div class="flex flex-col items-center group">
     <h2
-      class="text-sm mb-2 text-gh-muted/80 group-hover:text-gh-text transition-all"
+      class="text-sm mb-2 text-ui-muted/80 group-hover:text-ui-text transition-all"
     >
       Built by the community
     </h2>
@@ -19,7 +19,7 @@ const { data: contributors } = await useContributorsList()
           :to="contributor.url"
           target="_blank"
           external
-          class="block size-7.5 filter-saturate-0 hover:filter-saturate-100 overflow-hidden rounded-full bg-gh-card"
+          class="block size-7.5 filter-saturate-0 hover:filter-saturate-100 overflow-hidden rounded-full bg-ui-card"
         >
           <img
             :src="contributor.avatar"

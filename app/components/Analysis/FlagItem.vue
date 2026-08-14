@@ -17,7 +17,7 @@ function toggleExpanded() {
 </script>
 
 <template>
-  <li class="not-last:border-b border-gh-border-light/40 py-4">
+  <li class="not-last:border-b border-ui-border-subtle/40 py-4">
     <button
       class="flex text-left items-center gap-2 mb-1 flex-wrap"
       @click="toggleExpanded"
@@ -25,16 +25,16 @@ function toggleExpanded() {
       <span class="font-mono">{{ flag.label }}</span>
       <span
         v-if="flag.data.length"
-        class="i-lucide:chevron-down text-sm text-gh-muted transition-transform mt-0.5 shrink-0 ml-auto"
+        class="i-lucide:chevron-down text-sm text-ui-muted transition-transform mt-0.5 shrink-0 ml-auto"
         :class="isExpanded && 'rotate-180'"
       />
     </button>
-    <p class="text-gh-muted text-sm">{{ flag.detail }}</p>
+    <p class="text-ui-muted text-sm">{{ flag.detail }}</p>
 
     <template v-if="flag.data.length">
       <div
         v-if="isExpanded"
-        class="mt-3 pt-3 border-t border-gh-border-light/30 space-y-2"
+        class="mt-3 pt-3 border-t border-ui-border-subtle/30 space-y-2"
       >
         <div
           v-for="(group, i) in groupDataPoints(flag.data)"
@@ -43,7 +43,7 @@ function toggleExpanded() {
         >
           <span
             :class="group.icon"
-            class="text-xs text-gh-muted shrink-0 sticky top-4 self-start mt-1"
+            class="text-xs text-ui-muted shrink-0 sticky top-4 self-start mt-1"
           />
           <div class="flex-1 space-y-3">
             <div
@@ -58,17 +58,17 @@ function toggleExpanded() {
                     :class="
                       point.value
                         ? 'i-lucide:check text-green-500'
-                        : 'i-lucide:x text-gh-muted'
+                        : 'i-lucide:x text-ui-muted'
                     "
                     class="text-xs"
                   />
                 </template>
-                <span v-else class="text-sm text-gh-muted">
+                <span v-else class="text-sm text-ui-muted">
                   {{ parseDataPoint(point).displayValue }}
                 </span>
                 <span
                   v-if="parseDataPoint(point).displayThreshold !== undefined"
-                  class="text-gh-muted text-sm"
+                  class="text-ui-muted text-sm"
                 >
                   / {{ parseDataPoint(point).displayThreshold }}
                 </span>

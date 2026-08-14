@@ -11,13 +11,13 @@ const props = defineProps<{
 // @todo: should be globally available to avoid repetition and inconsistencies
 const color = computed(() => {
   if (props.classification === 'organic') {
-    return 'bg-green-500'
+    return 'bg-ui-organic'
   } else if (props.classification === 'automation') {
-    return 'bg-gh-danger-hover'
+    return 'bg-ui-automation'
   } else if (props.classification === 'mixed') {
-    return 'bg-gh-amber'
+    return 'bg-ui-mixed'
   } else {
-    return 'bg-gray-500'
+    return 'bg-ui-muted'
   }
 })
 
@@ -39,7 +39,7 @@ const trendLabel = computed(() => formatTrend(props.trend))
     <p class="text-sm">
       {{ label }}
 
-      <span class="text-gh-muted ml-1"> {{ percentage }}% </span>
+      <span class="text-ui-muted ml-1"> {{ percentage }}% </span>
 
       <span v-if="classification" :class="trendColor">
         <span :class="trendIcon" class="shrink-0 align-middle" />
