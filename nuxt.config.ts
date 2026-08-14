@@ -42,7 +42,6 @@ export default defineNuxtConfig({
         weights: ['400', '500'],
         preload: true,
         global: true,
-        provider: 'npm',
       },
     ],
   },
