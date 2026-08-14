@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTimeout } from '@vueuse/core'
 import { computed } from 'vue'
 import {
   VueUiStackbar,
@@ -20,6 +21,13 @@ const colors = useColors(rootEl)
 
 const dates = computed(() => data.value?.dates ?? [])
 const countsByDate = computed(() => data.value?.countsByDate ?? {})
+
+const ready = shallowRef(false)
+
+// Avoiding the f*ing CLS on load
+useTimeout(200, {
+  callback: () => (ready.value = true),
+})
 
 const classification = computed(() => {
   return getClassificationByDateChunksByDate({
@@ -66,6 +74,9 @@ const timeLabels = computed<string[]>(() => {
   })
 })
 const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
+  transitions: {
+    enable: false,
+  },
   orientation: 'horizontal',
   userOptions: { show: false },
   useCssAnimation: false,
@@ -104,13 +115,23 @@ const stackbarConfig = computed<VueUiStackbarConfig>(() => ({
 </script>
 
 <template>
-  <div class="mb-5">
+  <div
+    class="mb-5 transition-opacity"
+    :style="{
+      opacity: ready ? 1 : 0,
+    }"
+  >
     <h2 class="text-center">Weekly classification breakdown</h2>
     <p class="text-sm text-gh-muted text-center">
       A new weekly data point is added after each Sunday scan
     </p>
   </div>
-  <div class="flex flex-col gap-4 weekly-classification min-h-6">
+  <div
+    class="flex flex-col gap-4 weekly-classification min-h-6 transition-opacity"
+    :style="{
+      opacity: ready ? 1 : 0,
+    }"
+  >
     <ClientOnly>
       <VueUiStackbar :dataset="stackbarDataset" :config="stackbarConfig">
         <template #legend="{ legend }">

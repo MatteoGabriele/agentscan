@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTimeout } from '@vueuse/core'
 import { computed, shallowRef } from 'vue'
 import {
   VueUiXy,
@@ -22,6 +23,12 @@ type ScoreDistributionRange = {
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
+
+const ready = shallowRef(false)
+
+useTimeout(200, {
+  callback: () => (ready.value = true),
+})
 
 const uniqueEntries = computed(() => {
   if (!props.data) {
@@ -183,10 +190,17 @@ const config = computed<VueUiXyConfig>(() => ({
 </script>
 
 <template>
-  <div class="mb-5">
-    <h2 class="text-center">Overall PR score distribution</h2>
+  <div
+    class="transition-opacity"
+    :style="{
+      opacity: ready ? 1 : 0,
+    }"
+  >
+    <div class="mb-5">
+      <h2 class="text-center">Overall PR score distribution</h2>
+    </div>
+    <ClientOnly>
+      <VueUiXy :dataset :config />
+    </ClientOnly>
   </div>
-  <ClientOnly>
-    <VueUiXy :dataset :config />
-  </ClientOnly>
 </template>
