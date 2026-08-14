@@ -40,7 +40,7 @@ type EcosystemHealthHourly = {
 const SELECTION_BORDER = 2
 const SELECTION_RADIUS = 1
 
-const { data } = await useEcosystemHealthHourly()
+const { data } = await useEcosystemHealthHourlyWindow()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const componentEl = shallowRef<HTMLElement | null>(null)
@@ -48,8 +48,6 @@ const colors = useColors(rootEl)
 const activeCellEl = shallowRef<SVGRectElement | null>(null)
 
 const ready = shallowRef(false)
-
-console.log(colors.value)
 
 useTimeout(300, {
   callback: () => (ready.value = true),
@@ -59,12 +57,6 @@ let selectionOverlayEl: HTMLDivElement | null = null
 let animationFrameId: number | null = null
 
 const scanTimes = computed(() => data.value?.scanTimes ?? [])
-
-const hourLabels = computed(() => {
-  return scanTimes.value.map((timestamp) =>
-    dayjs.utc(timestamp).format('HH:mm'),
-  )
-})
 
 const heatmapSeries = computed(
   (): Array<{
@@ -108,6 +100,8 @@ function createHeatmapDataset(
 
 const numberOfPoints = computed(() => scanTimes.value.length)
 
+const axisTimeFormat = 'HH:mm'
+
 const baseConfig = computed<VueUiHeatmapConfig>(() => ({
   userOptions: {
     show: false,
@@ -143,10 +137,23 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
         xAxis: {
           show: true,
           color: colors.value.textMuted,
-          values: hourLabels.value,
+          values: scanTimes.value,
           rotation: -30,
           autoRotate: {
             enable: false,
+          },
+          datetimeFormatter: {
+            enable: true,
+            useUTC: false,
+            locale: 'en',
+            options: {
+              year: axisTimeFormat,
+              month: axisTimeFormat,
+              day: axisTimeFormat,
+              hour: axisTimeFormat,
+              minute: axisTimeFormat,
+              second: axisTimeFormat,
+            },
           },
         },
         yAxis: {
