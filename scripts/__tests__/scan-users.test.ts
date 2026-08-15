@@ -11,8 +11,8 @@ import type { EcosystemHealthItem } from '../../shared/types/ecosystem-health'
 import { getCompletedDailyEntries } from '../../shared/utils/daily-rollup'
 
 vi.mock('../../shared/daily-scan', () => ({ libraries: ['acme/lib'] }))
-vi.mock('../pr-hash', () => ({
-  hashPrId: (repo: string, number: number) => `${repo}#${number}`,
+vi.mock('../hash-value', () => ({
+  hashValue: (...parts: (string | number)[]) => parts.join('#'),
 }))
 
 beforeAll(() => {

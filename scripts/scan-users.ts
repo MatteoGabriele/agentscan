@@ -7,8 +7,7 @@ import { join } from 'path'
 import { Octokit } from 'octokit'
 import { identify } from '@unveil/identity'
 import type { GitHubEvent, IdentifyUser } from '@unveil/identity'
-import { hashPrId } from './pr-hash'
-import { encryptUserId } from './user-id-cipher'
+import { hashValue } from './hash-value'
 import { pack, unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
@@ -72,7 +71,7 @@ interface ScanOptions {
   dailyOutputFile?: string
   /**
    * Where the run records the accounts it scored as automations, as
-   * `[encryptedId, prCount]` pairs. Unlike every other output this one only
+   * `[hashedId, prCount]` pairs. Unlike every other output this one only
    * ever grows: it is a tally across scans, not a window over them.
    */
   automationIdsOutputFile?: string
@@ -386,7 +385,7 @@ export async function collectPrs(
           id: profile.id,
           login: profile.login,
           created_at: profile.created_at,
-          pr_key: hashPrId(repoFullName, pr.number),
+          pr_key: hashValue(repoFullName, pr.number),
           pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
           public_repos: profile.public_repos,
           profile,
@@ -523,7 +522,7 @@ export async function main(options: ScanOptions) {
       return
     }
     countedPrKeys.add(pr.pr_key)
-    automationIds.push(encryptUserId(pr.id))
+    automationIds.push(hashValue(pr.id))
   }
 
   async function scoreUser(pr: CollectedPr) {
