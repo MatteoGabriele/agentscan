@@ -19,14 +19,28 @@ type UseCssVariableOptions = {
   element?: CssVariableSource
 }
 
+type CamelCase<S extends string> = S extends `${infer Head}-${infer Tail}`
+  ? `${Head}${Capitalize<CamelCase<Tail>>}`
+  : S
+
+type CssVariableKey<S extends string> = S extends `--${infer Name}`
+  ? CamelCase<Name>
+  : CamelCase<S>
+
+type CssVariables<T extends readonly string[]> = {
+  [K in T[number] as CssVariableKey<K>]: string
+}
+
 function readCssVariable(element: HTMLElement, variableName: string): string {
   return getComputedStyle(element).getPropertyValue(variableName).trim()
 }
 
-function toCamelCase(cssVariable: string): string {
+function toCamelCase<T extends string>(cssVariable: T): CssVariableKey<T> {
   return cssVariable
     .replace(/^--/, '')
-    .replace(/-([a-z0-9])/gi, (_, c) => c.toUpperCase())
+    .replace(/-([a-z0-9])/gi, (_, c: string) =>
+      c.toUpperCase(),
+    ) as CssVariableKey<T>
 }
 
 function resolveElement(element?: CssVariableSource): HTMLElement | null {
@@ -43,10 +57,10 @@ function resolveElement(element?: CssVariableSource): HTMLElement | null {
   return resolved ?? document.documentElement
 }
 
-export function useCssVariables(
-  variables: readonly string[],
+export function useCssVariables<const T extends readonly string[]>(
+  variables: T,
   options: UseCssVariableOptions = {},
-): { colors: ComputedRef<Record<string, string>> } {
+): { colors: ComputedRef<CssVariables<T>> } {
   const recomputeToken = shallowRef(0)
   const isPreferredDark = usePreferredDark()
 
@@ -58,12 +72,12 @@ export function useCssVariables(
 
   const elementComputed = computed(() => resolveElement(options.element))
 
-  const colors = computed<Record<string, string>>(() => {
+  const colors = computed<CssVariables<T>>(() => {
     void recomputeToken.value
 
     const element = elementComputed.value
     if (!element) {
-      return {}
+      return {} as CssVariables<T>
     }
 
     const result: Record<string, string> = {}
@@ -72,7 +86,7 @@ export function useCssVariables(
       result[toCamelCase(variable)] = readCssVariable(element, variable)
     }
 
-    return result
+    return result as CssVariables<T>
   })
 
   return { colors }
