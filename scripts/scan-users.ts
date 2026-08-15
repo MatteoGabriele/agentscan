@@ -512,6 +512,10 @@ export async function main(options: ScanOptions) {
   const automationIds: string[] = []
   const countedPrKeys = new Set<string>()
 
+  // Only the windowed PRs feed this tally. The fixed sample is "the newest N
+  // PRs per repo" regardless of age, so the same PRs reappear in it every hour
+  // and counting them would add a flat +N per run forever. The window covers a
+  // distinct hour per run, so each PR reaches the tally exactly once.
   function recordAutomationPr(pr: CollectedPr, score: number) {
     // Thresholds live in the identity config, so read the classification back
     // rather than comparing against a number spelled out here.
@@ -588,7 +592,6 @@ export async function main(options: ScanOptions) {
 
     const scored = await scoreUser(pr)
     scanResults.push(toResult(pr, runAt, scored))
-    recordAutomationPr(pr, scored.score)
 
     if (scored.score !== INSUFFICIENT_DATA_SCORE) {
       const currentScore = repoScores.get(pr.repo_name) ?? 0
@@ -634,7 +637,13 @@ export async function main(options: ScanOptions) {
     console.log(`Daily: ${measured.length} day(s) rolled up from the window`)
   }
 
-  if (automationIdsOutputFile) {
+  if (automationIdsOutputFile && !window) {
+    console.warn(
+      'Automations: --automation-ids-output needs --window-output; the tally is built from windowed PRs only. Nothing written.',
+    )
+  }
+
+  if (automationIdsOutputFile && window) {
     const stored = dryRun ? [] : loadAutomationIds(automationIdsOutputFile)
     const tallies = mergeAutomationIds(stored, automationIds)
 
