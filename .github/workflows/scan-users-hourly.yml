@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -45,6 +46,8 @@ jobs:
 
       - name: Commit and push results
         id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -62,12 +65,42 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No changes detected"
-          else
-            git commit -m "chore: hourly user scan - $(date -u +'%Y-%m-%dT%H:00Z')"
-            git fetch origin main
-            git merge --no-edit origin/main
-            git push
+            exit 0
           fi
+
+          timestamp="$(date -u +'%Y-%m-%dT%H:00Z')"
+          git commit -m "chore: hourly user scan - $timestamp"
+          git fetch origin main
+
+          if git merge --no-edit origin/main && git push; then
+            exit 0
+          fi
+
+          # Main moved in a way we cannot reconcile unattended (conflicting
+          # merge, or a push that lost a race). Park the results on their own
+          # branch and let a human resolve it instead of dropping the scan.
+          git merge --abort || true
+
+          branch="scan/hourly-$(date -u +'%Y%m%dT%H%M%SZ')"
+          git push origin "HEAD:refs/heads/$branch"
+
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          body=$(printf '%s\n\n%s\n\n%s\n' \
+            "The hourly scan could not be committed to main automatically — the merge conflicted or the push was rejected. This branch holds the results so the scan is not lost." \
+            "**Read the conflict before merging.** The scan rewrites each data file whole rather than appending, so this branch goes stale the moment the next hourly scan lands on main. Resolving in this branch's favour drops every hour in between — permanently for data/daily-scan-results.json, which is never trimmed." \
+            "Run: $run_url")
+
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "chore: hourly user scan - $timestamp" \
+            --body "$body"
+
+          # A PR here is a recovery artifact, not a success. Fail the run so a
+          # persistent cause (branch protection, revoked write) surfaces at once
+          # instead of quietly opening a PR every hour.
+          echo "::error::Could not push scan results to main; opened $branch as a PR instead."
+          exit 1
 
       - name: Notify Discord
         if: steps.commit.outputs.daily-rolled-up == 'true'
