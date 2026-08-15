@@ -19,30 +19,28 @@ const darkMode = usePreferredDark()
 
 // TODO: abstract outside of the component
 const GROUPS = {
-  ['pr-outcome']: { max: 80, name: 'PR outcome', description: '' },
+  ['pr-outcome']: { max: 80, name: 'PR outcome' },
   fork: {
     max: 100,
     name: 'Fork',
-    description: 'Lorem ipsum dolor sit amet consectetur what the fork',
   },
-  ['pr-volume']: { max: 75, name: 'PR volume', description: '' },
-  ['branch-pr']: { max: 49, name: 'Branch PR', description: '' },
-  ['external-focus']: { max: 60, name: 'External focus', description: '' },
-  ['repo-creation']: { max: 35, name: 'Repo creation', description: '' },
-  watch: { max: 35, name: 'Watch', description: '' },
+  ['pr-volume']: { max: 75, name: 'PR volume' },
+  ['branch-pr']: { max: 49, name: 'Branch PR' },
+  ['external-focus']: { max: 60, name: 'External focus' },
+  ['repo-creation']: { max: 35, name: 'Repo creation' },
+  watch: { max: 35, name: 'Watch' },
   ['comment-pr-timing']: {
     max: 30,
     name: 'Comment PR timing',
-    description: '',
   },
-  timing: { max: 56, name: 'Timing', description: '' },
-  diversity: { max: 20, name: 'Diversity', description: '' },
-  engagement: { max: 25, name: 'Engagement', description: '' },
-  ['repo-spread']: { max: 30, name: 'Repo spread', description: '' },
-  ['comment-volume']: { max: 40, name: 'Comment vol.', description: '' },
-  ['pr-comment-volume']: { max: 38, name: 'PR comment vol.', description: '' },
-  ['account-age']: { max: 30, name: 'Account age', description: '' },
-  bounty: { max: 25, name: 'Bounty', description: '' },
+  timing: { max: 56, name: 'Timing' },
+  diversity: { max: 20, name: 'Diversity' },
+  engagement: { max: 25, name: 'Engagement' },
+  ['repo-spread']: { max: 30, name: 'Repo spread' },
+  ['comment-volume']: { max: 40, name: 'Comment vol.' },
+  ['pr-comment-volume']: { max: 38, name: 'PR comment vol.' },
+  ['account-age']: { max: 30, name: 'Account age' },
+  bounty: { max: 25, name: 'Bounty' },
 }
 
 const accountName = ref('')
