@@ -102,10 +102,10 @@ export function getTrendColor({
   reversed?: boolean
 }) {
   if (value > 0) {
-    return reversed ? 'text-gh-danger-hover' : 'text-gh-green'
+    return reversed ? 'text-[--automation]' : 'text-[--organic]'
   }
   if (value < 0) {
-    return reversed ? 'text-gh-green' : 'text-gh-danger-hover'
+    return reversed ? 'text-[--organic]' : 'text-[--automation]'
   }
-  return 'text-gh-muted'
+  return 'text-[--text-muted]'
 }
