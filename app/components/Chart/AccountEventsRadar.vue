@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 import { VueUiRadar, type VueUiRadarDataset } from 'vue-data-ui/vue-ui-radar'
 
 // TODO: props, when the component is plugged to the main search
-// props: username, flags should be enough
+// props: username, flags & classification should be enough
 
 import('vue-data-ui/style.css')
 
