@@ -5,6 +5,7 @@ import {
   previousHourWindow,
   trimToRecentScans,
 } from '../scan-users'
+import { libraries } from '../../shared/daily-scan'
 import type { EcosystemHealthItem } from '../../shared/types/ecosystem-health'
 import { getCompletedDailyEntries } from '../../shared/utils/daily-rollup'
 
@@ -15,7 +16,19 @@ vi.mock('../pr-hash', () => ({
 
 beforeAll(() => {
   vi.spyOn(console, 'log').mockImplementation(() => {})
+  vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
+
+/** Runs `fn` with the scanned repo list temporarily replaced. */
+async function withLibraries<T>(repos: string[], fn: () => Promise<T>) {
+  const original = [...libraries]
+  libraries.splice(0, libraries.length, ...repos)
+  try {
+    return await fn()
+  } finally {
+    libraries.splice(0, libraries.length, ...original)
+  }
+}
 
 const WINDOW = {
   start: new Date('2026-08-07T07:00:00Z'),
@@ -64,6 +77,49 @@ function makeOctokit(pages: PrFixture[][]) {
 
   return { octokit: octokit as unknown as Octokit, userCalls }
 }
+
+/**
+ * Multi-repo variant: each repo maps either to its pages, or to an Error the
+ * PR listing rejects with, so a failing repo can sit next to a healthy one.
+ */
+function makeMultiRepoOctokit(repos: Record<string, PrFixture[][] | Error>) {
+  const { octokit } = makeOctokit([])
+
+  octokit.rest.pulls.list = vi.fn(
+    async ({
+      owner,
+      repo,
+      page,
+    }: {
+      owner: string
+      repo: string
+      page: number
+    }) => {
+      const entry = repos[`${owner}/${repo}`]
+      if (entry instanceof Error) {
+        throw entry
+      }
+      return {
+        data: (entry?.[page - 1] ?? []).map((pr) => ({
+          number: pr.number,
+          created_at: pr.created_at,
+          state: pr.state ?? 'open',
+          merged_at: pr.merged_at ?? null,
+          user: { login: pr.login },
+        })),
+      }
+    },
+  ) as unknown as Octokit['rest']['pulls']['list']
+
+  return octokit
+}
+
+const prPage = (repo: string, count: number): PrFixture[] =>
+  Array.from({ length: count }, (_, i) => ({
+    number: i + 1,
+    login: `${repo}-author-${i}`,
+    created_at: '2026-08-07T07:30:00Z',
+  }))
 
 describe('previousHourWindow', () => {
   it('covers the previous full clock hour', () => {
@@ -171,14 +227,88 @@ describe('collectPrs', () => {
     expect(windowed).toEqual([])
   })
 
-  it('still aborts when a repo cannot fill the fixed sample', async () => {
+  it('skips a repo that cannot fill the fixed sample', async () => {
     const { octokit } = makeOctokit([
       [{ number: 1, login: 'ada', created_at: '2026-08-07T07:10:00Z' }],
     ])
 
+    // Single-repo library, so the only repo failing empties the run.
     await expect(collectPrs(octokit, 10, WINDOW)).rejects.toThrow(
-      'only 1/10 PRs collected',
+      'all 1 repos failed',
     )
+  })
+
+  it('keeps scanning the other repos when one fails', async () => {
+    const octokit = makeMultiRepoOctokit({
+      'acme/lib': [prPage('lib', 3)],
+      'acme/gone': new Error('Not Found'),
+      'acme/other': [prPage('other', 3)],
+    })
+
+    const { sample, windowed, skipped } = await withLibraries(
+      ['acme/lib', 'acme/gone', 'acme/other'],
+      async () => {
+        vi.useFakeTimers()
+        try {
+          // The failing repo burns through its retries on fake timers.
+          const pending = collectPrs(octokit, 2, WINDOW)
+          await vi.runAllTimersAsync()
+          return await pending
+        } finally {
+          vi.useRealTimers()
+        }
+      },
+    )
+
+    expect(sample.map((pr) => pr.repo_name)).toEqual([
+      'acme/lib',
+      'acme/lib',
+      'acme/other',
+      'acme/other',
+    ])
+    expect(windowed).toHaveLength(6)
+    expect(skipped).toEqual([{ repo_name: 'acme/gone', reason: 'Not Found' }])
+  })
+
+  it('drops the partial rows of a repo that fails mid-collection', async () => {
+    const octokit = makeMultiRepoOctokit({
+      // Two PRs against a sample of three: collected, then discarded.
+      'acme/thin': [prPage('thin', 2)],
+      'acme/full': [prPage('full', 3)],
+    })
+
+    const { sample, windowed, skipped } = await withLibraries(
+      ['acme/thin', 'acme/full'],
+      () => collectPrs(octokit, 3, WINDOW),
+    )
+
+    expect(sample.map((pr) => pr.repo_name)).toEqual([
+      'acme/full',
+      'acme/full',
+      'acme/full',
+    ])
+    // Not even the windowed rows of the failed repo survive.
+    expect(windowed.map((pr) => pr.repo_name)).toEqual([
+      'acme/full',
+      'acme/full',
+      'acme/full',
+    ])
+    expect(skipped).toEqual([
+      { repo_name: 'acme/thin', reason: 'only 2/3 PRs collected' },
+    ])
+  })
+
+  it('aborts when every repo fails', async () => {
+    const octokit = makeMultiRepoOctokit({
+      'acme/lib': [prPage('lib', 1)],
+      'acme/other': [prPage('other', 1)],
+    })
+
+    await expect(
+      withLibraries(['acme/lib', 'acme/other'], () =>
+        collectPrs(octokit, 5, WINDOW),
+      ),
+    ).rejects.toThrow('all 2 repos failed')
   })
 
   it('pages until it reaches the start of the window', async () => {

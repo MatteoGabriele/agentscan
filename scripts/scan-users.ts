@@ -218,6 +218,11 @@ async function fetchUserEvents(
  * `pr_status` is carried through so it can be sliced on later — inside a
  * one-hour window a `closed` row means "closed within the hour", which is a
  * signal in its own right rather than a reason to exclude the row.
+ *
+ * A repo that fails — deleted, renamed, private, or still erroring after the
+ * retries — is skipped whole rather than taking the run down with it. Its rows
+ * are buffered until the repo finishes, so a repo contributes either its full
+ * sample or nothing at all, never a half-read one that would understate it.
  */
 export async function collectPrs(
   octokit: Octokit,
@@ -226,6 +231,7 @@ export async function collectPrs(
 ) {
   const sample: CollectedPr[] = []
   const windowed: CollectedPr[] = []
+  const skipped: { repo_name: string; reason: string }[] = []
   // An account can author PRs in several tracked repos, and can land in both
   // datasets in the same run — fetch its profile once.
   const profiles = new Map<string, GitHubUser>()
@@ -251,107 +257,126 @@ export async function collectPrs(
 
   for (const repoFullName of libraries) {
     const [owner, repo] = repoFullName.split('/')
-    let prsFromThisRepo = 0
-    let windowedFromThisRepo = 0
+    // Buffered per repo so a failure half-way through discards this repo's rows
+    // instead of leaving a partial sample behind.
+    const repoSample: CollectedPr[] = []
+    const repoWindowed: CollectedPr[] = []
 
-    // Page 1 alone covers the fixed sample. The window may need more, so keep
-    // paging until a page ends before the window starts.
-    const prs: Awaited<ReturnType<typeof octokit.rest.pulls.list>>['data'] = []
+    try {
+      // Page 1 alone covers the fixed sample. The window may need more, so keep
+      // paging until a page ends before the window starts.
+      const prs: Awaited<ReturnType<typeof octokit.rest.pulls.list>>['data'] =
+        []
 
-    for (let page = 1; page <= (window ? WINDOW_MAX_PAGES : 1); page++) {
-      const response = await withRetry(
-        () =>
-          octokit.rest.pulls.list({
-            owner,
-            repo,
-            state: 'all',
-            sort: 'created',
-            direction: 'desc',
-            per_page: PRS_PER_PAGE,
-            page,
-          }),
-        `${repoFullName}: fetch PRs (page ${page})`,
-      )
+      for (let page = 1; page <= (window ? WINDOW_MAX_PAGES : 1); page++) {
+        const response = await withRetry(
+          () =>
+            octokit.rest.pulls.list({
+              owner,
+              repo,
+              state: 'all',
+              sort: 'created',
+              direction: 'desc',
+              per_page: PRS_PER_PAGE,
+              page,
+            }),
+          `${repoFullName}: fetch PRs (page ${page})`,
+        )
 
-      prs.push(...response.data)
+        prs.push(...response.data)
 
-      const oldest = response.data.at(-1)
-      const exhausted = response.data.length < PRS_PER_PAGE
-      const reachedWindowStart =
-        !window || !oldest || new Date(oldest.created_at) < window.start
+        const oldest = response.data.at(-1)
+        const exhausted = response.data.length < PRS_PER_PAGE
+        const reachedWindowStart =
+          !window || !oldest || new Date(oldest.created_at) < window.start
 
-      if (exhausted || reachedWindowStart) {
-        break
+        if (exhausted || reachedWindowStart) {
+          break
+        }
       }
+
+      for (const pr of prs) {
+        const createdAt = new Date(pr.created_at)
+        const olderThanWindow = !window || createdAt < window.start
+        const needsSample = repoSample.length < prsPerRepo
+
+        // Sorted newest first, so once the sample is full and we are past the
+        // window there is nothing left in this repo worth reading.
+        if (!needsSample && olderThanWindow) {
+          break
+        }
+
+        const inWindow =
+          window != null && !olderThanWindow && createdAt < window.end
+
+        if (!needsSample && !inWindow) {
+          continue
+        }
+        if (!pr.user?.login) {
+          continue
+        }
+
+        if (isKnownBot(pr.user.login)) {
+          console.log(`  ${repoFullName}: skipping known bot`)
+          continue
+        }
+
+        const profile = await getProfile(
+          pr.user.login,
+          `${repoFullName}: fetch user ${pr.user.login}`,
+        )
+
+        const collected: CollectedPr = {
+          id: profile.id,
+          login: profile.login,
+          created_at: profile.created_at,
+          pr_key: hashPrId(repoFullName, pr.number),
+          pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
+          public_repos: profile.public_repos,
+          profile,
+          repo_name: repoFullName,
+        }
+
+        if (needsSample) {
+          repoSample.push(collected)
+          console.log(`  ${repoFullName}: ${repoSample.length}/${prsPerRepo}`)
+        }
+
+        if (inWindow) {
+          repoWindowed.push(collected)
+        }
+      }
+
+      if (repoSample.length < prsPerRepo) {
+        throw new Error(`only ${repoSample.length}/${prsPerRepo} PRs collected`)
+      }
+    } catch (error) {
+      const reason = (error as Error).message
+      skipped.push({ repo_name: repoFullName, reason })
+      console.warn(`  ${repoFullName}: skipped — ${reason}`)
+      continue
     }
 
-    for (const pr of prs) {
-      const createdAt = new Date(pr.created_at)
-      const olderThanWindow = !window || createdAt < window.start
-      const needsSample = prsFromThisRepo < prsPerRepo
-
-      // Sorted newest first, so once the sample is full and we are past the
-      // window there is nothing left in this repo worth reading.
-      if (!needsSample && olderThanWindow) {
-        break
-      }
-
-      const inWindow =
-        window != null && !olderThanWindow && createdAt < window.end
-
-      if (!needsSample && !inWindow) {
-        continue
-      }
-      if (!pr.user?.login) {
-        continue
-      }
-
-      if (isKnownBot(pr.user.login)) {
-        console.log(`  ${repoFullName}: skipping known bot`)
-        continue
-      }
-
-      const profile = await getProfile(
-        pr.user.login,
-        `${repoFullName}: fetch user ${pr.user.login}`,
-      )
-
-      const collected: CollectedPr = {
-        id: profile.id,
-        login: profile.login,
-        created_at: profile.created_at,
-        pr_key: hashPrId(repoFullName, pr.number),
-        pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
-        public_repos: profile.public_repos,
-        profile,
-        repo_name: repoFullName,
-      }
-
-      if (needsSample) {
-        sample.push(collected)
-        prsFromThisRepo++
-        console.log(`  ${repoFullName}: ${prsFromThisRepo}/${prsPerRepo}`)
-      }
-
-      if (inWindow) {
-        windowed.push(collected)
-        windowedFromThisRepo++
-      }
-    }
-
-    if (prsFromThisRepo < prsPerRepo) {
-      throw new Error(
-        `${repoFullName}: only ${prsFromThisRepo}/${prsPerRepo} PRs collected — aborting scan`,
-      )
-    }
+    sample.push(...repoSample)
+    windowed.push(...repoWindowed)
 
     // No floor on the windowed count: an hour with no PRs is a real result.
     if (window) {
-      console.log(`  ${repoFullName}: ${windowedFromThisRepo} in window`)
+      console.log(`  ${repoFullName}: ${repoWindowed.length} in window`)
     }
   }
 
-  return { sample, windowed }
+  // Every repo failing is not a scan with nothing to report — it is a broken
+  // run (bad token, revoked access, GitHub down) and must not be written out.
+  if (skipped.length === libraries.length) {
+    throw new Error(
+      `all ${libraries.length} repos failed — aborting scan:\n${skipped
+        .map((entry) => `  ${entry.repo_name}: ${entry.reason}`)
+        .join('\n')}`,
+    )
+  }
+
+  return { sample, windowed, skipped }
 }
 
 export async function main(options: ScanOptions) {
@@ -398,7 +423,19 @@ export async function main(options: ScanOptions) {
     )
   }
 
-  const { sample, windowed } = await collectPrs(octokit, prsPerRepo, window)
+  const { sample, windowed, skipped } = await collectPrs(
+    octokit,
+    prsPerRepo,
+    window,
+  )
+
+  if (skipped.length) {
+    console.warn(
+      `Skipped ${skipped.length} repo(s): ${skipped
+        .map((entry) => entry.repo_name)
+        .join(', ')}`,
+    )
+  }
 
   // Re-running the workflow inside the same hour rewrites that hour's bucket
   // rather than appending a second copy of it.
@@ -495,7 +532,8 @@ export async function main(options: ScanOptions) {
     windowResults.push(toResult(pr, windowAt!, scored))
   }
 
-  // Only reached if every repo and every user scan succeeded
+  // Only reached if every user scan succeeded; repos that failed collection
+  // were dropped above and simply contribute no rows to this run.
   const finalResults =
     maxScans != null ? trimToRecentScans(scanResults, maxScans) : scanResults
 
