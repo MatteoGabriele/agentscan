@@ -7,7 +7,7 @@ import { join } from 'path'
 import { Octokit } from 'octokit'
 import { identify } from '@unveil/identity'
 import type { GitHubEvent, IdentifyUser } from '@unveil/identity'
-import { hashValue } from './hash-value'
+import { encryptValue } from './encrypt-value'
 import { pack, unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
@@ -205,7 +205,7 @@ function saveAutomationIds(
     return
   }
   const filePath = join(process.cwd(), 'data', outputFile)
-  writeFileSync(filePath, `${JSON.stringify(tallies)}\n`)
+  writeFileSync(filePath, `${JSON.stringify(tallies, null, 2)}\n`)
 }
 
 export function mergeAutomationIds(
@@ -385,7 +385,7 @@ export async function collectPrs(
           id: profile.id,
           login: profile.login,
           created_at: profile.created_at,
-          pr_key: hashValue(repoFullName, pr.number),
+          pr_key: encryptValue(repoFullName, pr.number),
           pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
           public_repos: profile.public_repos,
           profile,
@@ -522,7 +522,7 @@ export async function main(options: ScanOptions) {
       return
     }
     countedPrKeys.add(pr.pr_key)
-    automationIds.push(hashValue(pr.id))
+    automationIds.push(encryptValue(pr.id))
   }
 
   async function scoreUser(pr: CollectedPr) {
