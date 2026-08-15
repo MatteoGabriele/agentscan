@@ -692,11 +692,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ? dailyOutputArg.split('=')[1]
     : undefined
 
+  const automationIdsOutputPrefix = '--automation-ids-output='
   const automationIdsOutputArg = args.find((a) =>
-    a.startsWith('--automation-ids-output='),
+    a.startsWith(automationIdsOutputPrefix),
   )
   const automationIdsOutputFile = automationIdsOutputArg
-    ? automationIdsOutputArg.split('=')[1]
+    ? automationIdsOutputArg.slice(automationIdsOutputPrefix.length)
     : undefined
 
   main({
