@@ -7,14 +7,17 @@ import { join } from 'path'
 import { Octokit } from 'octokit'
 import { identify } from '@unveil/identity'
 import type { GitHubEvent, IdentifyUser } from '@unveil/identity'
-import { hashPrId } from './pr-hash'
+import { hashValue } from './hash-value'
 import { pack, unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
   getCompletedDailyEntries,
   mergeDailyEntries,
 } from '../shared/utils/daily-rollup'
-import { INSUFFICIENT_DATA_SCORE } from '../shared/utils/health-stats'
+import {
+  INSUFFICIENT_DATA_SCORE,
+  classifyByScore,
+} from '../shared/utils/health-stats'
 import type { PrStatus } from '../shared/types/ecosystem-health'
 
 // Configuration
@@ -66,7 +69,15 @@ interface ScanOptions {
    * date — whichever source reached it first owns it.
    */
   dailyOutputFile?: string
+  /**
+   * Where the run records the accounts it scored as automations, as
+   * `[hashedId, prCount]` pairs. Unlike every other output this one only
+   * ever grows: it is a tally across scans, not a window over them.
+   */
+  automationIdsOutputFile?: string
 }
+
+export type AutomationIdTally = [string, number]
 
 type GitHubUser = Awaited<
   ReturnType<Octokit['rest']['users']['getByUsername']>
@@ -171,6 +182,50 @@ function saveDailyEntries(
   }
   const filePath = join(process.cwd(), 'data', outputFile)
   writeFileSync(filePath, `${JSON.stringify(entries, null, 2)}\n`)
+}
+
+function loadAutomationIds(outputFile: string): AutomationIdTally[] {
+  const filePath = join(process.cwd(), 'data', outputFile)
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf-8'))
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      return []
+    }
+    throw err
+  }
+}
+
+function saveAutomationIds(
+  tallies: AutomationIdTally[],
+  outputFile: string,
+  dryRun: boolean = false,
+): void {
+  if (dryRun) {
+    return
+  }
+  const filePath = join(process.cwd(), 'data', outputFile)
+  writeFileSync(filePath, `${JSON.stringify(tallies)}\n`)
+}
+
+export function mergeAutomationIds(
+  stored: AutomationIdTally[],
+  seen: Iterable<string>,
+): AutomationIdTally[] {
+  const merged = stored.map((entry): AutomationIdTally => [entry[0], entry[1]])
+  const indexById = new Map(merged.map((entry, index) => [entry[0], index]))
+
+  for (const id of seen) {
+    const index = indexById.get(id)
+    if (index == null) {
+      indexById.set(id, merged.length)
+      merged.push([id, 1])
+    } else {
+      merged[index][1] += 1
+    }
+  }
+
+  return merged
 }
 
 // Drops the oldest scan runs so the file holds at most `maxScans` of them.
@@ -330,7 +385,7 @@ export async function collectPrs(
           id: profile.id,
           login: profile.login,
           created_at: profile.created_at,
-          pr_key: hashPrId(repoFullName, pr.number),
+          pr_key: hashValue(repoFullName, pr.number),
           pr_status: pr.merged_at ? 'merged' : (pr.state as PrStatus),
           public_repos: profile.public_repos,
           profile,
@@ -388,6 +443,7 @@ export async function main(options: ScanOptions) {
     windowOutputFile,
     windowMaxScans,
     dailyOutputFile,
+    automationIdsOutputFile,
   } = options
 
   // Scans run on a separate account's token so they draw from their own rate
@@ -453,6 +509,22 @@ export async function main(options: ScanOptions) {
     { score: number; events_count: number; is_bounty: boolean }
   >()
 
+  const automationIds: string[] = []
+  const countedPrKeys = new Set<string>()
+
+  function recordAutomationPr(pr: CollectedPr, score: number) {
+    // Thresholds live in the identity config, so read the classification back
+    // rather than comparing against a number spelled out here.
+    if (
+      classifyByScore(score) !== 'automation' ||
+      countedPrKeys.has(pr.pr_key)
+    ) {
+      return
+    }
+    countedPrKeys.add(pr.pr_key)
+    automationIds.push(hashValue(pr.id))
+  }
+
   async function scoreUser(pr: CollectedPr) {
     const cached = scoredUsers.get(pr.login)
     if (cached) {
@@ -516,6 +588,7 @@ export async function main(options: ScanOptions) {
 
     const scored = await scoreUser(pr)
     scanResults.push(toResult(pr, runAt, scored))
+    recordAutomationPr(pr, scored.score)
 
     if (scored.score !== INSUFFICIENT_DATA_SCORE) {
       const currentScore = repoScores.get(pr.repo_name) ?? 0
@@ -530,6 +603,7 @@ export async function main(options: ScanOptions) {
 
     const scored = await scoreUser(pr)
     windowResults.push(toResult(pr, windowAt!, scored))
+    recordAutomationPr(pr, scored.score)
   }
 
   // Only reached if every user scan succeeded; repos that failed collection
@@ -558,6 +632,16 @@ export async function main(options: ScanOptions) {
 
     saveDailyEntries(dailyEntries, dailyOutputFile, dryRun)
     console.log(`Daily: ${measured.length} day(s) rolled up from the window`)
+  }
+
+  if (automationIdsOutputFile) {
+    const stored = dryRun ? [] : loadAutomationIds(automationIdsOutputFile)
+    const tallies = mergeAutomationIds(stored, automationIds)
+
+    saveAutomationIds(tallies, automationIdsOutputFile, dryRun)
+    console.log(
+      `Automations: ${automationIds.length} PR(s) from ${new Set(automationIds).size} account(s) this run, ${tallies.length} tracked overall`,
+    )
   }
 
   const sortedRepos = Array.from(repoScores.entries()).sort(
@@ -608,6 +692,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ? dailyOutputArg.split('=')[1]
     : undefined
 
+  const automationIdsOutputPrefix = '--automation-ids-output='
+  const automationIdsOutputArg = args.find((a) =>
+    a.startsWith(automationIdsOutputPrefix),
+  )
+  const automationIdsOutputFile = automationIdsOutputArg
+    ? automationIdsOutputArg.slice(automationIdsOutputPrefix.length)
+    : undefined
+
   main({
     dryRun,
     outputFile,
@@ -616,6 +708,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ...(windowOutputFile && { windowOutputFile }),
     ...(windowMaxScans != null && { windowMaxScans }),
     ...(dailyOutputFile && { dailyOutputFile }),
+    ...(automationIdsOutputFile && { automationIdsOutputFile }),
   }).catch((error) => {
     console.error('Fatal error:', error.message)
     process.exit(1)

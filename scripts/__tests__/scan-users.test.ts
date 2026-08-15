@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeAll } from 'vitest'
 import type { Octokit } from 'octokit'
 import {
   collectPrs,
+  mergeAutomationIds,
   previousHourWindow,
   trimToRecentScans,
 } from '../scan-users'
@@ -10,8 +11,8 @@ import type { EcosystemHealthItem } from '../../shared/types/ecosystem-health'
 import { getCompletedDailyEntries } from '../../shared/utils/daily-rollup'
 
 vi.mock('../../shared/daily-scan', () => ({ libraries: ['acme/lib'] }))
-vi.mock('../pr-hash', () => ({
-  hashPrId: (repo: string, number: number) => `${repo}#${number}`,
+vi.mock('../hash-value', () => ({
+  hashValue: (...parts: (string | number)[]) => parts.join('#'),
 }))
 
 beforeAll(() => {
@@ -412,5 +413,50 @@ describe('daily rollup at the first midnight rollover', () => {
 
     expect(retained[0]?.created_at).toBe('2026-06-10T01:00:00.000Z')
     expect(getCompletedDailyEntries(retained, SCANNED_HOUR)).toEqual([])
+  })
+})
+
+describe('mergeAutomationIds', () => {
+  // Stand-ins for `hashUserId` output: the merge only ever compares them.
+  const ADA = 'a1a1a1'
+  const BOB = 'b2b2b2'
+  const CAT = 'c3c3c3'
+
+  it('starts new ids at one and keeps them in the order first seen', () => {
+    expect(mergeAutomationIds([], [ADA, BOB])).toEqual([
+      [ADA, 1],
+      [BOB, 1],
+    ])
+  })
+
+  it('bumps known ids in place and appends only the unseen ones', () => {
+    const stored: [string, number][] = [
+      [ADA, 2],
+      [BOB, 1],
+    ]
+
+    expect(mergeAutomationIds(stored, [BOB, CAT])).toEqual([
+      [ADA, 2],
+      [BOB, 2],
+      [CAT, 1],
+    ])
+  })
+
+  it('leaves the stored tally untouched', () => {
+    const stored: [string, number][] = [[ADA, 2]]
+
+    mergeAutomationIds(stored, [ADA])
+
+    expect(stored).toEqual([[ADA, 2]])
+  })
+
+  it('counts a repeated id once per PR, not once per run', () => {
+    // Mirrors the caller: one entry per automation-scored PR, so an account
+    // that spammed three PRs in a scan moves its counter by three.
+    expect(mergeAutomationIds([[ADA, 1]], [ADA, ADA, ADA])).toEqual([[ADA, 4]])
+  })
+
+  it('starts a new id at its PR count in the same run', () => {
+    expect(mergeAutomationIds([], [BOB, BOB])).toEqual([[BOB, 2]])
   })
 })
