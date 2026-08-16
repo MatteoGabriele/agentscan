@@ -2,12 +2,14 @@
 version: 1
 
 scan:
-  pull-requests: true
   issues: true
 
+trusted-author-associations:
+  - owner
+  - collaborator
+  - member
+
 allowed-users:
-  - MatteoGabriele
-  - graphieros
   - huang-julien
   - danielroe
   - gameroman
