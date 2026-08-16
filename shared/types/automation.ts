@@ -6,3 +6,5 @@ export type VerifiedAutomation = {
   createdAt: string
   reportedBy: string
 }
+
+export type AutomationTally = [string, number]
