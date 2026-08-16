@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import HourlyEventsWaffle from '~/components/Chart/HourlyEventsWaffle.vue'
-
 const { data: hourly } = await useEcosystemHealthHourly()
 </script>
 
