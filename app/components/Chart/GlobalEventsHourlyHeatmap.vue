@@ -15,8 +15,6 @@ import('vue-data-ui/style.css')
 
 dayjs.extend(utc)
 
-console.log(VueUiHeatmap)
-
 type EcosystemHealthCategory = 'organic' | 'mixed' | 'automation'
 
 type EcosystemHealthHourlySeries = {
