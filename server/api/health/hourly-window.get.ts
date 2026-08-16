@@ -38,7 +38,7 @@ export default defineEventHandler(async () => {
     const scanTimes = Object.keys(countsByScanTime).sort()
 
     const entries = Object.values(countsByScanTime).map((entry) => ({
-      date: dayjs(entry.createdAt).format('YYYY-MM-DD'),
+      date: dayjs.utc(entry.createdAt).format('YYYY-MM-DD'),
       createdAt: entry.createdAt,
       classifications: {
         organic: { count: entry.organic.count },
