@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useHead({
+  htmlAttrs: {
+    class: 'overflow-x-clip',
+  },
+})
+</script>
 
 <template>
   <section class="flex flex-col gap-6 h-full">
