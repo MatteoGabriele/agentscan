@@ -73,7 +73,7 @@ export const libraries = [
   'goauthentik/authentik',
   'unovue/reka-ui/pulls',
   'vuetifyjs/vuetify',
-  'nestjs/nest',
+  'rustdesk/rustdesk',
   'nitrojs/nitro',
   'sveltejs/kit',
   'bluesky-social/social-app',
