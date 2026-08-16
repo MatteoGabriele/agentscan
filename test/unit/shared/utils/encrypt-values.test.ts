@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { encryptValue, decryptValue, decryptParts } from '../encrypt-value'
+import {
+  encryptValue,
+  decryptValue,
+  decryptParts,
+} from '../../../../shared/utils/encrypt-values'
 
 beforeEach(() => {
   vi.stubEnv('PR_HASH_SECRET', 'test-secret')
