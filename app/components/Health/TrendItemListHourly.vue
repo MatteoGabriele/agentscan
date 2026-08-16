@@ -1,36 +1,20 @@
 <script setup lang="ts">
 import type { EcosystemHealthCategory } from '~~/shared/types/ecosystem-health'
 
-const props = withDefaults(
-  defineProps<{
-    view?: string
-  }>(),
-  {
-    view: 'daily',
-  },
-)
-
 type ClassificationStats = Record<
   EcosystemHealthCategory,
   { count: number; percentage: string }
 >
-
-const { data: ecosystemHealthDaily } = await useEcosystemHealth()
 const { data: ecosystemHealthHourly } = await useEcosystemHealthHourlyWindow()
 
-const entriesDaily = computed(() => ecosystemHealthDaily.value?.entries ?? [])
 const entriesHourly = computed(() => ecosystemHealthHourly.value?.entries ?? [])
 
 const categoryProgression = computed(() => {
-  return props.view === 'daily'
-    ? ecosystemHealthDaily.value?.categoryProgression
-    : ecosystemHealthHourly.value?.categoryProgression
+  return ecosystemHealthHourly.value?.categoryProgression
 })
 
 const latestDayStats = computed<ClassificationStats | null>(() => {
-  return props.view === 'daily'
-    ? getHealthStatsFromEntries(entriesDaily.value)
-    : getHealthStatsFromEntries(entriesHourly.value)
+  return getHealthStatsFromEntries(entriesHourly.value)
 })
 </script>
 
