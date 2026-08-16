@@ -12,8 +12,6 @@ import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc)
 
-console.log(VueUiWaffle)
-
 const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
