@@ -1,10 +1,15 @@
 import { unpack } from '~~/shared/utils/compactor'
+import type { ScanEntry } from '~~/shared/utils/daily-rollup'
 import {
   applyCumulativeTrends,
   fillEmptyHourlyBuckets,
   getClassificationStatsByScanTime,
 } from '~~/shared/utils/count-classification-by-date'
 import { WINDOW_MAX_HOURS } from '~~/shared/utils/health-history-window'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 export default defineEventHandler(async () => {
   try {
@@ -32,7 +37,18 @@ export default defineEventHandler(async () => {
     const categoryProgression = applyCumulativeTrends(countsByScanTime)
     const scanTimes = Object.keys(countsByScanTime).sort()
 
+    const entries = Object.values(countsByScanTime).map((entry) => ({
+      date: dayjs(entry.createdAt).format('YYYY-MM-DD'),
+      createdAt: entry.createdAt,
+      classifications: {
+        organic: { count: entry.organic.count },
+        mixed: { count: entry.mixed.count },
+        automation: { count: entry.automation.count },
+      },
+    })) as ScanEntry[]
+
     return {
+      entries,
       results,
       categoryProgression,
       countsByScanTime,

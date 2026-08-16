@@ -25,6 +25,8 @@ export type DailyScanEntry = {
   classifications: Record<IdentityClassification, DailyClassificationCounts>
 }
 
+export type ScanEntry = Omit<DailyScanEntry, 'hours'>
+
 type DailyScanBucket = Omit<DailyScanEntry, 'date' | 'hours'> & {
   hours: Set<string>
 }
@@ -168,8 +170,8 @@ export function getDailyCountsByDate(
   return result
 }
 
-export function getDailyHealthStats(
-  entries: DailyScanEntry[],
+export function getHealthStatsFromEntries(
+  entries: ScanEntry[],
 ): Record<
   EcosystemHealthCategory,
   { count: number; percentage: string }
