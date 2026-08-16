@@ -9,6 +9,8 @@ allowed-users:
   - MatteoGabriele
   - graphieros
   - huang-julien
+  - danielroe
+  - gameroman
 
 auto-close: true
 honeypot: true
