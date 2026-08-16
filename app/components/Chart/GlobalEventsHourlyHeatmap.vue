@@ -15,6 +15,8 @@ import('vue-data-ui/style.css')
 
 dayjs.extend(utc)
 
+console.log(VueUiHeatmap)
+
 type EcosystemHealthCategory = 'organic' | 'mixed' | 'automation'
 
 type EcosystemHealthHourlySeries = {
@@ -128,9 +130,6 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
         selected: {
           border: SELECTION_BORDER,
           color: colors.value.text,
-        },
-        value: {
-          show: false,
         },
       },
       dataLabels: {
