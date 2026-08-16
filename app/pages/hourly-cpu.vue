@@ -18,7 +18,7 @@
           The latest 24 hours, broken down per classification count.
         </p>
         <p class="text-sm text-ui-muted text-center">
-          Litterally an image of the CPU usage of the ecosystem.
+          Literally an image of the CPU usage of the ecosystem.
         </p>
       </div>
 
