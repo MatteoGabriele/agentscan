@@ -22,38 +22,47 @@ onMounted(() => {
 })
 
 const scanItems = computed<
-  Array<{ date: string; data: VueUiWaffleDatasetItem[] }>
+  Array<{ date: string; data: VueUiWaffleDatasetItem[]; totalCount: number }>
 >(() => {
   const entries = Object.entries(
     hourlyWindow.value?.countsByScanTime ?? {},
   ).slice(-24) // removing the first one so we have an even number of hours
 
-  return entries.map(([date, item]) => ({
-    date: dayjs.utc(date).format('HH:mm'),
-    data: [
-      {
-        name: 'Organic',
-        values: [item.organic?.count ?? 0],
-        color: colors.value.organic,
-      },
-      {
-        name: 'Mixed',
-        values: [item.mixed?.count ?? 0],
-        color: colors.value.mixed,
-      },
-      {
-        name: 'Automation',
-        values: [item.automation?.count ?? 0],
-        color: colors.value.automation,
-      },
-    ],
-  }))
+  return entries.map(([date, item]) => {
+    const countOrganic = item.organic?.count ?? 0
+    const countMixed = item.mixed?.count ?? 0
+    const countAutomation = item.automation?.count ?? 0
+    const totalCount = countOrganic + countMixed + countAutomation
+
+    return {
+      date: dayjs.utc(date).format('HH:mm'),
+      data: [
+        {
+          name: 'Organic',
+          values: [countOrganic],
+          color: colors.value.organic,
+        },
+        {
+          name: 'Mixed',
+          values: [countMixed],
+          color: colors.value.mixed,
+        },
+        {
+          name: 'Automation',
+          values: [countAutomation],
+          color: colors.value.automation,
+        },
+      ],
+      totalCount,
+    }
+  })
 })
 
 const waffles = computed<
   Array<{
     config: VueUiWaffleConfig & { time: string }
     dataset: VueUiWaffleDatasetItem[]
+    totalCount: number
   }>
 >(() => {
   return scanItems.value.map((scanItem) => ({
@@ -81,6 +90,7 @@ const waffles = computed<
       },
     },
     dataset: scanItem.data,
+    totalCount: scanItem.totalCount,
   }))
 })
 
@@ -97,18 +107,23 @@ function getTime(cfg: VueUiWaffleConfig & { time: string }) {
         :key="i"
         class="w-[100px] sm:w-[200px] flex flex-col"
       >
-        <span>{{ waffle.config.time }}</span>
+        <div class="flex flex-row gap-1 text-xs mt-2 mb-1">
+          <span>{{ waffle.config.time }}</span>
+          <span>•</span>
+          <span>{{ waffle.totalCount }} PRs</span>
+        </div>
         <VueUiWaffle
           :dataset="waffle?.dataset ?? []"
           :config="waffle?.config ?? {}"
         >
           <template #tooltip="{ datapoint, config }">
             <div class="text-xs flex flex-col">
-              <div class="mb-1">
+              <div class="mb-1 flex flex-row gap-2">
                 <span>{{
                   getTime(config as VueUiWaffleConfig & { time: string })
                 }}</span>
               </div>
+
               <div class="flex flex-row gap-1 items-center">
                 <div
                   class="h-2 w-2 rounded-full"
