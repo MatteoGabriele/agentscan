@@ -4,11 +4,10 @@ import {
   type VueUiWaffleConfig,
   type VueUiWaffleDatasetItem,
 } from 'vue-data-ui/vue-ui-waffle'
-
-import('vue-data-ui/style.css')
-
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+
+import('vue-data-ui/style.css')
 
 dayjs.extend(utc)
 
@@ -77,6 +76,9 @@ const waffles = computed<
           backgroundColor: colors.value.bg,
           legend: { show: false },
           layout: {
+            grid: {
+              size: Math.ceil(Math.sqrt(scanItem.totalCount)) || 1,
+            },
             rect: {
               stroke: colors.value.bg,
               useGradient: false,
