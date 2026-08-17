@@ -97,6 +97,10 @@ const waffles = computed<
 function getTime(cfg: VueUiWaffleConfig & { time: string }) {
   return cfg.time
 }
+
+function getCountLabel(count: number) {
+  return `${count} PR${count === 1 ? '' : 's'}`
+}
 </script>
 
 <template>
@@ -110,7 +114,7 @@ function getTime(cfg: VueUiWaffleConfig & { time: string }) {
         <div class="flex flex-row gap-1 text-xs mt-2 mb-1">
           <span>{{ waffle.config.time }}</span>
           <span>•</span>
-          <span>{{ waffle.totalCount }} PRs</span>
+          <span>{{ getCountLabel(waffle.totalCount) }}</span>
         </div>
         <VueUiWaffle
           :dataset="waffle?.dataset ?? []"
