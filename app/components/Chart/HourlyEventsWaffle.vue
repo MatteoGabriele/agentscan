@@ -77,6 +77,14 @@ const waffles = computed<
           legend: { show: false },
           layout: {
             grid: {
+              /**
+               * The grid is scaled to the PR count for this hour
+               * so that 1 square = 1 PR (roughly, in most cases):
+               * - better performance (less svg rects in the dom)
+               * - better reading of each hour's weight in the whole day
+               *
+               * Note: comment out fhe following line to disable this feature
+               */
               size: Math.ceil(Math.sqrt(scanItem.totalCount)) || 1,
             },
             rect: {
