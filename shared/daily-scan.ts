@@ -71,7 +71,7 @@ export const libraries = [
   'calcom/cal.diy',
   'apache/airflow',
   'goauthentik/authentik',
-  'unovue/reka-ui/pulls',
+  'unovue/reka-ui',
   'vuetifyjs/vuetify',
   'rustdesk/rustdesk',
   'nitrojs/nitro',
