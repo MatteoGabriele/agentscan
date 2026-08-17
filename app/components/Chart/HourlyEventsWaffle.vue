@@ -58,9 +58,11 @@ const scanItems = computed<
   })
 })
 
+type VueUiWaffleConfigWithTime = VueUiWaffleConfig & { time: string }
+
 const waffles = computed<
   Array<{
-    config: VueUiWaffleConfig & { time: string }
+    config: VueUiWaffleConfigWithTime
     dataset: VueUiWaffleDatasetItem[]
     totalCount: number
   }>
@@ -94,7 +96,7 @@ const waffles = computed<
   }))
 })
 
-function getTime(cfg: VueUiWaffleConfig & { time: string }) {
+function getTime(cfg: VueUiWaffleConfigWithTime) {
   return cfg.time
 }
 
@@ -123,9 +125,7 @@ function getCountLabel(count: number) {
           <template #tooltip="{ datapoint, config }">
             <div class="text-xs flex flex-col">
               <div class="mb-1 flex flex-row gap-2">
-                <span>{{
-                  getTime(config as VueUiWaffleConfig & { time: string })
-                }}</span>
+                <span>{{ getTime(config as VueUiWaffleConfigWithTime) }}</span>
               </div>
 
               <div class="flex flex-row gap-1 items-center">
