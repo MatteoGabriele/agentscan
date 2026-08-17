@@ -5,7 +5,7 @@ import {
   type VueUiWaffleDatasetItem,
 } from 'vue-data-ui/vue-ui-waffle'
 
-import 'vue-data-ui/style.css'
+import('vue-data-ui/style.css')
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
