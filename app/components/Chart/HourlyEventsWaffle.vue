@@ -59,6 +59,8 @@ const scanItems = computed<
 
 type VueUiWaffleConfigWithTime = VueUiWaffleConfig & { time: string }
 
+const merged = shallowRef(false)
+
 const waffles = computed<
   Array<{
     config: VueUiWaffleConfigWithTime
@@ -89,7 +91,17 @@ const waffles = computed<
             },
             rect: {
               stroke: colors.value.bg,
+              strokeWidth: 1,
               useGradient: false,
+              merged: merged.value,
+              selection: {
+                unselectedOpacity: 1,
+                wrap: {
+                  show: true,
+                  stroke: colors.value.text,
+                  strokeWidth: 10,
+                },
+              },
             },
           },
           tooltip: {
@@ -116,6 +128,14 @@ function getCountLabel(count: number) {
 </script>
 
 <template>
+  <div class="flex flew-row items-center justify-center mb-6">
+    <!-- Experimental merge mode. I prefer the non-merge mode, but this is an annex of the lab^^ -->
+    <label>
+      <input type="checkbox" v-model="merged" />
+      Merged mode
+    </label>
+  </div>
+
   <ClientOnly v-if="waffles.length">
     <div class="flex flex-row flex-wrap gap-1 justify-center">
       <div
