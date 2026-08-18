@@ -16,7 +16,7 @@ useHead({
     </div>
 
     <div
-      class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto pb-12 w-full px-4"
+      class="flex flex-col items-center justify-center max-w-4xl mx-auto w-full px-4"
     >
       <div class="mb-5 transition-opacity">
         <h2 class="text-center">Hourly classification breakdown</h2>
