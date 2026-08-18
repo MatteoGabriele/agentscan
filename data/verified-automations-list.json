@@ -350,5 +350,21 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/356",
     "reportedBy": "sheremet-va",
     "createdAt": "2026-08-18"
+  },
+  {
+    "username": "Sanjays2402",
+    "id": 51058514,
+    "reason": "Repeated AI spam in weasyprint (look at closed PRs and maintainer reactions)",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/358",
+    "reportedBy": "Yann-P",
+    "createdAt": "2026-08-18"
+  },
+  {
+    "username": "dennismdejong",
+    "id": 55197148,
+    "reason": "Spam contribution in melcloudhome repo, self disclosing as AI.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/357",
+    "reportedBy": "Yann-P",
+    "createdAt": "2026-08-18"
   }
 ]
