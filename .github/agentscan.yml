@@ -13,6 +13,7 @@ allowed-users:
   - huang-julien
   - danielroe
   - gameroman
+  - sheremet-va
 
 auto-close: true
 honeypot: true
