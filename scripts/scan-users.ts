@@ -458,13 +458,20 @@ export async function main(options: ScanOptions) {
     )
   }
 
+  const storedScanResults = dryRun ? [] : loadScanResults(outputFile)
+
+  // A stored bucket for this hour means the workflow already ran for it. Its
+  // rows get rewritten below, but the automation tallies only ever grow, so a
+  // rerun must not count the same PRs a second time.
+  const isSameHourRerun = storedScanResults.some(
+    (result) => result.created_at === windowAt,
+  )
+
   // Re-running the workflow inside the same hour rewrites that hour's bucket
   // rather than appending a second copy of it.
-  const scanResults = dryRun
-    ? []
-    : loadScanResults(outputFile).filter(
-        (result) => result.created_at !== windowAt,
-      )
+  const scanResults = storedScanResults.filter(
+    (result) => result.created_at !== windowAt,
+  )
 
   // One score per account, reused across every PR it authored in this run —
   // the analysis looks at the user's events, not at the individual PR.
@@ -583,11 +590,15 @@ export async function main(options: ScanOptions) {
 
   if (automationIdsOutputFile) {
     const stored = dryRun ? [] : loadAutomationIds(automationIdsOutputFile)
-    const tallies = mergeAutomationIds(stored, automationIds)
+    const tallies = isSameHourRerun
+      ? stored
+      : mergeAutomationIds(stored, automationIds)
 
     saveAutomationIds(tallies, automationIdsOutputFile, dryRun)
     console.log(
-      `Automations: ${automationIds.length} PR(s) from ${new Set(automationIds).size} account(s) this run, ${tallies.length} tracked overall`,
+      isSameHourRerun
+        ? `Automations: rerun of ${windowAt} — tallies left at ${tallies.length} tracked overall`
+        : `Automations: ${automationIds.length} PR(s) from ${new Set(automationIds).size} account(s) this run, ${tallies.length} tracked overall`,
     )
   }
 

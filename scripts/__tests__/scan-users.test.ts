@@ -46,6 +46,15 @@ type PrFixture = {
   merged_at?: string | null
 }
 
+const userProfile = (username: string) => ({
+  data: {
+    id: username.length,
+    login: username,
+    created_at: '2020-01-01T00:00:00Z',
+    public_repos: 3,
+  },
+})
+
 function makeOctokit(pages: PrFixture[][]) {
   const userCalls: string[] = []
 
@@ -65,14 +74,7 @@ function makeOctokit(pages: PrFixture[][]) {
       users: {
         getByUsername: vi.fn(async ({ username }: { username: string }) => {
           userCalls.push(username)
-          return {
-            data: {
-              id: username.length,
-              login: username,
-              created_at: '2020-01-01T00:00:00Z',
-              public_repos: 3,
-            },
-          }
+          return userProfile(username)
         }),
       },
     },
@@ -271,14 +273,29 @@ describe('collectPrs', () => {
 
   it('drops the partial rows of a repo that fails mid-collection', async () => {
     const octokit = makeMultiRepoOctokit({
-      // A full page holding only 25 scorable PRs, so the cap is not filled
-      // and paging continues into the page that fails.
       'acme/thin': [
-        [...botPrs(25, 200), ...inWindowPrs(25, 175, 'thin-author')],
-        new Error('Not Found'),
+        [
+          {
+            number: 2,
+            login: 'thin-early',
+            created_at: '2026-08-07T07:30:00Z',
+          },
+          { number: 1, login: 'thin-late', created_at: '2026-08-07T07:20:00Z' },
+        ],
       ],
       'acme/full': [prPage('full', 3)],
     })
+
+    // The first author resolves and its row is buffered; the second one dies
+    // while the rows are being built, so the repo fails part-way through.
+    octokit.rest.users.getByUsername = vi.fn(
+      async ({ username }: { username: string }) => {
+        if (username === 'thin-late') {
+          throw new Error('Not Found')
+        }
+        return userProfile(username)
+      },
+    ) as unknown as Octokit['rest']['users']['getByUsername']
 
     const { windowed, skipped } = await withLibraries(
       ['acme/thin', 'acme/full'],
