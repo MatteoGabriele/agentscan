@@ -3567,5 +3567,48 @@
         }
       }
     }
+  },
+  {
+    "date": "2026-08-18",
+    "createdAt": "2026-08-18T00:00:00.000Z",
+    "hours": 24,
+    "classifications": {
+      "organic": {
+        "count": 682,
+        "bountyCount": 12,
+        "prStatusCounts": {
+          "open": 613,
+          "closed": 27,
+          "merged": 42
+        }
+      },
+      "mixed": {
+        "count": 253,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 179,
+          "closed": 9,
+          "merged": 65
+        }
+      },
+      "automation": {
+        "count": 302,
+        "bountyCount": 4,
+        "prStatusCounts": {
+          "open": 225,
+          "closed": 15,
+          "merged": 62
+        }
+      },
+      "insufficient-data": {
+        "count": 79,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 74,
+          "closed": 5,
+          "merged": 0
+        }
+      }
+    }
   }
 ]
