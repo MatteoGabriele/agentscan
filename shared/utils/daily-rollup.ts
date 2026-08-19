@@ -141,14 +141,6 @@ export function getCompletedDailyEntries(
     .sort(byDate)
 }
 
-export function getSampleDailyEntries(
-  results: EcosystemHealthItem[],
-): DailyScanEntry[] {
-  return [...collectBucketsByDate(results).entries()]
-    .map(([date, bucket]) => toDailyEntry(date, bucket, 0))
-    .sort(byDate)
-}
-
 export function getDailyCountsByDate(
   entries: DailyScanEntry[],
 ): GetClassificationStatsByDateResults {

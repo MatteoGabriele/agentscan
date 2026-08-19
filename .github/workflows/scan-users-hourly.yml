@@ -38,10 +38,8 @@ jobs:
           PR_HASH_SECRET: ${{ secrets.PR_HASH_SECRET }}
         run: >
           pnpm exec tsx scripts/scan-users.ts
-          --output=hourly-scan-results.txt
-          --max-scans=25
-          --window-output=hourly-window-scan-results.txt
-          --window-max-scans=30
+          --output=hourly-window-scan-results.txt
+          --max-scans=30
           --daily-output=daily-scan-results.json
           --automation-ids-output=automation-ids.json
 
@@ -54,7 +52,7 @@ jobs:
           git config --local user.name "GitHub Action"
 
           # Staged-diff check, so the first run picks up the still-untracked files.
-          git add data/hourly-scan-results.txt data/hourly-window-scan-results.txt data/daily-scan-results.json data/automation-ids.json
+          git add data/hourly-window-scan-results.txt data/daily-scan-results.json data/automation-ids.json
 
           # A day is only rolled up once its last hour is scanned, so this file
           # changes once a day — that is the Discord notification's trigger.

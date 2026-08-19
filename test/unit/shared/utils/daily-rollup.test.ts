@@ -3,10 +3,10 @@ import type { DailyScanEntry } from '../../../../shared/utils/daily-rollup'
 import {
   getCompletedDailyEntries,
   getDailyCountsByDate,
-  getSampleDailyEntries,
   mergeDailyEntries,
 } from '../../../../shared/utils/daily-rollup'
 import { getClassificationStatsByDate } from '../../../../shared/utils/count-classification-by-date'
+import { classifyByScore } from '../../../../shared/utils/health-stats'
 import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
 
 function createEcosystemHealthItem(
@@ -28,6 +28,56 @@ function createFullDay(date: string, score: number): EcosystemHealthItem[] {
       score,
     }),
   )
+}
+
+/**
+ * Folds rows into stored days directly, with none of the retention and
+ * completeness rules the scan applies before it writes one. The reader tests
+ * below are about how an entry reads back, not about when it earns its place
+ * in the file, so they build their fixtures rather than scanning for them.
+ */
+function foldIntoStoredEntries(
+  results: EcosystemHealthItem[],
+): DailyScanEntry[] {
+  const entriesByDate = new Map<string, DailyScanEntry>()
+
+  for (const result of results) {
+    const date = result.created_at.slice(0, 10)
+    const entry =
+      entriesByDate.get(date) ??
+      createDailyScanEntry({
+        date,
+        createdAt: result.created_at,
+        hours: 0,
+        classifications: {
+          organic: createClassificationCounts(),
+          mixed: createClassificationCounts(),
+          automation: createClassificationCounts(),
+          'insufficient-data': createClassificationCounts(),
+        },
+      })
+    const counts = entry.classifications[classifyByScore(result.score)]
+
+    counts.count += 1
+    counts.bountyCount += result.is_bounty ? 1 : 0
+    counts.prStatusCounts[result.pr_status] += 1
+    entry.createdAt =
+      result.created_at < entry.createdAt ? result.created_at : entry.createdAt
+
+    entriesByDate.set(date, entry)
+  }
+
+  return [...entriesByDate.values()].sort((a, b) =>
+    a.date.localeCompare(b.date),
+  )
+}
+
+function createClassificationCounts() {
+  return {
+    count: 0,
+    bountyCount: 0,
+    prStatusCounts: { open: 0, closed: 0, merged: 0 },
+  }
 }
 
 function createDailyScanEntry(entry: Partial<DailyScanEntry>): DailyScanEntry {
@@ -134,42 +184,6 @@ describe('getCompletedDailyEntries', () => {
   })
 })
 
-describe('getSampleDailyEntries', () => {
-  it('turns every day of the sample into an entry, latest day included', () => {
-    const entries = getSampleDailyEntries([
-      createEcosystemHealthItem({
-        created_at: '2026-06-10T04:00:00.000Z',
-        score: 10,
-        is_bounty: true,
-      }),
-      createEcosystemHealthItem({ created_at: '2026-06-10T04:00:00.000Z' }),
-      createEcosystemHealthItem({ created_at: '2026-06-11T09:30:00.000Z' }),
-    ])
-
-    expect(entries.map((entry) => entry.date)).toEqual([
-      '2026-06-10',
-      '2026-06-11',
-    ])
-    expect(entries[0]?.createdAt).toBe('2026-06-10T04:00:00.000Z')
-    expect(entries[0]?.classifications.automation).toEqual({
-      count: 1,
-      bountyCount: 1,
-      prStatusCounts: { open: 1, closed: 0, merged: 0 },
-    })
-    expect(entries[0]?.classifications.organic.count).toBe(1)
-  })
-
-  it('reports no hourly coverage, whatever the run was built from', () => {
-    const [entry] = getSampleDailyEntries(createFullDay('2026-06-10', 90))
-
-    expect(entry?.hours).toBe(0)
-  })
-
-  it('returns nothing for an empty scan file', () => {
-    expect(getSampleDailyEntries([])).toEqual([])
-  })
-})
-
 describe('getDailyCountsByDate', () => {
   // The day the scan pipeline would report for the same rows, so the stored
   // entry can be checked against the numbers already on the graph.
@@ -185,7 +199,7 @@ describe('getDailyCountsByDate', () => {
   ]
 
   it('reads a stored day exactly as the scan pipeline reads the same rows', () => {
-    const [entry] = getSampleDailyEntries(rows)
+    const [entry] = foldIntoStoredEntries(rows)
 
     expect(getDailyCountsByDate([entry!])).toEqual(
       getClassificationStatsByDate(rows),
@@ -193,7 +207,7 @@ describe('getDailyCountsByDate', () => {
   })
 
   it('leaves insufficient-data out of the total and the percentages', () => {
-    const [entry] = getSampleDailyEntries(rows)
+    const [entry] = foldIntoStoredEntries(rows)
     const counts = getDailyCountsByDate([entry!])['2026-06-10']
 
     // 11 rows were measured, but only the 10 scored ones are aggregated.
@@ -205,7 +219,7 @@ describe('getDailyCountsByDate', () => {
   })
 
   it('keeps the day sorted and carries its scan time through', () => {
-    const entries = getSampleDailyEntries([
+    const entries = foldIntoStoredEntries([
       createEcosystemHealthItem({ created_at: '2026-06-11T09:30:00.000Z' }),
       createEcosystemHealthItem({ created_at: '2026-06-10T04:00:00.000Z' }),
     ])

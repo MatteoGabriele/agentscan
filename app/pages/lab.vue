@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: hourly } = await useEcosystemHealthHourly()
+const { data: hourly } = await useEcosystemHealthHourlyWindow()
 </script>
 
 <template>

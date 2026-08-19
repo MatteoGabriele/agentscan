@@ -84,8 +84,11 @@ function makeOctokit(pages: PrFixture[][]) {
 /**
  * Multi-repo variant: each repo maps either to its pages, or to an Error the
  * PR listing rejects with, so a failing repo can sit next to a healthy one.
+ * A single page can be an Error too, for a repo that dies part-way through.
  */
-function makeMultiRepoOctokit(repos: Record<string, PrFixture[][] | Error>) {
+function makeMultiRepoOctokit(
+  repos: Record<string, (PrFixture[] | Error)[] | Error>,
+) {
   const { octokit } = makeOctokit([])
 
   octokit.rest.pulls.list = vi.fn(
@@ -102,8 +105,12 @@ function makeMultiRepoOctokit(repos: Record<string, PrFixture[][] | Error>) {
       if (entry instanceof Error) {
         throw entry
       }
+      const pageData = entry?.[page - 1]
+      if (pageData instanceof Error) {
+        throw pageData
+      }
       return {
-        data: (entry?.[page - 1] ?? []).map((pr) => ({
+        data: (pageData ?? []).map((pr) => ({
           number: pr.number,
           created_at: pr.created_at,
           state: pr.state ?? 'open',
@@ -121,6 +128,24 @@ const prPage = (repo: string, count: number): PrFixture[] =>
   Array.from({ length: count }, (_, i) => ({
     number: i + 1,
     login: `${repo}-author-${i}`,
+    created_at: '2026-08-07T07:30:00Z',
+  }))
+
+// PRs inside the window, numbered down from `from` so they read newest-first
+// like the API returns them. Single-author, so the profile cache keeps the
+// cap tests fast — 30 real authors would cost 30 rate-limit delays.
+const inWindowPrs = (count: number, from: number, login = 'ada'): PrFixture[] =>
+  Array.from({ length: count }, (_, i) => ({
+    number: from - i,
+    login,
+    created_at: '2026-08-07T07:30:00Z',
+  }))
+
+// Bots are filtered out, so they fill a page without filling the cap.
+const botPrs = (count: number, from: number): PrFixture[] =>
+  Array.from({ length: count }, (_, i) => ({
+    number: from - i,
+    login: 'dependabot[bot]',
     created_at: '2026-08-07T07:30:00Z',
   }))
 
@@ -144,27 +169,10 @@ describe('previousHourWindow', () => {
 })
 
 describe('collectPrs', () => {
-  it('keeps the fixed sample untouched when no window is requested', async () => {
-    const { octokit } = makeOctokit([
-      [
-        { number: 3, login: 'ada', created_at: '2026-08-07T08:30:00Z' },
-        { number: 2, login: 'bob', created_at: '2026-08-07T07:30:00Z' },
-        { number: 1, login: 'cat', created_at: '2026-08-01T00:00:00Z' },
-      ],
-    ])
-
-    const { sample, windowed } = await collectPrs(octokit, 2)
-
-    expect(sample.map((pr) => pr.pr_key)).toEqual(['acme/lib#3', 'acme/lib#2'])
-    expect(windowed).toEqual([])
-    // Only page 1 is ever read without a window.
-    expect(octokit.rest.pulls.list).toHaveBeenCalledTimes(1)
-  })
-
   it('windows on created_at, keeping closed and merged PRs', async () => {
     const { octokit } = makeOctokit([
       [
-        // Opened after the window closed — sample only.
+        // Opened after the window closed — belongs to the next run.
         { number: 5, login: 'ada', created_at: '2026-08-07T08:10:00Z' },
         // Opened and closed inside the window: the spam-PR case.
         {
@@ -186,9 +194,8 @@ describe('collectPrs', () => {
       ],
     ])
 
-    const { sample, windowed } = await collectPrs(octokit, 2, WINDOW)
+    const { windowed } = await collectPrs(octokit, WINDOW)
 
-    expect(sample.map((pr) => pr.pr_key)).toEqual(['acme/lib#5', 'acme/lib#4'])
     expect(windowed.map((pr) => pr.pr_key)).toEqual([
       'acme/lib#4',
       'acme/lib#3',
@@ -210,7 +217,7 @@ describe('collectPrs', () => {
       ],
     ])
 
-    const { windowed } = await collectPrs(octokit, 1, WINDOW)
+    const { windowed } = await collectPrs(octokit, WINDOW)
 
     // 08:00:00 belongs to the next window, 07:00:00 to this one.
     expect(windowed.map((pr) => pr.pr_key)).toEqual(['acme/lib#2'])
@@ -224,21 +231,9 @@ describe('collectPrs', () => {
       ],
     ])
 
-    const { sample, windowed } = await collectPrs(octokit, 2, WINDOW)
+    const { windowed } = await collectPrs(octokit, WINDOW)
 
-    expect(sample).toHaveLength(2)
     expect(windowed).toEqual([])
-  })
-
-  it('skips a repo that cannot fill the fixed sample', async () => {
-    const { octokit } = makeOctokit([
-      [{ number: 1, login: 'ada', created_at: '2026-08-07T07:10:00Z' }],
-    ])
-
-    // Single-repo library, so the only repo failing empties the run.
-    await expect(collectPrs(octokit, 10, WINDOW)).rejects.toThrow(
-      'all 1 repos failed',
-    )
   })
 
   it('keeps scanning the other repos when one fails', async () => {
@@ -248,13 +243,13 @@ describe('collectPrs', () => {
       'acme/other': [prPage('other', 3)],
     })
 
-    const { sample, windowed, skipped } = await withLibraries(
+    const { windowed, skipped } = await withLibraries(
       ['acme/lib', 'acme/gone', 'acme/other'],
       async () => {
         vi.useFakeTimers()
         try {
           // The failing repo burns through its retries on fake timers.
-          const pending = collectPrs(octokit, 2, WINDOW)
+          const pending = collectPrs(octokit, WINDOW)
           await vi.runAllTimersAsync()
           return await pending
         } finally {
@@ -263,55 +258,114 @@ describe('collectPrs', () => {
       },
     )
 
-    expect(sample.map((pr) => pr.repo_name)).toEqual([
+    expect(windowed.map((pr) => pr.repo_name)).toEqual([
       'acme/lib',
       'acme/lib',
+      'acme/lib',
+      'acme/other',
       'acme/other',
       'acme/other',
     ])
-    expect(windowed).toHaveLength(6)
     expect(skipped).toEqual([{ repo_name: 'acme/gone', reason: 'Not Found' }])
   })
 
   it('drops the partial rows of a repo that fails mid-collection', async () => {
     const octokit = makeMultiRepoOctokit({
-      // Two PRs against a sample of three: collected, then discarded.
-      'acme/thin': [prPage('thin', 2)],
+      // A full page holding only 25 scorable PRs, so the cap is not filled
+      // and paging continues into the page that fails.
+      'acme/thin': [
+        [...botPrs(25, 200), ...inWindowPrs(25, 175, 'thin-author')],
+        new Error('Not Found'),
+      ],
       'acme/full': [prPage('full', 3)],
     })
 
-    const { sample, windowed, skipped } = await withLibraries(
+    const { windowed, skipped } = await withLibraries(
       ['acme/thin', 'acme/full'],
-      () => collectPrs(octokit, 3, WINDOW),
+      async () => {
+        vi.useFakeTimers()
+        try {
+          const pending = collectPrs(octokit, WINDOW)
+          await vi.runAllTimersAsync()
+          return await pending
+        } finally {
+          vi.useRealTimers()
+        }
+      },
     )
 
-    expect(sample.map((pr) => pr.repo_name)).toEqual([
-      'acme/full',
-      'acme/full',
-      'acme/full',
-    ])
-    // Not even the windowed rows of the failed repo survive.
+    // Not one of the failed repo's buffered rows survives.
     expect(windowed.map((pr) => pr.repo_name)).toEqual([
       'acme/full',
       'acme/full',
       'acme/full',
     ])
-    expect(skipped).toEqual([
-      { repo_name: 'acme/thin', reason: 'only 2/3 PRs collected' },
-    ])
+    expect(skipped).toEqual([{ repo_name: 'acme/thin', reason: 'Not Found' }])
   })
 
   it('aborts when every repo fails', async () => {
     const octokit = makeMultiRepoOctokit({
-      'acme/lib': [prPage('lib', 1)],
-      'acme/other': [prPage('other', 1)],
+      'acme/lib': new Error('Not Found'),
+      'acme/other': new Error('Not Found'),
     })
 
-    await expect(
-      withLibraries(['acme/lib', 'acme/other'], () =>
-        collectPrs(octokit, 5, WINDOW),
-      ),
-    ).rejects.toThrow('all 2 repos failed')
+    vi.useFakeTimers()
+    try {
+      const pending = withLibraries(['acme/lib', 'acme/other'], () =>
+        collectPrs(octokit, WINDOW),
+      )
+      // Asserted before the timers advance, so the rejection is never unhandled.
+      const settled = expect(pending).rejects.toThrow('all 2 repos failed')
+      await vi.runAllTimersAsync()
+      await settled
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('caps one repo at 30 PRs, keeping the newest', async () => {
+    const { octokit } = makeOctokit([inWindowPrs(40, 40)])
+
+    const { windowed } = await collectPrs(octokit, WINDOW)
+
+    expect(windowed).toHaveLength(30)
+    // Newest-first, so the cap keeps #40 down to #11.
+    expect(windowed.at(0)?.pr_key).toBe('acme/lib#40')
+    expect(windowed.at(-1)?.pr_key).toBe('acme/lib#11')
+  })
+
+  it('stops paging once the cap can already be filled', async () => {
+    // Page 1 alone holds 50 in-window PRs, well past the cap of 30.
+    const { octokit } = makeOctokit([inWindowPrs(50, 100), inWindowPrs(50, 50)])
+
+    const { windowed } = await collectPrs(octokit, WINDOW)
+
+    expect(windowed).toHaveLength(30)
+    expect(octokit.rest.pulls.list).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not let bots eat into the cap', async () => {
+    // A full page carrying only 25 real PRs, then a page of scorable ones.
+    const { octokit } = makeOctokit([
+      [...botPrs(25, 200), ...inWindowPrs(25, 175)],
+      inWindowPrs(50, 150),
+    ])
+
+    const { windowed } = await collectPrs(octokit, WINDOW)
+
+    // The bots do not count toward the cap, so page 2 is still fetched and
+    // the repo reaches a full 30 scorable rows.
+    expect(octokit.rest.pulls.list).toHaveBeenCalledTimes(2)
+    expect(windowed).toHaveLength(30)
+    expect(windowed.every((pr) => pr.login === 'ada')).toBe(true)
+  })
+
+  it('leaves a repo under the cap untouched', async () => {
+    const { octokit } = makeOctokit([inWindowPrs(29, 29)])
+
+    const { windowed } = await collectPrs(octokit, WINDOW)
+
+    expect(windowed).toHaveLength(29)
   })
 
   it('pages until it reaches the start of the window', async () => {
@@ -330,13 +384,14 @@ describe('collectPrs', () => {
       page(50, '2026-08-07T06:30:00Z'),
     ])
 
-    const { windowed } = await collectPrs(octokit, 10, WINDOW)
+    const { windowed } = await collectPrs(octokit, WINDOW)
 
-    expect(octokit.rest.pulls.list).toHaveBeenCalledTimes(3)
-    expect(windowed).toHaveLength(100)
+    // Page 1 already holds 50 in-window PRs, so the cap stops paging there.
+    expect(octokit.rest.pulls.list).toHaveBeenCalledTimes(1)
+    expect(windowed).toHaveLength(30)
   })
 
-  it('fetches each author profile once across both datasets', async () => {
+  it('fetches each author profile once per run', async () => {
     const { octokit, userCalls } = makeOctokit([
       [
         { number: 3, login: 'ada', created_at: '2026-08-07T07:50:00Z' },
@@ -345,14 +400,13 @@ describe('collectPrs', () => {
       ],
     ])
 
-    const { sample, windowed } = await collectPrs(octokit, 3, WINDOW)
+    const { windowed } = await collectPrs(octokit, WINDOW)
 
-    expect(sample).toHaveLength(3)
     expect(windowed).toHaveLength(3)
     expect(userCalls).toEqual(['ada', 'bob'])
   })
 
-  it('skips known bots in both datasets', async () => {
+  it('skips known bots', async () => {
     const { octokit } = makeOctokit([
       [
         {
@@ -365,9 +419,8 @@ describe('collectPrs', () => {
       ],
     ])
 
-    const { sample, windowed } = await collectPrs(octokit, 2, WINDOW)
+    const { windowed } = await collectPrs(octokit, WINDOW)
 
-    expect(sample.map((pr) => pr.login)).toEqual(['ada', 'bob'])
     expect(windowed.map((pr) => pr.login)).toEqual(['ada', 'bob'])
   })
 })
