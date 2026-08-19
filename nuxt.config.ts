@@ -106,11 +106,6 @@ export default defineNuxtConfig({
         maxAge: 60 * 60,
       },
     },
-    '/api/health/hourly': {
-      cache: {
-        maxAge: 60 * 5,
-      },
-    },
     '/api/health/hourly-window': {
       cache: {
         maxAge: 60 * 5,

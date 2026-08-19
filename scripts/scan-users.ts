@@ -31,11 +31,13 @@ const EVENTS_PER_PAGE = 100
 const DELAY_BETWEEN_GITHUB_CALLS = 200
 const RETRY_DELAY_MS = 5000
 const RETRY_MAX_ATTEMPT = 2
-const PR_SCAN_AMOUNT = 10
 const PRS_PER_PAGE = 50
-// Safety net for the hourly window: a repo that opened more than this many PRs
-// in a single hour is either enormous or under attack — either way, stop paging.
+// Safety net for the hourly window.
 const WINDOW_MAX_PAGES = 5
+// Ceiling on what one repo may contribute to one hour. Scoring an author costs
+// four API calls and ~2s, and the run has to finish inside the hour it measures
+// with budget left for the next one.
+const MAX_PRS_PER_REPO = 30
 
 interface ScanResult {
   created_at: string
@@ -51,24 +53,17 @@ interface ScanResult {
 
 interface ScanOptions {
   dryRun?: boolean
-  prsPerRepo?: number
+  /**
+   * The hourly log, and the run's only measurement: every PR opened during the
+   * previous full hour, written as one bucket per run.
+   */
   outputFile: string
-  /** Keep only the N most recent scan runs in the output file (rolling window). */
+  /** Keep only the N most recent hourly buckets in the output file. */
   maxScans?: number
   /**
-   * When set, the same run also writes a second, time-windowed dataset here:
-   * every PR opened during the previous full hour, instead of the fixed
-   * top-N-per-repo sample. Omit to leave the run single-file.
-   */
-  windowOutputFile?: string
-  /** Rolling window for `windowOutputFile`, in scan runs. */
-  windowMaxScans?: number
-  /**
-   * Where this run appends its day entries. Both scan shapes feed the same
-   * file: alongside `windowOutputFile` it contributes every day the window has
-   * completed, and on its own the daily sample run contributes the day it just
-   * measured. Days already in the file are kept, so the two never fight over a
-   * date — whichever source reached it first owns it.
+   * Where this run appends its day entries, rolled up from the hourly buckets
+   * once a day has all of its hours. Days already in the file are kept, so a
+   * re-run never rewrites a day it already measured.
    */
   dailyOutputFile?: string
   /**
@@ -260,35 +255,17 @@ async function fetchUserEvents(
 }
 
 /**
- * Walks each repo's PR list once and feeds two datasets from it:
- *
- *   `sample`   — the N most recent PRs per repo, whatever their age. Fixed size,
- *                so the ecosystem graph compares like with like over time.
- *   `windowed` — every PR *opened* inside `window`, however many that is (often
- *                zero for quiet repos). Sized by real activity, not by quota.
- *
- * Both keep closed and merged PRs. The window filters on `created_at` only:
- * a spam PR opened at 07:12 and closed at 07:15 was still opened in the window,
- * and dropping it would delete exactly the population the window is measuring.
- * `pr_status` is carried through so it can be sliced on later — inside a
- * one-hour window a `closed` row means "closed within the hour", which is a
- * signal in its own right rather than a reason to exclude the row.
- *
- * A repo that fails — deleted, renamed, private, or still erroring after the
- * retries — is skipped whole rather than taking the run down with it. Its rows
- * are buffered until the repo finishes, so a repo contributes either its full
- * sample or nothing at all, never a half-read one that would understate it.
+ * Walks each repo's PR list and collects the PRs *opened* inside `window`
+ * however many that is, often zero for quiet repos.
  */
 export async function collectPrs(
   octokit: Octokit,
-  prsPerRepo: number = PR_SCAN_AMOUNT,
-  window: { start: Date; end: Date } | null = null,
+  window: { start: Date; end: Date },
 ) {
-  const sample: CollectedPr[] = []
   const windowed: CollectedPr[] = []
   const skipped: { repo_name: string; reason: string }[] = []
-  // An account can author PRs in several tracked repos, and can land in both
-  // datasets in the same run — fetch its profile once.
+  // An account can author PRs in several tracked repos in the same run —
+  // fetch its profile once.
   const profiles = new Map<string, GitHubUser>()
 
   async function getProfile(login: string, label: string) {
@@ -310,20 +287,29 @@ export async function collectPrs(
     return fullProfile.data
   }
 
+  function countsTowardCap(pr: {
+    created_at: string
+    user?: { login?: string } | null
+  }) {
+    const createdAt = new Date(pr.created_at)
+    return (
+      createdAt >= window.start &&
+      createdAt < window.end &&
+      !!pr.user?.login &&
+      !isKnownBot(pr.user.login)
+    )
+  }
+
   for (const repoFullName of libraries) {
     const [owner, repo] = repoFullName.split('/')
-    // Buffered per repo so a failure half-way through discards this repo's rows
-    // instead of leaving a partial sample behind.
-    const repoSample: CollectedPr[] = []
     const repoWindowed: CollectedPr[] = []
 
     try {
-      // Page 1 alone covers the fixed sample. The window may need more, so keep
-      // paging until a page ends before the window starts.
+      // Keep paging until a page ends before the window starts.
       const prs: Awaited<ReturnType<typeof octokit.rest.pulls.list>>['data'] =
         []
 
-      for (let page = 1; page <= (window ? WINDOW_MAX_PAGES : 1); page++) {
+      for (let page = 1; page <= WINDOW_MAX_PAGES; page++) {
         const response = await withRetry(
           () =>
             octokit.rest.pulls.list({
@@ -343,30 +329,35 @@ export async function collectPrs(
         const oldest = response.data.at(-1)
         const exhausted = response.data.length < PRS_PER_PAGE
         const reachedWindowStart =
-          !window || !oldest || new Date(oldest.created_at) < window.start
+          !oldest || new Date(oldest.created_at) < window.start
+        const capFilled = prs.filter(countsTowardCap).length >= MAX_PRS_PER_REPO
 
-        if (exhausted || reachedWindowStart) {
+        if (exhausted || reachedWindowStart || capFilled) {
           break
         }
       }
 
       for (const pr of prs) {
         const createdAt = new Date(pr.created_at)
-        const olderThanWindow = !window || createdAt < window.start
-        const needsSample = repoSample.length < prsPerRepo
 
-        // Sorted newest first, so once the sample is full and we are past the
-        // window there is nothing left in this repo worth reading.
-        if (!needsSample && olderThanWindow) {
+        // Sorted newest first, so the first PR older than the window means
+        // there is nothing left in this repo worth reading.
+        if (createdAt < window.start) {
           break
         }
 
-        const inWindow =
-          window != null && !olderThanWindow && createdAt < window.end
+        if (repoWindowed.length >= MAX_PRS_PER_REPO) {
+          console.warn(
+            `  ${repoFullName}: capped at ${MAX_PRS_PER_REPO} PRs in window`,
+          )
+          break
+        }
 
-        if (!needsSample && !inWindow) {
+        // Opened after the window closed — it belongs to the next run.
+        if (createdAt >= window.end) {
           continue
         }
+
         if (!pr.user?.login) {
           continue
         }
@@ -392,18 +383,7 @@ export async function collectPrs(
           repo_name: repoFullName,
         }
 
-        if (needsSample) {
-          repoSample.push(collected)
-          console.log(`  ${repoFullName}: ${repoSample.length}/${prsPerRepo}`)
-        }
-
-        if (inWindow) {
-          repoWindowed.push(collected)
-        }
-      }
-
-      if (repoSample.length < prsPerRepo) {
-        throw new Error(`only ${repoSample.length}/${prsPerRepo} PRs collected`)
+        repoWindowed.push(collected)
       }
     } catch (error) {
       const reason = (error as Error).message
@@ -412,13 +392,10 @@ export async function collectPrs(
       continue
     }
 
-    sample.push(...repoSample)
     windowed.push(...repoWindowed)
 
-    // No floor on the windowed count: an hour with no PRs is a real result.
-    if (window) {
-      console.log(`  ${repoFullName}: ${repoWindowed.length} in window`)
-    }
+    // No floor on the count: an hour with no PRs is a real result.
+    console.log(`  ${repoFullName}: ${repoWindowed.length} in window`)
   }
 
   // Every repo failing is not a scan with nothing to report — it is a broken
@@ -431,17 +408,14 @@ export async function collectPrs(
     )
   }
 
-  return { sample, windowed, skipped }
+  return { windowed, skipped }
 }
 
 export async function main(options: ScanOptions) {
   const {
     dryRun = false,
-    prsPerRepo = PR_SCAN_AMOUNT,
     outputFile,
     maxScans,
-    windowOutputFile,
-    windowMaxScans,
     dailyOutputFile,
     automationIdsOutputFile,
   } = options
@@ -463,27 +437,18 @@ export async function main(options: ScanOptions) {
   }
 
   const octokit = new Octokit({ auth: token })
-  const scanResults = dryRun ? [] : loadScanResults(outputFile)
   const verifiedAutomations = loadVerifiedAutomations()
-  const now = new Date()
-  const runAt = now.toISOString()
 
-  const window = windowOutputFile ? previousHourWindow(now) : null
-  // The windowed rows are stamped with the hour they describe, not the moment
-  // the run started, so a bucket means "PRs opened during 07:00–08:00".
-  const windowAt = window?.start.toISOString()
+  const window = previousHourWindow(new Date())
+  // Rows are stamped with the hour they describe, not the moment the run
+  // started, so a bucket means "PRs opened during 07:00–08:00".
+  const windowAt = window.start.toISOString()
 
-  if (window) {
-    console.log(
-      `Window: ${window.start.toISOString()} → ${window.end.toISOString()}`,
-    )
-  }
-
-  const { sample, windowed, skipped } = await collectPrs(
-    octokit,
-    prsPerRepo,
-    window,
+  console.log(
+    `Window: ${window.start.toISOString()} → ${window.end.toISOString()}`,
   )
+
+  const { windowed, skipped } = await collectPrs(octokit, window)
 
   if (skipped.length) {
     console.warn(
@@ -493,14 +458,20 @@ export async function main(options: ScanOptions) {
     )
   }
 
+  const storedScanResults = dryRun ? [] : loadScanResults(outputFile)
+
+  // A stored bucket for this hour means the workflow already ran for it. Its
+  // rows get rewritten below, but the automation tallies only ever grow, so a
+  // rerun must not count the same PRs a second time.
+  const isSameHourRerun = storedScanResults.some(
+    (result) => result.created_at === windowAt,
+  )
+
   // Re-running the workflow inside the same hour rewrites that hour's bucket
   // rather than appending a second copy of it.
-  const windowResults =
-    dryRun || !windowOutputFile
-      ? []
-      : loadScanResults(windowOutputFile).filter(
-          (result) => result.created_at !== windowAt,
-        )
+  const scanResults = storedScanResults.filter(
+    (result) => result.created_at !== windowAt,
+  )
 
   // One score per account, reused across every PR it authored in this run —
   // the analysis looks at the user's events, not at the individual PR.
@@ -512,10 +483,7 @@ export async function main(options: ScanOptions) {
   const automationIds: string[] = []
   const countedPrKeys = new Set<string>()
 
-  // Only the windowed PRs feed this tally. The fixed sample is "the newest N
-  // PRs per repo" regardless of age, so the same PRs reappear in it every hour
-  // and counting them would add a flat +N per run forever. The window covers a
-  // distinct hour per run, so each PR reaches the tally exactly once.
+  // Each run covers a distinct hour, so a PR reaches this tally exactly once.
   function recordAutomationPr(pr: CollectedPr, score: number) {
     // Thresholds live in the identity config, so read the classification back
     // rather than comparing against a number spelled out here.
@@ -584,29 +552,21 @@ export async function main(options: ScanOptions) {
   }
 
   let completedCount = 0
-  const total = sample.length + windowed.length
   const repoScores: Map<string, number> = new Map()
 
-  for (const pr of sample) {
-    console.log(`Scanning (${++completedCount}/${total}) [${pr.repo_name}]`)
+  for (const pr of windowed) {
+    console.log(
+      `Scanning (${++completedCount}/${windowed.length}) [${pr.repo_name}]`,
+    )
 
     const scored = await scoreUser(pr)
-    scanResults.push(toResult(pr, runAt, scored))
+    scanResults.push(toResult(pr, windowAt, scored))
+    recordAutomationPr(pr, scored.score)
 
     if (scored.score !== INSUFFICIENT_DATA_SCORE) {
       const currentScore = repoScores.get(pr.repo_name) ?? 0
       repoScores.set(pr.repo_name, currentScore + scored.score)
     }
-  }
-
-  for (const pr of windowed) {
-    console.log(
-      `Scanning window (${++completedCount}/${total}) [${pr.repo_name}]`,
-    )
-
-    const scored = await scoreUser(pr)
-    windowResults.push(toResult(pr, windowAt!, scored))
-    recordAutomationPr(pr, scored.score)
   }
 
   // Only reached if every user scan succeeded; repos that failed collection
@@ -615,41 +575,30 @@ export async function main(options: ScanOptions) {
     maxScans != null ? trimToRecentScans(scanResults, maxScans) : scanResults
 
   saveScanResults(finalResults, outputFile, dryRun)
+  console.log(`Window: ${windowed.length} PRs opened in the previous hour`)
 
-  const finalWindowResults =
-    windowMaxScans != null
-      ? trimToRecentScans(windowResults, windowMaxScans)
-      : windowResults
-
-  if (windowOutputFile) {
-    saveScanResults(finalWindowResults, windowOutputFile, dryRun)
-    console.log(`Window: ${windowed.length} PRs opened in the previous hour`)
-  }
-
-  // Only the hourly window measures a full day. The sample scan sees a single
-  // moment of one, so it never writes a day.
-  if (dailyOutputFile && windowOutputFile) {
+  // Rolled up from the untrimmed rows: retention can drop a day's first hour
+  // on the very run that completes that day.
+  if (dailyOutputFile) {
     const stored = dryRun ? [] : loadDailyEntries(dailyOutputFile)
-    const measured = getCompletedDailyEntries(windowResults, windowAt!)
+    const measured = getCompletedDailyEntries(scanResults, windowAt)
     const dailyEntries = mergeDailyEntries(stored, measured)
 
     saveDailyEntries(dailyEntries, dailyOutputFile, dryRun)
     console.log(`Daily: ${measured.length} day(s) rolled up from the window`)
   }
 
-  if (automationIdsOutputFile && !window) {
-    console.warn(
-      'Automations: --automation-ids-output needs --window-output; the tally is built from windowed PRs only. Nothing written.',
-    )
-  }
-
-  if (automationIdsOutputFile && window) {
+  if (automationIdsOutputFile) {
     const stored = dryRun ? [] : loadAutomationIds(automationIdsOutputFile)
-    const tallies = mergeAutomationIds(stored, automationIds)
+    const tallies = isSameHourRerun
+      ? stored
+      : mergeAutomationIds(stored, automationIds)
 
     saveAutomationIds(tallies, automationIdsOutputFile, dryRun)
     console.log(
-      `Automations: ${automationIds.length} PR(s) from ${new Set(automationIds).size} account(s) this run, ${tallies.length} tracked overall`,
+      isSameHourRerun
+        ? `Automations: rerun of ${windowAt} — tallies left at ${tallies.length} tracked overall`
+        : `Automations: ${automationIds.length} PR(s) from ${new Set(automationIds).size} account(s) this run, ${tallies.length} tracked overall`,
     )
   }
 
@@ -664,10 +613,6 @@ export async function main(options: ScanOptions) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run')
-  const prsPerRepoArg = args.find((a) => a.startsWith('--prs-per-repo='))
-  const prsPerRepo = prsPerRepoArg
-    ? parseInt(prsPerRepoArg.split('=')[1], PR_SCAN_AMOUNT)
-    : undefined
 
   const outputArg = args.find((a) => a.startsWith('--output='))
   const outputFile = outputArg ? outputArg.split('=')[1] : undefined
@@ -682,18 +627,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const maxScansArg = args.find((a) => a.startsWith('--max-scans='))
   const maxScans = maxScansArg
     ? parseInt(maxScansArg.split('=')[1], 10)
-    : undefined
-
-  const windowOutputArg = args.find((a) => a.startsWith('--window-output='))
-  const windowOutputFile = windowOutputArg
-    ? windowOutputArg.split('=')[1]
-    : undefined
-
-  const windowMaxScansArg = args.find((a) =>
-    a.startsWith('--window-max-scans='),
-  )
-  const windowMaxScans = windowMaxScansArg
-    ? parseInt(windowMaxScansArg.split('=')[1], 10)
     : undefined
 
   const dailyOutputArg = args.find((a) => a.startsWith('--daily-output='))
@@ -712,10 +645,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   main({
     dryRun,
     outputFile,
-    ...(prsPerRepo != null && { prsPerRepo }),
     ...(maxScans != null && { maxScans }),
-    ...(windowOutputFile && { windowOutputFile }),
-    ...(windowMaxScans != null && { windowMaxScans }),
     ...(dailyOutputFile && { dailyOutputFile }),
     ...(automationIdsOutputFile && { automationIdsOutputFile }),
   }).catch((error) => {
