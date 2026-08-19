@@ -25,7 +25,7 @@ const { data, status, error } = useFetch(
   },
 )
 
-const { data: verifiedAutomations } = useVerifiedAutomations()
+const { data: verifiedAutomations } = await useVerifiedAutomations()
 
 const verifiedAutomation = computed(() => {
   return verifiedAutomations.value?.find((account) => {
@@ -36,7 +36,12 @@ const verifiedAutomation = computed(() => {
   })
 })
 
-const { data: integrations } = useIntegrations()
+const { data: automationTally } = await useAutomationTally()
+const matchedTally = computed(() => {
+  return automationTally.value?.find((tally) => tally.id === props.user.id)
+})
+
+const { data: integrations } = await useIntegrations()
 const activityReport = computed<IntegrationItem | undefined>(() => {
   return integrations.value?.find((item) => {
     return item.username.toLowerCase() === username.value?.toLowerCase()
@@ -53,7 +58,11 @@ const classification = computed<IdentityClassification | undefined>(() => {
 const { classificationDetails } = useClassificationDetails(classification)
 const { scoreStyle } = useScoreStyle(
   classification,
-  computed(() => ({ hasCommunityFlag: hasCommunityFlag.value })),
+  computed(() => ({
+    hasCommunityFlag: hasCommunityFlag.value,
+    hasActivityReport: hasActivityReport.value,
+    hasTally: !!matchedTally.value,
+  })),
 )
 
 const { classificationIcon } = useClassificationIcons(classification)
@@ -103,6 +112,13 @@ const warnings = computed<string[]>(() => {
 
   if (isBountyHunter.value) {
     list.push('Possible bounty activity.')
+  }
+
+  if (matchedTally.value) {
+    const count = matchedTally.value.counter
+    list.push(
+      `Opened ${count} PR${count === 1 ? '' : 's'} in repositories we scan hourly, while scoring as automation.`,
+    )
   }
 
   return list

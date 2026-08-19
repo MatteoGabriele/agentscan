@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { decryptValue } from './encrypt-value'
+import { decryptValue } from '../shared/utils/encrypt-values'
 
 // Every ciphertext this repo writes is hex in whole 16-byte blocks. Anything
 // else in the file — a login, a date, a count — is left alone.

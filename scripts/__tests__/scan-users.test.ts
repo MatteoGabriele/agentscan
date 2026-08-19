@@ -11,7 +11,7 @@ import type { EcosystemHealthItem } from '../../shared/types/ecosystem-health'
 import { getCompletedDailyEntries } from '../../shared/utils/daily-rollup'
 
 vi.mock('../../shared/daily-scan', () => ({ libraries: ['acme/lib'] }))
-vi.mock('../encrypt-value', () => ({
+vi.mock('../../shared/utils/encrypt-values', () => ({
   encryptValue: (...parts: (string | number)[]) => parts.join('#'),
 }))
 
@@ -20,14 +20,16 @@ beforeAll(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
+const mockedLibraries = libraries as unknown as string[]
+
 /** Runs `fn` with the scanned repo list temporarily replaced. */
 async function withLibraries<T>(repos: string[], fn: () => Promise<T>) {
-  const original = [...libraries]
-  libraries.splice(0, libraries.length, ...repos)
+  const original = [...mockedLibraries]
+  mockedLibraries.splice(0, mockedLibraries.length, ...repos)
   try {
     return await fn()
   } finally {
-    libraries.splice(0, libraries.length, ...original)
+    mockedLibraries.splice(0, mockedLibraries.length, ...original)
   }
 }
 

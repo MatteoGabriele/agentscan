@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import { createCipheriv, createDecipheriv, createHash } from 'crypto'
 
 function deriveKey(): Buffer {

@@ -3481,5 +3481,134 @@
         }
       }
     }
+  },
+  {
+    "date": "2026-08-16",
+    "createdAt": "2026-08-16T00:00:00.000Z",
+    "hours": 23,
+    "classifications": {
+      "organic": {
+        "count": 376,
+        "bountyCount": 7,
+        "prStatusCounts": {
+          "open": 335,
+          "closed": 10,
+          "merged": 31
+        }
+      },
+      "mixed": {
+        "count": 113,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 67,
+          "closed": 8,
+          "merged": 38
+        }
+      },
+      "automation": {
+        "count": 389,
+        "bountyCount": 3,
+        "prStatusCounts": {
+          "open": 256,
+          "closed": 15,
+          "merged": 118
+        }
+      },
+      "insufficient-data": {
+        "count": 47,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 45,
+          "closed": 2,
+          "merged": 0
+        }
+      }
+    }
+  },
+  {
+    "date": "2026-08-17",
+    "createdAt": "2026-08-17T00:00:00.000Z",
+    "hours": 24,
+    "classifications": {
+      "organic": {
+        "count": 528,
+        "bountyCount": 6,
+        "prStatusCounts": {
+          "open": 475,
+          "closed": 11,
+          "merged": 42
+        }
+      },
+      "mixed": {
+        "count": 168,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 141,
+          "closed": 6,
+          "merged": 21
+        }
+      },
+      "automation": {
+        "count": 314,
+        "bountyCount": 5,
+        "prStatusCounts": {
+          "open": 242,
+          "closed": 17,
+          "merged": 55
+        }
+      },
+      "insufficient-data": {
+        "count": 61,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 55,
+          "closed": 4,
+          "merged": 2
+        }
+      }
+    }
+  },
+  {
+    "date": "2026-08-18",
+    "createdAt": "2026-08-18T00:00:00.000Z",
+    "hours": 24,
+    "classifications": {
+      "organic": {
+        "count": 682,
+        "bountyCount": 12,
+        "prStatusCounts": {
+          "open": 613,
+          "closed": 27,
+          "merged": 42
+        }
+      },
+      "mixed": {
+        "count": 253,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 179,
+          "closed": 9,
+          "merged": 65
+        }
+      },
+      "automation": {
+        "count": 302,
+        "bountyCount": 4,
+        "prStatusCounts": {
+          "open": 225,
+          "closed": 15,
+          "merged": 62
+        }
+      },
+      "insufficient-data": {
+        "count": 79,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 74,
+          "closed": 5,
+          "merged": 0
+        }
+      }
+    }
   }
 ]

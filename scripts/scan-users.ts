@@ -1,5 +1,7 @@
-/// <reference types="node" />
-import type { VerifiedAutomation } from '../shared/types/automation'
+import type {
+  AutomationTally,
+  VerifiedAutomation,
+} from '../shared/types/automation'
 import { libraries } from '../shared/daily-scan'
 import { isKnownBot } from '../shared/cicd-known-bots'
 import { readFileSync, writeFileSync } from 'fs'
@@ -7,7 +9,7 @@ import { join } from 'path'
 import { Octokit } from 'octokit'
 import { identify } from '@unveil/identity'
 import type { GitHubEvent, IdentifyUser } from '@unveil/identity'
-import { encryptValue } from './encrypt-value'
+import { encryptValue } from '../shared/utils/encrypt-values'
 import { pack, unpack } from '../shared/utils/compactor'
 import type { DailyScanEntry } from '../shared/utils/daily-rollup'
 import {
@@ -76,8 +78,6 @@ interface ScanOptions {
    */
   automationIdsOutputFile?: string
 }
-
-export type AutomationIdTally = [string, number]
 
 type GitHubUser = Awaited<
   ReturnType<Octokit['rest']['users']['getByUsername']>
@@ -184,7 +184,7 @@ function saveDailyEntries(
   writeFileSync(filePath, `${JSON.stringify(entries, null, 2)}\n`)
 }
 
-function loadAutomationIds(outputFile: string): AutomationIdTally[] {
+function loadAutomationIds(outputFile: string): AutomationTally[] {
   const filePath = join(process.cwd(), 'data', outputFile)
   try {
     return JSON.parse(readFileSync(filePath, 'utf-8'))
@@ -197,7 +197,7 @@ function loadAutomationIds(outputFile: string): AutomationIdTally[] {
 }
 
 function saveAutomationIds(
-  tallies: AutomationIdTally[],
+  tallies: AutomationTally[],
   outputFile: string,
   dryRun: boolean = false,
 ): void {
@@ -209,10 +209,10 @@ function saveAutomationIds(
 }
 
 export function mergeAutomationIds(
-  stored: AutomationIdTally[],
+  stored: AutomationTally[],
   seen: Iterable<string>,
-): AutomationIdTally[] {
-  const merged = stored.map((entry): AutomationIdTally => [entry[0], entry[1]])
+): AutomationTally[] {
+  const merged = stored.map((entry): AutomationTally => [entry[0], entry[1]])
   const indexById = new Map(merged.map((entry, index) => [entry[0], index]))
 
   for (const id of seen) {
