@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calcLinearProgression } from '../../../../shared/utils/calc-linear-progression'
+import { calcLinearProgression } from './calc-linear-progression'
 
 describe('calcLinearProgression', () => {
   it('returns zero values when the array is empty', () => {

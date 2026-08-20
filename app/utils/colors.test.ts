@@ -5,7 +5,7 @@ import {
   rgbToHex,
   interpolate,
   interpolateHexColors,
-} from '../../../../app/utils/colors'
+} from './colors'
 
 describe('clamp', () => {
   it('returns the provided value when in range', () => {

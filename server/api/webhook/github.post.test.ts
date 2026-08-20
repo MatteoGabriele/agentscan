@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest'
 import type { IdentifyResult } from '@unveil/identity'
 import { getClassificationDetails, identify } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
-import handler from '../../../../../server/api/webhook/github/index.post.ts'
+import handler from './github/index.post.ts'
 
 // vi.hoisted runs before all module imports — used to stub Nuxt auto-imports
 // and to create shared mock objects referenced in vi.mock() factories below.
@@ -124,6 +124,19 @@ const BASE_PAYLOAD = {
 const MOCK_ANALYSIS: IdentifyResult = {
   classification: 'organic',
   score: 20,
+  confidence: 0.1,
+  groups: [],
+  timezone: {
+    confidence: 1,
+    offsetHours: 2,
+  },
+  window: {
+    eventCount: 2,
+    spanDays: 2,
+    firstEventAt: null,
+    lastEventAt: null,
+    saturated: false,
+  },
   flags: [
     {
       label: 'Test Flag',
@@ -131,14 +144,14 @@ const MOCK_ANALYSIS: IdentifyResult = {
       detail: 'Test detail',
       data: [],
       events: [],
+      group: 'account-age',
     },
   ],
   isBountyHunter: false,
   profile: { age: 365, repos: 0 },
 }
 
-// The event object itself is irrelevant — handler accesses it only via mocked globals.
-const MOCK_EVENT = {}
+const MOCK_EVENT = {} satisfies H3Event<EventHandlerRequest>
 
 // --- Helpers ---
 

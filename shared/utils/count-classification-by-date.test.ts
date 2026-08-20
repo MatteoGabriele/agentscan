@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type {
   ClassificationStats,
   ClassificationMetric,
-} from '../../../../shared/utils/count-classification-by-date'
+} from './count-classification-by-date'
 import {
   fillEmptyHourlyBuckets,
   getClassificationStatsByDate,
@@ -11,8 +11,8 @@ import {
   getClassificationForPreviousDays,
   getClassificationStatsByScanTime,
   getWeeklyClassification,
-} from '../../../../shared/utils/count-classification-by-date'
-import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
+} from './count-classification-by-date'
+import type { EcosystemHealthItem } from '../types/ecosystem-health'
 
 function createEcosystemHealthItem(
   created_at: string,

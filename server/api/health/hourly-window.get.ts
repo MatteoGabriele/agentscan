@@ -18,6 +18,15 @@ export default defineEventHandler(async () => {
 
     const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
 
+    //   created_at: fromUnixSecs(numCreatedTs)
+    //   score: Number(score)
+    //   pr_key: base64UrlToHex(prKeyB64!)
+    //   pr_status: (STATUS_DECODE[status!] ?? status!) as PrStatus
+    //   user_created_at: fromUnixSecs(numUserCreatedTs)
+    //   user_public_repos_count: numPublicRepos
+    //   events_count: numEvents
+    //   repo_name: repos[numRepoIdx] ?? ''
+    //   is_bounty: isBounty === '1'
     const results = unpack(content).map((entry) => ({
       ...entry,
       created_at: roundToClosestHour(entry.created_at),
