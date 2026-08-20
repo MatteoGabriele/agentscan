@@ -243,6 +243,7 @@ function resetTooltip() {
   showTooltipRepoBreakdown.value = false
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function toggleTooltipView() {
   showTooltipRepoBreakdown.value = !showTooltipRepoBreakdown.value
 }
@@ -268,7 +269,7 @@ function handleChartMouseleave() {
             ref="chartRef"
             :dataset
             :config
-            @selectX="handleDatapointClick"
+            @select-x="handleDatapointClick"
           >
             <template #area-gradient="{ series, id }">
               <linearGradient :id x1="0" x2="0" y1="0" y2="1">
