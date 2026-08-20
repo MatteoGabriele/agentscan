@@ -10,6 +10,7 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
     user_public_repos_count: 869,
     events_count: 200,
     repo_name: 'nuxt/nuxt',
+    is_bounty: false,
   },
   {
     created_at: '2026-05-25T19:27:30.519Z',
@@ -20,6 +21,7 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
     user_public_repos_count: 2,
     events_count: 20,
     repo_name: 'nuxt/nuxt',
+    is_bounty: false,
   },
   {
     created_at: '2026-05-26T19:27:30.519Z',
@@ -30,6 +32,7 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
     user_public_repos_count: 2,
     events_count: 20,
     repo_name: 'nuxt/nuxt',
+    is_bounty: false,
   },
   {
     created_at: '2026-05-26T19:27:30.519Z',
@@ -40,6 +43,7 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
     user_public_repos_count: 6,
     events_count: 167,
     repo_name: 'biomejs/biome',
+    is_bounty: false,
   },
   {
     created_at: '2026-05-26T19:27:30.519Z',
@@ -50,6 +54,7 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
     user_public_repos_count: 13,
     events_count: 84,
     repo_name: 'biomejs/biome',
+    is_bounty: false,
   },
   {
     created_at: '2026-05-26T19:27:30.519Z',
@@ -60,6 +65,7 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
     user_public_repos_count: 13,
     events_count: 84,
     repo_name: 'some/repo',
+    is_bounty: false,
   },
 ]
 

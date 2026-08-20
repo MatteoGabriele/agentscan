@@ -1,9 +1,6 @@
 import type { GitHubEvent, IdentifyFlag } from '@unveil/identity'
 import { describe, expect, it } from 'vitest'
-import {
-  buildEvidenceLines,
-  buildReportIssueUrl,
-} from '../../../../shared/utils/report-issue'
+import { buildEvidenceLines, buildReportIssueUrl } from './report-issue'
 
 const makeFlag = (overrides: Partial<IdentifyFlag> = {}): IdentifyFlag => ({
   label: 'Test Flag',

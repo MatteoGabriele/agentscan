@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatUsername } from '../../../../server/utils/format-username'
+import { formatUsername } from './format-username'
 
 describe('formatUsername', () => {
   it('does not throw on malformed URL encoding', () => {

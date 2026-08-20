@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { pack, unpack } from '../../../../shared/utils/compactor'
-import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
+import { pack, unpack } from './compactor'
+import type { EcosystemHealthItem } from '../types/ecosystem-health'
 
 const ITEMS: EcosystemHealthItem[] = [
   {

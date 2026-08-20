@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
+import type { EcosystemHealthItem } from '../types/ecosystem-health'
 import {
   classifyByScore,
   formatTrend,
   getHealthStats,
   formatProgressionPoints,
   INSUFFICIENT_DATA_SCORE,
-} from '../../../../shared/utils/health-stats'
-import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from '../../mocks/ecosystemHealthItems'
+} from './health-stats'
+import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from '../../test/unit/mocks/ecosystem-health-items'
 
 describe('formatTrend', () => {
   it('formats a ratio to a signed and rounded percentage string', () => {
