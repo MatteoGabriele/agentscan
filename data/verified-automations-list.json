@@ -366,5 +366,13 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/357",
     "reportedBy": "Yann-P",
     "createdAt": "2026-08-18"
+  },
+  {
+    "username": "eastagiletracker",
+    "id": 310448263,
+    "reason": "Self-disclosed AI tool for \"extreme programming with agents\".",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/363",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-20"
   }
 ]
