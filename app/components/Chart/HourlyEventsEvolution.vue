@@ -3,6 +3,7 @@ import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
+  type VueUiXyEmitSelectX,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import { useElementSize } from '@vueuse/core'
@@ -223,6 +224,34 @@ const viewBoxPadding = computed(() => {
 })
 
 const isChartHovered = shallowRef(false)
+
+/**
+ * Boilerplate for tooltip content switching
+ */
+
+function handleDatapointClick(_payload: VueUiXyEmitSelectX) {
+  if (isMobile.value) {
+    return // We don't drill down repo details on mobile
+  }
+  // TODO: uncomment when we're ready to use this feature
+  // toggleTooltipView()
+}
+
+const showTooltipRepoBreakdown = shallowRef(false)
+
+function resetTooltip() {
+  showTooltipRepoBreakdown.value = false
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function toggleTooltipView() {
+  showTooltipRepoBreakdown.value = !showTooltipRepoBreakdown.value
+}
+
+function handleChartMouseleave() {
+  isChartHovered.value = false
+  resetTooltip()
+}
 </script>
 
 <template>
@@ -231,7 +260,7 @@ const isChartHovered = shallowRef(false)
       ref="chartContainer"
       class="flex-1 h-full no-chart-transition"
       @mouseenter="isChartHovered = true"
-      @mouseleave="isChartHovered = false"
+      @mouseleave="handleChartMouseleave"
     >
       <ClientOnly>
         <Transition name="chart-fade" appear>
@@ -240,6 +269,7 @@ const isChartHovered = shallowRef(false)
             ref="chartRef"
             :dataset
             :config
+            @select-x="handleDatapointClick"
           >
             <template #area-gradient="{ series, id }">
               <linearGradient :id x1="0" x2="0" y1="0" y2="1">
@@ -258,7 +288,18 @@ const isChartHovered = shallowRef(false)
                   {{ formatScanTime(timeLabel.absoluteIndex) }}
                 </div>
 
+                <!-- TODO: dedicated tooltip component for the repo drill view -->
+                <!-- NOTE: it should have an equivalent width as the regular tooltip to avoid a big shift when toggling, because the tooltip will keep the same coordinates when its content changes -->
+                <div
+                  v-if="showTooltipRepoBreakdown"
+                  class="max-w-[300px] text-xs"
+                >
+                  <!-- Additional content added to the dataset computed property will be surfaced in the exposed datapoint -->
+                  {{ datapoint }}
+                </div>
+
                 <EventsEvolutionTooltipTable
+                  v-else
                   :tooltip-slot-props="{ datapoint, timeLabel, series }"
                   :colors
                   :can-compare="timeLabel.absoluteIndex > 0"
