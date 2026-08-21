@@ -129,9 +129,6 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
           border: SELECTION_BORDER,
           color: colors.value.text,
         },
-        value: {
-          show: false,
-        },
       },
       dataLabels: {
         xAxis: {

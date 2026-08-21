@@ -31,8 +31,11 @@ const { data: hourly } = await useEcosystemHealthHourlyWindow()
     </div>
 
     <div
-      class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto pb-12 w-full px-4"
+      class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto py-12 w-full"
     >
+      <div class="full">
+        <LazyChartHourlyEventsWaffle />
+      </div>
       <div class="w-full">
         <LazyChartScoreDistribution
           :data="hourly?.results"
