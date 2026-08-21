@@ -374,5 +374,13 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/363",
     "reportedBy": "MatteoGabriele",
     "createdAt": "2026-08-20"
+  },
+  {
+    "username": "SparshGarg999",
+    "id": 76697238,
+    "reason": "The account has submitted several PRs to React and other repositories without waiting for reviews.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/368",
+    "reportedBy": "Austin1serb",
+    "createdAt": "2026-08-21"
   }
 ]
