@@ -7,6 +7,7 @@ type ToggleOptions<T> = {
 
 const props = defineProps<{
   options: ToggleOptions<ToggleValue>[]
+  label?: string
 }>()
 
 const selected = defineModel<ToggleValue>()
@@ -19,7 +20,7 @@ const selectedToggleCaption = computed<string | undefined>(() => {
 <template>
   <div
     role="group"
-    aria-label="Chart time range"
+    :aria-label="label ?? 'Chart time range'"
     class="inline-flex gap-0.5 rounded-full border border-ui-border-subtle/40 p-0.5"
   >
     <button
