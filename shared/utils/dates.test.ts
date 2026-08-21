@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  formatDateRange,
-  roundToClosestHour,
-} from '../../../../shared/utils/dates'
+import { formatDateRange, roundToClosestHour } from './dates'
 
 describe('formatDateRange', () => {
   it('formats a date range with YYYY-MM-DD inputs', () => {

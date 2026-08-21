@@ -113,4 +113,12 @@ export const landmarks: Landmark[] = [
     icon: 'i-lucide:info',
     iconSvg: SVG_ICON.info,
   },
+
+  {
+    date: '2026-08-21',
+    name: 'Sample update',
+    description: '120 repositories added to the dataset',
+    icon: 'i-lucide:info',
+    iconSvg: SVG_ICON.info,
+  },
 ]

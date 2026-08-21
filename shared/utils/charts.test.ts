@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getCompleteDayRange, getDayKey } from '../../../../shared/utils/charts'
+import { getCompleteDayRange, getDayKey } from './charts'
 
 describe('getCompleteDayRange', () => {
   it('returns an empty array for an empty array in input', () => {

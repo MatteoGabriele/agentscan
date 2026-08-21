@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import type { DailyScanEntry } from '../../../../shared/utils/daily-rollup'
+import type { DailyScanEntry } from './daily-rollup'
 import {
   getCompletedDailyEntries,
   getDailyCountsByDate,
   mergeDailyEntries,
-} from '../../../../shared/utils/daily-rollup'
-import { getClassificationStatsByDate } from '../../../../shared/utils/count-classification-by-date'
-import { classifyByScore } from '../../../../shared/utils/health-stats'
-import type { EcosystemHealthItem } from '../../../../shared/types/ecosystem-health'
+} from './daily-rollup'
+import { getClassificationStatsByDate } from './count-classification-by-date'
+import { classifyByScore } from './health-stats'
+import type { EcosystemHealthItem } from '../types/ecosystem-health'
 
 function createEcosystemHealthItem(
   item: Partial<EcosystemHealthItem>,

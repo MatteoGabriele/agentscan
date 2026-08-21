@@ -3610,5 +3610,91 @@
         }
       }
     }
+  },
+  {
+    "date": "2026-08-19",
+    "createdAt": "2026-08-19T00:00:00.000Z",
+    "hours": 24,
+    "classifications": {
+      "organic": {
+        "count": 674,
+        "bountyCount": 5,
+        "prStatusCounts": {
+          "open": 590,
+          "closed": 29,
+          "merged": 55
+        }
+      },
+      "mixed": {
+        "count": 176,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 136,
+          "closed": 10,
+          "merged": 30
+        }
+      },
+      "automation": {
+        "count": 208,
+        "bountyCount": 6,
+        "prStatusCounts": {
+          "open": 172,
+          "closed": 12,
+          "merged": 24
+        }
+      },
+      "insufficient-data": {
+        "count": 64,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 57,
+          "closed": 7,
+          "merged": 0
+        }
+      }
+    }
+  },
+  {
+    "date": "2026-08-20",
+    "createdAt": "2026-08-20T00:00:00.000Z",
+    "hours": 24,
+    "classifications": {
+      "organic": {
+        "count": 716,
+        "bountyCount": 3,
+        "prStatusCounts": {
+          "open": 636,
+          "closed": 32,
+          "merged": 48
+        }
+      },
+      "mixed": {
+        "count": 107,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 87,
+          "closed": 2,
+          "merged": 18
+        }
+      },
+      "automation": {
+        "count": 241,
+        "bountyCount": 4,
+        "prStatusCounts": {
+          "open": 168,
+          "closed": 6,
+          "merged": 67
+        }
+      },
+      "insufficient-data": {
+        "count": 76,
+        "bountyCount": 0,
+        "prStatusCounts": {
+          "open": 72,
+          "closed": 4,
+          "merged": 0
+        }
+      }
+    }
   }
 ]

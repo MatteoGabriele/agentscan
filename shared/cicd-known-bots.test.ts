@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isKnownBot } from '../../../shared/cicd-known-bots'
+import { isKnownBot } from './cicd-known-bots'
 
 describe('isKnownBot', () => {
   it('returns true for usernames matching a known bot name', () => {

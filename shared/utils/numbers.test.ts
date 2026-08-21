@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { round } from '../../../../shared/utils/numbers'
+import { round } from './numbers'
 
 describe('round', () => {
   it('rounds as it should have natively', () => {

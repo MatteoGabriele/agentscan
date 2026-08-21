@@ -138,7 +138,6 @@ export default defineEventHandler(async (event) => {
     appId: config.githubAppId,
     privateKey,
     webhooks: { secret: config.githubWebhookSecret },
-    Octokit: TrackedOctokit,
   })
 
   const octokit = await app.getInstallationOctokit(payload.installation.id)
