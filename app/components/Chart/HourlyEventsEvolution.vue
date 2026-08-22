@@ -268,7 +268,7 @@ function handleChartMouseleave() {
             >
               <div class="flex flex-col tabular-nums">
                 <ChartEventsEvolutionTooltipHeader
-                  :timeLabel="formatScanTime(timeLabel.absoluteIndex)"
+                  :time-label="formatScanTime(timeLabel.absoluteIndex)"
                   :count="
                     getTotalPrScanned(
                       series as VueUiXySeriesWithCounts,

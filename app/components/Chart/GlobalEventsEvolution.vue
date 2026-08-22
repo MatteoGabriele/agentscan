@@ -358,7 +358,7 @@ function placeLandmark({
             >
               <div class="flex flex-col tabular-nums">
                 <ChartEventsEvolutionTooltipHeader
-                  :timeLabel="timeLabel.text"
+                  :time-label="timeLabel.text"
                   :count="
                     getTotalPrScanned(
                       series as VueUiXySeriesWithCounts,
