@@ -382,5 +382,13 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/368",
     "reportedBy": "Austin1serb",
     "createdAt": "2026-08-21"
+  },
+  {
+    "username": "maximilliangrand",
+    "id": 214999687,
+    "reason": "Clear indicators of automation include very lengthy PR descriptions, which are common in AI-generated content and often do not follow contribution guidelines.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/349",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-15"
   }
 ]
