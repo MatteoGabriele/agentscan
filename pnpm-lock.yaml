@@ -50,6 +50,9 @@ importers:
       '@unveil/identity':
         specifier: 2.0.2
         version: 2.0.2
+      '@unveil/vk':
+        specifier: ^0.5.0
+        version: 0.5.0
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.35(typescript@6.0.3))
@@ -2690,6 +2693,9 @@ packages:
 
   '@unveil/identity@2.0.2':
     resolution: {integrity: sha512-3tqmXVXQlf9Tp9n96cu2cwOyTczoGsMYdCS42zHJTMyuZqDn4gMkjEMaPupOHTuG4mkLAEppilIOeNxtf2OxXw==}
+
+  '@unveil/vk@0.5.0':
+    resolution: {integrity: sha512-HO/VCqxINcj/Obb8ibDATxyYpOV7my3mibDziqBdSMmx+xvwraEPcAdBJeVUDcp8Hy2cZiLG8JSwSYoOEadD4A==}
 
   '@valibot/to-json-schema@1.7.1':
     resolution: {integrity: sha512-3qkmU6KXWh8GIThEAW3kuRHPQBMjWkKy+Ppz3WkUucx53DTpOa6siMn4xDGSOhlVyMrDaJTCTMLYPZVAIk1P0A==}
@@ -8940,6 +8946,10 @@ snapshots:
     optional: true
 
   '@unveil/identity@2.0.2': {}
+
+  '@unveil/vk@0.5.0':
+    dependencies:
+      '@unveil/identity': 2.0.2
 
   '@valibot/to-json-schema@1.7.1(valibot@1.4.1(typescript@6.0.3))':
     dependencies:
