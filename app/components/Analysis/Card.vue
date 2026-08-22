@@ -13,7 +13,7 @@ const props = defineProps<{
 const username = computed<string | undefined | null>(() => props.user.login)
 
 const analysisKey = computed<string>(() => `analysis:${username.value}`)
-const { data, status, error } = useFetch(
+const { data, status, error, refresh } = useFetch(
   () => `/api/identify-replicant/${username.value}`,
   {
     query: {
@@ -132,7 +132,7 @@ useSeoAnalysis(identifyAnalysis, {
 
 <template>
   <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
-  <LazyErrorCardGeneric v-else-if="error" :error />
+  <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
   <template v-else-if="data">
     <div
       class="flex gap-6 bg-ui-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"

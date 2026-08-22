@@ -19,6 +19,10 @@ export default defineConfig({
     }),
   ],
   transformers: [transformerDirectives(), transformerVariantGroup()],
+  shortcuts: {
+    'pill-action':
+      'flex items-center gap-2 rounded-full border-1 border-solid border-ui-border px-4 py-2 text-sm hover:bg-ui-muted/15 transition-all',
+  },
   theme: {
     font: {
       mono: "'Roboto', monospace",

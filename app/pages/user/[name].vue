@@ -15,13 +15,14 @@ const username = computed(() => {
 })
 
 const accountKey = computed<string>(() => `account:${username.value}`)
-const { data: user, error } = await useFetch(
-  () => `/api/account/${username.value}`,
-  {
-    key: accountKey,
-    watch: [username],
-  },
-)
+const {
+  data: user,
+  error,
+  refresh,
+} = await useFetch(() => `/api/account/${username.value}`, {
+  key: accountKey,
+  watch: [username],
+})
 
 async function handleSubmit(name: string) {
   await router.push({ name: 'user-name', params: { name } })
@@ -45,6 +46,6 @@ useSeoUser(user)
       <LazyAnalysisCard :user hydrate-on-visible />
     </template>
 
-    <LazyUserCardError v-else-if="error" :error :username />
+    <LazyUserCardError v-else-if="error" :error :username :retry="refresh" />
   </div>
 </template>
