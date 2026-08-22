@@ -1,6 +1,8 @@
 import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest'
 import type { IdentifyResult } from '@unveil/identity'
-import { getClassificationDetails, identify } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity'
+import type { AnalyzeReturn } from '@unveil/vk'
+import { analyze } from '@unveil/vk'
 import { parse as parseYaml } from 'yaml'
 import handler from './github/index.post.ts'
 
@@ -29,10 +31,11 @@ const {
         return data
       },
     ),
+    // The handler authenticates as the installation and hands the token to
+    // `analyze`, which does the GitHub reads itself.
+    auth: vi.fn(),
     rest: {
       repos: { getContent: vi.fn() },
-      users: { getByUsername: vi.fn() },
-      activity: { listPublicEventsForUser: vi.fn() },
       issues: {
         listComments: vi.fn(),
         createComment: vi.fn(),
@@ -99,6 +102,7 @@ vi.mock('@octokit/webhooks', () => ({
   }),
 }))
 vi.mock('@unveil/identity')
+vi.mock('@unveil/vk', () => ({ analyze: vi.fn() }))
 vi.mock('yaml', () => ({ parse: vi.fn() }))
 
 // --- Shared fixtures ---
@@ -150,6 +154,8 @@ const MOCK_ANALYSIS: IdentifyResult = {
   profile: { age: 365, repos: 0 },
 }
 
+const MOCK_USER_ID = 4242
+
 const MOCK_EVENT = {} satisfies H3Event<EventHandlerRequest>
 
 // --- Helpers ---
@@ -164,6 +170,15 @@ function setupEvent(
   useRuntimeConfigMock.mockReturnValue({
     ...RUNTIME_CONFIG,
     ...configOverrides,
+  })
+}
+
+function mockAnalysis(analysis: IdentifyResult) {
+  vi.mocked(analyze).mockResolvedValue({
+    analysis,
+    events: [],
+    eventsCount: 0,
+    userId: MOCK_USER_ID,
   })
 }
 
@@ -195,14 +210,11 @@ describe('GitHub Webhook Handler', () => {
     // Default: valid signature, full PR payload, no agentscan.yml, no verified list
     mockWebhooks.verify.mockResolvedValue(true)
     mockApp.getInstallationOctokit.mockResolvedValue(mockInstallationOctokit)
+    mockInstallationOctokit.auth.mockResolvedValue({
+      token: 'installation-token',
+    })
     mockInstallationOctokit.rest.repos.getContent.mockRejectedValue(
       new Error('Not Found'),
-    )
-    mockInstallationOctokit.rest.users.getByUsername.mockResolvedValue({
-      data: { public_repos: 10, created_at: '2020-01-01T00:00:00Z' },
-    })
-    mockInstallationOctokit.rest.activity.listPublicEventsForUser.mockResolvedValue(
-      { data: [] },
     )
     mockInstallationOctokit.rest.issues.listComments.mockResolvedValue({
       data: [],
@@ -220,7 +232,7 @@ describe('GitHub Webhook Handler', () => {
       new Error('Not Found'),
     )
 
-    vi.mocked(identify).mockReturnValue(MOCK_ANALYSIS)
+    mockAnalysis(MOCK_ANALYSIS)
     vi.mocked(getClassificationDetails).mockReturnValue({
       label: 'Organic Account',
       description: 'This account appears to be organic.',
@@ -273,7 +285,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
     })
 
     it('returns { ok: true } when pull_request is absent from payload', async () => {
@@ -282,7 +294,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
     })
 
     it('returns { ok: true } when installation is absent from payload', async () => {
@@ -291,7 +303,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
     })
 
     it('returns 503 when GitHub App credentials are not configured', async () => {
@@ -321,47 +333,22 @@ describe('GitHub Webhook Handler', () => {
   })
 
   describe('Normal Flow', () => {
-    it('fetches 3 pages of public events', async () => {
-      await handler(MOCK_EVENT)
-
-      expect(
-        mockInstallationOctokit.rest.activity.listPublicEventsForUser,
-      ).toHaveBeenCalledTimes(3)
-      expect(
-        mockInstallationOctokit.rest.activity.listPublicEventsForUser,
-      ).toHaveBeenNthCalledWith(1, {
-        username: 'test-user',
-        per_page: 100,
-        page: 1,
-      })
-      expect(
-        mockInstallationOctokit.rest.activity.listPublicEventsForUser,
-      ).toHaveBeenNthCalledWith(3, {
-        username: 'test-user',
-        per_page: 100,
-        page: 3,
-      })
-    })
-
-    it('calls identify with user data from the GitHub API', async () => {
-      mockInstallationOctokit.rest.users.getByUsername.mockResolvedValue({
-        data: { public_repos: 25, created_at: '2019-06-15T00:00:00Z' },
-      })
+    it('calls analyze with the username and the installation token', async () => {
+      mockInstallationOctokit.auth.mockResolvedValue({ token: 'ghs_token' })
 
       await handler(MOCK_EVENT)
 
-      expect(identify).toHaveBeenCalledWith(
-        expect.objectContaining({
-          user: {
-            created_at: '2019-06-15T00:00:00Z',
-            public_repos: 25,
-          },
-        }),
+      expect(mockInstallationOctokit.auth).toHaveBeenCalledWith({
+        type: 'installation',
+      })
+      expect(analyze).toHaveBeenCalledWith(
+        'test-user',
+        expect.objectContaining({ token: 'ghs_token' }),
       )
     })
 
     it('returns reported/flagged status', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'organic',
       })
@@ -403,7 +390,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
@@ -420,13 +407,13 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
     })
 
     it('proceeds with scan for regular user accounts', async () => {
       await handler(MOCK_EVENT)
 
-      expect(identify).toHaveBeenCalled()
+      expect(analyze).toHaveBeenCalled()
     })
   })
 
@@ -437,7 +424,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
@@ -451,7 +438,7 @@ describe('GitHub Webhook Handler', () => {
 
       await handler(MOCK_EVENT)
 
-      expect(identify).toHaveBeenCalled()
+      expect(analyze).toHaveBeenCalled()
     })
   })
 
@@ -470,7 +457,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
@@ -491,7 +478,7 @@ describe('GitHub Webhook Handler', () => {
 
       await handler(MOCK_EVENT)
 
-      expect(identify).toHaveBeenCalled()
+      expect(analyze).toHaveBeenCalled()
     })
 
     it('proceeds with scan when trusted-author-associations is not configured', async () => {
@@ -505,13 +492,13 @@ describe('GitHub Webhook Handler', () => {
 
       await handler(MOCK_EVENT)
 
-      expect(identify).toHaveBeenCalled()
+      expect(analyze).toHaveBeenCalled()
     })
   })
 
   describe('Scan Mode: silent', () => {
     it('returns { ok: true } without posting a comment or adding labels', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -531,7 +518,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Scan Mode: labels', () => {
     it('adds labels but does not post a comment', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -558,7 +545,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Scan Mode: comment', () => {
     it('posts a comment but does not add labels', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -598,7 +585,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Scan Mode: full (default)', () => {
     it('posts a comment and adds labels when classification is not organic', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -654,7 +641,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('adds mixed-signals label for mixed classification', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -669,7 +656,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('adds automation-signals label for automation classification', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -696,7 +683,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('uses custom labels from repo config', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -749,7 +736,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('still posts comment for non-organic accounts when comment-on-organic is disabled', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -764,7 +751,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Auto-Close', () => {
     it('does not close the PR when autoClose is disabled (default)', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -775,7 +762,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('closes the PR when autoClose is enabled and classification matches', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -796,7 +783,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('does not close the PR when classification is not in autoCloseClassifications', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -828,7 +815,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('closes the PR when multiple classifications are in the autoClose list', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -862,7 +849,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('closes the PR when autoClose matches even though mode is silent', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1002,7 +989,7 @@ describe('GitHub Webhook Handler', () => {
       })
 
       it('does not post a honeypot comment when the PR is auto-closed anyway', async () => {
-        vi.mocked(identify).mockReturnValue({
+        mockAnalysis({
           ...MOCK_ANALYSIS,
           classification: 'automation',
         })
@@ -1411,7 +1398,7 @@ describe('GitHub Webhook Handler', () => {
 
         await handler(MOCK_EVENT)
 
-        expect(identify).not.toHaveBeenCalled()
+        expect(analyze).not.toHaveBeenCalled()
         expect(
           mockInstallationOctokit.rest.checks.create,
         ).not.toHaveBeenCalled()
@@ -1421,7 +1408,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Custom Messages (via repo config)', () => {
     it('uses the custom automation message in the posted comment', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1458,7 +1445,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Report Link', () => {
     it('includes a pre-filled report-issue link for automation classifications', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1475,7 +1462,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('omits the report link for mixed classifications', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -1498,7 +1485,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('omits the report link for community-flagged accounts even when classification is automation', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1514,7 +1501,7 @@ describe('GitHub Webhook Handler', () => {
 
   describe('Evidence', () => {
     it('includes a collapsible evidence section listing the flags', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1529,7 +1516,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('omits the evidence section when there are no flags', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
         flags: [],
@@ -1571,7 +1558,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('completes the check run with a success conclusion for mixed accounts when auto-close is disabled', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -1584,7 +1571,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('completes the check run with a success conclusion for automation accounts when auto-close is disabled', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1607,7 +1594,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('completes the check run with an action_required conclusion when auto-close triggers on a matching classification', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'automation',
       })
@@ -1624,7 +1611,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('completes the check run with a success conclusion when auto-close is enabled but the classification does not match', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -1655,7 +1642,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('completes the check run with "Analysis skipped" when repo config mode is silent', async () => {
-      vi.mocked(identify).mockReturnValue({
+      mockAnalysis({
         ...MOCK_ANALYSIS,
         classification: 'mixed',
       })
@@ -1686,7 +1673,7 @@ describe('GitHub Webhook Handler', () => {
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(identify).not.toHaveBeenCalled()
+      expect(analyze).not.toHaveBeenCalled()
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
@@ -1708,9 +1695,7 @@ describe('GitHub Webhook Handler', () => {
     })
 
     it('completes the check run with a failure conclusion and rethrows when scanning errors', async () => {
-      mockInstallationOctokit.rest.users.getByUsername.mockRejectedValue(
-        new Error('boom'),
-      )
+      vi.mocked(analyze).mockRejectedValue(new Error('boom'))
 
       await expect(handler(MOCK_EVENT)).rejects.toThrow('boom')
 
@@ -1766,10 +1751,10 @@ describe('GitHub Webhook Handler', () => {
 
       // Stays pending past the deadline: stands in for a scan slow enough to be
       // killed by the function timeout before it can conclude the run itself.
-      let resolveUser: (value: unknown) => void = () => {}
-      mockInstallationOctokit.rest.users.getByUsername.mockReturnValue(
+      let resolveAnalysis: (value: AnalyzeReturn) => void = () => {}
+      vi.mocked(analyze).mockReturnValue(
         new Promise((resolve) => {
-          resolveUser = resolve
+          resolveAnalysis = resolve
         }),
       )
 
@@ -1789,8 +1774,11 @@ describe('GitHub Webhook Handler', () => {
 
       // Let the handler run its cleanup before handing the clock back, so no
       // in-flight work leaks into the next test.
-      resolveUser({
-        data: { public_repos: 10, created_at: '2020-01-01T00:00:00Z' },
+      resolveAnalysis({
+        analysis: MOCK_ANALYSIS,
+        events: [],
+        eventsCount: 0,
+        userId: MOCK_USER_ID,
       })
       await pending
 
