@@ -12,8 +12,15 @@ import { useColors } from '~/composables/useColors'
 import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
-import type { VueUiXyDatasetItemWithTrends } from '~~/shared/types/ecosystem-health'
-import EventsEvolutionTooltipTable from './EventsEvolutionTooltipTable.vue'
+import type {
+  EventsEvolutionSeries,
+  VueUiXySeriesWithCounts,
+} from '~~/shared/types/ecosystem-health'
+import {
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
+  getTotalPrScanned,
+} from '~~/shared/utils/charts.ts'
+
 const { data: ecosystemHealth } = await useEcosystemHealth()
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
@@ -47,57 +54,28 @@ onMounted(() => {
 
 const colors = useColors(rootEl)
 
-function composeRawDataset(): VueUiXyDatasetItemWithTrends[] {
-  return [
-    {
-      name: 'Organic',
-      series:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.organic.percentage ?? 0,
-        ) ?? [],
-      trends:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.organic.trend ?? 0,
-        ) ?? [],
-      color: colors.value.organic,
-      type: 'line',
-      smooth: true,
-      useArea: true,
-    },
-    {
-      name: 'Mixed',
-      series:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.mixed.percentage ?? 0,
-        ) ?? [],
-      trends:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.mixed.trend ?? 0,
-        ) ?? [],
-      color: colors.value.mixed,
-      type: 'line',
-      smooth: true,
-      useArea: true,
-    },
-    {
-      name: 'Automation',
-      series:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.automation.percentage ?? 0,
-        ) ?? [],
-      trends:
-        dates.value?.map(
-          (date) => countsByDate.value?.[date]?.automation.trend ?? 0,
-        ) ?? [],
-      color: colors.value.automation,
-      type: 'line',
-      smooth: true,
-      useArea: true,
-    },
-  ]
-}
-
-const rawDataset = computed(() => composeRawDataset())
+const rawDataset = computed<EventsEvolutionSeries[]>(() =>
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+    name,
+    category,
+    series: (dates.value ?? []).map(
+      (scanTime) => countsByDate.value?.[scanTime]?.[category].percentage ?? 0,
+    ),
+    trends: (dates.value ?? []).map(
+      (scanTime) => countsByDate.value?.[scanTime]?.[category].trend ?? 0,
+    ),
+    counts: (dates.value ?? []).map(
+      (scanTime) => countsByDate.value?.[scanTime]?.[category].count ?? 0,
+    ),
+    totals: (dates.value ?? []).map(
+      (scanTime) => countsByDate.value?.[scanTime]?.total.count ?? 0,
+    ),
+    color: colors.value[category],
+    type: 'line',
+    smooth: true,
+    useArea: true,
+  })),
+)
 
 const max = computed(() => {
   const values = rawDataset.value.flatMap((datasetItem) =>
@@ -375,13 +353,21 @@ function placeLandmark({
               </linearGradient>
             </template>
 
-            <template #tooltip="{ datapoint, timeLabel, series }">
+            <template
+              #tooltip="{ datapoint, timeLabel, series, absoluteIndex }"
+            >
               <div class="flex flex-col tabular-nums">
-                <div :style="{ color: colors.textMuted }" class="mb-1">
-                  {{ timeLabel.text }}
-                </div>
+                <ChartEventsEvolutionTooltipHeader
+                  :timeLabel="timeLabel.text"
+                  :count="
+                    getTotalPrScanned(
+                      series as VueUiXySeriesWithCounts,
+                      absoluteIndex,
+                    )
+                  "
+                />
 
-                <EventsEvolutionTooltipTable
+                <ChartEventsEvolutionTooltipTable
                   :tooltip-slot-props="{ datapoint, timeLabel, series }"
                   :colors
                   :can-compare="timeLabel.absoluteIndex > 0"
@@ -391,7 +377,7 @@ function placeLandmark({
                     <th class="px-2 text-center">vs Day-1</th>
                     <th class="px-2 text-left">Trend</th>
                   </template>
-                </EventsEvolutionTooltipTable>
+                </ChartEventsEvolutionTooltipTable>
 
                 <!-- LANDMARK INFO -->
                 <div

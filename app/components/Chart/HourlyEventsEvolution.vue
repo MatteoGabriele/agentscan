@@ -10,7 +10,14 @@ import { useElementSize } from '@vueuse/core'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { round } from '~~/shared/utils/numbers'
-import EventsEvolutionTooltipTable from './EventsEvolutionTooltipTable.vue'
+import type {
+  EventsEvolutionSeries,
+  VueUiXySeriesWithCounts,
+} from '~~/shared/types/ecosystem-health.ts'
+import {
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
+  getTotalPrScanned,
+} from '~~/shared/utils/charts.ts'
 
 dayjs.extend(utc)
 
@@ -47,34 +54,8 @@ const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,
 )
 
-type HourlySerie = VueUiXyDatasetItem & {
-  category: EcosystemHealthCategory
-  trends: number[]
-  counts: number[]
-  totals: number[]
-}
-
-const classifications: Array<{
-  name: string
-  category: EcosystemHealthCategory
-}> = [
-  { name: 'Organic', category: 'organic' },
-  { name: 'Mixed', category: 'mixed' },
-  { name: 'Automation', category: 'automation' },
-]
-
-function getSerieColor(category: EcosystemHealthCategory) {
-  if (category === 'organic') {
-    return colors.value.organic
-  }
-  if (category === 'mixed') {
-    return colors.value.mixed
-  }
-  return colors.value.automation
-}
-
-const rawDataset = computed<HourlySerie[]>(() =>
-  classifications.map(({ name, category }) => ({
+const rawDataset = computed<EventsEvolutionSeries[]>(() =>
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
     name,
     category,
     series: (scanTimes.value ?? []).map(
@@ -90,7 +71,7 @@ const rawDataset = computed<HourlySerie[]>(() =>
     totals: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.total.count ?? 0,
     ),
-    color: getSerieColor(category),
+    color: colors.value[category],
     type: 'line',
     smooth: true,
     useArea: true,
@@ -282,11 +263,19 @@ function handleChartMouseleave() {
               </linearGradient>
             </template>
 
-            <template #tooltip="{ datapoint, timeLabel, series }">
-              <div class="flex flex-col">
-                <div :style="{ color: colors.textMuted }" class="mb-1">
-                  {{ formatScanTime(timeLabel.absoluteIndex) }}
-                </div>
+            <template
+              #tooltip="{ datapoint, timeLabel, series, absoluteIndex }"
+            >
+              <div class="flex flex-col tabular-nums">
+                <ChartEventsEvolutionTooltipHeader
+                  :timeLabel="formatScanTime(timeLabel.absoluteIndex)"
+                  :count="
+                    getTotalPrScanned(
+                      series as VueUiXySeriesWithCounts,
+                      absoluteIndex,
+                    )
+                  "
+                />
 
                 <!-- TODO: dedicated tooltip component for the repo drill view -->
                 <!-- NOTE: it should have an equivalent width as the regular tooltip to avoid a big shift when toggling, because the tooltip will keep the same coordinates when its content changes -->
@@ -298,7 +287,7 @@ function handleChartMouseleave() {
                   {{ datapoint }}
                 </div>
 
-                <EventsEvolutionTooltipTable
+                <ChartEventsEvolutionTooltipTable
                   v-else
                   :tooltip-slot-props="{ datapoint, timeLabel, series }"
                   :colors
@@ -309,7 +298,7 @@ function handleChartMouseleave() {
                     <th class="px-2 text-center">vs Hour-1</th>
                     <th class="px-2 text-left">Trend</th>
                   </template>
-                </EventsEvolutionTooltipTable>
+                </ChartEventsEvolutionTooltipTable>
               </div>
             </template>
 
