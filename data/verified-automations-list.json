@@ -390,5 +390,13 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/349",
     "reportedBy": "MatteoGabriele",
     "createdAt": "2026-08-15"
+  },
+  {
+    "username": "santhiprakash",
+    "id": 38608178,
+    "reason": "Heavy automation usage creating spam PRs in many repos within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/371",
+    "reportedBy": "bluwy",
+    "createdAt": "2026-08-22"
   }
 ]
