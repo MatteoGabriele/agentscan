@@ -2,8 +2,6 @@ import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
 import {
   getClassificationDetails,
-  identify,
-  type IdentifyResult,
   type IdentityClassification,
 } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
