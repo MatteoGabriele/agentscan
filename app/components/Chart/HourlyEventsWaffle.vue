@@ -307,7 +307,7 @@ function getCountLabel(count: number) {
                   <span>Count:</span>
                   <div class="flex flex-row gap-1">
                     <span>{{ datapoint.value }}</span>
-                    <span>({{ datapoint.proportion }}%)</span>
+                    <span>({{ Math.round(datapoint.proportion * 100) }}%)</span>
                   </div>
                 </div>
               </div>
