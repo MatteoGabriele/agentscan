@@ -21,7 +21,7 @@ import {
   getTotalPrScanned,
 } from '~~/shared/utils/charts.ts'
 
-const { data: ecosystemHealth } = await useEcosystemHealth()
+const { data: ecosystemHealth } = useEcosystemHealth()
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
