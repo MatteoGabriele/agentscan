@@ -256,7 +256,7 @@ function approvalComment(decision: Decision, config: Config): string {
     : 'The account has been added to `data/verified-automations-list.json`.'
 
   return [
-    `## ✅ Approved`,
+    `## Approved`,
     ``,
     `This report reached the ${config.minApprovals} approvals required by the review team.`,
     ``,
@@ -275,7 +275,7 @@ function rejectionComment(decision: Decision, config: Config): string {
       : `This report collected the ${config.minRejections} rejections that settle a review, so it cannot reach the ${config.minApprovals} approvals it needs.`
 
   return [
-    `## ❌ Not flagged`,
+    `## Not flagged`,
     ``,
     unreachable,
     ``,
@@ -377,7 +377,7 @@ async function decidePhase(
   }
 
   fs.writeFileSync(decisionsPath, JSON.stringify(decisions, null, 2) + '\n')
-  console.log(`\n📝 Wrote ${decisions.length} decision(s) to ${decisionsPath}`)
+  console.log(`\nWrote ${decisions.length} decision(s) to ${decisionsPath}`)
 }
 
 async function finalizePhase(

@@ -86,7 +86,7 @@ export function truncate(text: string, maxLength = MAX_REASON_LENGTH): string {
 
 export function openedMessage(report: ReportSummary): string {
   return [
-    '🆕 **New automation report**',
+    '**New automation report**',
     '',
     `Account: \`@${report.username}\``,
     `Reported by: \`@${report.reportedBy}\``,
@@ -111,7 +111,7 @@ export function decidedMessage(
     : `\`@${report.username}\` was not flagged.`
 
   return [
-    approved ? '✅ **Report approved**' : '❌ **Report not flagged**',
+    approved ? '**Report approved**' : '**Report not flagged**',
     '',
     outcome,
     '',
@@ -237,7 +237,7 @@ async function fetchReport(
   )
 
   if (!labels.includes(REPORT_LABEL)) {
-    console.log(`ℹ️ Issue #${issue} is not an automation report — skipping`)
+    console.log(`Issue #${issue} is not an automation report — skipping`)
     return null
   }
 
