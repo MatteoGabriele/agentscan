@@ -2,9 +2,6 @@
 /**
  * Review community-reported automation issues by counting reviewer reactions.
  *
- * Reactions emit no webhook event, so this polls the open `automation` issues
- * on a schedule instead of reacting to one.
- *
  * It runs in two modes, so an issue is never closed before its entry is safely
  * on main:
  *   --mode=decide    count reactions, run `add:automation` for approved issues
@@ -253,7 +250,7 @@ function scoreboard(decision: Decision, config: Config): string {
 function approvalComment(decision: Decision, config: Config): string {
   const added = decision.alreadyListed
     ? 'This account was already on the list, so no new entry was added.'
-    : 'The account has been added to `data/verified-automations-list.json`.'
+    : 'The account has been added to the [automations list](https://agentscan.tools/automations).'
 
   return [
     `## Approved`,
