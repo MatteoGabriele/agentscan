@@ -48,6 +48,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Approvals are finalized against main, so a workflow_dispatch from
+          # another ref cannot land entries anywhere else.
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -102,7 +106,7 @@ jobs:
           git fetch origin main
 
           for attempt in 1 2 3; do
-            if git rebase origin/main && git push; then
+            if git rebase origin/main && git push origin HEAD:main; then
               echo "Pushed on attempt $attempt ($count line(s) added)"
               exit 0
             fi
