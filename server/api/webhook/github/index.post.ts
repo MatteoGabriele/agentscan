@@ -2,8 +2,6 @@ import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
 import {
   getClassificationDetails,
-  identify,
-  type IdentifyResult,
   type IdentityClassification,
 } from '@unveil/identity'
 import { isKnownBot } from '~~/shared/cicd-known-bots'
@@ -27,6 +25,9 @@ import {
   HONEYPOT_RESULT_MARKER,
   isOwnComment,
 } from './_honeypot'
+import { analyze } from '@unveil/vk'
+
+type OctokitAuthInstall = { token?: string } | undefined
 
 // Netlify's synchronous function timeout is 10s. Leave room to conclude the
 // check run before the process is killed.
@@ -385,20 +386,6 @@ export default defineEventHandler(async (event) => {
       return { ok: true }
     }
 
-    const { data: user } = await octokit.rest.users.getByUsername({ username })
-
-    const responses = await Promise.all(
-      Array.from({ length: 3 }, (_, index) =>
-        octokit.rest.activity.listPublicEventsForUser({
-          username,
-          per_page: 100,
-          page: index + 1,
-        }),
-      ),
-    )
-
-    const events = responses.flatMap((r) => r.data)
-
     let verified: AutomationListItem[] = []
     try {
       const { data: verifiedList } = await app.octokit.rest.repos.getContent({
@@ -417,9 +404,15 @@ export default defineEventHandler(async (event) => {
     }
 
     const hasCommunityFlag = verified.some((a) => a.username === username)
-    const userId: number | undefined = user.id
 
-    const analysis: IdentifyResult = identify({ user, events })
+    const installation = (await octokit.auth({
+      type: 'installation',
+    })) as OctokitAuthInstall
+
+    const { analysis, userId } = await analyze(username, {
+      token: installation?.token,
+      showEvents: true,
+    })
 
     const details = hasCommunityFlag
       ? COMMUNITY_FLAGGED_DETAILS
