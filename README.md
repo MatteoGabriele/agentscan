@@ -1,4 +1,4 @@
-# AgentScan
+# AgentSkan
 
 Automation pattern detection for open source maintainers.
 
