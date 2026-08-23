@@ -4,6 +4,7 @@ import {
   openedMessage,
   decidedMessage,
   digestMessages,
+  votersLine,
   type PendingReport,
   type ReportSummary,
   type Thresholds,
@@ -132,7 +133,42 @@ const pending = (overrides: Partial<PendingReport> = {}): PendingReport => ({
   username: 'kaigritun',
   approvals: 2,
   rejections: 0,
+  approvedBy: ['alice', 'bob'],
+  rejectedBy: [],
   ...overrides,
+})
+
+describe('votersLine', () => {
+  it('lists who voted which way', () => {
+    const line = votersLine(
+      pending({ approvedBy: ['alice', 'bob'], rejectedBy: ['carol'] }),
+    )
+
+    expect(line).toContain('👍 `alice, bob`')
+    expect(line).toContain('👎 `carol`')
+  })
+
+  it('leaves out a side nobody has taken', () => {
+    const line = votersLine(pending({ approvedBy: ['alice'], rejectedBy: [] }))
+
+    expect(line).toContain('👍 `alice`')
+    expect(line).not.toContain('👎')
+  })
+
+  it('says so when nobody has voted yet', () => {
+    const line = votersLine(pending({ approvedBy: [], rejectedBy: [] }))
+
+    expect(line).toContain('nobody has voted yet')
+  })
+
+  // Names are a roster, not a summons: no @ means Discord pings no one.
+  it('does not tag the reviewers it names', () => {
+    const line = votersLine(
+      pending({ approvedBy: ['alice'], rejectedBy: ['carol'] }),
+    )
+
+    expect(line).not.toContain('@')
+  })
 })
 
 describe('digestMessages', () => {
@@ -163,6 +199,48 @@ describe('digestMessages', () => {
     for (const message of messages) {
       expect(message).not.toMatch(/[^<]https?:\/\//)
       expect(message).not.toMatch(/https?:\/\/\S*[^>\s]$/m)
+    }
+  })
+
+  it('lists who has voted under each report', () => {
+    const [message] = digestMessages(
+      [pending({ approvedBy: ['alice', 'bob'], rejectedBy: ['carol'] })],
+      thresholds,
+    )
+
+    const lines = message.split('\n')
+    const entry = lines.findIndex((line) => line.includes('`@kaigritun`'))
+
+    expect(lines[entry + 1]).toContain('👍 `alice, bob`')
+    expect(lines[entry + 1]).toContain('👎 `carol`')
+  })
+
+  // The split moves whole reports, so no message can open with a roster whose
+  // report was left at the end of the previous one.
+  it('never separates a roster from the report it belongs to', () => {
+    const many = Array.from({ length: 120 }, (_, index) =>
+      pending({
+        issue: index,
+        username: `automation-account-${index}`,
+        approvedBy: ['alice', 'bob'],
+      }),
+    )
+
+    const messages = digestMessages(many, thresholds)
+    expect(messages.length).toBeGreaterThan(1)
+
+    for (const message of messages) {
+      const lines = message.split('\n')
+
+      lines.forEach((line, index) => {
+        if (line.includes('`@automation-account-')) {
+          expect(lines[index + 1]).toContain('👍 `alice, bob`')
+        }
+
+        if (line.startsWith('   👍')) {
+          expect(lines[index - 1]).toContain('`@automation-account-')
+        }
+      })
     }
   })
 

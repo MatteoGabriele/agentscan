@@ -62,13 +62,16 @@ export interface Thresholds {
   minRejections: number
 }
 
-/** One line of the daily digest: an open report nobody has settled yet. */
+/** One entry of the daily digest: an open report nobody has settled yet. */
 export interface PendingReport {
   issue: number
   url: string
   username: string
   approvals: number
   rejections: number
+  /** Reviewer logins, so everyone can spot the report they have not voted on. */
+  approvedBy: string[]
+  rejectedBy: string[]
 }
 
 export function truncate(text: string, maxLength = MAX_REASON_LENGTH): string {
@@ -121,6 +124,24 @@ export function decidedMessage(
   ].join('\n')
 }
 
+export function votersLine(report: PendingReport): string {
+  const parts: string[] = []
+
+  if (report.approvedBy.length) {
+    parts.push(`👍 \`${report.approvedBy.join(', ')}\``)
+  }
+
+  if (report.rejectedBy.length) {
+    parts.push(`👎 \`${report.rejectedBy.join(', ')}\``)
+  }
+
+  if (!parts.length) {
+    return '   nobody has voted yet'
+  }
+
+  return `   ${parts.join(' · ')}`
+}
+
 /**
  * The daily list of reports still waiting on a verdict.
  *
@@ -144,27 +165,29 @@ export function digestMessages(
     'React 👍 or 👎 on an issue to move it along.',
   ].join(' ')
 
-  // Links are wrapped in <> so no entry drags a preview card along behind it
-  const lines = reports.map(
-    (report) =>
-      `\`@${report.username}\` — 👍 ${report.approvals}/${thresholds.minApprovals} · 👎 ${report.rejections}/${thresholds.minRejections} · <${report.url}>`,
-  )
+  // Links are wrapped in <> so no entry drags a preview card along behind it.
+  // Each report is a block of two lines — the tally, then who voted — and the
+  // split below moves whole blocks, so a roster never lands without its report.
+  const blocks = reports.map((report) => [
+    `\`@${report.username}\` — 👍 ${report.approvals}/${thresholds.minApprovals} · 👎 ${report.rejections}/${thresholds.minRejections} · <${report.url}>`,
+    votersLine(report),
+  ])
 
   const messages: string[] = []
   let current: string[] = [header, '']
-  let lineCount = 0
+  let blockCount = 0
 
-  for (const line of lines) {
-    const projected = [...current, line, '', footer].join('\n')
+  for (const block of blocks) {
+    const projected = [...current, ...block, '', footer].join('\n')
 
-    if (lineCount > 0 && projected.length > MAX_MESSAGE_LENGTH) {
+    if (blockCount > 0 && projected.length > MAX_MESSAGE_LENGTH) {
       messages.push(current.join('\n'))
       current = []
-      lineCount = 0
+      blockCount = 0
     }
 
-    current.push(line)
-    lineCount++
+    current.push(...block)
+    blockCount++
   }
 
   messages.push([...current, '', footer].join('\n'))
@@ -362,6 +385,8 @@ async function digestEvent(dryRun: boolean): Promise<void> {
       username: report.username,
       approvals: counted.approvals,
       rejections: counted.rejections,
+      approvedBy: counted.approvedBy,
+      rejectedBy: counted.rejectedBy,
     })
   }
 
