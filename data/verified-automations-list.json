@@ -412,5 +412,33 @@
       "sheremet-va",
       "MatteoGabriele"
     ]
+  },
+  {
+    "username": "giaBaoJS",
+    "id": 39545125,
+    "reason": "Clear indication of automated activity: numerous PRs have been created across various projects in just a few days, often within the same minute. Four PRs were opened in a short period on Svelte.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/378",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-23",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "bluwy",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "seven7763",
+    "id": 246023385,
+    "reason": "The account shows a very high number of open PRs across 100 repositories, with a significantly high ratio of closed PRs. In one day, 71 PRs were closed, indicating potential spamming.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/345",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-15",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "bluwy",
+      "ematipico"
+    ]
   }
 ]
