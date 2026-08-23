@@ -8,7 +8,7 @@ body:
       value: |
         > [!IMPORTANT]
         > Only reports opened through AgentScan are considered valid: either from
-        > the website, or from this issue template in the AgentScan repository.
+        > the website, or from the link left by the GitHub Action or GitHub App during analysis.
         > Reports sent through any other channel are closed without review.
         >
         > The recommended way is to start from the website: go to
