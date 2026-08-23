@@ -6,6 +6,17 @@ body:
   - type: markdown
     attributes:
       value: |
+        > [!IMPORTANT]
+        > Only reports opened through AgentScan are considered valid: either from
+        > the website, or from this issue template in the AgentScan repository.
+        > Reports sent through any other channel are closed without review.
+        >
+        > The recommended way is to start from the website: go to
+        > [agentscan.tools](https://agentscan.tools), search for the account, open
+        > its page and click **Add report**. That pre-fills this form with the
+        > username, the user ID and the evidence AgentScan already collected, so
+        > reviewers get consistent, verifiable data.
+
         Thank you for helping identify automated accounts on GitHub. Please fill in the details below.
 
         ### How your report is reviewed
