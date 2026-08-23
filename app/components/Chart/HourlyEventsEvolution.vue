@@ -303,21 +303,6 @@ function handleChartMouseleave() {
               >
                 Loading...
               </text>
-              <path
-                v-if="isLoading"
-                class="animated-path"
-                :d="`
-                    M ${svg.drawingArea.left} ${svg.drawingArea.top + svg.drawingArea.height / 2}
-                    L ${svg.drawingArea.left + svg.drawingArea.width} ${svg.drawingArea.top + svg.drawingArea.height / 2}
-                  `"
-                :style="{
-                  strokeDasharray: svg.drawingArea.width,
-                  strokeDashoffset: svg.drawingArea.width,
-                }"
-                stroke="white"
-                stroke-width="2"
-                fill="none"
-              />
             </template>
 
             <template
