@@ -303,6 +303,14 @@ async function closeIssue(
       : rejectionComment(decision, config),
   })
 
+  await octokit.rest.issues.update({
+    owner: OWNER,
+    repo: REPO,
+    issue_number: decision.issue,
+    state: 'closed',
+    state_reason: approved ? 'completed' : 'not_planned',
+  })
+
   await octokit.rest.issues.addLabels({
     owner: OWNER,
     repo: REPO,
@@ -320,14 +328,6 @@ async function closeIssue(
   } catch {
     // The label may have been removed by hand already.
   }
-
-  await octokit.rest.issues.update({
-    owner: OWNER,
-    repo: REPO,
-    issue_number: decision.issue,
-    state: 'closed',
-    state_reason: approved ? 'completed' : 'not_planned',
-  })
 
   console.log(
     `${approved ? '✅' : '❌'} Issue #${decision.issue} closed as ${approved ? 'approved' : 'rejected'}`,
