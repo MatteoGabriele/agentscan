@@ -23,7 +23,7 @@ dayjs.extend(utc)
 
 import('vue-data-ui/style.css')
 
-const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
+const { data: hourlyWindow } = useEcosystemHealthHourlyWindow()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
