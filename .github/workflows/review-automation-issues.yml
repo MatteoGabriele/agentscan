@@ -63,10 +63,6 @@ jobs:
       - name: Count reactions and stage approvals
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Passed as an environment variable, never interpolated into the
-          # script below: `${{ }}` is expanded into the shell source before bash
-          # parses it, so a dispatch input inside a `run:` block is a
-          # code-execution hole rather than an argument.
           ISSUE_INPUT: ${{ inputs.issue }}
         run: |
           args=()
