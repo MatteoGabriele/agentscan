@@ -1,0 +1,128 @@
+name: Review Automation Reports
+
+# 👍 / 👎 reactions emit no webhook event, so the open reports are polled on a
+# schedule rather than reacted to.
+on:
+  schedule:
+    # Half past the hour, so this does not queue behind the hourly scan.
+    - cron: '30 * * * *'
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: 'Review only this issue number (leave empty for all open reports)'
+        required: false
+        type: string
+
+# The hourly scan pushes to main too, so the two take turns instead of racing.
+concurrency:
+  group: scan-results
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: github.repository == 'MatteoGabriele/agentscan'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    env:
+      # Reviewers whose 👍 / 👎 on an `automation` issue count. Add handles here.
+      REVIEWERS: |
+        MatteoGabriele
+        huang-julien
+        danielroe
+        gameroman
+        sheremet-va
+        ematipico
+        graphieros
+        TheAlexLichter
+        orbisk
+        bluwy
+
+      MIN_APPROVALS: '4'
+      MIN_REJECTIONS: '2'
+
+      DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Approvals are finalized against main, so a workflow_dispatch from
+          # another ref cannot land entries anywhere else.
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Count reactions and stage approvals
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_INPUT: ${{ inputs.issue }}
+        run: |
+          args=()
+
+          if [ -n "$ISSUE_INPUT" ]; then
+            case "$ISSUE_INPUT" in
+              *[!0-9]*)
+                echo "::error::issue input must be an issue number, got: $ISSUE_INPUT"
+                exit 1
+                ;;
+            esac
+            args+=("--issue=$ISSUE_INPUT")
+          fi
+
+          pnpm exec tsx scripts/review-automation-issues.ts \
+            --mode=decide \
+            --decisions="$DECISIONS_FILE" \
+            "${args[@]}"
+
+      - name: Commit and push approvals
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add data/verified-automations-list.json
+
+          if git diff --cached --quiet; then
+            echo "No new automations to commit"
+            exit 0
+          fi
+
+          count="$(git diff --cached --numstat -- data/verified-automations-list.json | awk '{print $1}')"
+          git commit -m "chore: add approved automation reports"
+
+          # Main moves on its own (hourly scan, merged PRs), so rebase onto
+          # whatever landed while this run was working.
+          git fetch origin main
+
+          for attempt in 1 2 3; do
+            if git rebase origin/main && git push origin HEAD:main; then
+              echo "Pushed on attempt $attempt ($count line(s) added)"
+              exit 0
+            fi
+            git rebase --abort || true
+            sleep $((attempt * 5))
+            git fetch origin main
+          done
+
+          echo "::error::Could not push the approved automation entries to main; issues were left open and will be retried next run."
+          exit 1
+
+      # Only now that the entries are on main: comment, relabel and close.
+      - name: Close reviewed issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          pnpm exec tsx scripts/review-automation-issues.ts
+          --mode=finalize
+          --decisions="$DECISIONS_FILE"

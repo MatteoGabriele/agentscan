@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import {
   parseIssueBody,
+  parseApprovedBy,
   validateEntry,
   generateEntry,
   type AutomationEntry,
@@ -147,6 +148,45 @@ describe('validateEntry', () => {
     expect(validateEntry(entry)).toBe(false)
   })
 
+  it('should accept an entry with an approvedBy list', () => {
+    const entry: Partial<AutomationEntry> = {
+      username: 'testuser',
+      id: 123456,
+      reason: 'Suspicious behavior',
+      issueUrl: 'https://github.com/test/issue/1',
+      createdAt: '2024-01-01',
+      reportedBy: 'reporter',
+      approvedBy: ['alice', 'bob'],
+    }
+    expect(validateEntry(entry)).toBe(true)
+  })
+
+  it('should reject an empty approvedBy list rather than write it', () => {
+    const entry: Partial<AutomationEntry> = {
+      username: 'testuser',
+      id: 123456,
+      reason: 'Suspicious behavior',
+      issueUrl: 'https://github.com/test/issue/1',
+      createdAt: '2024-01-01',
+      reportedBy: 'reporter',
+      approvedBy: [],
+    }
+    expect(validateEntry(entry)).toBe(false)
+  })
+
+  it('should reject a malformed approvedBy list', () => {
+    const entry = {
+      username: 'testuser',
+      id: 123456,
+      reason: 'Suspicious behavior',
+      issueUrl: 'https://github.com/test/issue/1',
+      createdAt: '2024-01-01',
+      reportedBy: 'reporter',
+      approvedBy: ['alice', ''],
+    } as Partial<AutomationEntry>
+    expect(validateEntry(entry)).toBe(false)
+  })
+
   it('should reject entry missing reportedBy', () => {
     const entry: Partial<AutomationEntry> = {
       username: 'testuser',
@@ -241,5 +281,89 @@ This is suspicious behavior.
     )
     expect(entry.reportedBy).toBe('reporter')
     expect(entry.createdAt).toBe('2024-04-28')
+  })
+})
+
+describe('parseApprovedBy', () => {
+  it('splits on commas and whitespace', () => {
+    expect(parseApprovedBy('alice, bob\ncarol')).toEqual([
+      'alice',
+      'bob',
+      'carol',
+    ])
+  })
+
+  it('strips a leading @ and drops duplicates and empties', () => {
+    expect(parseApprovedBy('@alice,alice, ,bob')).toEqual(['alice', 'bob'])
+  })
+
+  // These logins end up on the public list, so they keep the casing GitHub gave.
+  it('leaves casing alone', () => {
+    expect(parseApprovedBy('MatteoGabriele')).toEqual(['MatteoGabriele'])
+  })
+
+  it('handles an undefined value', () => {
+    expect(parseApprovedBy(undefined)).toEqual([])
+  })
+})
+
+describe('generateEntry approvedBy', () => {
+  const parsedData: Partial<AutomationEntry> = {
+    username: 'testuser',
+    id: 123456,
+    reason: 'Test reason',
+  }
+
+  it('records the reviewers whose 👍 carried the report', () => {
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      'reporter',
+      '2024-01-15',
+      ['alice', 'bob'],
+    )
+    expect(entry.approvedBy).toEqual(['alice', 'bob'])
+  })
+
+  // Older entries have no votes at all, so an entry added without them has to
+  // read the same way rather than carrying an empty array.
+  it('omits the key entirely when there are no approvals', () => {
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      'reporter',
+      '2024-01-15',
+      [],
+    )
+    expect('approvedBy' in entry).toBe(false)
+  })
+
+  it('omits the key when no list is passed at all', () => {
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      'reporter',
+      '2024-01-15',
+    )
+    expect('approvedBy' in entry).toBe(false)
+  })
+
+  it('serialises with approvedBy last, leaving the existing key order alone', () => {
+    const entry = generateEntry(
+      parsedData,
+      'https://github.com/test/issue/1',
+      'reporter',
+      '2024-01-15',
+      ['alice'],
+    )
+    expect(Object.keys(entry)).toEqual([
+      'username',
+      'id',
+      'reason',
+      'issueUrl',
+      'reportedBy',
+      'createdAt',
+      'approvedBy',
+    ])
   })
 })
