@@ -6,7 +6,7 @@ import {
   type VueUiXyEmitSelectX,
 } from 'vue-data-ui/vue-ui-xy'
 import { useTooltipPosition } from 'vue-data-ui/composables'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useTimeout } from '@vueuse/core'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { round } from '~~/shared/utils/numbers'
@@ -23,7 +23,15 @@ dayjs.extend(utc)
 
 import('vue-data-ui/style.css')
 
-const { data: hourlyWindow } = useEcosystemHealthHourlyWindow()
+const { data: hourlyWindow, status } = useEcosystemHealthHourlyWindow()
+
+const ready = shallowRef(false)
+
+useTimeout(200, {
+  callback: () => (ready.value = true),
+})
+
+const isLoading = computed(() => status.value !== 'success')
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)
@@ -54,14 +62,21 @@ const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,
 )
 
+const skeletonSeries = computed<number[]>(() => {
+  const length = isMobile.value ? 13 : 25
+  return Array.from({ length }, () => 50)
+})
+
 const rawDataset = computed<EventsEvolutionSeries[]>(() =>
   CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
     name,
     category,
-    series: (scanTimes.value ?? []).map(
-      (scanTime) =>
-        countsByScanTime.value?.[scanTime]?.[category].percentage ?? 0,
-    ),
+    series: isLoading.value
+      ? skeletonSeries.value
+      : (scanTimes.value ?? []).map(
+          (scanTime) =>
+            countsByScanTime.value?.[scanTime]?.[category].percentage ?? 0,
+        ),
     trends: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.[category].trend ?? 0,
     ),
@@ -71,7 +86,7 @@ const rawDataset = computed<EventsEvolutionSeries[]>(() =>
     totals: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.total.count ?? 0,
     ),
-    color: colors.value[category],
+    color: isLoading.value ? colors.value.border : colors.value[category],
     type: 'line',
     smooth: true,
     useArea: true,
@@ -79,6 +94,9 @@ const rawDataset = computed<EventsEvolutionSeries[]>(() =>
 )
 
 const scaleMax = computed(() => {
+  if (isLoading.value) {
+    return 100
+  }
   const values = rawDataset.value.flatMap((serie) =>
     (serie.series as Array<number | null>).map((point) => point ?? 0),
   )
@@ -101,6 +119,10 @@ const axisTimeFormat = 'HH:mm'
 
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
+  transitions: {
+    enable: ready.value,
+    pauseOnDatasetChange: false,
+  },
   chart: {
     userOptions: { show: false },
     zoom: { show: false },
@@ -118,11 +140,12 @@ const config = computed<VueUiXyConfig>(() => ({
       bottom: isMobile.value ? 0 : 36,
     },
     highlighter: {
-      opacity: 1,
+      opacity: isLoading.value ? 0 : 1,
       color: colors.value.text,
-      useLine: true,
+      useLine: !isLoading.value,
     },
     tooltip: {
+      show: !isLoading.value,
       backgroundColor: colors.value.bg,
       color: colors.value.text,
       borderColor: colors.value.border,
@@ -190,7 +213,7 @@ function formatScanTime(index: number) {
 const progressionLabelOffsetX = 0
 
 const viewBoxPadding = computed(() => {
-  const maxSeries = scanTimes.value?.length ?? 0
+  const maxSeries = isLoading.value ? 25 : (scanTimes.value?.length ?? 0)
 
   if (maxSeries <= 1 || width.value <= 0) {
     return { left: 0, right: 0 }
@@ -236,7 +259,7 @@ function handleChartMouseleave() {
 </script>
 
 <template>
-  <div class="relative h-full w-full flex flex-col">
+  <div class="relative h-full w-full flex flex-col" :class="{ ready: ready }">
     <div
       ref="chartContainer"
       class="flex-1 h-full no-chart-transition"
@@ -257,10 +280,29 @@ function handleChartMouseleave() {
                 <stop
                   offset="0%"
                   :stop-color="series.color"
-                  stop-opacity="0.3"
+                  :stop-opacity="isLoading ? 0.05 : 0.3"
                 />
                 <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
               </linearGradient>
+            </template>
+
+            <template #svg="{ svg }">
+              <text
+                v-if="isLoading"
+                :x="svg.drawingArea.left + svg.drawingArea.width / 2"
+                :y="svg.drawingArea.top + svg.drawingArea.height / 4"
+                :fill="colors.textMuted"
+                :font-size="14"
+                :stroke="colors.bg"
+                :stroke-width="6"
+                paint-order="stroke fill"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+                text-anchor="middle"
+                dominant-baseline="middle"
+              >
+                Loading...
+              </text>
             </template>
 
             <template
@@ -315,6 +357,7 @@ function handleChartMouseleave() {
             >
               <text
                 v-if="
+                  !isLoading &&
                   (absoluteIndex + scanTimesOffset) % (isMobile ? 3 : 6) ===
                     0 &&
                   ![0, (scanTimes?.length ?? 1) - 1].includes(absoluteIndex)
@@ -342,6 +385,9 @@ function handleChartMouseleave() {
 :deep(.vue-data-ui-component circle) {
   transition: none !important;
 }
+.ready :deep(.vue-data-ui-component path) {
+  transition: all 0.2s !important;
+}
 :deep(.vue-ui-xy-svg) {
   overflow: visible; /** for last time label cropping issue  */
 }
@@ -356,12 +402,6 @@ function handleChartMouseleave() {
 
 .chart-fade-enter-to {
   opacity: 1;
-}
-
-.no-chart-transition path,
-.no-chart-transition circle {
-  transition: none !important;
-  animation: none !important;
 }
 
 .time-label {
