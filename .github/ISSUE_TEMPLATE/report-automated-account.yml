@@ -7,15 +7,18 @@ body:
     attributes:
       value: |
         > [!IMPORTANT]
-        > Only reports opened through AgentScan are considered valid: either from
-        > the website, or from the link left by the GitHub Action or GitHub App during analysis.
-        > Reports sent through any other channel are closed without review.
+        > **Please open this form from AgentScan, not by hand.**
         >
-        > The recommended way is to start from the website: go to
-        > [agentscan.tools](https://agentscan.tools), search for the account, open
-        > its page and click **Add report**. That pre-fills this form with the
-        > username, the user ID and the evidence AgentScan already collected, so
-        > reviewers get consistent, verifiable data.
+        > 1. Go to [agentscan.tools](https://agentscan.tools)
+        > 2. Search for the account
+        > 3. Click **Add report** on its page
+        >
+        > That fills in the username, the user ID and the evidence for you, so
+        > reviewers see the same data every time. All you have to add is a clear,
+        > factual reason and any extra details that show the account is automated.
+        >
+        > The link left by the GitHub Action or GitHub App on a pull request works
+        > too. Reports started any other way are closed without review.
 
         Thank you for helping identify automated accounts on GitHub. Please fill in the details below.
 
