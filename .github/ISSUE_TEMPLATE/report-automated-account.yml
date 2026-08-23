@@ -19,9 +19,8 @@ body:
 
         A bot counts those reactions every hour and closes the report once the
         outcome is settled: **4 👍 flags the account**, **2 👎 rejects it**, and a
-        report is also rejected as soon as too many 👎 make 4 👍 impossible. Only
-        the [review team](https://github.com/MatteoGabriele/agentscan/blob/main/.github/workflows/review-automation-issues.yml)
-        votes — reactions from anyone else, including yours, are ignored.
+        report is also rejected as soon as too many 👎 make 4 👍 impossible. 
+        Reactions from anyone else, including yours, are ignored.
 
   - type: input
     id: username
