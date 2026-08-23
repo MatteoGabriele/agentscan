@@ -2,6 +2,7 @@
 const props = defineProps<{
   error?: (Error & { statusCode?: number }) | null
   username?: string
+  retry?: (() => unknown) | null
 }>()
 
 const { data: verifiedAutomations } = useVerifiedAutomations()
@@ -11,33 +12,70 @@ const isFlaggedAccount = computed(() => {
     return automation.username === props.username
   })
 })
+
+const isNotFound = computed<boolean>(() => props.error?.statusCode === 404)
+
+const githubUrl = computed<string>(() => {
+  return `https://github.com/${props.username}`
+})
 </script>
 
 <template>
-  <div
-    v-if="error?.statusCode === 404"
-    class="bg-ui-card p-6 rounded-2 border-2 border-solid border-ui-border text-center"
+  <ErrorCard
+    v-if="isNotFound && isFlaggedAccount"
+    icon="i-lucide:gift"
+    tone="positive"
+    title="Good news"
+    description="This account was reported as an automation, and GitHub no longer serves it. It looks like it is gone for good."
+    hint="Reports stay listed so the pattern remains searchable."
   >
-    <template v-if="isFlaggedAccount">
-      <span
-        class="i-lucide:gift text-xl text-ui-muted mx-auto mb-4 block"
-        aria-hidden="true"
-      />
-      <h3 class="text-xl font-mono text-ui-text mb-1">Good news</h3>
-      <p class="text-ui-muted text-sm text-pretty">
-        This flagged account seems to be no longer active.
-      </p>
+    <p
+      v-if="username"
+      class="mt-4 font-mono text-sm text-ui-muted px-3 py-1 rounded-full bg-ui-muted/10"
+    >
+      @{{ username }}
+    </p>
+
+    <template #actions>
+      <NuxtLink to="/automations" class="pill-action">
+        <span class="i-lucide:flag text-xs" aria-hidden="true" />
+        See reported accounts
+      </NuxtLink>
     </template>
-    <template v-else>
-      <span
-        class="i-lucide:ghost text-xl text-ui-muted mx-auto mb-4 block"
-        aria-hidden="true"
-      />
-      <h3 class="text-xl font-mono text-ui-text mb-1">User not found</h3>
-      <p class="text-ui-muted text-sm">
-        Double-check the username and try again
-      </p>
+  </ErrorCard>
+
+  <ErrorCard
+    v-else-if="isNotFound"
+    icon="i-lucide:ghost"
+    tone="neutral"
+    title="No account under that name"
+    description="GitHub has no public account with this handle. It may have been renamed, deleted, or simply mistyped."
+    hint="Handles are matched exactly, but casing does not matter."
+  >
+    <p
+      v-if="username"
+      class="mt-4 font-mono text-sm text-ui-muted px-3 py-1 rounded-full bg-ui-muted/10"
+    >
+      @{{ username }}
+    </p>
+
+    <template #actions>
+      <NuxtLink to="/" class="pill-action">
+        <span class="i-lucide:search text-xs" aria-hidden="true" />
+        Search another account
+      </NuxtLink>
+      <NuxtLink
+        v-if="username"
+        :to="githubUrl"
+        external
+        target="_blank"
+        class="pill-action"
+      >
+        <span class="i-lucide:external-link text-xs" aria-hidden="true" />
+        Check on GitHub
+      </NuxtLink>
     </template>
-  </div>
-  <ErrorCardGeneric v-else :error />
+  </ErrorCard>
+
+  <ErrorCardGeneric v-else :error :retry />
 </template>

@@ -1,28 +1,29 @@
 <script setup lang="ts">
 const props = defineProps<{
   error: unknown
+  retry?: (() => unknown) | null
 }>()
 
-const errorMessage = computed<string>(() => {
-  if (props.error instanceof Error) {
-    return props.error.message
+const { errorDetails } = useErrorDetails(() => props.error)
+
+const retryHandler = computed<(() => unknown) | null>(() => {
+  if (!errorDetails.value.canRetry) {
+    return null
   }
 
-  return String(props.error)
+  return props.retry ?? (() => reloadNuxtApp())
 })
 </script>
 
 <template>
-  <div
-    class="bg-ui-card p-6 rounded-2 border-2 border-solid border-ui-border text-center"
-  >
-    <span
-      class="i-lucide:badge-x text-xl text-ui-muted mx-auto mb-4 block"
-      aria-hidden="true"
-    />
-
-    <p class="text-ui-muted">
-      {{ errorMessage }}
-    </p>
-  </div>
+  <ErrorCard
+    :icon="errorDetails.icon"
+    :tone="errorDetails.tone"
+    :title="errorDetails.title"
+    :description="errorDetails.description"
+    :hint="errorDetails.hint"
+    :status-code="errorDetails.statusCode"
+    :detail="errorDetails.detail"
+    :retry="retryHandler"
+  />
 </template>
