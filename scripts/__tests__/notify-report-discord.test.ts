@@ -101,6 +101,15 @@ describe('decidedMessage', () => {
     expect(message).toContain('was not flagged')
   })
 
+  // The verdict is posted with SUPPRESS_EMBEDS too, but a run settling several
+  // reports would still stack preview cards if the link were left bare.
+  it('wraps the issue link so Discord shows no preview card', () => {
+    const message = decidedMessage(report, decision(), thresholds)
+
+    expect(message).toContain(`<${report.url}>`)
+    expect(message).not.toContain(`\n${report.url}`)
+  })
+
   it('shows the tally against the configured thresholds', () => {
     expect(decidedMessage(report, decision(), thresholds)).toContain(
       '👍 4/4  ·  👎 0/2',

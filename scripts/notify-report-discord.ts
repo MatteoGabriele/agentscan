@@ -47,11 +47,6 @@ const MAX_MESSAGE_LENGTH = 2000
 /** Discord rate limits webhooks, and a run can settle several reports at once. */
 const POST_INTERVAL_MS = 1_000
 
-/**
- * Discord's SUPPRESS_EMBEDS message flag (1 << 2). The digest lists one link
- * per report, and without this a busy day would unroll into a wall of link
- * previews.
- */
 const SUPPRESS_EMBEDS = 4
 
 export interface ReportSummary {
@@ -121,7 +116,8 @@ export function decidedMessage(
     // comment already spells it out.
     `👍 ${decision.approvals}/${thresholds.minApprovals}  ·  👎 ${decision.rejections}/${thresholds.minRejections}`,
     '',
-    report.url,
+    // Wrapped in <> so the link brings no preview card with it.
+    `<${report.url}>`,
   ].join('\n')
 }
 
@@ -148,9 +144,7 @@ export function digestMessages(
     'React 👍 or 👎 on an issue to move it along.',
   ].join(' ')
 
-  // Links are wrapped in <> so no entry drags a preview card along behind it —
-  // a dozen of those would bury the list. The digest is also posted with
-  // SUPPRESS_EMBEDS, so the formatting is the belt and the flag is the braces.
+  // Links are wrapped in <> so no entry drags a preview card along behind it
   const lines = reports.map(
     (report) =>
       `\`@${report.username}\` — 👍 ${report.approvals}/${thresholds.minApprovals} · 👎 ${report.rejections}/${thresholds.minRejections} · <${report.url}>`,
@@ -328,7 +322,9 @@ async function decidedEvent(dryRun: boolean): Promise<void> {
       await new Promise((resolve) => setTimeout(resolve, POST_INTERVAL_MS))
     }
 
-    await post(decidedMessage(report, decision, thresholds), dryRun)
+    await post(decidedMessage(report, decision, thresholds), dryRun, {
+      suppressEmbeds: true,
+    })
   }
 }
 
