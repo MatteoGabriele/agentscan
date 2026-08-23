@@ -35,7 +35,7 @@ jobs:
       - name: Announce on Discord
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISCORD_WEBHOOK_REPORT: ${{ secrets.DISCORD_WEBHOOK_REPORT }}
+          DISCORD_WEBHOOK_REPORT: ${{ secrets.OSS_GUILD_REPORTS_DISCORD_WEBHOOK }}
         run: >
           pnpm exec tsx scripts/notify-report-discord.ts
           --event=opened
