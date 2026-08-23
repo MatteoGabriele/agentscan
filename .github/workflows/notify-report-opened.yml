@@ -1,0 +1,42 @@
+name: Announce New Automation Report
+
+# Reviewers rule on reports by reacting to the issue, so they need to hear that
+# one exists. Only the first opening is announced — the report label being added
+# by hand later, or the issue being reopened, posts nothing.
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  announce:
+    if: >
+      github.repository == 'MatteoGabriele/agentscan' &&
+      contains(github.event.issue.labels.*.name, 'automation')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Announce on Discord
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_REPORT: ${{ secrets.DISCORD_WEBHOOK_REPORT }}
+        run: >
+          pnpm exec tsx scripts/notify-report-discord.ts
+          --event=opened
+          --issue=${{ github.event.issue.number }}

@@ -126,3 +126,15 @@ jobs:
           pnpm exec tsx scripts/review-automation-issues.ts
           --mode=finalize
           --decisions="$DECISIONS_FILE"
+
+      # Settled reports only: a pending one never reaches the decisions file, so
+      # the channel hears about a report twice at most — once when it opens, and
+      # once when it is ruled on.
+      - name: Announce outcomes on Discord
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_REPORT: ${{ secrets.DISCORD_WEBHOOK_REPORT }}
+        run: >
+          pnpm exec tsx scripts/notify-report-discord.ts
+          --event=decided
+          --decisions="$DECISIONS_FILE"
