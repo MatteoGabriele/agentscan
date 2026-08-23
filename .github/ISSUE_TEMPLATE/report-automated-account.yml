@@ -8,6 +8,21 @@ body:
       value: |
         Thank you for helping identify automated accounts on GitHub. Please fill in the details below.
 
+        ### How your report is reviewed
+
+        Reports are not decided by a single maintainer. Once you submit, the
+        issue is announced to the review team, and each reviewer rules on it by
+        reacting to the issue itself:
+
+        - 👍 the evidence shows an automated account
+        - 👎 the evidence is not conclusive
+
+        A bot counts those reactions every hour and closes the report once the
+        outcome is settled: **4 👍 flags the account**, **2 👎 rejects it**, and a
+        report is also rejected as soon as too many 👎 make 4 👍 impossible. Only
+        the [review team](https://github.com/MatteoGabriele/agentscan/blob/main/.github/workflows/review-automation-issues.yml)
+        votes — reactions from anyone else, including yours, are ignored.
+
   - type: input
     id: username
     attributes:
