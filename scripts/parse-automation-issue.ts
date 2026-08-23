@@ -1,8 +1,11 @@
 /// <reference types="node" />
 /**
  * Parse automation report issues and generate JSON entries
- * Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>
+ * Usage: npx tsx scripts/parse-automation-issue.ts <issue-number> [--approved-by=a,b]
  *        npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] (legacy mode)
+ *
+ * --approved-by is passed by the review workflow: the reviewers whose 👍 carried the
+ * report, recorded on the entry so the list says who stood behind it.
  */
 
 import fs from 'fs'
@@ -17,6 +20,8 @@ interface AutomationEntry {
   issueUrl: string
   createdAt: string
   reportedBy: string
+  /** Omitted entirely when the entry was added without a recorded vote. */
+  approvedBy?: string[]
 }
 
 export type { AutomationEntry }
@@ -49,6 +54,21 @@ export function parseIssueBody(body: string): Partial<AutomationEntry> {
   }
 }
 
+/**
+ * Reads the `--approved-by` list. Casing is left alone: these are GitHub logins as
+ * the reactions reported them, and they end up on the public list.
+ */
+export function parseApprovedBy(raw: string | undefined): string[] {
+  return [
+    ...new Set(
+      (raw || '')
+        .split(/[\s,]+/)
+        .map((name) => name.trim().replace(/^@/, ''))
+        .filter(Boolean),
+    ),
+  ]
+}
+
 export function validateEntry(
   entry: Partial<AutomationEntry>,
 ): entry is AutomationEntry {
@@ -72,6 +92,16 @@ export function validateEntry(
     console.error('✗ Missing or invalid reportedBy')
     return false
   }
+  if (entry.approvedBy !== undefined) {
+    if (
+      !Array.isArray(entry.approvedBy) ||
+      entry.approvedBy.length === 0 ||
+      entry.approvedBy.some((name) => typeof name !== 'string' || !name.trim())
+    ) {
+      console.error('✗ Invalid approvedBy list')
+      return false
+    }
+  }
   return true
 }
 
@@ -80,6 +110,7 @@ export function generateEntry(
   issueUrl: string,
   reportedBy: string,
   createdAt?: string,
+  approvedBy?: string[],
 ): AutomationEntry {
   return {
     username: parsed.username!,
@@ -88,6 +119,9 @@ export function generateEntry(
     issueUrl,
     reportedBy,
     createdAt: createdAt || new Date().toISOString().split('T')[0],
+    // Left off rather than written as [], so an entry added by hand reads the same
+    // as the ones that predate the vote being recorded.
+    ...(approvedBy?.length ? { approvedBy } : {}),
   }
 }
 
@@ -123,7 +157,9 @@ async function fetchIssueFromGitHub(issueNumber: number): Promise<{
   createdAt: string
   reportedBy: string
 }> {
-  const octokit = new Octokit()
+  // Authenticated when running in CI, so the review workflow does not burn
+  // through the 60/hour unauthenticated budget.
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
 
   try {
     const { data: issue } = await octokit.rest.issues.get({
@@ -154,14 +190,30 @@ function isIssueNumber(arg: string): boolean {
   return /^\d+$/.test(arg)
 }
 
+/**
+ * `--name=value` only. Legacy mode takes the issue body as a positional argument,
+ * so a bare `--` prefix is not enough to tell a flag from a report that happens to
+ * open with a dash.
+ */
+function flag(name: string): string | undefined {
+  const match = process.argv
+    .slice(2)
+    .find((arg) => arg.startsWith(`--${name}=`))
+  return match?.split('=').slice(1).join('=')
+}
+
+function positionalArgs(): string[] {
+  return process.argv.slice(2).filter((arg) => !/^--[a-z-]+=/.test(arg))
+}
+
 async function main() {
-  const firstArg = process.argv[2]
-  const secondArg = process.argv[3]
-  const thirdArg = process.argv[4]
+  const positional = positionalArgs()
+  const [firstArg, secondArg, thirdArg] = positional
+  const approvedBy = parseApprovedBy(flag('approved-by'))
 
   if (!firstArg) {
     console.error(
-      'Usage: npx tsx scripts/parse-automation-issue.ts <issue-number>',
+      'Usage: npx tsx scripts/parse-automation-issue.ts <issue-number> [--approved-by=a,b]',
     )
     console.error(
       '  or: npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] [reported-by] [created-at] (legacy)',
@@ -195,7 +247,7 @@ async function main() {
     issueBody = firstArg
     issueUrl = secondArg || ''
     reportedBy = thirdArg || ''
-    createdAt = process.argv[5] || new Date().toISOString().split('T')[0]
+    createdAt = positional[3] || new Date().toISOString().split('T')[0]
   }
 
   const parsed = parseIssueBody(issueBody)
@@ -206,9 +258,16 @@ async function main() {
   console.log(`  id: ${parsed.id}`)
   console.log(`  reason: "${parsed.reason?.substring(0, 60)}..."`)
   console.log(`  reportedBy: "${reportedBy}"`)
+  console.log(`  approvedBy: [${approvedBy.join(', ')}]`)
   console.log('')
 
-  const entry = generateEntry(parsed, issueUrl || '', reportedBy, createdAt)
+  const entry = generateEntry(
+    parsed,
+    issueUrl || '',
+    reportedBy,
+    createdAt,
+    approvedBy,
+  )
 
   if (!validateEntry(entry)) {
     process.exit(1)
@@ -221,6 +280,9 @@ async function main() {
   console.log(`  Issue: ${entry.issueUrl}`)
   console.log(`  Reported by: ${entry.reportedBy}`)
   console.log(`  Created: ${entry.createdAt}`)
+  if (entry.approvedBy) {
+    console.log(`  Approved by: ${entry.approvedBy.join(', ')}`)
+  }
 
   addEntryToJson(entry)
 }
