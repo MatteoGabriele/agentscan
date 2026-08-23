@@ -398,5 +398,19 @@
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/371",
     "reportedBy": "bluwy",
     "createdAt": "2026-08-22"
+  },
+  {
+    "username": "11suixing11",
+    "id": 108918571,
+    "reason": "Multiple AI-generated PRs to multiple repos",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/302",
+    "reportedBy": "gameroman",
+    "createdAt": "2026-08-04",
+    "approvedBy": [
+      "graphieros",
+      "ematipico",
+      "sheremet-va",
+      "MatteoGabriele"
+    ]
   }
 ]
