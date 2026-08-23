@@ -25,9 +25,13 @@ export function useErrorDetails(error: MaybeRefOrGetter<unknown>): {
 } {
   const errorDetails = computed<ErrorDetails>(() => {
     const { statusCode, message, data } = (toValue(error) ?? {}) as ErrorLike
+    const rawDetail = data?.message ?? message
     const base = {
       statusCode,
-      detail: (data?.message ?? message)?.trim() || undefined,
+      detail:
+        typeof rawDetail === 'string'
+          ? rawDetail.trim() || undefined
+          : undefined,
     }
 
     if (statusCode === 400) {
