@@ -6,17 +6,44 @@ on:
   schedule:
     # Half past the hour, so this does not queue behind the hourly scan.
     - cron: '30 * * * *'
+    # Daily digest. 14:45 UTC is the widest window where Europe and both US
+    # coasts are awake
+    - cron: '45 14 * * *'
   workflow_dispatch:
     inputs:
       issue:
         description: 'Review only this issue number (leave empty for all open reports)'
         required: false
         type: string
+      digest:
+        description: 'Also post the pending-report digest to Discord'
+        required: false
+        default: false
+        type: boolean
 
 # The hourly scan pushes to main too, so the two take turns instead of racing.
 concurrency:
   group: scan-results
   cancel-in-progress: false
+
+env:
+  # The Rosen Association
+  REVIEWERS: |
+    MatteoGabriele
+    huang-julien
+    danielroe
+    gameroman
+    sheremet-va
+    ematipico
+    graphieros
+    TheAlexLichter
+    orbisk
+    bluwy
+
+  MIN_APPROVALS: '4'
+  MIN_REJECTIONS: '2'
+
+  DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
 
 jobs:
   review:
@@ -25,25 +52,6 @@ jobs:
     permissions:
       contents: write
       issues: write
-
-    env:
-      # Reviewers whose 👍 / 👎 on an `automation` issue count. Add handles here.
-      REVIEWERS: |
-        MatteoGabriele
-        huang-julien
-        danielroe
-        gameroman
-        sheremet-va
-        ematipico
-        graphieros
-        TheAlexLichter
-        orbisk
-        bluwy
-
-      MIN_APPROVALS: '4'
-      MIN_REJECTIONS: '2'
-
-      DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
 
     steps:
       - name: Checkout repository
@@ -133,8 +141,41 @@ jobs:
       - name: Announce outcomes on Discord
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISCORD_WEBHOOK_REPORT: ${{ secrets.DISCORD_WEBHOOK_REPORT }}
+          DISCORD_WEBHOOK_REPORT: ${{ secrets.OSS_GUILD_REPORTS_DISCORD_WEBHOOK }}
         run: >
           pnpm exec tsx scripts/notify-report-discord.ts
           --event=decided
           --decisions="$DECISIONS_FILE"
+
+  # A daily digest
+  digest:
+    needs: review
+    if: >-
+      ${{ !cancelled() &&
+      github.repository == 'MatteoGabriele/agentscan' &&
+      (github.event.schedule == '45 14 * * *' || inputs.digest) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Post the pending report digest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_REPORT: ${{ secrets.OSS_GUILD_REPORTS_DISCORD_WEBHOOK }}
+        run: pnpm exec tsx scripts/notify-report-discord.ts --event=digest

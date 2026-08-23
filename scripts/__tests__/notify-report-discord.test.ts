@@ -3,6 +3,8 @@ import {
   truncate,
   openedMessage,
   decidedMessage,
+  digestMessages,
+  type PendingReport,
   type ReportSummary,
   type Thresholds,
 } from '../notify-report-discord'
@@ -112,5 +114,102 @@ describe('decidedMessage', () => {
 
     expect(message).not.toContain('alice')
     expect(message).not.toContain('bob')
+  })
+})
+
+const pending = (overrides: Partial<PendingReport> = {}): PendingReport => ({
+  issue: 42,
+  url: 'https://github.com/MatteoGabriele/agentscan/issues/42',
+  username: 'kaigritun',
+  approvals: 2,
+  rejections: 0,
+  ...overrides,
+})
+
+describe('digestMessages', () => {
+  it('posts nothing when no report is pending', () => {
+    expect(digestMessages([], thresholds)).toEqual([])
+  })
+
+  it('lists the account, both tallies and the issue link', () => {
+    const [message] = digestMessages([pending()], thresholds)
+
+    expect(message).toContain('`@kaigritun`')
+    expect(message).toContain('👍 2/4')
+    expect(message).toContain('👎 0/2')
+    expect(message).toContain(
+      '<https://github.com/MatteoGabriele/agentscan/issues/42>',
+    )
+  })
+
+  // A preview card per entry would bury the list, so every link is wrapped in
+  // <>. The digest is posted with SUPPRESS_EMBEDS too, but the formatting alone
+  // has to be enough.
+  it('leaves no bare link that Discord would unfurl into a preview', () => {
+    const messages = digestMessages(
+      [pending({ issue: 1 }), pending({ issue: 2 }), pending({ issue: 3 })],
+      thresholds,
+    )
+
+    for (const message of messages) {
+      expect(message).not.toMatch(/[^<]https?:\/\//)
+      expect(message).not.toMatch(/https?:\/\/\S*[^>\s]$/m)
+    }
+  })
+
+  it('keeps the reports in the order it was given', () => {
+    const [message] = digestMessages(
+      [
+        pending({ issue: 7, username: 'older' }),
+        pending({ issue: 9, username: 'newer' }),
+      ],
+      thresholds,
+    )
+
+    expect(message.indexOf('older')).toBeLessThan(message.indexOf('newer'))
+  })
+
+  it('counts the backlog in the footer, and reads right for one report', () => {
+    const [one] = digestMessages([pending()], thresholds)
+    expect(one).toContain('1 report is still open.')
+
+    const [several] = digestMessages(
+      [pending({ issue: 1 }), pending({ issue: 2 })],
+      thresholds,
+    )
+    expect(several).toContain('2 reports are still open.')
+  })
+
+  it('fits a single message when the backlog is small', () => {
+    expect(
+      digestMessages([pending(), pending({ issue: 43 })], thresholds),
+    ).toHaveLength(1)
+  })
+
+  // Discord drops anything past 2000 characters, so a long backlog has to span
+  // several messages rather than lose its tail.
+  it('splits a long backlog into messages that each fit the limit', () => {
+    const many = Array.from({ length: 120 }, (_, index) =>
+      pending({ issue: index, username: `automation-account-${index}` }),
+    )
+
+    const messages = digestMessages(many, thresholds)
+
+    expect(messages.length).toBeGreaterThan(1)
+    for (const message of messages) {
+      expect(message.length).toBeLessThanOrEqual(2000)
+    }
+  })
+
+  it('lists every pending report across the split', () => {
+    const many = Array.from({ length: 120 }, (_, index) =>
+      pending({ issue: index, username: `automation-account-${index}` }),
+    )
+
+    const combined = digestMessages(many, thresholds).join('\n')
+
+    for (const report of many) {
+      expect(combined).toContain(`\`@${report.username}\``)
+    }
   })
 })

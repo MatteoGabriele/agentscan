@@ -47,7 +47,7 @@ export interface Decision extends Tally {
   alreadyListed?: boolean
 }
 
-interface Config {
+export interface Config {
   reviewers: string[]
   minApprovals: number
   minRejections: number
@@ -86,7 +86,7 @@ export function decide(tally: Tally, config: Config): Outcome {
   return 'pending'
 }
 
-function readConfig(): Config {
+export function readConfig(): Config {
   const reviewers = parseReviewers(process.env.REVIEWERS)
 
   if (reviewers.length === 0) {
@@ -126,7 +126,7 @@ function client(): Octokit {
   return new Octokit({ auth })
 }
 
-async function openReports(
+export async function openReports(
   octokit: Octokit,
   only?: number,
 ): Promise<{ number: number; labels: string[] }[]> {
@@ -169,7 +169,7 @@ async function openReports(
   )
 }
 
-async function tally(
+export async function tally(
   octokit: Octokit,
   issue: number,
   reviewers: string[],

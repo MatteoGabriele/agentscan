@@ -3,26 +3,34 @@
  * Announce automation report activity in the reviewers' Discord channel.
  *
  * Reviewers rule on reports by reacting to the issue, so they first have to
- * know one exists. Three moments are announced, and only those three: a report
- * being opened, and the review workflow approving or rejecting it. Nothing is
- * posted while a report sits pending, so the channel stays a to-do list rather
- * than a running commentary.
+ * know one exists. A report being opened is announced, the review workflow
+ * approving or rejecting it is announced, and once a day the reports still
+ * waiting are listed again. Nothing else is posted, so the channel stays a
+ * to-do list rather than a running commentary.
  *
  *   --event=opened   --issue=<n>          a freshly opened report
  *   --event=decided  --decisions=<file>   the review workflow's outcomes
+ *   --event=digest                        every report still awaiting a verdict
  *
  * Add --dry-run to print the messages instead of sending them.
  *
  * Configuration comes from the environment (see the workflows):
  *   DISCORD_WEBHOOK_REPORT  webhook URL for the reviewers' channel
  *   GITHUB_TOKEN            used to read the issues
- *   MIN_APPROVALS           only to render the 👍 n/N denominator
- *   MIN_REJECTIONS          only to render the 👎 n/N denominator
+ *   REVIEWERS               digest only: whose 👍 / 👎 count
+ *   MIN_APPROVALS           the 👍 n/N denominator, and the digest's bar
+ *   MIN_REJECTIONS          the 👎 n/N denominator, and the digest's bar
  */
 
 import fs from 'fs'
 import { Octokit } from 'octokit'
 import { parseIssueBody } from './parse-automation-issue'
+import {
+  decide,
+  openReports,
+  readConfig,
+  tally,
+} from './review-automation-issues'
 import type { Decision } from './review-automation-issues'
 
 const OWNER = 'MatteoGabriele'
@@ -33,8 +41,18 @@ const REPORT_LABEL = 'automation'
 /** Discord caps a message at 2000 characters; the reason is the only long part. */
 const MAX_REASON_LENGTH = 300
 
+/** The same cap, applied to the digest by splitting it across messages. */
+const MAX_MESSAGE_LENGTH = 2000
+
 /** Discord rate limits webhooks, and a run can settle several reports at once. */
 const POST_INTERVAL_MS = 1_000
+
+/**
+ * Discord's SUPPRESS_EMBEDS message flag (1 << 2). The digest lists one link
+ * per report, and without this a busy day would unroll into a wall of link
+ * previews.
+ */
+const SUPPRESS_EMBEDS = 4
 
 export interface ReportSummary {
   issue: number
@@ -47,6 +65,15 @@ export interface ReportSummary {
 export interface Thresholds {
   minApprovals: number
   minRejections: number
+}
+
+/** One line of the daily digest: an open report nobody has settled yet. */
+export interface PendingReport {
+  issue: number
+  url: string
+  username: string
+  approvals: number
+  rejections: number
 }
 
 export function truncate(text: string, maxLength = MAX_REASON_LENGTH): string {
@@ -96,6 +123,59 @@ export function decidedMessage(
     '',
     report.url,
   ].join('\n')
+}
+
+/**
+ * The daily list of reports still waiting on a verdict.
+ *
+ * Returns one string per Discord message: a long backlog is split across
+ * several rather than silently cut off at the 2000 character cap. An empty
+ * backlog returns nothing at all — a day with no pending reports is worth no
+ * post.
+ */
+export function digestMessages(
+  reports: PendingReport[],
+  thresholds: Thresholds,
+): string[] {
+  if (!reports.length) {
+    return []
+  }
+
+  const header = '☀️ **Automation reports waiting on a review**'
+
+  const footer = [
+    `${reports.length} report${reports.length === 1 ? '' : 's'} ${reports.length === 1 ? 'is' : 'are'} still open.`,
+    'React 👍 or 👎 on an issue to move it along.',
+  ].join(' ')
+
+  // Links are wrapped in <> so no entry drags a preview card along behind it —
+  // a dozen of those would bury the list. The digest is also posted with
+  // SUPPRESS_EMBEDS, so the formatting is the belt and the flag is the braces.
+  const lines = reports.map(
+    (report) =>
+      `\`@${report.username}\` — 👍 ${report.approvals}/${thresholds.minApprovals} · 👎 ${report.rejections}/${thresholds.minRejections} · <${report.url}>`,
+  )
+
+  const messages: string[] = []
+  let current: string[] = [header, '']
+  let lineCount = 0
+
+  for (const line of lines) {
+    const projected = [...current, line, '', footer].join('\n')
+
+    if (lineCount > 0 && projected.length > MAX_MESSAGE_LENGTH) {
+      messages.push(current.join('\n'))
+      current = []
+      lineCount = 0
+    }
+
+    current.push(line)
+    lineCount++
+  }
+
+  messages.push([...current, '', footer].join('\n'))
+
+  return messages
 }
 
 function readThresholds(): Thresholds {
@@ -155,7 +235,11 @@ async function fetchReport(
   }
 }
 
-async function post(content: string, dryRun: boolean): Promise<void> {
+async function post(
+  content: string,
+  dryRun: boolean,
+  { suppressEmbeds = false } = {},
+): Promise<void> {
   if (dryRun) {
     console.log('Dry run — nothing sent to Discord:\n')
     console.log(content)
@@ -173,7 +257,10 @@ async function post(content: string, dryRun: boolean): Promise<void> {
   const response = await fetch(webhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({
+      content,
+      ...(suppressEmbeds ? { flags: SUPPRESS_EMBEDS } : {}),
+    }),
     signal: AbortSignal.timeout(10_000),
   })
 
@@ -245,6 +332,64 @@ async function decidedEvent(dryRun: boolean): Promise<void> {
   }
 }
 
+/**
+ * Lists every open report that is still pending, cheapest signal first: the
+ * same reviewer roster and the same thresholds the review workflow decides on,
+ * so the counts here match the ones that will settle the report.
+ */
+async function digestEvent(dryRun: boolean): Promise<void> {
+  const octokit = client()
+  const config = readConfig()
+
+  const open = await openReports(octokit)
+  const pending: PendingReport[] = []
+
+  // Ascending issue number, so the reports that have waited longest lead.
+  for (const issue of open.sort((a, b) => a.number - b.number)) {
+    const counted = await tally(octokit, issue.number, config.reviewers)
+
+    // A settled report is left out: the review job running just before this one
+    // has already announced and closed it.
+    if (decide(counted, config) !== 'pending') {
+      continue
+    }
+
+    const report = await fetchReport(octokit, issue.number)
+
+    if (!report) {
+      continue
+    }
+
+    pending.push({
+      issue: issue.number,
+      url: report.url,
+      username: report.username,
+      approvals: counted.approvals,
+      rejections: counted.rejections,
+    })
+  }
+
+  const messages = digestMessages(pending, {
+    minApprovals: config.minApprovals,
+    minRejections: config.minRejections,
+  })
+
+  if (!messages.length) {
+    console.log('No pending reports — nothing to announce')
+    return
+  }
+
+  console.log(`📋 ${pending.length} pending report(s)`)
+
+  for (const [index, message] of messages.entries()) {
+    if (index > 0 && !dryRun) {
+      await new Promise((resolve) => setTimeout(resolve, POST_INTERVAL_MS))
+    }
+
+    await post(message, dryRun, { suppressEmbeds: true })
+  }
+}
+
 async function main() {
   const event = flag('event')
   const dryRun = process.argv.slice(2).includes('--dry-run')
@@ -259,7 +404,14 @@ async function main() {
     return
   }
 
-  console.error(`✗ Unknown event "${event}" — expected opened or decided`)
+  if (event === 'digest') {
+    await digestEvent(dryRun)
+    return
+  }
+
+  console.error(
+    `✗ Unknown event "${event}" — expected opened, decided or digest`,
+  )
   process.exit(1)
 }
 

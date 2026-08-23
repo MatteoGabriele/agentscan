@@ -17,6 +17,8 @@
     "trigger:discord:dry-run": "pnpm exec tsx --env-file=.env scripts/notify-discord.ts --dry-run",
     "trigger:discord:report": "pnpm exec tsx --env-file=.env scripts/notify-report-discord.ts",
     "trigger:discord:report:dry-run": "pnpm exec tsx --env-file=.env scripts/notify-report-discord.ts --dry-run",
+    "trigger:discord:digest": "pnpm exec tsx --env-file=.env scripts/notify-report-discord.ts --event=digest",
+    "trigger:discord:digest:dry-run": "pnpm exec tsx --env-file=.env scripts/notify-report-discord.ts --event=digest --dry-run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
