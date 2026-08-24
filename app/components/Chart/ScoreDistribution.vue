@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import { identityConfig } from '@unveil/identity'
 import { useTimeout } from '@vueuse/core'
 import { computed, shallowRef } from 'vue'
 import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
+  type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import { round } from '~~/shared/utils/numbers'
 
 import('vue-data-ui/style.css')
 
-const props = defineProps<{
-  data: EcosystemHealthItem[] | undefined
-}>()
+const { data: hourly } = useEcosystemHealthHourlyWindow()
 
 type ScoreDistributionRange = {
   label: string
@@ -31,13 +31,16 @@ useTimeout(200, {
 })
 
 const uniqueEntries = computed(() => {
-  if (!props.data) {
+  if (!hourly.value?.results) {
     return []
   }
 
   return [
     ...new Map(
-      props.data.map((item) => [`${item.repo_name}#${item.pr_key}`, item]),
+      hourly.value.results.map((item) => [
+        `${item.repo_name}#${item.pr_key}`,
+        item,
+      ]),
     ).values(),
   ]
 })
@@ -126,6 +129,8 @@ function space(n: number) {
   return Array.from({ length: n }, () => invisibleCharacter).join(' ')
 }
 
+const bottomPadding = 52
+
 const config = computed<VueUiXyConfig>(() => ({
   useCssAnimation: false,
   chart: {
@@ -134,6 +139,7 @@ const config = computed<VueUiXyConfig>(() => ({
     height: 350,
     padding: {
       top: 24,
+      bottom: bottomPadding,
     },
     labels: {
       fontSize: 16,
@@ -187,6 +193,56 @@ const config = computed<VueUiXyConfig>(() => ({
     },
   },
 }))
+
+function getClassificationAnnotations(svg: VueUiXySvgSlotProps['svg']) {
+  const { left, width } = svg.drawingArea
+  const padding = 6
+  const x2Automation =
+    left + (width * identityConfig.THRESHOLD_SUSPICIOUS) / 100
+  const x2Mixed = left + (width * identityConfig.THRESHOLD_HUMAN) / 100
+
+  const y = svg.height - bottomPadding
+  return [
+    {
+      label: 'Automation',
+      x1: left + padding,
+      x2: x2Automation - padding,
+      y,
+      color: colors.value.automation,
+      subtotal: svg.data
+        .filter((_, i) => i <= 4)
+        .map((d) => d.absoluteValues[0])
+        .reduce((a, b) => (a ?? 0) + (b ?? 0), 0),
+    },
+    {
+      label: 'Mixed',
+      x1: x2Automation + padding,
+      x2: x2Mixed - padding,
+      y,
+      color: colors.value.mixed,
+      subtotal: svg.data
+        .filter((_, i) => i > 4 && i <= 6)
+        .map((d) => d.absoluteValues[0])
+        .reduce((a, b) => (a ?? 0) + (b ?? 0), 0),
+    },
+    {
+      label: 'Organic',
+      x1: x2Mixed + padding,
+      x2: svg.drawingArea.right - padding,
+      y,
+      color: colors.value.organic,
+      subtotal: svg.data
+        .filter((_, i) => i > 6)
+        .map((d) => d.absoluteValues[0])
+        .reduce((a, b) => (a ?? 0) + (b ?? 0), 0),
+    },
+  ].map((annotation) => {
+    return {
+      ...annotation,
+      classificationProportion: (annotation.subtotal ?? 0) / (total.value ?? 1),
+    }
+  })
+}
 </script>
 
 <template>
@@ -198,9 +254,45 @@ const config = computed<VueUiXyConfig>(() => ({
   >
     <div class="mb-5">
       <h2 class="text-center">Overall PR score distribution</h2>
+      <p class="text-sm text-ui-muted text-center">
+        For the 25 entries of the hourly window
+      </p>
     </div>
     <ClientOnly>
-      <VueUiXy :dataset :config />
+      <VueUiXy :dataset :config>
+        <template #svg="{ svg }">
+          <g
+            v-for="annotation in getClassificationAnnotations(svg)"
+            :key="annotation.label"
+          >
+            <path
+              :d="`M${annotation.x1 - 3},${annotation.y - 3} ${annotation.x1},${annotation.y} ${annotation.x2},${annotation.y} ${annotation.x2 + 3},${annotation.y - 3}`"
+              :stroke="annotation.color"
+              stroke-width="1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <text
+              :x="annotation.x1 + (annotation.x2 - annotation.x1) / 2"
+              :y="svg.height - bottomPadding + 22"
+              text-anchor="middle"
+              font-size="16"
+              :fill="colors.textMuted"
+            >
+              {{ annotation.label }}
+            </text>
+            <text
+              :x="annotation.x1 + (annotation.x2 - annotation.x1) / 2"
+              :y="svg.height"
+              text-anchor="middle"
+              font-size="24"
+              :fill="colors.text"
+            >
+              {{ Math.round(annotation.classificationProportion * 100) }}%
+            </text>
+          </g>
+        </template>
+      </VueUiXy>
     </ClientOnly>
   </div>
 </template>

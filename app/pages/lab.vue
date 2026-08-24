@@ -1,6 +1,4 @@
-<script setup lang="ts">
-const { data: hourly } = await useEcosystemHealthHourlyWindow()
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <section class="flex flex-col gap-6 h-full">
@@ -37,18 +35,12 @@ const { data: hourly } = await useEcosystemHealthHourlyWindow()
         <LazyChartHourlyEventsWaffle />
       </div>
       <div class="w-full">
-        <LazyChartScoreDistribution
-          :data="hourly?.results"
-          hydrate-on-visible
-        />
+        <LazyChartScoreDistribution hydrate-on-visible />
       </div>
       <div class="w-full">
         <LazyReportWeeklyClassification
           :hydrate-on-visible="{ rootMargin: '0px 0px 600px 0px' }"
         />
-      </div>
-      <div class="w-full">
-        <LazyChartGlobalEventsHourlyHeatmap />
       </div>
       <div class="w-full">
         <LazyChartGlobalEventsHeatmap />
