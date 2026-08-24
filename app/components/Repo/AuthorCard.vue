@@ -17,7 +17,7 @@ const prLabel = computed<string>(() => {
 
 const classification = computed(() => props.analysis.classification)
 
-const { data: verifiedAutomations } = useVerifiedAutomations()
+const { data: verifiedAutomations } = useAuotomationReports()
 
 const hasCommunityFlag = computed(() => {
   return !!verifiedAutomations.value?.find((account) => {

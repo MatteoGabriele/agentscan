@@ -1,9 +1,9 @@
-import type { VerifiedAutomation } from '~~/shared/types/automation'
+import type { AuotomationReport } from '~~/shared/types/automation'
 
 export default defineEventHandler(async (event) => {
   try {
     // Fetch the verified automations list
-    const automations: VerifiedAutomation[] = await $fetch(
+    const automations: AuotomationReport[] = await $fetch(
       '/api/verified-automations',
     )
 
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-function generateRSSFeed(automations: VerifiedAutomation[]): string {
+function generateRSSFeed(automations: AuotomationReport[]): string {
   const baseUrl = 'https://agentscan.tools'
   const lastBuildDate = new Date().toUTCString()
   const feedLastUpdate = automations[0]

@@ -1,9 +1,9 @@
-import type { VerifiedAutomation } from '~~/shared/types/automation'
+import type { AuotomationReport } from '~~/shared/types/automation'
 
 export default defineEventHandler(async () => {
   try {
     const results = await useStorage('assets:data').getItem<
-      VerifiedAutomation[]
+      AuotomationReport[]
     >('verified-automations-list.json')
 
     return results ?? []

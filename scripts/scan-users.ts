@@ -1,6 +1,6 @@
 import type {
   AutomationTally,
-  VerifiedAutomation,
+  AuotomationReport,
 } from '../shared/types/automation'
 import { libraries } from '../shared/daily-scan'
 import { isKnownBot } from '../shared/cicd-known-bots'
@@ -119,10 +119,10 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
   throw lastError!
 }
 
-function loadVerifiedAutomations(): Set<number> {
+function loadAuotomationReports(): Set<number> {
   const filePath = join(process.cwd(), 'data', 'verified-automations-list.json')
   try {
-    const data: VerifiedAutomation[] = JSON.parse(
+    const data: AuotomationReport[] = JSON.parse(
       readFileSync(filePath, 'utf-8'),
     )
     return new Set(data.map((item) => item.id))
@@ -437,7 +437,7 @@ export async function main(options: ScanOptions) {
   }
 
   const octokit = new Octokit({ auth: token })
-  const verifiedAutomations = loadVerifiedAutomations()
+  const verifiedAutomations = loadAuotomationReports()
 
   const window = previousHourWindow(new Date())
   // Rows are stamped with the hour they describe, not the moment the run

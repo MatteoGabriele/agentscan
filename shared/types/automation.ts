@@ -1,4 +1,4 @@
-export type VerifiedAutomation = {
+export type AuotomationReport = {
   username: string
   id: number
   reason: string

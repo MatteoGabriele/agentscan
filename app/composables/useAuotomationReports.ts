@@ -1,0 +1,5 @@
+export function useAuotomationReports() {
+  return useAsyncData('automation-reports', async () => {
+    return $fetch('/api/verified-automations')
+  })
+}

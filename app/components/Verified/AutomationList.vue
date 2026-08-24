@@ -1,12 +1,12 @@
 <script setup lang="ts">
-const { data, pending } = await useVerifiedAutomations()
+const { data, pending } = await useAuotomationReports()
 
 const MAX_VISIBLE_ITEMS = 4
-const items = computed<VerifiedAutomation[]>(
+const items = computed<AuotomationReport[]>(
   () => data.value?.toReversed() ?? [],
 )
 
-const recentItems = computed<VerifiedAutomation[]>(() => {
+const recentItems = computed<AuotomationReport[]>(() => {
   return items.value.slice(0, MAX_VISIBLE_ITEMS)
 })
 const restItemsCount = computed<number>(() => {
