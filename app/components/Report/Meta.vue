@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <p class="flex gap-1 items-baseline text-ui-muted text-xs">
+  <p class="flex flex-wrap gap-1 items-baseline text-ui-muted text-xs">
     <span>
       Reported by
       <NuxtLink

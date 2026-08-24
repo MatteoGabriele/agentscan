@@ -134,8 +134,17 @@ useHead({
 
           <p class="my-2 text-sm">{{ item.reason }}</p>
 
-          <footer class="flex items-baseline justify-between mt-4">
-            <ReportMeta :report="item" />
+          <footer
+            class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mt-4"
+          >
+            <div class="flex flex-col gap-2">
+              <ReportMeta :report="item" />
+
+              <ReportApprovals
+                v-if="item.approvedBy?.length"
+                :approved-by="item.approvedBy"
+              />
+            </div>
 
             <NuxtLink
               :to="item.issueUrl"
