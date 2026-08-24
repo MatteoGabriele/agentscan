@@ -454,5 +454,20 @@
       "MatteoGabriele",
       "bluwy"
     ]
+  },
+  {
+    "username": "anupamme",
+    "id": 667857,
+    "reason": "They mention \"Automated security fix\" in their PRs",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/383",
+    "reportedBy": "gameroman",
+    "createdAt": "2026-08-24",
+    "approvedBy": [
+      "MatteoGabriele",
+      "bluwy",
+      "graphieros",
+      "sheremet-va",
+      "ematipico"
+    ]
   }
 ]
