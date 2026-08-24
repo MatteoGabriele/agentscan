@@ -10,9 +10,9 @@ import {
 } from 'vue-data-ui/vue-ui-xy'
 import { round } from '~~/shared/utils/numbers'
 
-const { data: hourly } = useEcosystemHealthHourlyWindow()
-
 import('vue-data-ui/style.css')
+
+const { data: hourly } = useEcosystemHealthHourlyWindow()
 
 type ScoreDistributionRange = {
   label: string
