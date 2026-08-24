@@ -13,6 +13,10 @@ const restReviewersCount = computed<number>(() => {
   return props.approvedBy.length - visibleReviewers.value.length
 })
 
+function avatarUrl(reviewer: string): string {
+  return `https://avatars.githubusercontent.com/${encodeURIComponent(reviewer)}?size=48`
+}
+
 const label = computed<string>(() => {
   const count = props.approvedBy.length
   return `Approved by ${count} reviewer${count === 1 ? '' : 's'}`
@@ -34,7 +38,7 @@ const label = computed<string>(() => {
           class="block size-6 overflow-hidden rounded-full bg-ui-card ring-2 ring-ui-card"
         >
           <img
-            :src="`https://github.com/${reviewer}.png?size=48`"
+            :src="avatarUrl(reviewer)"
             :alt="`Avatar of ${reviewer}`"
             :title="reviewer"
             loading="lazy"
