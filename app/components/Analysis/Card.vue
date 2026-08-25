@@ -25,7 +25,7 @@ const { data, status, error, refresh } = useFetch(
   },
 )
 
-const { data: reports } = await useAuotomationReports()
+const { data: reports } = await useAutomationReports()
 
 const report = computed(() => {
   return reports.value?.find((account) => {

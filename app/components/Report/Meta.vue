@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  report: AuotomationReport
+  report: AutomationReport
 }>()
 </script>
 

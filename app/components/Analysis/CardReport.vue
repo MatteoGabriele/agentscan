@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  report: AuotomationReport
+  report: AutomationReport
 }>()
 
 const approvedBy = computed<string[]>(() => {

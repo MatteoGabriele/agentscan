@@ -1,4 +1,4 @@
-export type AuotomationReport = {
+export type AutomationReport = {
   username: string
   id: number
   reason: string

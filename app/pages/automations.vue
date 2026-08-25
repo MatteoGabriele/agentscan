@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data, status, error } = await useAuotomationReports()
+const { data, status, error } = await useAutomationReports()
 const search = ref('')
 
 const items = computed(() => {

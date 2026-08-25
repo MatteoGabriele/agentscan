@@ -1,12 +1,10 @@
 <script setup lang="ts">
-const { data, pending } = await useAuotomationReports()
+const { data, pending } = await useAutomationReports()
 
 const MAX_VISIBLE_ITEMS = 4
-const items = computed<AuotomationReport[]>(
-  () => data.value?.toReversed() ?? [],
-)
+const items = computed<AutomationReport[]>(() => data.value?.toReversed() ?? [])
 
-const recentItems = computed<AuotomationReport[]>(() => {
+const recentItems = computed<AutomationReport[]>(() => {
   return items.value.slice(0, MAX_VISIBLE_ITEMS)
 })
 const restItemsCount = computed<number>(() => {

@@ -5,7 +5,7 @@ const props = defineProps<{
   retry?: (() => unknown) | null
 }>()
 
-const { data: verifiedAutomations } = useAuotomationReports()
+const { data: verifiedAutomations } = useAutomationReports()
 
 const isFlaggedAccount = computed(() => {
   return verifiedAutomations.value?.some((automation) => {
