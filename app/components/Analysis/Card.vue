@@ -143,7 +143,13 @@ useSeoAnalysis(identifyAnalysis, {
       <UserDetails :user />
     </div>
 
-    <div class="px-6 pt-6 border-t border-solid" :class="scoreStyle.border">
+    <div
+      class="fade-divider mx-6 h-px opacity-35"
+      :class="scoreStyle.background"
+      aria-hidden="true"
+    />
+
+    <div class="px-6">
       <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
       <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
       <template v-else-if="data">
