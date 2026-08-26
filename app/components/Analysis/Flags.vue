@@ -9,9 +9,15 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-ui-card p-6 rounded-2 border-1 border-solid border-ui-border">
-    <h3 class="text-ui-text text-xl font-mono">Activity Signals</h3>
-    <ul>
+  <section class="bg-ui-card rounded-2 px-6 py-5">
+    <header class="flex items-baseline gap-2">
+      <h3 class="text-ui-text text-xl font-mono">Activity signals</h3>
+      <span v-if="flags.length" class="text-ui-muted text-sm">
+        {{ flags.length }}
+      </span>
+    </header>
+
+    <ul v-if="flags.length" class="mt-1">
       <AnalysisFlagItem v-for="flag in flags" :key="flag.label" :flag="flag" />
     </ul>
 
@@ -20,5 +26,5 @@ defineProps<{
       :items="[activityReport]"
       class="mt-4"
     />
-  </div>
+  </section>
 </template>
