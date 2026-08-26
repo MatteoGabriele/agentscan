@@ -11,7 +11,7 @@ defineProps<{
 <template>
   <section class="bg-ui-card rounded-2 px-6 py-5">
     <header class="flex items-baseline gap-2">
-      <h3 class="text-ui-text text-xl font-mono">Activity signals</h3>
+      <h3 class="text-ui-text text-lg font-mono">Activity signals</h3>
       <span v-if="flags.length" class="text-ui-muted text-sm">
         {{ flags.length }}
       </span>
