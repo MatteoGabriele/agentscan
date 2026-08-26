@@ -306,6 +306,14 @@ const isEmpty = computed(
       .reduce((a, b) => (a ?? 0) + (b ?? 0), 0) === 0,
 )
 
+/**
+ * Both branches below are computed from props alone, so the server already knows
+ * which one the client will mount and can hold the matching space for it.
+ */
+const hasChart = computed<boolean>(() => {
+  return hasEnoughDataPoints.value && !isEmpty.value
+})
+
 const maxValue = computed(() => {
   const values = datasetLine.value
     .filter((s) => selectedLegendItems.value.includes(s.name))
@@ -526,7 +534,7 @@ onMounted(pauseChartAnimations)
   <ClientOnly>
     <div :class="{ loading: shouldPauseChartTransitions }">
       <VueUiXy
-        v-if="hasEnoughDataPoints && !isEmpty"
+        v-if="hasChart"
         ref="chartLineRef"
         :dataset="datasetLine"
         :config="configLine"
@@ -640,6 +648,19 @@ onMounted(pauseChartAnimations)
         </div>
       </div>
     </div>
+
+    <!--
+      The chart only exists client-side, so without this the server renders an
+      empty box and everything below jumps down once it mounts. The svg is
+      width: 100% over a 1000x600 viewBox, followed by the legend row.
+    -->
+    <template #fallback>
+      <div v-if="hasChart" aria-hidden="true">
+        <div class="w-full aspect-5/3" />
+        <div class="mt-2 h-5" />
+      </div>
+      <div v-else class="w-full h-40" aria-hidden="true" />
+    </template>
   </ClientOnly>
 </template>
 

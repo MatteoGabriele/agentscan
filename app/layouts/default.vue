@@ -52,7 +52,15 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
     <div class="min-h-svh flex flex-col relative @container">
       <MainHeader class="mx-auto w-full max-w-screen-xl" />
 
-      <div class="flex flex-1 items-center justify-center">
+      <!--
+        Only the home page is centered in the viewport. Elsewhere the content
+        grows as data arrives, and centering it would drag the whole page
+        upwards on every update instead of just appending below.
+      -->
+      <div
+        class="flex flex-1 justify-center"
+        :class="isHomePage ? 'items-center' : 'items-start'"
+      >
         <main
           class="max-w-screen-md mx-auto px-4 @container w-full"
           :class="{ 'py-20': !isHomePage }"
