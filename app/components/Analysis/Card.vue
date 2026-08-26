@@ -268,12 +268,14 @@ useSeoAnalysis(identifyAnalysis, {
   </div>
 
   <template v-if="status === 'success' && data">
-    <LazyAnalysisFlags
-      v-if="data.analysis.flags.length > 0 || hasActivityReport"
-      :flags="data.analysis.flags"
-      :activity-report="activityReport"
-      hydrate-on-interaction
-    />
+    <div class="@lg:mx-6">
+      <LazyAnalysisFlags
+        v-if="data.analysis.flags.length > 0 || hasActivityReport"
+        :flags="data.analysis.flags"
+        :activity-report="activityReport"
+        hydrate-on-interaction
+      />
+    </div>
 
     <template v-if="classification !== 'insufficient-data'">
       <LazyChartAccountEventsTimeline
