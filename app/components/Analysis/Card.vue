@@ -135,14 +135,18 @@ useSeoAnalysis(identifyAnalysis, {
 </script>
 
 <template>
-  <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
-  <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
-  <template v-else-if="data">
-    <div
-      class="flex gap-6 bg-ui-card p-6 rounded-2 border-2 border-solid flex-col @lg:flex-row"
-      :class="scoreStyle.border"
-    >
-      <div class="w-full">
+  <div
+    class="flex flex-col gap-6 bg-ui-card py-4 @md:py-6 rounded-2 border-2 border-solid"
+    :class="scoreStyle.border"
+  >
+    <div class="px-6">
+      <UserDetails :user />
+    </div>
+
+    <div class="px-6 pt-6 border-t border-solid" :class="scoreStyle.border">
+      <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
+      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
+      <template v-else-if="data">
         <section v-if="verifiedAutomation">
           <header class="mb-2 flex gap-2 items-center text-ui-automation">
             <span class="i-lucide:circle-alert text-base" aria-hidden="true" />
@@ -253,9 +257,11 @@ useSeoAnalysis(identifyAnalysis, {
             Add report
           </NuxtLink>
         </section>
-      </div>
+      </template>
     </div>
+  </div>
 
+  <template v-if="data">
     <LazyAnalysisFlags
       v-if="data.analysis.flags.length > 0 || hasActivityReport"
       :flags="data.analysis.flags"

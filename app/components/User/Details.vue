@@ -7,9 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div
-    class="flex @lg:items-center gap-4 @lg:gap-6 bg-ui-card p-4 @md:p-6 rounded-2 border-1 border-solid border-ui-border"
-  >
+  <div class="flex @lg:items-center gap-4 @lg:gap-6">
     <div
       v-if="user.avatar_url"
       class="size-12 @lg:size-20 rounded-full overflow-hidden bg-ui-card shrink-0"
