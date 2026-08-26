@@ -267,7 +267,7 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
   </div>
 
-  <template v-if="data">
+  <template v-if="status === 'success' && data">
     <LazyAnalysisFlags
       v-if="data.analysis.flags.length > 0 || hasActivityReport"
       :flags="data.analysis.flags"
