@@ -41,10 +41,7 @@ useSeoUser(user)
   />
 
   <div class="flex flex-col gap-6 @container">
-    <template v-if="user">
-      <LazyUserCard :user />
-      <LazyAnalysisCard :user hydrate-on-visible />
-    </template>
+    <LazyAnalysisCard v-if="user" :user />
 
     <LazyUserCardError v-else-if="error" :error :username :retry="refresh" />
   </div>
