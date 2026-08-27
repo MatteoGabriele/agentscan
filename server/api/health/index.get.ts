@@ -1,46 +1,9 @@
-import type { DailyScanEntry } from '~~/shared/utils/daily-rollup'
-import { getDailyCountsByDate } from '~~/shared/utils/daily-rollup'
-import { applyCumulativeTrends } from '~~/shared/utils/count-classification-by-date'
-import { getRecentDailyEntries } from '~~/shared/utils/health-history-window'
+import type { EcosystemHealthDailyResponse } from '~~/shared/types/logs-api'
 
 export default defineEventHandler(async (event) => {
-  try {
-    const query = getQuery(event)
-    const isFullHistory = String(query.full ?? 'false') === 'true'
+  const query = getQuery(event)
 
-    const raw = await useStorage('assets:data').getItemRaw(
-      'daily-scan-results.json',
-    )
-
-    if (!raw) {
-      throw new Error('daily-scan-results.json not found')
-    }
-
-    const content = Buffer.isBuffer(raw) ? raw.toString('utf-8') : String(raw)
-    const allEntries = JSON.parse(content) as DailyScanEntry[]
-    const entries = isFullHistory
-      ? allEntries
-      : getRecentDailyEntries(allEntries)
-
-    const countsByDate = getDailyCountsByDate(entries)
-    const categoryProgression = applyCumulativeTrends(countsByDate)
-    const dates = Object.keys(countsByDate).sort()
-    const scanTimes = dates.map(
-      (date) => countsByDate[date]?.createdAt ?? `${date}T00:00:00.000Z`,
-    )
-
-    return {
-      entries,
-      categoryProgression,
-      countsByDate,
-      dates,
-      scanTimes,
-    }
-  } catch (error) {
-    console.error('Daily scan fetch error:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to fetch daily scan results',
-    })
-  }
+  return fetchFromLogs<EcosystemHealthDailyResponse>('/api/health', {
+    query: { full: String(query.full ?? 'false') },
+  })
 })

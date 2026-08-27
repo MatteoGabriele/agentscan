@@ -1,7 +1,0 @@
-[functions]
-directory = "netlify/functions"
-
-# Top of every hour. GitHub's scheduler is unreliable, so Netlify drives the
-# hourly scan and the function dispatches the workflow.
-[functions."trigger-hourly-scan"]
-schedule = "0 * * * *"

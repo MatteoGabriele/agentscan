@@ -36,18 +36,10 @@ reviews:
     base_branches:
       - main
 
-    # The scan workflow commits to main directly, but these keep any scan or
-    # backfill PR from spending a review on generated data.
     ignore_title_keywords:
-      - 'chore: hourly user scan'
-      - 'chore: daily user scan'
-      - 'chore: backfill'
       - wip
 
-  # Generated and vendored files. data/ alone is ~1MB of scan output that churns
-  # hourly on main, so it lands in any branch diff that merges main back in.
   path_filters:
-    - '!data/**'
     - '!mock-data/**'
     - '!pnpm-lock.yaml'
     - '!public/**'

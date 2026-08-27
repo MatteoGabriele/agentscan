@@ -58,6 +58,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Where the hourly scan publishes its results. Overridable with
+    // NUXT_LOGS_API_BASE; the health and automation-tally routes proxy it.
+    logsApiBase: 'https://logs.agentscan.tools',
     githubToken: '',
     githubAppId: '',
     githubAppPrivateKey: '',
