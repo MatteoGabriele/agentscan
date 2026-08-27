@@ -14,7 +14,6 @@ type UseScoreStyle = {
 type UseScoreStyleOptions = {
   hasCommunityFlag?: boolean
   hasActivityReport?: boolean
-  hasTally?: boolean
 }
 
 const mixed = {
@@ -51,7 +50,7 @@ export function useScoreStyle(
 
     if (value === 'automation' || opts?.hasCommunityFlag) {
       return automation
-    } else if (value === 'mixed' || opts?.hasActivityReport || opts?.hasTally) {
+    } else if (value === 'mixed' || opts?.hasActivityReport) {
       return mixed
     } else if (value === 'organic') {
       return organic
