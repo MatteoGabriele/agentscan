@@ -25,7 +25,9 @@ export default defineConfig({
   },
   theme: {
     font: {
-      mono: "'Roboto', monospace",
+      // Roboto is a sans, so the fallback has to be one too: falling back to
+      // `monospace` reflowed every heading once the webfont swapped in.
+      mono: "'Roboto', Helvetica, Arial, sans-serif",
       sans: "'Open Sans', system-ui, -apple-system, sans-serif",
     },
     colors: {

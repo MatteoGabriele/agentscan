@@ -38,7 +38,7 @@ const organic = {
 const insufficient = {
   text: 'text-ui-muted',
   border: 'border-ui-border',
-  background: 'bg-ui-bg',
+  background: 'bg-ui-border',
 }
 
 export function useScoreStyle(
