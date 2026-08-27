@@ -267,36 +267,34 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
   </div>
 
-  <template v-if="status === 'success' && data">
-    <div class="@lg:mx-6">
-      <LazyAnalysisFlags
-        v-if="data.analysis.flags.length > 0 || hasActivityReport"
-        :flags="data.analysis.flags"
-        :activity-report="activityReport"
-        hydrate-on-interaction
-      />
-    </div>
+  <div class="@lg:mx-6">
+    <AnalysisFlagsSkeleton v-if="status === 'pending'" />
+    <LazyAnalysisFlags
+      v-else-if="data && (data.analysis.flags.length > 0 || hasActivityReport)"
+      :flags="data.analysis.flags"
+      :activity-report="activityReport"
+      hydrate-on-interaction
+    />
+  </div>
 
-    <template v-if="classification !== 'insufficient-data'">
-      <LazyChartAccountEventsTimeline
-        :classification="classification"
-        :events="data.events"
-        hydrate-on-visible
-      />
+  <template v-if="classification !== 'insufficient-data' && data">
+    <LazyChartAccountEventsTimeline
+      :classification="classification"
+      :events="data.events"
+      hydrate-on-visible
+    />
 
-      <LazyChartAccountEventsBreakdown
-        :classification="classification"
-        :events="data.events"
-        hydrate-on-interaction
-      />
-    </template>
-
-    <p
-      class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-    >
-      Results are based on pattern analysis and should be interpreted as
-      possible signals, not conclusions. Always verify findings with additional
-      context.
-    </p>
+    <LazyChartAccountEventsBreakdown
+      :classification="classification"
+      :events="data.events"
+      hydrate-on-interaction
+    />
   </template>
+
+  <p
+    class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
+  >
+    Results are based on pattern analysis and should be interpreted as possible
+    signals, not conclusions. Always verify findings with additional context.
+  </p>
 </template>
