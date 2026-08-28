@@ -399,6 +399,26 @@ describe('GitHub Webhook Handler', () => {
       )
     })
 
+    it('percent-encodes the bot login in the check run details_url', async () => {
+      setupEvent({
+        pull_request: {
+          number: 123,
+          user: { login: 'dependabot[bot]' },
+          head: { sha: 'abc123' },
+        },
+      })
+
+      await handler(MOCK_EVENT)
+
+      // Raw brackets make `details_url` an invalid URL, GitHub rejects the
+      // update, and the check run stays stuck in progress.
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          details_url: 'https://agentscan.tools/user/dependabot%5Bbot%5D',
+        }),
+      )
+    })
+
     it('returns { ok: true } without scanning for usernames ending with [bot]', async () => {
       setupEvent({
         pull_request: { number: 123, user: { login: 'some-custom-tool[bot]' } },
@@ -1726,24 +1746,50 @@ describe('GitHub Webhook Handler', () => {
       onTestFinished(() => consoleError.mockRestore())
 
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
-      // No retry of the real conclusion, but the run must not be left at
-      // `in_progress`: the guard concludes it as neutral instead.
+      // Each conclusion is attempted twice — full payload, then stripped — and
+      // the run must not be left at `in_progress`: once the real conclusion is
+      // exhausted the guard concludes it as neutral instead.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
-        2,
+        4,
       )
       expect(
         mockInstallationOctokit.rest.checks.update,
       ).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          conclusion: 'neutral',
-          output: expect.objectContaining({ title: 'Analysis incomplete' }),
-        }),
+        expect.objectContaining({ status: 'completed', conclusion: 'neutral' }),
       )
-      expect(consoleError).toHaveBeenCalledTimes(2)
       expect(consoleError).toHaveBeenLastCalledWith(
-        expect.stringContaining('Failed to complete check run'),
+        expect.stringContaining('without output'),
         expect.any(Error),
       )
+    })
+
+    it('completes the check run without output when GitHub rejects the payload', async () => {
+      mockInstallationOctokit.rest.checks.update
+        .mockRejectedValueOnce(new Error('422 Invalid request'))
+        .mockResolvedValue({ data: {} })
+
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {})
+      onTestFinished(() => consoleError.mockRestore())
+
+      await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
+
+      // The stripped retry lands the real conclusion, so the safety net in
+      // `finally` sees a settled run and does not overwrite it with neutral.
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
+        2,
+      )
+
+      const stripped =
+        mockInstallationOctokit.rest.checks.update.mock.calls[1]![0]
+
+      expect(stripped).toMatchObject({
+        status: 'completed',
+        conclusion: 'success',
+      })
+      expect(stripped).not.toHaveProperty('output')
+      expect(stripped).not.toHaveProperty('details_url')
     })
 
     it('concludes the check run as neutral when the analysis outruns the deadline', async () => {
