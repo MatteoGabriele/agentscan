@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const { trackEvent } = useSaEvent()
 
 const isMenuOpen = ref<boolean>(false)
 function toggleMenu() {
@@ -41,12 +42,38 @@ onBeforeUnmount(() => {
 
     <div
       v-if="isMenuOpen"
-      class="flex items-center flex-col gap-6 justify-center h-full"
+      class="flex items-center flex-col gap-8 justify-center h-full"
     >
+      <div class="flex flex-col items-center gap-4">
+        <p
+          class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+        >
+          Scan
+        </p>
+        <ul class="flex flex-col items-center gap-4">
+          <li>
+            <LazyMainMenuItem class="text-xl" to="/" label="Account search" />
+          </li>
+          <li>
+            <LazyMainMenuItem
+              class="text-xl"
+              to="/scan"
+              label="Repository scan"
+            />
+          </li>
+          <li>
+            <LazyMainMenuItem
+              class="text-xl"
+              to="/automations"
+              label="Community reports"
+            />
+          </li>
+        </ul>
+      </div>
+
+      <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
+
       <ul class="flex flex-col items-center gap-4">
-        <li>
-          <LazyMainMenuItem class="text-xl" to="/" label="Search" />
-        </li>
         <li>
           <LazyMainMenuItem
             class="text-xl"
@@ -56,34 +83,17 @@ onBeforeUnmount(() => {
         </li>
         <li><LazyMainMenuItem class="text-xl" to="/lab" label="The lab" /></li>
         <li>
-          <LazyMainMenuItem
-            class="text-xl"
-            to="/scan"
-            label="Repository scan"
-          />
-        </li>
-        <li>
-          <LazyMainMenuItem
-            class="text-xl"
-            to="/automations"
-            label="Community reports"
-          />
-        </li>
-        <li>
           <LazyMainMenuItem class="text-xl" to="/bookmarks" label="Bookmarks" />
         </li>
+        <li>
+          <LazyMainMenuItem
+            class="text-xl"
+            to="/app"
+            label="Install AgentScan"
+            @click="trackEvent('get_agentscan_clicked')"
+          />
+        </li>
       </ul>
-
-      <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
-
-      <NuxtLink
-        to="/app"
-        class="flex items-center px-4 gap-1 py-1 font-medium rounded-full border border-ui-border text-ui-muted hover:text-ui-text hover:border-ui-border/60 transition-colors whitespace-nowrap cta-glint"
-        title="Install the GitHub App or use the GitHub Action"
-      >
-        <span class="i-lucide-github text-sm"></span>
-        <span>Install AgentScan</span>
-      </NuxtLink>
 
       <LazyContributorsList class="my-12" />
     </div>

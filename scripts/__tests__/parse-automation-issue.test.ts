@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import {
   parseIssueBody,
+  sanitizeReason,
+  MAX_REASON_LENGTH,
   parseApprovedBy,
   validateEntry,
   generateEntry,
@@ -91,6 +93,74 @@ testuser`
   })
 })
 
+describe('sanitizeReason', () => {
+  it('strips bare URLs and the words left dangling in front of them', () => {
+    expect(
+      sanitizeReason(
+        'Self-disclosed as an AI agent, see https://github.com/foo/bar/pull/1',
+      ),
+    ).toBe('Self-disclosed as an AI agent')
+  })
+
+  it('strips a parenthetical built around a link', () => {
+    expect(
+      sanitizeReason(
+        'Self-disclosed AI agent (see github.com/foo/bar/pull/12)',
+      ),
+    ).toBe('Self-disclosed AI agent')
+  })
+
+  it('leaves a link-free parenthetical alone', () => {
+    expect(
+      sanitizeReason('Bursty activity only (no human-looking commits)'),
+    ).toBe('Bursty activity only (no human-looking commits)')
+  })
+
+  it('keeps the text of a markdown link and drops the URL', () => {
+    expect(
+      sanitizeReason('Describes itself as [an AI agent](https://example.com)'),
+    ).toBe('Describes itself as an AI agent')
+  })
+
+  it('strips autolinks, images and HTML tags', () => {
+    expect(
+      sanitizeReason(
+        'Bot account <https://x.com/bot> ![proof](https://img.co/a.png) <b>confirmed</b>',
+      ),
+    ).toBe('Bot account confirmed')
+  })
+
+  it('strips bullets, blockquotes and code ticks', () => {
+    expect(sanitizeReason('- `bot` account > flagged')).toBe(
+      'bot account > flagged',
+    )
+  })
+
+  it('leaves underscores inside names alone', () => {
+    expect(sanitizeReason('Same pattern as some_bot_name')).toBe(
+      'Same pattern as some_bot_name',
+    )
+  })
+
+  it('keeps only the first paragraph', () => {
+    expect(sanitizeReason('First sentence.\n\nSecond paragraph.')).toBe(
+      'First sentence.',
+    )
+  })
+
+  it('truncates at a word boundary past the maximum length', () => {
+    const reason = sanitizeReason('word '.repeat(100))!
+    expect(reason.length).toBeLessThanOrEqual(MAX_REASON_LENGTH + 1)
+    expect(reason.endsWith('word…')).toBe(true)
+  })
+
+  it('passes an already clean sentence through untouched', () => {
+    expect(sanitizeReason('Heavy automation usage creating spam PRs')).toBe(
+      'Heavy automation usage creating spam PRs',
+    )
+  })
+})
+
 describe('validateEntry', () => {
   it('should validate a complete entry', () => {
     const entry: Partial<AutomationEntry> = {
@@ -102,6 +172,30 @@ describe('validateEntry', () => {
       reportedBy: 'reporter',
     }
     expect(validateEntry(entry)).toBe(true)
+  })
+
+  it('should reject a reason containing a link', () => {
+    const entry: Partial<AutomationEntry> = {
+      username: 'testuser',
+      id: 123456,
+      reason: 'Spam PRs, see https://github.com/foo/bar/pull/1',
+      issueUrl: 'https://github.com/test/issue/1',
+      createdAt: '2024-01-01',
+      reportedBy: 'reporter',
+    }
+    expect(validateEntry(entry)).toBe(false)
+  })
+
+  it('should reject a reason longer than the maximum length', () => {
+    const entry: Partial<AutomationEntry> = {
+      username: 'testuser',
+      id: 123456,
+      reason: 'a'.repeat(MAX_REASON_LENGTH + 2),
+      issueUrl: 'https://github.com/test/issue/1',
+      createdAt: '2024-01-01',
+      reportedBy: 'reporter',
+    }
+    expect(validateEntry(entry)).toBe(false)
   })
 
   it('should reject entry missing username', () => {

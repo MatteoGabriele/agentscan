@@ -93,6 +93,12 @@ export default defineNuxtConfig({
       },
     },
 
+    '/api/repo-stars': {
+      cache: {
+        maxAge: 60 * 60,
+      },
+    },
+
     '/api/identify-replicant/**': {
       isr: {
         expiration: 60 * 10,

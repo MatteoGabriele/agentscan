@@ -2,12 +2,6 @@
 /**
  * Announce automation report activity in the reviewers' Discord channel.
  *
- * Reviewers rule on reports by reacting to the issue, so they first have to
- * know one exists. A report being opened is announced, the review workflow
- * approving or rejecting it is announced, and once a day the reports still
- * waiting are listed again. Nothing else is posted, so the channel stays a
- * to-do list rather than a running commentary.
- *
  *   --event=opened   --issue=<n>          a freshly opened report
  *   --event=decided  --decisions=<file>   the review workflow's outcomes
  *   --event=digest                        every report still awaiting a verdict
@@ -38,11 +32,11 @@ const REPO = 'agentscan'
 
 const REPORT_LABEL = 'automation'
 
-/** Discord caps a message at 2000 characters; the reason is the only long part. */
+/** Discord caps a message at 2000 characters */
 const MAX_REASON_LENGTH = 300
 
 /** The same cap, applied to the digest by splitting it across messages. */
-const MAX_MESSAGE_LENGTH = 2000
+const MAX_MESSAGE_LENGTH = 2_000
 
 /** Discord rate limits webhooks, and a run can settle several reports at once. */
 const POST_INTERVAL_MS = 1_000
@@ -136,20 +130,25 @@ export function votersLine(report: PendingReport): string {
   }
 
   if (!parts.length) {
-    return '   nobody has voted yet'
+    return '> *nobody has voted yet*'
   }
 
-  return `   ${parts.join(' · ')}`
+  return `> voted by  ${parts.join('  ·  ')}`
 }
 
-/**
- * The daily list of reports still waiting on a verdict.
- *
- * Returns one string per Discord message: a long backlog is split across
- * several rather than silently cut off at the 2000 character cap. An empty
- * backlog returns nothing at all — a day with no pending reports is worth no
- * post.
- */
+export function reportBlock(
+  report: PendingReport,
+  thresholds: Thresholds,
+): string[] {
+  return [
+    `**#${report.issue}**  ·  \`@${report.username}\``,
+    `> 👍 ${report.approvals}/${thresholds.minApprovals}  ·  👎 ${report.rejections}/${thresholds.minRejections}`,
+    votersLine(report),
+    // Wrapped in <> so no entry drags a preview card along behind it.
+    `> <${report.url}>`,
+  ]
+}
+
 export function digestMessages(
   reports: PendingReport[],
   thresholds: Thresholds,
@@ -158,39 +157,34 @@ export function digestMessages(
     return []
   }
 
-  const header = '☀️ **Automation reports waiting on a review**'
+  const header = '## ☀️ Automation reports waiting on a review'
 
   const footer = [
     `${reports.length} report${reports.length === 1 ? '' : 's'} ${reports.length === 1 ? 'is' : 'are'} still open.`,
     'React 👍 or 👎 on an issue to move it along.',
   ].join(' ')
 
-  // Links are wrapped in <> so no entry drags a preview card along behind it.
-  // Each report is a block of two lines — the tally, then who voted — and the
-  // split below moves whole blocks, so a roster never lands without its report.
-  const blocks = reports.map((report) => [
-    `\`@${report.username}\` — 👍 ${report.approvals}/${thresholds.minApprovals} · 👎 ${report.rejections}/${thresholds.minRejections} · <${report.url}>`,
-    votersLine(report),
-  ])
+  const blocks = reports.map((report) => reportBlock(report, thresholds))
+
+  const render = (body: string[]) =>
+    [header, '', ...body, '', footer].join('\n')
 
   const messages: string[] = []
-  let current: string[] = [header, '']
-  let blockCount = 0
+  let current: string[] = []
 
   for (const block of blocks) {
-    const projected = [...current, ...block, '', footer].join('\n')
+    const next = current.length ? [...current, '', ...block] : [...block]
 
-    if (blockCount > 0 && projected.length > MAX_MESSAGE_LENGTH) {
-      messages.push(current.join('\n'))
-      current = []
-      blockCount = 0
+    if (current.length && render(next).length > MAX_MESSAGE_LENGTH) {
+      messages.push(render(current))
+      current = [...block]
+      continue
     }
 
-    current.push(...block)
-    blockCount++
+    current = next
   }
 
-  messages.push([...current, '', footer].join('\n'))
+  messages.push(render(current))
 
   return messages
 }

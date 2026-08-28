@@ -33,6 +33,12 @@ type OctokitAuthInstall = { token?: string } | undefined
 // check run before the process is killed.
 const CHECK_RUN_DEADLINE_MS = 8_000
 
+// Bot logins carry square brackets (`dependabot[bot]`), which are not legal in
+// a URL path. Left raw, GitHub rejects `details_url` and the check run never
+// gets a result.
+const profileUrl = (username: string) =>
+  `https://agentscan.tools/user/${encodeURIComponent(username)}`
+
 type AutomationListItem = {
   username: string
   reason: string
@@ -324,22 +330,39 @@ export default defineEventHandler(async (event) => {
     // is still waiting for GitHub skips instead of sending a second result.
     isCheckRunSettled = true
 
+    // Reporting a result is the only way out of `in_progress`: GitHub never
+    // expires a check run on its own, so whatever goes wrong here, the run has
+    // to end with a conclusion or it blocks the PR forever.
+    const result = {
+      owner,
+      repo,
+      check_run_id: checkRunId,
+      status: 'completed' as const,
+      conclusion,
+      completed_at: new Date().toISOString(),
+    }
+
     try {
       await octokit.rest.checks.update({
-        owner,
-        repo,
-        check_run_id: checkRunId,
-        status: 'completed',
-        conclusion,
-        completed_at: new Date().toISOString(),
-        details_url: `https://agentscan.tools/user/${username}`,
+        ...result,
+        details_url: profileUrl(username),
         output: { title, summary },
       })
+      return
     } catch (err: unknown) {
-      // The check run still has no result, so let a later call try again.
-      isCheckRunSettled = false
       console.error(
         `Failed to complete check run ${checkRunId} on ${owner}/${repo}:`,
+        err,
+      )
+    }
+
+    // unblocks the PR
+    try {
+      await octokit.rest.checks.update(result)
+    } catch (err: unknown) {
+      isCheckRunSettled = false
+      console.error(
+        `Failed to complete check run ${checkRunId} on ${owner}/${repo} without output:`,
         err,
       )
     }
@@ -561,7 +584,7 @@ export default defineEventHandler(async (event) => {
       '',
       description,
       '',
-      `[View full analysis →](https://agentscan.tools/user/${username})`,
+      `[View full analysis →](${profileUrl(username)})`,
       ...(reportUrl ? ['', `[Report this account →](${reportUrl})`] : []),
       ...(evidenceLines.length > 0
         ? [

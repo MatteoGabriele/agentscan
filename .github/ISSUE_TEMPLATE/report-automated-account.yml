@@ -59,7 +59,12 @@ body:
     attributes:
       label: Why do you believe this is an automated account?
       description: |
-        ⚠️ **This will be displayed publicly on the website** - Keep it concise and factual.
+        ⚠️ **This will be displayed publicly on the website** - one or two plain
+        sentences, nothing else. **No links, no markdown, no lists.** Links and
+        examples go in *Supporting Evidence* and *Additional Context* below.
+
+        Anything past the first paragraph is dropped, links and formatting are
+        stripped out, and the reason is cut off after 280 characters.
 
         **Good examples:**
         - "Self-disclosed as an AI agent"
@@ -67,9 +72,10 @@ body:
         - "Heavy automation usage creating spam PRs within short timeframe"
 
         **Not recommended:**
+        - Links, screenshots or bullet lists (use the fields below)
         - Long narratives or detailed stories
         - Personal opinions or speculation
-      placeholder: 'Brief, factual reason visible to the public...'
+      placeholder: 'Brief, factual sentence visible to the public - no links...'
     validations:
       required: true
 
