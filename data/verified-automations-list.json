@@ -483,5 +483,33 @@
       "bluwy",
       "graphieros"
     ]
+  },
+  {
+    "username": "kaluli123123",
+    "id": 295758798,
+    "reason": "Clear signs of spamming across multiple repositories. Most noticeable is the 36 consecutive PRs in the flutter/flutter repository.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/388",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-25",
+    "approvedBy": [
+      "MatteoGabriele",
+      "bluwy",
+      "graphieros",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "HosnainRafi",
+    "id": 82991389,
+    "reason": "Clear signs of spamming across multiple repositories: 6 consecutive PRs submitted to netlify/cli, netlify/build, nuxt, vitest, eslint, and several others, all within the same time range.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/387",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-25",
+    "approvedBy": [
+      "MatteoGabriele",
+      "bluwy",
+      "graphieros",
+      "ematipico"
+    ]
   }
 ]
