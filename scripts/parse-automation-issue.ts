@@ -26,6 +26,82 @@ interface AutomationEntry {
 
 export type { AutomationEntry }
 
+/**
+ * The reason is shown as plain prose on the public list, so it has to stay one
+ * sentence-shaped string. Links belong in Supporting Evidence / Additional Context,
+ * where reviewers read them; reporters still paste them here, so they are stripped
+ * rather than trusted.
+ */
+export const MAX_REASON_LENGTH = 280
+
+/**
+ * Strips everything that is not sentence text: markdown images and links, bare and
+ * autolinked URLs, HTML tags, code ticks and list bullets. Link text is kept, since
+ * "self-describes as [an AI agent](url)" still reads as a reason without the URL.
+ */
+export function sanitizeReason(raw: string | undefined): string | undefined {
+  if (!raw) {
+    return raw
+  }
+
+  let reason = raw.split(/\n\s*\n/)[0]
+
+  reason = reason
+    // ![alt](url) - an image says nothing once the URL is gone
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    // [text](url) -> text
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    // a whole parenthetical built around a link ("(see https://...)") goes with it
+    .replace(/\([^)]*(?:https?:\/\/|www\.|\.[a-z]{2,}\/)[^)]*\)?/gi, ' ')
+    // <https://...> and any HTML tag
+    .replace(/<[^>\s]+>/g, ' ')
+    // bare URLs, with or without a scheme
+    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, ' ')
+    .replace(/\b[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}\/\S*/gi, ' ')
+    // markdown leftovers: code ticks, and line-leading bullets/quotes/headings.
+    // Emphasis markers are left alone mid-word so `some_bot_name` survives intact.
+    .replace(/`/g, '')
+    .replace(/^[\s>#*-]+/gm, ' ')
+    // empty brackets or parens left behind by a stripped URL
+    .replace(/\(\s*\)|\[\s*\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return truncateReason(trimDanglingTail(reason))
+}
+
+/**
+ * A stripped URL usually leaves the words that introduced it ("spam PRs, see",
+ * "flagged in:"). Drop that tail so the reason still ends like a sentence.
+ */
+function trimDanglingTail(reason: string): string {
+  return reason
+    .replace(/[\s,;:–—(-]+$/, '')
+    .replace(
+      /(?:[\s,;:–—-]*\b(?:see|at|in|on|via|from|here|and|e\.g)\b\.?)+$/i,
+      '',
+    )
+    .replace(/[\s,;:–—(-]+$/, '')
+    .trim()
+}
+
+/** Cuts at a word boundary so a long report reads as a sentence, not a fragment. */
+function truncateReason(reason: string): string {
+  if (reason.length <= MAX_REASON_LENGTH) {
+    return reason
+  }
+
+  const clipped = reason.slice(0, MAX_REASON_LENGTH)
+  const lastSpace = clipped.lastIndexOf(' ')
+
+  return (
+    (lastSpace > 0 ? clipped.slice(0, lastSpace) : clipped).replace(
+      /[\s,;:.–—-]+$/,
+      '',
+    ) + '…'
+  )
+}
+
 export function parseIssueBody(body: string): Partial<AutomationEntry> {
   // Parse GitHub form template format using @github/issue-parser
   const parsed = parseIssue(body)
@@ -34,18 +110,11 @@ export function parseIssueBody(body: string): Partial<AutomationEntry> {
   const username = parsed['GitHub Username']?.toString().trim()
   const idStr = parsed['GitHub User ID']?.toString().trim()
   const id = idStr ? parseInt(idStr, 10) : undefined
-  const reasonRaw = parsed['Why do you believe this is an automated account?']
-    ?.toString()
-    .trim()
-
-  // Clean up reason - take first paragraph and normalize whitespace
-  let reason = reasonRaw
-  if (reason) {
-    // Split by double newline and take first paragraph
-    reason = reason.split(/\n\s*\n/)[0].trim()
-    // Clean up any remaining special characters or excessive whitespace
-    reason = reason.replace(/\s+/g, ' ')
-  }
+  const reason = sanitizeReason(
+    parsed['Why do you believe this is an automated account?']
+      ?.toString()
+      .trim(),
+  )
 
   return {
     username,
@@ -82,6 +151,18 @@ export function validateEntry(
   }
   if (!entry.reason || typeof entry.reason !== 'string') {
     console.error('✗ Missing or invalid reason')
+    return false
+  }
+  // Belt and braces: sanitizeReason already strips these, so a link reaching here
+  // means a reason was built by some other path and must not go on the public list.
+  if (/https?:\/\/|www\.|\]\(/i.test(entry.reason)) {
+    console.error(
+      '✗ Reason must be plain text - move links to Supporting Evidence',
+    )
+    return false
+  }
+  if (entry.reason.length > MAX_REASON_LENGTH + 1) {
+    console.error(`✗ Reason is longer than ${MAX_REASON_LENGTH} characters`)
     return false
   }
   if (!entry.issueUrl || typeof entry.issueUrl !== 'string') {
