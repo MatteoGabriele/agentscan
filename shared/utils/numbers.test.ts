@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { round } from './numbers'
+import { formatCompactNumber, round } from './numbers'
 
 describe('round', () => {
   it('rounds as it should have natively', () => {
@@ -20,5 +20,20 @@ describe('round', () => {
     expect(round(1.5, 0)).toBe(2)
     expect(round(-1.5, 0)).toBe(-1)
     expect(round(0, 2)).toBe(0)
+  })
+})
+
+describe('formatCompactNumber', () => {
+  it('keeps small counts as they are', () => {
+    expect(formatCompactNumber(0)).toBe('0')
+    expect(formatCompactNumber(42)).toBe('42')
+    expect(formatCompactNumber(999)).toBe('999')
+  })
+
+  it('shortens thousands to a single decimal', () => {
+    expect(formatCompactNumber(1000)).toBe('1K')
+    expect(formatCompactNumber(1200)).toBe('1.2K')
+    expect(formatCompactNumber(1250)).toBe('1.3K')
+    expect(formatCompactNumber(12500)).toBe('12.5K')
   })
 })

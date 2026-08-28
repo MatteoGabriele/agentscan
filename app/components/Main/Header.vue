@@ -1,9 +1,32 @@
 <script setup lang="ts">
+import type { MenuDropdownItem } from '~~/shared/types/menu'
+
 defineProps<{
   onlyLogo?: boolean
 }>()
 
 const { trackEvent } = useSaEvent()
+
+const scanItems: MenuDropdownItem[] = [
+  {
+    to: '/',
+    label: 'Account search',
+    description: "Analyze a GitHub account's activity",
+    icon: 'i-lucide:search',
+  },
+  {
+    to: '/scan',
+    label: 'Repository scan',
+    description: 'Recent PR authors of any public repository',
+    icon: 'i-lucide:scan-search',
+  },
+  {
+    to: '/automations',
+    label: 'Community reports',
+    description: 'Automations flagged by the community',
+    icon: 'i-lucide:flag',
+  },
+]
 </script>
 
 <template>
@@ -19,30 +42,25 @@ const { trackEvent } = useSaEvent()
       </NuxtLink>
     </div>
     <div v-if="!onlyLogo" class="hidden @4xl:block">
-      <ul class="flex items-center gap-4">
-        <li class="hidden @5xl:block">
-          <LazyMainMenuItem to="/" label="Search" />
+      <ul class="flex items-center gap-5">
+        <li>
+          <LazyMainMenuDropdown label="Scan" :items="scanItems" />
         </li>
         <li><LazyMainMenuItem to="/health" label="Ecosystem health" /></li>
         <li><LazyMainMenuItem to="/lab" label="The lab" /></li>
-        <li><LazyMainMenuItem to="/scan" label="Repository scan" /></li>
-        <li>
-          <LazyMainMenuItem to="/automations" label="Community reports" />
-        </li>
         <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
+        <li>
+          <LazyMainMenuItem
+            to="/app"
+            label="Install AgentScan"
+            @click="trackEvent('get_agentscan_clicked')"
+          />
+        </li>
       </ul>
     </div>
 
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
-      <NuxtLink
-        to="/app"
-        class="hidden @4xl:inline-flex items-center px-3.5 @4xl:px-2.5 gap-1 py-1 font-medium text-xs rounded-full border border-ui-border/80 text-ui-muted hover:text-ui-text hover:border-ui-border/60 transition-colors whitespace-nowrap cta-glint"
-        title="Install the GitHub App or use the GitHub Action"
-        @click="trackEvent('get_agentscan_clicked')"
-      >
-        <span class="i-lucide-github"></span>
-        <span>Install AgentScan</span>
-      </NuxtLink>
+      <LazyMainGithubStars hydrate-on-visible />
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>
