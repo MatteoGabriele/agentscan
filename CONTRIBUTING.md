@@ -30,6 +30,15 @@ A GitHub token is optional for local development. Without one the app still work
 GITHUB_TOKEN=your_github_personal_access_token
 ```
 
+The ecosystem health pages read their data from
+[agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs), which runs
+the hourly scan. `pnpm dev` talks to the deployed one, so there is nothing to
+set up. Point it somewhere else — a local checkout of that repo, say — with:
+
+```env
+NUXT_LOGS_API_BASE=http://127.0.0.1:3000
+```
+
 **4. Start the dev server**
 
 ```bash
@@ -45,8 +54,13 @@ server/
 pages/           # Nuxt pages
 components/      # Vue components
 data/
-  verified-automated.json  # Curated list of verified automated accounts
+  verified-automations-list.json  # Curated list of verified automated accounts
 ```
+
+The hourly GitHub scan, the data it writes and the endpoints that serve it live
+in [agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs). The
+routes under `server/api/health/` and `server/api/automation-tally` here are
+pass-throughs to that service.
 
 ## Making changes
 

@@ -1,24 +1,3 @@
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc.js'
-
-dayjs.extend(utc)
-
-export function subtractMonths({
-  date,
-  months,
-}: {
-  date: string
-  months: number
-}): string {
-  const source = dayjs.utc(date)
-
-  if (!source.isValid()) {
-    return ''
-  }
-
-  return source.subtract(months, 'month').startOf('day').toISOString()
-}
-
 export function formatDateRange({
   startDate,
   endDate,
@@ -58,12 +37,4 @@ export function formatDateRange({
   }).format(end)
 
   return `${startLabel} - ${endLabel}`
-}
-
-export function roundToClosestHour(timestamp: string): string {
-  const date = dayjs(timestamp)
-  if (!date.isValid()) {
-    return timestamp
-  }
-  return date.utc().add(30, 'minute').startOf('hour').toISOString()
 }

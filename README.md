@@ -43,6 +43,15 @@ Contributions are welcome. If you find something that doesn't work or have an id
 
 For local development setup, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Where the data comes from
+
+The hourly scan that measures ecosystem health runs in a separate repository,
+[agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs). It scores
+every pull request opened across the tracked repos each hour, commits the
+results, and serves them back over HTTP. This repository is the site, the
+GitHub App, the webhook and the verified automations list; the health pages
+proxy that service rather than reading any scan data of their own.
+
 ## Stack
 
 - [Nuxt](https://nuxt.com)
