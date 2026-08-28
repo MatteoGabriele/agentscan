@@ -211,8 +211,11 @@ describe('digestMessages', () => {
     const lines = message.split('\n')
     const entry = lines.findIndex((line) => line.includes('`@kaigritun`'))
 
-    expect(lines[entry + 1]).toContain('👍 `alice, bob`')
-    expect(lines[entry + 1]).toContain('👎 `carol`')
+    // The entry runs: account, tally, roster, link.
+    expect(lines[entry + 1]).toContain('👍 2/4')
+    expect(lines[entry + 2]).toContain('👍 `alice, bob`')
+    expect(lines[entry + 2]).toContain('👎 `carol`')
+    expect(lines[entry + 3]).toContain('<https://')
   })
 
   // The split moves whole reports, so no message can open with a roster whose
@@ -234,14 +237,32 @@ describe('digestMessages', () => {
 
       lines.forEach((line, index) => {
         if (line.includes('`@automation-account-')) {
-          expect(lines[index + 1]).toContain('👍 `alice, bob`')
+          expect(lines[index + 2]).toContain('👍 `alice, bob`')
+          expect(lines[index + 3]).toContain('<https://')
         }
 
-        if (line.startsWith('   👍')) {
-          expect(lines[index - 1]).toContain('`@automation-account-')
+        if (line.startsWith('> voted by')) {
+          expect(lines[index - 2]).toContain('`@automation-account-')
         }
       })
     }
+  })
+
+  // The old flat list ran every report together, which was unreadable in the
+  // channel: each entry now stands as its own block.
+  it('separates the reports with a blank line', () => {
+    const [message] = digestMessages(
+      [
+        pending({ issue: 1, username: 'first' }),
+        pending({ issue: 2, username: 'second' }),
+      ],
+      thresholds,
+    )
+
+    const lines = message.split('\n')
+    const second = lines.findIndex((line) => line.includes('`@second`'))
+
+    expect(lines[second - 1]).toBe('')
   })
 
   it('keeps the reports in the order it was given', () => {
