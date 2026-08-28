@@ -1,5 +1,7 @@
 import type { NitroFetchOptions } from 'nitropack'
 
+const DEFAULT_TIMEOUT_MS = 10_000
+
 export async function fetchFromLogs<T>(
   path: string,
   options: NitroFetchOptions<string> = {},
@@ -9,6 +11,7 @@ export async function fetchFromLogs<T>(
   try {
     return await $fetch<T>(path, {
       baseURL: logsApiBase,
+      timeout: DEFAULT_TIMEOUT_MS,
       ...options,
     })
   } catch (error) {
