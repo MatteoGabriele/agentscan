@@ -1,5 +1,9 @@
 import type { EcosystemHealthTrmnlResponse } from '~~/shared/types/logs-api'
 
-export default defineEventHandler(async () => {
-  return fetchFromLogs<EcosystemHealthTrmnlResponse>('/api/health/trmnl')
-})
+export default defineCachedEventHandler(
+  async () => fetchFromLogs<EcosystemHealthTrmnlResponse>('/api/health/trmnl'),
+  {
+    maxAge: 60 * 5,
+    getKey: () => currentScanWindow('day'),
+  },
+)

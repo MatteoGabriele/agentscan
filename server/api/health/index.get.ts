@@ -1,9 +1,19 @@
+import type { H3Event } from 'h3'
 import type { EcosystemHealthDailyResponse } from '~~/shared/types/logs-api'
 
-export default defineEventHandler(async (event) => {
-  const query = getQuery(event)
+const fullHistoryFlag = (event: H3Event) => {
+  return String(getQuery(event).full ?? 'false')
+}
 
-  return fetchFromLogs<EcosystemHealthDailyResponse>('/api/health', {
-    query: { full: String(query.full ?? 'false') },
-  })
-})
+export default defineCachedEventHandler(
+  async (event) =>
+    fetchFromLogs<EcosystemHealthDailyResponse>('/api/health', {
+      query: {
+        full: fullHistoryFlag(event),
+      },
+    }),
+  {
+    maxAge: 60 * 5,
+    getKey: (event) => `${currentScanWindow('day')}-${fullHistoryFlag(event)}`,
+  },
+)

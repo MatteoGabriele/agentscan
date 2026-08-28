@@ -1,7 +1,12 @@
 import type { EcosystemHealthHourlyWindowResponse } from '~~/shared/types/logs-api'
 
-export default defineEventHandler(async () => {
-  return fetchFromLogs<EcosystemHealthHourlyWindowResponse>(
-    '/api/health/hourly-window',
-  )
-})
+export default defineCachedEventHandler(
+  async () =>
+    fetchFromLogs<EcosystemHealthHourlyWindowResponse>(
+      '/api/health/hourly-window',
+    ),
+  {
+    maxAge: 60 * 5,
+    getKey: () => currentScanWindow('hour'),
+  },
+)
