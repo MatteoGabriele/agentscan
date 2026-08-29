@@ -8,7 +8,7 @@
       <div class="text-ui-muted mt-2 flex flex-col text-pretty max-w-lg">
         <p>
           We're currently collecting fresh data to provide you with more
-          accurate ecosystem health insights.
+          accurate activity breakdown insights.
         </p>
         <p class="mt-2">Please check back soon.</p>
       </div>

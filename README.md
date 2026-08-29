@@ -45,7 +45,7 @@ For local development setup, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Where the data comes from
 
-The hourly scan that measures ecosystem health runs in a separate repository,
+The hourly scan that measures Activity Breakdown runs in a separate repository,
 [agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs). It scores
 every pull request opened across the tracked repos each hour, commits the
 results, and serves them back over HTTP. This repository is the site, the

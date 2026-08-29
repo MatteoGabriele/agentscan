@@ -30,7 +30,7 @@ A GitHub token is optional for local development. Without one the app still work
 GITHUB_TOKEN=your_github_personal_access_token
 ```
 
-The ecosystem health pages read their data from
+The Activity Breakdown pages read their data from
 [agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs), which runs
 the hourly scan. `pnpm dev` talks to the deployed one, so there is nothing to
 set up. Point it somewhere else — a local checkout of that repo, say — with:
