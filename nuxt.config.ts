@@ -92,6 +92,13 @@ export default defineNuxtConfig({
       },
     },
 
+    // served from data/adopters.json, refreshed weekly by the workflow.
+    '/api/adopters': {
+      cache: {
+        maxAge: 60 * 60,
+      },
+    },
+
     '/api/repo-stars': {
       cache: {
         maxAge: 60 * 60,

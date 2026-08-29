@@ -57,7 +57,7 @@ const { trackEvent } = useSaEvent()
             Install the GitHub App
           </NuxtLink>
 
-          <p class="text-xs text-ui-muted/70">
+          <p class="text-ui-text/60">
             Prefer running it in CI? Try the
             <NuxtLink
               external
@@ -70,7 +70,7 @@ const { trackEvent } = useSaEvent()
             instead.
           </p>
 
-          <ContributorsList class="mt-4" />
+          <CommunityStrip class="mt-4" />
 
           <div
             class="md:absolute w-full px-4 md:bottom-4 md:left-1/2 md:-translate-x-1/2 flex text-center justify-center"

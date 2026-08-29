@@ -14,7 +14,8 @@ function handleSubmit(name: string) {
 
   <LazyVerifiedAutomationList hydrate-on-interaction />
 
-  <ContributorsList
-    class="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex"
+  <LazyCommunityStrip
+    hydrate-on-visible
+    class="hidden w-full md:flex absolute bottom-8 left-0"
   />
 </template>
