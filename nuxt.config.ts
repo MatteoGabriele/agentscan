@@ -81,7 +81,7 @@ export default defineNuxtConfig({
   routeRules: {
     '/health': {
       redirect: {
-        to: 'activity',
+        to: '/activity',
         statusCode: 301,
       },
     },
