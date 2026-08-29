@@ -18,6 +18,7 @@ export const knownBots = [
   'heroku',
   'aws-amplify',
   'eslintbot',
+  'actions-user',
 ]
 
 export function isKnownBot(username: string): boolean {

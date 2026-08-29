@@ -5,6 +5,8 @@
   "packageManager": "pnpm@11.22.0",
   "scripts": {
     "build": "nuxt build",
+    "clean": "nuxt cleanup",
+    "clean:run": "nuxt cleanup && pnpm dev",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
