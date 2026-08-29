@@ -78,6 +78,13 @@ export default defineNuxtConfig({
   router: { options: { scrollBehaviorType: 'smooth' } },
 
   routeRules: {
+    '/health': {
+      redirect: {
+        to: '/activity',
+        statusCode: 301,
+      },
+    },
+
     '/privacy-policy': { prerender: true },
 
     '/api/account/**': {

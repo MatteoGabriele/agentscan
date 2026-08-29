@@ -77,8 +77,8 @@ onBeforeUnmount(() => {
         <li>
           <LazyMainMenuItem
             class="text-xl"
-            to="/health"
-            label="Ecosystem health"
+            to="/activity"
+            label="Activity Breakdown"
           />
         </li>
         <li><LazyMainMenuItem class="text-xl" to="/lab" label="The lab" /></li>

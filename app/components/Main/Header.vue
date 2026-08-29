@@ -46,7 +46,7 @@ const scanItems: MenuDropdownItem[] = [
         <li>
           <LazyMainMenuDropdown label="Scan" :items="scanItems" />
         </li>
-        <li><LazyMainMenuItem to="/health" label="Ecosystem health" /></li>
+        <li><LazyMainMenuItem to="/activity" label="Activity Breakdown" /></li>
         <li><LazyMainMenuItem to="/lab" label="The lab" /></li>
         <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
         <li>
