@@ -1,6 +1,5 @@
-export type ActionRepository = {
+export type AdopterRepository = {
   name: string
-  description: string | null
   url: string
   stars: number
   avatar: string

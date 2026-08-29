@@ -92,11 +92,12 @@ export default defineNuxtConfig({
       },
     },
 
-    // Code search is rate limited to 10 requests a minute, so this one is
-    // cached hard: adopters do not appear by the hour.
-    '/api/action-repositories': {
+    // code search is rate limited to 10 requests a minute,
+    // and the installation list costs a token per install.
+    // this is polled every couple of days.
+    '/api/adopters': {
       cache: {
-        maxAge: 60 * 60 * 6,
+        maxAge: 60 * 60 * 48,
       },
     },
 

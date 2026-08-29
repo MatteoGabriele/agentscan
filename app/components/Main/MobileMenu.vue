@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
         </li>
       </ul>
 
-      <LazyContributorsList class="my-12" />
+      <LazyCommunityStrip class="my-12" />
     </div>
   </div>
 </template>
