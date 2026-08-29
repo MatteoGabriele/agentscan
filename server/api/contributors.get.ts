@@ -1,3 +1,5 @@
+import { isKnownBot } from '~~/shared/cicd-known-bots'
+
 const cibotList = ['actions-user']
 
 export default defineEventHandler(async () => {
@@ -25,7 +27,9 @@ export default defineEventHandler(async () => {
 
     const contributors = [
       ...new Map(
-        [...core, ...app, ...action].map((account) => [account.login, account]),
+        [...core, ...app, ...action]
+          .filter((account) => !isKnownBot(account.login ?? ''))
+          .map((account) => [account.login, account]),
       ).values(),
     ]
 
