@@ -92,12 +92,10 @@ export default defineNuxtConfig({
       },
     },
 
-    // code search is rate limited to 10 requests a minute,
-    // and the installation list costs a token per install.
-    // this is polled every couple of days.
+    // served from data/adopters.json, refreshed weekly by the workflow.
     '/api/adopters': {
       cache: {
-        maxAge: 60 * 60 * 48,
+        maxAge: 60 * 60,
       },
     },
 
