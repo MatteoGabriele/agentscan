@@ -44,10 +44,30 @@ export interface Decision extends Tally {
   alreadyListed?: boolean
 }
 
-export interface Config {
-  reviewers: string[]
+/** The bar a report has to clear, without the roster it is counted against. */
+export interface Thresholds {
   minApprovals: number
   minRejections: number
+}
+
+export interface Config extends Thresholds {
+  reviewers: string[]
+}
+
+/**
+ * The thresholds on their own, for the jobs that only render them — the Discord
+ * messages, the explainer comment — and have no roster to count reactions
+ * against. Defaults match readConfig, so a message built without the workflow's
+ * environment still shows the real bar.
+ */
+export function readThresholds(): Thresholds {
+  const minApprovals = parseInt(process.env.MIN_APPROVALS || '5', 10)
+  const minRejections = parseInt(process.env.MIN_REJECTIONS || '3', 10)
+
+  return {
+    minApprovals: Number.isInteger(minApprovals) ? minApprovals : 5,
+    minRejections: Number.isInteger(minRejections) ? minRejections : 3,
+  }
 }
 
 export function parseReviewers(raw: string | undefined): string[] {

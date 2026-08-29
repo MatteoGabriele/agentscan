@@ -1,11 +1,15 @@
 name: Announce New Automation Report
 
-# Reviewers rule on reports by reacting to the issue, so they need to hear that
-# one exists. Only the first opening is announced — the report label being added
-# by hand later, or the issue being reopened, posts nothing.
+# Reviewers rule on reports by reacting to the issue.
 on:
   issues:
     types: [opened]
+
+# Kept in step with .github/workflows/review-automation-issues.yml, which is
+# where the reactions are actually counted against these numbers.
+env:
+  MIN_APPROVALS: '4'
+  MIN_REJECTIONS: '2'
 
 jobs:
   announce:
@@ -15,11 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: read
+      issues: write
 
     steps:
+      # Only for the scripts under scripts/ — this job never runs git, so the
+      # token is kept out of .git/config and away from everything installed.
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,6 +39,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # First, so the reporter reads the rules before anyone starts voting.
+      - name: Explain the review process on the issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          pnpm exec tsx scripts/comment-review-process.ts
+          --issue=${{ github.event.issue.number }}
 
       - name: Announce on Discord
         env:
