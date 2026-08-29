@@ -142,26 +142,32 @@ export async function collectAppRepositories(
       continue
     }
 
+    // Skipping a failed installation would return a short list that still looks
+    // healthy and overwrite the committed file, so the whole run fails instead.
+    let installed
     try {
-      const installed = await octokit.paginate(
+      installed = await octokit.paginate(
         octokit.rest.apps.listReposAccessibleToInstallation,
         { per_page: REPOSITORY_PAGE_SIZE },
       )
+    } catch (err) {
+      throw new Error(
+        `Could not list the repositories of installation ${installation.id}: ${(err as Error).message}`,
+        { cause: err },
+      )
+    }
 
-      for (const repository of installed) {
-        if (repository.private || repository.fork) {
-          continue
-        }
-
-        repositories.push({
-          name: repository.full_name,
-          url: repository.html_url,
-          stars: repository.stargazers_count,
-          avatar: withAvatarSize(repository.owner.avatar_url),
-        })
+    for (const repository of installed) {
+      if (repository.private || repository.fork) {
+        continue
       }
-    } catch {
-      continue
+
+      repositories.push({
+        name: repository.full_name,
+        url: repository.html_url,
+        stars: repository.stargazers_count,
+        avatar: withAvatarSize(repository.owner.avatar_url),
+      })
     }
   }
 
