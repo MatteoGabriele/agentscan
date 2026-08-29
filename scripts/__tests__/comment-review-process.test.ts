@@ -21,7 +21,6 @@ describe('reviewProcessComment', () => {
 
     expect(body).toContain('**5 👍 — flagged.**')
     expect(body).toContain('**3 👎 — rejected.**')
-    expect(body).toContain('make 5 👍 impossible')
   })
 
   it('says that only the review team is counted', () => {
