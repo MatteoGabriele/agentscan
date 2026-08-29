@@ -60,36 +60,39 @@ function showRest() {
           :key="index"
           class="md:-mx-1 hover:z-10"
         >
-          <NuxtLink
-            external
-            target="_blank"
-            :to="item.url"
-            :title="item.title ?? item.name"
-            class="block size-7.5 overflow-hidden rounded-full bg-ui-card ring-2 ring-ui-bg filter-saturate-0 hover:filter-saturate-100 hover:scale-115 transition-all"
-          >
-            <img :src="item.avatar" :alt="item.name" class="size-full" />
-          </NuxtLink>
+          <Tooltip :label="item.title ?? item.name ?? ''">
+            <NuxtLink
+              external
+              target="_blank"
+              :to="item.url"
+              class="block size-7.5 overflow-hidden rounded-full bg-ui-card ring-2 ring-ui-bg filter-saturate-0 hover:filter-saturate-100 hover:scale-115 transition-all"
+            >
+              <img :src="item.avatar" :alt="item.name" class="size-full" />
+            </NuxtLink>
+          </Tooltip>
         </li>
 
         <li v-if="restItemsCount" class="md:-mx-1 hover:z-10">
-          <NuxtLink
-            v-if="moreUrl"
-            :to="moreUrl"
-            :title="`See all ${items.length} on GitHub`"
-            class="flex items-center justify-center size-7.5 rounded-full ring-2 ring-ui-bg bg-ui-bg border border-ui-border/40 text-[0.65rem] font-medium tabular-nums text-ui-muted hover:text-ui-text hover:scale-115 transition-all"
-          >
-            +{{ restItemsCount }}
-          </NuxtLink>
+          <Tooltip v-if="moreUrl" :label="`See all ${items.length} on GitHub`">
+            <NuxtLink
+              :to="moreUrl"
+              :aria-label="`See all ${items.length} on GitHub`"
+              class="flex items-center justify-center size-7.5 rounded-full ring-2 ring-ui-bg bg-ui-bg border border-ui-border/40 text-[0.65rem] font-medium tabular-nums text-ui-muted hover:text-ui-text hover:scale-115 transition-all"
+            >
+              +{{ restItemsCount }}
+            </NuxtLink>
+          </Tooltip>
 
-          <button
-            v-else
-            type="button"
-            :title="`Show ${restItemsCount} more`"
-            class="size-7.5 rounded-full ring-2 ring-ui-bg bg-ui-bg border border-ui-border/40 text-[0.65rem] font-medium tabular-nums text-ui-muted hover:text-ui-text hover:scale-115 transition-all"
-            @click="showRest"
-          >
-            +{{ restItemsCount }}
-          </button>
+          <Tooltip v-else :label="`Show ${restItemsCount} more`">
+            <button
+              type="button"
+              :aria-label="`Show ${restItemsCount} more`"
+              class="size-7.5 rounded-full ring-2 ring-ui-bg bg-ui-bg border border-ui-border/40 text-[0.65rem] font-medium tabular-nums text-ui-muted hover:text-ui-text hover:scale-115 transition-all"
+              @click="showRest"
+            >
+              +{{ restItemsCount }}
+            </button>
+          </Tooltip>
         </li>
       </template>
     </ul>
