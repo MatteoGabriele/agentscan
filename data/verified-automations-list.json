@@ -511,5 +511,19 @@
       "graphieros",
       "ematipico"
     ]
+  },
+  {
+    "username": "SnowingFox",
+    "id": 26035718,
+    "reason": "This account appears to be automating their workflow by opening multiple PRs that do not adhere to the repository contribution guidelines, featuring automated descriptions and responses.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/398",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-29",
+    "approvedBy": [
+      "sheremet-va",
+      "ematipico",
+      "MatteoGabriele",
+      "graphieros"
+    ]
   }
 ]
