@@ -188,16 +188,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           The list keeps growing. We would love to cover many more projects, but
           we have to stay within GitHub's API rate limits.
         </p>
-        <ul>
-          <li v-for="name in libraries" :key="name">
-            <NuxtLink
-              class="underline"
-              external
-              :href="`https://github.com/${name}`"
-              >{{ name }}</NuxtLink
-            >
-          </li>
-        </ul>
+        <ScannedRepositoryList />
       </div>
     </section>
   </NuxtLayout>
