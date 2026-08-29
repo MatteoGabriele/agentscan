@@ -1,6 +1,0 @@
-[[redirects]]
-  from = "/health"
-  to = "/activity"
-  status = 301
-  force = true
-  query = {path = ":path"}
