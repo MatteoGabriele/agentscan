@@ -96,6 +96,15 @@ const unveilIdentityVersion = unveilIdentityPackage.version
                   Community flags RSS feed
                 </NuxtLink>
               </li>
+              <li>
+                <NuxtLink
+                  title="Who's using AgentScan?"
+                  to="/adopters"
+                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                >
+                  Who's using AgentScan?
+                </NuxtLink>
+              </li>
             </ul>
           </div>
         </div>

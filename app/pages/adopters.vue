@@ -28,7 +28,7 @@ useHead({
     { property: 'og:title', content: 'Used by | AgentScan' },
     {
       property: 'og:description',
-      content: 'Public repositories running AgentScan on their pull requests',
+      content: 'Public repositories running AgentScan on their CI',
     },
     { property: 'og:type', content: 'website' },
   ],
@@ -39,8 +39,7 @@ useHead({
   <header class="text-center md:text-left">
     <h1 class="text-2xl font-semibold">Used by</h1>
     <p class="text-ui-muted mt-2">
-      Public repositories running AgentScan on their pull requests, either
-      through the
+      Public repositories that run AgentScan in CI, using either the
       <NuxtLink
         to="https://github.com/MatteoGabriele/agentscan-action"
         target="_blank"
@@ -57,7 +56,12 @@ useHead({
         class="underline hover:text-ui-text"
       >
         app</NuxtLink
-      >. Private repositories are never listed.
+      >.
+    </p>
+    <p class="text-ui-muted text-sm mt-1">
+      GitHub doesn't publish which projects use an action or an app, so this
+      list is built from a custom query against the GitHub API. Some are
+      probably missing.
     </p>
 
     <p class="mt-6 text-sm text-ui-text">
