@@ -23,9 +23,12 @@ import {
   decide,
   openReports,
   readConfig,
+  readThresholds,
   tally,
 } from './review-automation-issues'
-import type { Decision } from './review-automation-issues'
+import type { Decision, Thresholds } from './review-automation-issues'
+
+export type { Thresholds }
 
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
@@ -49,11 +52,6 @@ export interface ReportSummary {
   username: string
   reportedBy: string
   reason: string
-}
-
-export interface Thresholds {
-  minApprovals: number
-  minRejections: number
 }
 
 /** One entry of the daily digest: an open report nobody has settled yet. */
@@ -187,18 +185,6 @@ export function digestMessages(
   messages.push(render(current))
 
   return messages
-}
-
-function readThresholds(): Thresholds {
-  // Defaults match scripts/review-automation-issues.ts, so a message rendered
-  // without the workflow's environment still shows the real bar.
-  const minApprovals = parseInt(process.env.MIN_APPROVALS || '5', 10)
-  const minRejections = parseInt(process.env.MIN_REJECTIONS || '3', 10)
-
-  return {
-    minApprovals: Number.isInteger(minApprovals) ? minApprovals : 5,
-    minRejections: Number.isInteger(minRejections) ? minRejections : 3,
-  }
 }
 
 function client(): Octokit {

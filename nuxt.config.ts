@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/fonts',
-    // '@nuxt/hints',
   ],
 
   plugins: ['~/plugins/analytics.client'],
