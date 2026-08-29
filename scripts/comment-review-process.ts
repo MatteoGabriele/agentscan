@@ -38,7 +38,7 @@ export function reviewProcessComment(thresholds: Thresholds): string {
   // wrapping the prose here would wrap it in the rendered comment too.
   return [
     MARKER,
-    `## How this report gets decided`,
+    `### How this report gets decided`,
     ``,
     `Thanks for taking the time to report this account. Here is what happens next, so none of it comes as a surprise.`,
     ``,
