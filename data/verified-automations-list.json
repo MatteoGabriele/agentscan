@@ -525,5 +525,35 @@
       "MatteoGabriele",
       "graphieros"
     ]
+  },
+  {
+    "username": "ethanstoner",
+    "id": 177599791,
+    "reason": "The account leverages AI to produce nearly everything, from PR descriptions to follow-up responses for maintainers. Additionally, the PR merge numbers on their CV suggest they care more about stats farming than genuine contribution.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/405",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-30",
+    "approvedBy": [
+      "gameroman",
+      "sheremet-va",
+      "graphieros",
+      "MatteoGabriele",
+      "danielroe",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "begininvoke",
+    "id": 56797886,
+    "reason": "Spamming thousands of projects with supposed security vulnerability fixes. Extremely high spam and closed pull request rates, with over 1500 PRs across 500+ projects in just a few days.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/403",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-08-30",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "danielroe",
+      "trueberryless"
+    ]
   }
 ]
