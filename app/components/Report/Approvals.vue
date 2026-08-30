@@ -3,7 +3,7 @@ const props = defineProps<{
   approvedBy: string[]
 }>()
 
-const MAX_VISIBLE_AVATARS = 5
+const MAX_VISIBLE_AVATARS = 15
 
 const visibleReviewers = computed<string[]>(() => {
   return props.approvedBy.slice(0, MAX_VISIBLE_AVATARS)
