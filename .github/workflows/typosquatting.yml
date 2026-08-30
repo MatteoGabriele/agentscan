@@ -1,0 +1,16 @@
+name: Typosquat
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: MatteoGabriele/typosquat@94e108d28b61ca997a51eba4acfea68a369b23fe
