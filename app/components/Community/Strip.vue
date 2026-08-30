@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const maxVisibleRepositories = 10
+const maxVisibleRepositories = 9
 
 const { data: contributors, status: contributorsStatus } =
   await useContributorsList()
-const { data: adopters, status: adoptersStatus } = useAdopters()
+const { data: adopters, status: adoptersStatus } = await useAdopters()
 
 const people = computed<AvatarStackItem[]>(() => contributors.value ?? [])
 

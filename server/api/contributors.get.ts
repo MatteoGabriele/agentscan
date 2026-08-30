@@ -1,25 +1,16 @@
 import { isKnownBot } from '~~/shared/cicd-known-bots'
-
-type RepoItem = {
-  owner: string
-  repo: string
-}
+import { projectRepositories } from '~~/shared/project-repositories'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
   const octokit = createOctokit(config.githubToken)
 
-  const repos: RepoItem[] = [
-    { owner: 'MatteoGabriele', repo: 'agentscan' },
-    { owner: 'MatteoGabriele', repo: 'agentscan-action' },
-    { owner: 'unveil-project', repo: 'identity' },
-  ]
-
   try {
     const requests = await Promise.all(
-      repos.map((repo) => {
+      projectRepositories.map(({ owner, repo }) => {
         return octokit.rest.repos.listContributors({
-          ...repo,
+          owner,
+          repo,
           per_page: 30,
         })
       }),

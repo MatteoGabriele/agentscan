@@ -58,7 +58,7 @@ const { trackEvent } = useSaEvent()
           </NuxtLink>
 
           <p class="text-ui-text/60">
-            Prefer running it in CI? Try the
+            Prefer a more tailored workflow? Try the
             <NuxtLink
               external
               target="_blank"
