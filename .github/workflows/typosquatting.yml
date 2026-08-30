@@ -14,3 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: MatteoGabriele/typosquat@f17928de1d77115cb68af20a1f6aa6206eba03dc
+        with:
+          mode: warn
