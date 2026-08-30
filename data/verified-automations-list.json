@@ -555,5 +555,19 @@
       "danielroe",
       "trueberryless"
     ]
+  },
+  {
+    "username": "FrancoKaddour",
+    "id": 147673141,
+    "reason": "The account showed several signs of AI-generated content, including repetitive stock phrases (e.g. \"Good catch, you're right\"), frequent em dashes, unusually high commit volume (up to ~200/day), and simultaneous PRs across unrelated projects.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/402",
+    "reportedBy": "Netail",
+    "createdAt": "2026-08-29",
+    "approvedBy": [
+      "MatteoGabriele",
+      "ematipico",
+      "graphieros",
+      "trueberryless"
+    ]
   }
 ]
