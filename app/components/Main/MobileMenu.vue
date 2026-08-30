@@ -66,10 +66,40 @@ onBeforeUnmount(() => {
               />
             </li>
             <li>
+              <LazyMainMenuItem class="text-xl" to="/lab" label="The Lab" />
+            </li>
+          </ul>
+        </div>
+
+        <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
+
+        <LazyMainMenuItem
+          class="text-xl"
+          to="/activity"
+          label="Activity Breakdown"
+        />
+
+        <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
+
+        <div class="flex flex-col items-center gap-3">
+          <p
+            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+          >
+            Community
+          </p>
+          <ul class="flex flex-col items-center gap-3">
+            <li>
               <LazyMainMenuItem
                 class="text-xl"
                 to="/automations"
                 label="Community reports"
+              />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/adopters"
+                label="Used by"
               />
             </li>
           </ul>
@@ -77,33 +107,12 @@ onBeforeUnmount(() => {
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
 
-        <ul class="flex flex-col items-center gap-3">
-          <li>
-            <LazyMainMenuItem
-              class="text-xl"
-              to="/activity"
-              label="Activity Breakdown"
-            />
-          </li>
-          <li>
-            <LazyMainMenuItem class="text-xl" to="/lab" label="The lab" />
-          </li>
-          <li>
-            <LazyMainMenuItem
-              class="text-xl"
-              to="/bookmarks"
-              label="Bookmarks"
-            />
-          </li>
-          <li>
-            <LazyMainMenuItem
-              class="text-xl"
-              to="/app"
-              label="Install AgentScan"
-              @click="trackEvent('get_agentscan_clicked')"
-            />
-          </li>
-        </ul>
+        <LazyMainMenuItem
+          class="text-xl"
+          to="/app"
+          label="Install AgentScan"
+          @click="trackEvent('get_agentscan_clicked')"
+        />
 
         <LazyCommunityStrip class="mt-4 max-w-2/3" />
       </div>

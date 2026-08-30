@@ -21,10 +21,25 @@ const scanItems: MenuDropdownItem[] = [
     icon: 'i-lucide:scan-search',
   },
   {
+    to: '/lab',
+    label: 'The Lab',
+    description: 'Experimental account scan mapping',
+    icon: 'i-lucide:flask-conical',
+  },
+]
+
+const communityItems: MenuDropdownItem[] = [
+  {
     to: '/automations',
     label: 'Community reports',
     description: 'Automations flagged by the community',
     icon: 'i-lucide:flag',
+  },
+  {
+    to: '/adopters',
+    label: 'Used by',
+    description: 'Public repositories running AgentScan on their CI',
+    icon: 'i-lucide:heart-handshake',
   },
 ]
 </script>
@@ -47,8 +62,9 @@ const scanItems: MenuDropdownItem[] = [
           <LazyMainMenuDropdown label="Scan" :items="scanItems" />
         </li>
         <li><LazyMainMenuItem to="/activity" label="Activity Breakdown" /></li>
-        <li><LazyMainMenuItem to="/lab" label="The lab" /></li>
-        <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
+        <li>
+          <LazyMainMenuDropdown label="Community" :items="communityItems" />
+        </li>
         <li>
           <LazyMainMenuItem
             to="/app"
@@ -59,7 +75,9 @@ const scanItems: MenuDropdownItem[] = [
       </ul>
     </div>
 
-    <div v-if="!onlyLogo" class="flex-1 flex items-center gap-4 justify-end">
+    <div v-if="!onlyLogo" class="flex-1 flex items-center gap-3 justify-end">
+      <LazyMainBookmarksLink hydrate-on-visible />
+
       <LazyMainGithubStars hydrate-on-visible />
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />

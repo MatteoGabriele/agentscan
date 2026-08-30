@@ -20,7 +20,9 @@ defineProps<{
         <h2 class="text-ui-text text-xl font-mono">
           {{ user.name || user.login }}
         </h2>
-        <UserBookmarkButton :user />
+        <Tooltip label="Bookmark">
+          <UserBookmarkButton :user />
+        </Tooltip>
       </div>
       <NuxtLink
         :external="true"
