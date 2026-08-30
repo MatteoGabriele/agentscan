@@ -39,6 +39,7 @@ env:
     TheAlexLichter
     orbisk
     bluwy
+    trueberryless
 
   MIN_APPROVALS: '4'
   MIN_REJECTIONS: '2'
