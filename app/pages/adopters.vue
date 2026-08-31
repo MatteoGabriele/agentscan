@@ -58,11 +58,6 @@ useHead({
         app</NuxtLink
       >.
     </p>
-    <p class="text-ui-muted text-sm mt-1">
-      GitHub doesn't publish which projects use an action or an app, so this
-      list is built from a custom query against the GitHub API. Some are
-      probably missing.
-    </p>
 
     <p class="mt-6 text-sm text-ui-text">
       <span
