@@ -1,12 +1,11 @@
 # AgentScan
-
 Automation pattern detection for open source maintainers.
-
-**Let it handle the spam while you focus on the project.**
 
 AgentScan analyzes a GitHub account's public activity and scores it based on how much it appears to rely on automation. There's no AI involved, just event analysis, powered by [identity](https://github.com/unveil-project/identity). The results are indicators, not verdicts: a starting point for your own judgment, not a final answer.
 
 Scores aren't bulletproof. Sophisticated automated accounts can slip through, and legitimate developers can occasionally trigger false positives. To help with that, AgentScan also maintains a curated list of manually verified accounts, submitted by the community and reviewed by maintainers before being merged in.
+
+AgentScan is used by maintainers and teams across the open source ecosystem. See [who's using it](https://agentscan.tools/adopters).
 
 ## Use it in your own repository
 
