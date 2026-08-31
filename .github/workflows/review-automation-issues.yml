@@ -40,6 +40,7 @@ env:
     orbisk
     bluwy
     trueberryless
+    bnb
 
   MIN_APPROVALS: '4'
   MIN_REJECTIONS: '2'
