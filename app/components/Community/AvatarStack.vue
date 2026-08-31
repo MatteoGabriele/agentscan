@@ -34,16 +34,12 @@ function showRest() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center group">
-    <p
-      class="text-xs text-ui-muted/80 tracking-wider font-medium mb-2 group-hover:text-ui-text transition-colors"
-    >
+  <div class="flex flex-col items-center">
+    <p class="text-xs text-ui-text tracking-wider font-medium mb-2">
       {{ label }}
     </p>
 
-    <ul
-      class="flex items-center flex-wrap justify-center gap-y-1.5 min-h-7.5 max-w-72"
-    >
+    <ul class="flex flex-wrap justify-center gap-y-1.5 min-h-7.5 max-w-72">
       <template v-if="pending">
         <li
           v-for="index in max || 5"
