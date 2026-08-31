@@ -67,7 +67,7 @@ watch(
           class="flex items-start gap-3 rounded-1.5 px-2.5 py-2 hover:bg-ui-muted/15 transition-colors group"
         >
           <span
-            class="mt-0.5 shrink-0 group-hover:text-ui-text transition-colors"
+            class="mt-1 shrink-0 group-hover:text-ui-text transition-colors"
             :class="[
               item.icon,
               isItemActive(item.to) ? 'text-ui-text' : 'text-ui-muted',

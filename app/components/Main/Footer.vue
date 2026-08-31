@@ -89,7 +89,6 @@ const unveilIdentityVersion = unveilIdentityPackage.version
                 <NuxtLink
                   external
                   target="_blank"
-                  title="RSS feed"
                   to="/feed.xml"
                   class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
                 >
@@ -98,11 +97,18 @@ const unveilIdentityVersion = unveilIdentityPackage.version
               </li>
               <li>
                 <NuxtLink
-                  title="Who's using AgentScan?"
                   to="/adopters"
                   class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
                 >
                   Who's using AgentScan?
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink
+                  to="/contribute"
+                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                >
+                  Contribute
                 </NuxtLink>
               </li>
             </ul>

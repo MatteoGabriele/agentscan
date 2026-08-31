@@ -12,13 +12,13 @@ const scanItems: MenuDropdownItem[] = [
     to: '/',
     label: 'Account search',
     description: "Analyze a GitHub account's activity",
-    icon: 'i-lucide:search',
+    icon: 'i-lucide:user-search',
   },
   {
     to: '/scan',
     label: 'Repository scan',
     description: 'Recent PR authors of any public repository',
-    icon: 'i-lucide:scan-search',
+    icon: 'i-lucide:book-search',
   },
   {
     to: '/lab',
@@ -30,10 +30,16 @@ const scanItems: MenuDropdownItem[] = [
 
 const communityItems: MenuDropdownItem[] = [
   {
+    to: '/contribute',
+    label: 'Contribute',
+    description: 'Ways to help the AgentScan ecosystem',
+    icon: 'i-lucide:book-heart',
+  },
+  {
     to: '/automations',
     label: 'Community reports',
     description: 'Automations flagged by the community',
-    icon: 'i-lucide:flag',
+    icon: 'i-lucide:clipboard-pen',
   },
   {
     to: '/adopters',

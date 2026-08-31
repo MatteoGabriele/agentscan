@@ -102,6 +102,13 @@ onBeforeUnmount(() => {
                 label="Used by"
               />
             </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/contribute"
+                label="Contribute"
+              />
+            </li>
           </ul>
         </div>
 

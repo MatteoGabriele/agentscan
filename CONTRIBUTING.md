@@ -1,6 +1,6 @@
 # Contributing to AgentScan
 
-Thanks for your interest in contributing. This is an open experiment and contributions of all kinds are welcome — bug fixes, new signals, copy improvements, or just opening an issue with an idea.
+Thanks for your interest in contributing. This is an open experiment and contributions of all kinds are welcome: bug fixes, new signals, copy improvements, or just opening an issue with an idea.
 
 ## Local development
 
@@ -33,7 +33,8 @@ GITHUB_TOKEN=your_github_personal_access_token
 The Ecosystem Activity pages read their data from
 [agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs), which runs
 the hourly scan. `pnpm dev` talks to the deployed one, so there is nothing to
-set up. Point it somewhere else — a local checkout of that repo, say — with:
+set up. Point it somewhere else, a local checkout of that repo for instance,
+with:
 
 ```env
 NUXT_LOGS_API_BASE=http://127.0.0.1:3000
@@ -48,11 +49,14 @@ pnpm dev
 ## Project structure
 
 ```
+app/
+  pages/         # Nuxt pages
+  components/    # Vue components
+  composables/   # Vue composables
 server/
   api/           # Nitro server API routes
   utils/         # Shared server utilities
-pages/           # Nuxt pages
-components/      # Vue components
+shared/          # Code shared between the app and the server
 data/
   verified-automations-list.json  # Curated list of verified automated accounts
 ```
@@ -66,7 +70,14 @@ pass-throughs to that service.
 
 ### Scoring algorithm
 
-The scoring logic lives in `shared/utils/voight-kampff-test` folder. Each signal has a label, a point value, and a detail string. If you want to add a new signal, follow the existing pattern and open a PR with your reasoning — explain what the signal detects and why it's indicative of automation.
+The scoring logic does not live in this repository. It is published as
+[@unveil/identity](https://github.com/unveil-project/identity) and consumed here
+as a dependency.
+
+New signals, better thresholds and detection fixes belong in that repository.
+Open a PR there with your reasoning: what the signal detects, and why it is
+indicative of automation. The changes reach AgentScan once the package version
+is bumped here.
 
 ### Styles
 
@@ -74,12 +85,13 @@ AgentScan uses UnoCSS with the default preset. Stick to utility classes directly
 
 ### Verified accounts list
 
-To add a verified automated account to the curated list, follow the process in the README — open an issue first, don't submit a PR directly without a linked issue.
+To add a verified automated account to the curated list, you need to first go to the account you want to flag on AgentScan itself and press the "report" link. Do not open an issue from the repository itself because you will miss a lot of key insights and evidence about the account.
 
-## Before submitting a PR
-
-- Keep PRs focused — one thing per PR
-- Link to the relevant issue if there is one
+Submissions are reviewed before they land. Reviewers vote on the issue with a 👍
+or a 👎 reaction, and a workflow checks those votes every hour. With enough
+approvals the account is added to `data/verified-automations-list.json` and the
+issue is closed as confirmed; with enough rejections it is closed as rejected.
+Until the vote settles, the issue stays open and nothing changes on the site.
 
 ## Questions
 
