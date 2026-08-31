@@ -11,14 +11,14 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Activity Breakdown | AgentScan',
+  title: 'Ecosystem Activity | AgentScan',
   meta: [
     {
       name: 'description',
       content:
         'A snapshot of community contribution patterns across the ecosystem.',
     },
-    { property: 'og:title', content: 'Activity Breakdown | AgentScan' },
+    { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
     { property: 'og:image', content: '/health.png' },
     {
       property: 'og:description',
@@ -71,7 +71,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
         >
           <div class="mx-auto max-w-2xl w-full">
             <header class="text-center mt-16 md:mt-24 px-4">
-              <h1 class="text-2xl font-semibold">Activity Breakdown</h1>
+              <h1 class="text-2xl font-semibold">Ecosystem Activity</h1>
               <div class="text-ui-muted mt-1 flex flex-col text-pretty">
                 <p>
                   A snapshot of community contribution patterns across the
@@ -125,7 +125,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
 
     <section id="learn-more" class="mx-auto max-w-2xl px-4 py-16 md:py-24">
       <h2 class="text-xl font-semibold">
-        What is the Activity Breakdown chart?
+        What is the Ecosystem Activity chart?
       </h2>
       <div class="mt-4 flex flex-col gap-2 text-ui-text/80 text-pretty">
         <p>

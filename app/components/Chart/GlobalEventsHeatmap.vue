@@ -235,7 +235,7 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
       opacity: ready ? 1 : 0,
     }"
   >
-    <h2 class="text-center">Daily Activity Breakdown heatmap</h2>
+    <h2 class="text-center">Daily Ecosystem Activity heatmap</h2>
   </div>
   <div
     class="flex w-full flex-col items-center gap-6 px-12 md:flex-row md:px-0 transition-opacity"

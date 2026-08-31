@@ -76,7 +76,7 @@ onBeforeUnmount(() => {
         <LazyMainMenuItem
           class="text-xl"
           to="/activity"
-          label="Activity Breakdown"
+          label="Ecosystem Activity"
         />
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>

@@ -61,7 +61,7 @@ const communityItems: MenuDropdownItem[] = [
         <li>
           <LazyMainMenuDropdown label="Scan" :items="scanItems" />
         </li>
-        <li><LazyMainMenuItem to="/activity" label="Activity Breakdown" /></li>
+        <li><LazyMainMenuItem to="/activity" label="Ecosystem Activity" /></li>
         <li>
           <LazyMainMenuDropdown label="Community" :items="communityItems" />
         </li>
