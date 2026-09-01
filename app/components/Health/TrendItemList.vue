@@ -6,14 +6,43 @@ type ClassificationStats = Record<
   { count: number; percentage: string }
 >
 
+const { view = 'daily' } = defineProps<{
+  view?: 'daily' | 'hourly'
+}>()
+
+const isHourly = computed(() => view === 'hourly')
+
 const { data: ecosystemHealth } = await useEcosystemHealth()
+const { data: hourlyWindow, execute: loadHourlyWindow } =
+  useEcosystemHealthHourlyWindow({ immediate: false })
+
+watch(
+  isHourly,
+  (hourly) => {
+    if (hourly) {
+      loadHourlyWindow()
+    }
+  },
+  { immediate: true },
+)
+
 const entries = computed(() => ecosystemHealth.value?.entries ?? [])
 
 const categoryProgression = computed(() => {
-  return ecosystemHealth.value?.categoryProgression
+  return isHourly.value
+    ? hourlyWindow.value?.categoryProgression
+    : ecosystemHealth.value?.categoryProgression
 })
 
-const latestDayStats = computed<ClassificationStats | null>(() => {
+const stats = computed<ClassificationStats | null>(() => {
+  if (isHourly.value) {
+    // Totals over the whole scan window the hourly chart plots, not the last scan
+    return getHealthStatsByBuckets(
+      hourlyWindow.value?.countsByScanTime,
+      hourlyWindow.value?.scanTimes,
+    )
+  }
+
   return getDailyHealthStats(entries.value)
 })
 </script>
@@ -27,7 +56,7 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
         classification="organic"
         label="Organic"
         :trend="categoryProgression?.organic.trend"
-        :percentage="latestDayStats?.organic.percentage"
+        :percentage="stats?.organic.percentage"
       />
     </li>
     <li>
@@ -35,7 +64,7 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
         classification="mixed"
         label="Mixed"
         :trend="categoryProgression?.mixed.trend"
-        :percentage="latestDayStats?.mixed.percentage"
+        :percentage="stats?.mixed.percentage"
       />
     </li>
     <li>
@@ -43,7 +72,7 @@ const latestDayStats = computed<ClassificationStats | null>(() => {
         classification="automation"
         label="Automation"
         :trend="categoryProgression?.automation.trend"
-        :percentage="latestDayStats?.automation.percentage"
+        :percentage="stats?.automation.percentage"
       />
     </li>
   </ul>
