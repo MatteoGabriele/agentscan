@@ -39,12 +39,22 @@ const trendLabel = computed(() => formatTrend(props.trend))
     <p class="text-sm">
       {{ label }}
 
-      <span class="text-ui-muted ml-1"> {{ percentage }}% </span>
+      <template v-if="percentage">
+        <span class="text-ui-muted ml-1"> {{ percentage }}% </span>
 
-      <span v-if="classification" :class="trendColor">
-        <span :class="trendIcon" class="shrink-0 align-middle" />
-        {{ trendLabel }}
-      </span>
+        <span v-if="classification" :class="trendColor">
+          <span :class="trendIcon" class="shrink-0 align-middle" />
+          {{ trendLabel }}
+        </span>
+      </template>
+
+      <Skeleton
+        v-else
+        class="ml-1 inline-block align-middle"
+        width="w-[92px]"
+        height="h-[14px]"
+        rounded="full"
+      />
     </p>
   </div>
 </template>

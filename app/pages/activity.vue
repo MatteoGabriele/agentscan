@@ -87,7 +87,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
             </header>
 
             <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-ui-border/40">
-              <HealthTrendItemList />
+              <HealthTrendItemList :view="urlParams.view" />
             </div>
 
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
