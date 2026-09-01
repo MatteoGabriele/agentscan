@@ -1,5 +1,23 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/logo-dark.svg">
+  <img src="./.github/assets/logo-light.svg" alt="AgentScan" width="96" height="96">
+</picture>
+
 # AgentScan
-Automation pattern detection for open source maintainers.
+
+**Automation pattern detection for open source maintainers.**
+
+[![Website](https://img.shields.io/badge/agentscan.tools-238636?style=flat-square&logo=googlechrome&logoColor=white)](https://agentscan.tools)
+[![GitHub App](https://img.shields.io/badge/GitHub%20App-install-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/apps/agentscanapp)
+[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-setup-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/MatteoGabriele/agentscan-action)
+
+[![Last commit](https://img.shields.io/github/last-commit/MatteoGabriele/agentscan?style=flat-square&color=238636)](https://github.com/MatteoGabriele/agentscan/commits/main)
+[![Issues](https://img.shields.io/github/issues/MatteoGabriele/agentscan?style=flat-square&color=238636)](https://github.com/MatteoGabriele/agentscan/issues)
+[![License](https://img.shields.io/github/license/MatteoGabriele/agentscan?style=flat-square&color=238636)](./LICENSE)
+
+</div>
 
 AgentScan analyzes a GitHub account's public activity and scores it based on how much it appears to rely on automation. There's no AI involved, just event analysis, powered by [identity](https://github.com/unveil-project/identity). The results are indicators, not verdicts: a starting point for your own judgment, not a final answer.
 
