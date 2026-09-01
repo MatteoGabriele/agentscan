@@ -6,6 +6,7 @@ import type {
 import {
   fillEmptyHourlyBuckets,
   getClassificationStatsByDate,
+  getHealthStatsByBuckets,
   getCategoryDeltas,
   getClassificationByDateChunks,
   getClassificationForPreviousDays,
@@ -937,5 +938,54 @@ describe('fillEmptyHourlyBuckets', () => {
       automation: { count: 0, trend: 0, percentage: 0 },
       total: { count: 0, trend: 0, percentage: 0 },
     })
+  })
+})
+
+describe('getHealthStatsByBuckets', () => {
+  const countsByHour = getClassificationStatsByScanTime([
+    createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
+    createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 50),
+    createEcosystemHealthItem('2026-08-08T06:00:00.000Z', 10),
+    createEcosystemHealthItem('2026-08-08T06:00:00.000Z', 10),
+    createEcosystemHealthItem('2026-08-08T06:00:00.000Z', 90),
+  ])
+
+  it('sums every bucket instead of reading the last one', () => {
+    expect(getHealthStatsByBuckets(countsByHour)).toEqual({
+      organic: { count: 2, percentage: '40.0' },
+      mixed: { count: 1, percentage: '20.0' },
+      automation: { count: 2, percentage: '40.0' },
+    })
+  })
+
+  it('only counts the buckets it is given', () => {
+    expect(
+      getHealthStatsByBuckets(countsByHour, ['2026-08-08T05:00:00.000Z']),
+    ).toEqual({
+      organic: { count: 1, percentage: '50.0' },
+      mixed: { count: 1, percentage: '50.0' },
+      automation: { count: 0, percentage: '0.0' },
+    })
+  })
+
+  it('ignores insufficient data scans', () => {
+    const counts = getClassificationStatsByScanTime([
+      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
+      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', -1),
+    ])
+
+    expect(getHealthStatsByBuckets(counts)).toEqual({
+      organic: { count: 1, percentage: '100.0' },
+      mixed: { count: 0, percentage: '0.0' },
+      automation: { count: 0, percentage: '0.0' },
+    })
+  })
+
+  it('returns null without any data', () => {
+    expect(getHealthStatsByBuckets(undefined)).toBeNull()
+    expect(getHealthStatsByBuckets({})).toBeNull()
+    expect(
+      getHealthStatsByBuckets(countsByHour, ['2026-08-08T09:00:00.000Z']),
+    ).toBeNull()
   })
 })

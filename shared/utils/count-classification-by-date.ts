@@ -4,7 +4,7 @@ import type {
   EcosystemHealthCategoryProgression,
 } from '../types/ecosystem-health'
 import { round } from './numbers'
-import { INSUFFICIENT_DATA_SCORE } from './health-stats'
+import { formatPercentage, INSUFFICIENT_DATA_SCORE } from './health-stats'
 import { calcLinearProgression } from './calc-linear-progression'
 
 export type ClassificationMetric = {
@@ -122,6 +122,60 @@ export function getClassificationStatsByDate(
   data: EcosystemHealthItem[] = [],
 ): GetClassificationStatsByDateResults {
   return getClassificationStatsByBucket(data, getDateKey)
+}
+
+export function getHealthStatsByBuckets(
+  countsByBucket: GetClassificationStatsByDateResults | undefined,
+  buckets: string[] = Object.keys(countsByBucket ?? {}),
+): Record<
+  EcosystemHealthCategory,
+  { count: number; percentage: string }
+> | null {
+  if (!countsByBucket) {
+    return null
+  }
+
+  const counts: Record<EcosystemHealthCategory, number> = {
+    organic: 0,
+    mixed: 0,
+    automation: 0,
+  }
+
+  buckets.forEach((bucket) => {
+    const bucketCounts = countsByBucket[bucket]
+
+    if (!bucketCounts) {
+      return
+    }
+
+    CLASSIFICATION_CATEGORIES.forEach((category) => {
+      counts[category] += bucketCounts[category].count
+    })
+  })
+
+  const total = CLASSIFICATION_CATEGORIES.reduce(
+    (sum, category) => sum + counts[category],
+    0,
+  )
+
+  if (total === 0) {
+    return null
+  }
+
+  return {
+    organic: {
+      count: counts.organic,
+      percentage: formatPercentage((counts.organic / total) * 100),
+    },
+    mixed: {
+      count: counts.mixed,
+      percentage: formatPercentage((counts.mixed / total) * 100),
+    },
+    automation: {
+      count: counts.automation,
+      percentage: formatPercentage((counts.automation / total) * 100),
+    },
+  }
 }
 
 // Entries written by the same scan run share a `created_at`, so a run is
