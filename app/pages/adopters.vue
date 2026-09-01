@@ -1,25 +1,39 @@
 <script setup lang="ts">
-import { formatCompactNumber } from '~~/shared/utils/numbers'
+import type { AdopterGroup } from '~~/shared/utils/group-adopters'
+import { groupAdoptersByOwner } from '~~/shared/utils/group-adopters'
 
 const SKELETON_ROWS = 8
 
 const { data, status, error } = useAdopters()
-const { trackEvent } = useSaEvent()
 
 const search = ref('')
 
 const repositories = computed<AdopterRepository[]>(() => data.value ?? [])
 
-const filteredRepositories = computed<AdopterRepository[]>(() => {
-  const query = search.value.trim().toLowerCase()
+const query = computed<string>(() => search.value.trim().toLowerCase())
 
-  if (!query) {
+// The repository name carries its owner, so searching for one keeps every
+// repository underneath it.
+const filteredRepositories = computed<AdopterRepository[]>(() => {
+  if (!query.value) {
     return repositories.value
   }
 
   return repositories.value.filter((repository) => {
-    return repository.name.toLowerCase().includes(query)
+    return repository.name.toLowerCase().includes(query.value)
   })
+})
+
+const allGroups = computed<AdopterGroup[]>(() => {
+  return groupAdoptersByOwner(repositories.value)
+})
+
+const groups = computed<AdopterGroup[]>(() => {
+  if (!query.value) {
+    return allGroups.value
+  }
+
+  return groupAdoptersByOwner(filteredRepositories.value)
 })
 
 useHead({
@@ -65,14 +79,16 @@ useHead({
         class="h-2.5 bg-ui-border rounded w-32 inline-block animate-pulse"
       />
       <span v-else class="tabular-nums">
-        {{ repositories.length }} repositories
+        {{ repositories.length }} repositories from
+        {{ allGroups.length }}
+        {{ allGroups.length === 1 ? 'account' : 'accounts' }}
       </span>
     </p>
 
     <input
       v-model="search"
       type="text"
-      placeholder="Search by repository..."
+      placeholder="Search by repository or account..."
       class="mt-12 w-full px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:border-ui-border/80"
     />
   </header>
@@ -98,45 +114,17 @@ useHead({
   </p>
 
   <div v-else class="mt-12">
-    <p v-if="filteredRepositories.length === 0" class="text-ui-muted">
+    <p v-if="groups.length === 0" class="text-ui-muted">
       No repository has been found under "{{ search }}"
     </p>
 
     <ul v-else class="flex flex-col">
-      <li
-        v-for="repository in filteredRepositories"
-        :key="repository.name"
-        class="not-last:border-b border-ui-border-subtle/40"
-      >
-        <NuxtLink
-          external
-          target="_blank"
-          rel="noopener"
-          :to="repository.url"
-          class="group flex items-center gap-3 py-3"
-          @click="trackEvent('adopter_repository_link_clicked')"
-        >
-          <img
-            :src="repository.avatar"
-            alt=""
-            aria-hidden="true"
-            class="size-8 rounded-full shrink-0 bg-ui-card"
-          />
-
-          <span
-            class="font-mono text-sm truncate group-hover:text-ui-muted transition-colors"
-          >
-            {{ repository.name }}
-          </span>
-
-          <span
-            class="ml-auto shrink-0 inline-flex items-center gap-1 text-xs text-ui-muted tabular-nums"
-          >
-            <span class="i-lucide:star text-[0.9em]" aria-hidden="true" />
-            {{ formatCompactNumber(repository.stars) }}
-          </span>
-        </NuxtLink>
-      </li>
+      <AdopterGroupItem
+        v-for="group in groups"
+        :key="group.owner"
+        :group
+        :force-expanded="Boolean(query)"
+      />
     </ul>
   </div>
 </template>
