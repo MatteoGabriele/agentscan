@@ -1,4 +1,5 @@
 # AgentScan
+
 Automation pattern detection for open source maintainers.
 
 AgentScan analyzes a GitHub account's public activity and scores it based on how much it appears to rely on automation. There's no AI involved, just event analysis, powered by [identity](https://github.com/unveil-project/identity). The results are indicators, not verdicts: a starting point for your own judgment, not a final answer.
