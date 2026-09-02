@@ -611,5 +611,19 @@
       "bnb",
       "gameroman"
     ]
+  },
+  {
+    "username": "LeonxLJX",
+    "id": 51880185,
+    "reason": "at exactly the same time, this account posted three identical comments in each of these issues, 'claiming' them to work",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/415",
+    "reportedBy": "danielroe",
+    "createdAt": "2026-09-01",
+    "approvedBy": [
+      "gameroman",
+      "MatteoGabriele",
+      "graphieros",
+      "trueberryless"
+    ]
   }
 ]
