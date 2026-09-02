@@ -625,5 +625,19 @@
       "graphieros",
       "trueberryless"
     ]
+  },
+  {
+    "username": "steipete",
+    "id": 58493,
+    "reason": "This account relies heavily on automated workflows, opening PRs that fail to follow repository contribution guidelines and contain automated descriptions and code changes",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/420",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-09-02",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "gameroman",
+      "sheremet-va"
+    ]
   }
 ]
