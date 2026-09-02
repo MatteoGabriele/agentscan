@@ -639,5 +639,33 @@
       "gameroman",
       "sheremet-va"
     ]
+  },
+  {
+    "username": "bun-unsafe",
+    "id": 236466140,
+    "reason": "Self-disclosed as an AI agent.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/421",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-09-02",
+    "approvedBy": [
+      "MatteoGabriele",
+      "gameroman",
+      "graphieros",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "shoemoney",
+    "id": 444294,
+    "reason": "Mass-forks and mass-contribs in a short time frame. PRs have quite a typical sloperator behavior pattern with the description having the same template across different projects (instead using project templates). Raw LLM responses sometimes leak instead of human interactions.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/416",
+    "reportedBy": "webknjaz",
+    "createdAt": "2026-09-01",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "trueberryless",
+      "ematipico"
+    ]
   }
 ]
