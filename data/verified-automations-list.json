@@ -487,7 +487,7 @@
   {
     "username": "kaluli123123",
     "id": 295758798,
-    "reason": "Clear signs of spamming across multiple repositories. Most noticeable is the 36 consecutive PRs in the flutter/flutter repository.",
+    "reason": "Clear signs of spamming across multiple repositories. Most noticeable is the 56 consecutive PRs in the flutter/flutter repository.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/388",
     "reportedBy": "MatteoGabriele",
     "createdAt": "2026-08-25",
@@ -615,7 +615,7 @@
   {
     "username": "LeonxLJX",
     "id": 51880185,
-    "reason": "at exactly the same time, this account posted three identical comments in each of these issues, 'claiming' them to work",
+    "reason": "Posted identical comments on 6 separate issues in the same repository, multiple times and all at the same time.",
     "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/415",
     "reportedBy": "danielroe",
     "createdAt": "2026-09-01",
