@@ -1,4 +1,4 @@
-import { isKnownBot } from '~~/shared/cicd-known-bots'
+import { isGitHubAppAccount } from '@unveil/identity'
 import { projectRepositories } from '~~/shared/project-repositories'
 
 export default defineEventHandler(async () => {
@@ -21,7 +21,7 @@ export default defineEventHandler(async () => {
     const contributors = [
       ...new Map(
         allContributors
-          .filter((account) => !isKnownBot(account.login ?? ''))
+          .filter((account) => !isGitHubAppAccount(account))
           .map((account) => [account.login, account]),
       ).values(),
     ]

@@ -2,9 +2,9 @@ import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
 import {
   getClassificationDetails,
+  isGitHubAppAccount,
   type IdentityClassification,
 } from '@unveil/identity'
-import { isKnownBot } from '~~/shared/cicd-known-bots'
 import {
   DEFAULT_CONFIG,
   parseRepoConfig,
@@ -181,7 +181,7 @@ export default defineEventHandler(async (event) => {
     if (
       !commentAuthor ||
       commentAuthor !== username ||
-      isKnownBot(commentAuthor)
+      isGitHubAppAccount({ type: payload.comment.user?.type })
     ) {
       return { ok: true }
     }
@@ -397,14 +397,13 @@ export default defineEventHandler(async (event) => {
 
     if (
       repoConfig['allowed-users'].includes(username) ||
-      isKnownBot(username) ||
       (authorAssociation &&
         repoConfig['trusted-author-associations'].includes(authorAssociation))
     ) {
       await completeCheckRun(
         'success',
         'Analysis skipped',
-        'This contributor is exempt from analysis (allow-listed, a known automation, or a trusted author association).',
+        'This contributor is exempt from analysis (allow-listed or a trusted author association).',
       )
       return { ok: true }
     }
@@ -436,6 +435,19 @@ export default defineEventHandler(async (event) => {
       token: installation?.token,
       showEvents: true,
     })
+
+    // A GitHub App account (`type: "Bot"`) is CI, not a contributor to judge:
+    // being automated is the whole point of it. The analysis stands, it just
+    // has nothing to report. No comment, no label, and the check passes so the
+    // PR is not held up.
+    if (analysis.isGitHubApp) {
+      await completeCheckRun(
+        'success',
+        'GitHub App',
+        `@${username} is a GitHub App. Automated activity is expected from it, so there is nothing to report.`,
+      )
+      return { ok: true }
+    }
 
     const details = hasCommunityFlag
       ? COMMUNITY_FLAGGED_DETAILS

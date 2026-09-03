@@ -151,6 +151,7 @@ const MOCK_ANALYSIS: IdentifyResult = {
     },
   ],
   isBountyHunter: false,
+  isGitHubApp: false,
   profile: { age: 365, repos: 0 },
 }
 
@@ -377,8 +378,8 @@ describe('GitHub Webhook Handler', () => {
     })
   })
 
-  describe('Known Bots', () => {
-    it('returns { ok: true } without scanning when username is a known CI/CD bot', async () => {
+  describe('GitHub Apps', () => {
+    it('returns { ok: true } without commenting when the analysis says the author is a GitHub App', async () => {
       setupEvent({
         pull_request: {
           number: 123,
@@ -386,15 +387,21 @@ describe('GitHub Webhook Handler', () => {
           head: { sha: 'abc123' },
         },
       })
+      mockAnalysis({ ...MOCK_ANALYSIS, isGitHubApp: true })
 
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(analyze).not.toHaveBeenCalled()
+      expect(
+        mockInstallationOctokit.rest.issues.createComment,
+      ).not.toHaveBeenCalled()
+      expect(
+        mockInstallationOctokit.rest.issues.addLabels,
+      ).not.toHaveBeenCalled()
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           conclusion: 'success',
-          output: expect.objectContaining({ title: 'Analysis skipped' }),
+          output: expect.objectContaining({ title: 'GitHub App' }),
         }),
       )
     })
@@ -407,6 +414,7 @@ describe('GitHub Webhook Handler', () => {
           head: { sha: 'abc123' },
         },
       })
+      mockAnalysis({ ...MOCK_ANALYSIS, isGitHubApp: true })
 
       await handler(MOCK_EVENT)
 
@@ -419,21 +427,29 @@ describe('GitHub Webhook Handler', () => {
       )
     })
 
-    it('returns { ok: true } without scanning for usernames ending with [bot]', async () => {
-      setupEvent({
-        pull_request: { number: 123, user: { login: 'some-custom-tool[bot]' } },
+    it('does not auto-close a GitHub App pull request', async () => {
+      mockRepoConfig({ 'auto-close': true })
+      mockAnalysis({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+        isGitHubApp: true,
       })
 
       const result = await handler(MOCK_EVENT)
 
       expect(result).toEqual({ ok: true })
-      expect(analyze).not.toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.issues.update).not.toHaveBeenCalled()
     })
 
-    it('proceeds with scan for regular user accounts', async () => {
+    it('proceeds with the regular flow for accounts that are not GitHub Apps', async () => {
       await handler(MOCK_EVENT)
 
       expect(analyze).toHaveBeenCalled()
+      expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          output: expect.objectContaining({ title: 'Organic Account' }),
+        }),
+      )
     })
   })
 
