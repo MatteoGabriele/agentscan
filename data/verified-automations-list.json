@@ -667,5 +667,19 @@
       "trueberryless",
       "ematipico"
     ]
+  },
+  {
+    "username": "arronKler",
+    "id": 11434728,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe. GitHub Actions automatically comments on PRs when the author has not signed the CLA. The account in question does not sign the CLA and instead opens 10+ PRs, adding a \"recheck\" comment to each one.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/417",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-09-02",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico",
+      "trueberryless"
+    ]
   }
 ]
