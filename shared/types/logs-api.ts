@@ -53,3 +53,8 @@ export type AutomationTallyResponse = {
   id: number
   counter: number
 }[]
+
+export type LibrariesResponse = {
+  total: number
+  repos: string[]
+}

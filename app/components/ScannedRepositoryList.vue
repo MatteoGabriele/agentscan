@@ -1,21 +1,26 @@
 <script setup lang="ts">
-import { libraries } from '~~/shared/daily-scan'
-
 const MAX_ITEMS = 10
+
+const { data, status } = await useLibraries()
 
 const showAllItems = ref(false)
 const displayItems = computed(() => {
+  const repos = data.value?.repos ?? []
+
   if (showAllItems.value) {
-    return libraries
+    return repos
   }
 
-  return libraries.slice(0, MAX_ITEMS)
+  return repos.slice(0, MAX_ITEMS)
 })
 </script>
 
 <template>
   <div class="flex flex-col gap-2 items-start">
-    <ul>
+    <div v-if="status === 'pending'" class="flex flex-col gap-2 w-full">
+      <Skeleton v-for="index in MAX_ITEMS" :key="index" width="w-40" />
+    </div>
+    <ul v-else>
       <li v-for="name in displayItems" :key="name">
         <NuxtLink
           class="underline"
@@ -26,7 +31,7 @@ const displayItems = computed(() => {
       </li>
     </ul>
     <button
-      v-if="!showAllItems"
+      v-if="status !== 'pending' && !showAllItems"
       class="text-sm text-ui-muted/70 hover:text-ui-text"
       @click="showAllItems = true"
     >

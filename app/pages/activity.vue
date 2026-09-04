@@ -3,7 +3,6 @@ import {
   DEFAULT_HISTORY_MONTHS,
   WINDOW_MAX_HOURS,
 } from '~~/shared/utils/activity-history-window'
-import { libraries } from '~~/shared/daily-scan'
 import { useUrlSearchParams } from '@vueuse/core'
 
 definePageMeta({
@@ -35,6 +34,8 @@ type ChartRangeOption = {
   label: string
   caption: string
 }
+
+const { data: librariesData } = await useLibraries()
 
 const isMobile = useIsMobile()
 
@@ -180,9 +181,9 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           Which repositories
         </h3>
         <p>
-          For now, we track {{ libraries.length }} repositories. Some we picked
-          by hand because we care about them; others were chosen at random from
-          the GitHub trending repositories page. They go from TypeScript,
+          For now, we track {{ librariesData?.total ?? 0 }}. Some we picked by
+          hand because we care about them; others were chosen at random from the
+          GitHub trending repositories page. They go from TypeScript,
           JavaScript, Go, Python, and Rust to toolchains, frameworks, testing
           libraries, learning websites, and even AI-related projects.
         </p>
