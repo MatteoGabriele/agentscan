@@ -8,7 +8,7 @@ export function useEcosystemHealthHourlyWindow({
   return useAsyncData(
     'ecosystem-health-hourly-window',
     async () => {
-      return $fetch('/api/health/hourly-window')
+      return $fetch('/api/activity/hourly-window')
     },
     { immediate },
   )

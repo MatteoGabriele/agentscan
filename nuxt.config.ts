@@ -58,7 +58,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Where the hourly scan publishes its results. Overridable with
-    // NUXT_LOGS_API_BASE; the health and automation-tally routes proxy it.
+    // NUXT_LOGS_API_BASE; the activity and automation-tally routes proxy it.
     logsApiBase: 'https://logs.agentscan.tools',
     githubToken: '',
     githubAppId: '',
@@ -81,6 +81,22 @@ export default defineNuxtConfig({
     '/health': {
       redirect: {
         to: '/activity',
+        statusCode: 301,
+      },
+    },
+
+    // the routes moved with the agentscan-logs rename; keep the old paths
+    // working for anything still pointing at them.
+    '/api/health': {
+      redirect: {
+        to: '/api/activity',
+        statusCode: 301,
+      },
+    },
+
+    '/api/health/**': {
+      redirect: {
+        to: '/api/activity/**',
         statusCode: 301,
       },
     },

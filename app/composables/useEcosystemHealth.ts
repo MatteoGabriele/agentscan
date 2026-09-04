@@ -8,7 +8,7 @@ export function useEcosystemHealth({
   const key = full ? 'ecosystem-health-full' : 'ecosystem-health-default'
 
   return useAsyncData(key, async () => {
-    return $fetch('/api/health', {
+    return $fetch('/api/activity', {
       query: {
         full,
       },

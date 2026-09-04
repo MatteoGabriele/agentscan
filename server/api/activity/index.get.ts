@@ -7,7 +7,7 @@ const fullHistoryFlag = (event: H3Event) => {
 
 export default defineCachedEventHandler(
   async (event) =>
-    fetchFromLogs<EcosystemHealthDailyResponse>('/api/health', {
+    fetchFromLogs<EcosystemHealthDailyResponse>('/api/activity', {
       query: {
         full: fullHistoryFlag(event),
       },

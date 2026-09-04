@@ -1,5 +1,5 @@
 // The responses agentscan-logs serves. The scan, the data files and the
-// aggregation all live in that repo; the routes under server/api/health and
+// aggregation all live in that repo; the routes under server/api/activity and
 // server/api/automation-tally here only pass them through, so these types are
 // the contract between the two.
 
