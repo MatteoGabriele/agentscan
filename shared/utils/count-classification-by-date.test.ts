@@ -6,23 +6,20 @@ import type {
 import {
   fillEmptyHourlyBuckets,
   getClassificationStatsByDate,
-  getHealthStatsByBuckets,
+  getActivityStatsByBuckets,
   getCategoryDeltas,
   getClassificationByDateChunks,
   getClassificationForPreviousDays,
   getClassificationStatsByScanTime,
   getWeeklyClassification,
 } from './count-classification-by-date'
-import type { EcosystemHealthItem } from '../types/ecosystem-health'
+import type { ActivityItem } from '../types/activity'
 
-function createEcosystemHealthItem(
-  created_at: string,
-  score: number,
-): EcosystemHealthItem {
+function createActivityItem(created_at: string, score: number): ActivityItem {
   return {
     created_at,
     score,
-  } as EcosystemHealthItem
+  } as ActivityItem
 }
 
 function expectClassificationMetric(
@@ -47,9 +44,9 @@ function expectClassificationCounts(
 describe('getClassificationStatsByDate', () => {
   it('returns an object with sorted date keys', () => {
     const result = getClassificationStatsByDate([
-      createEcosystemHealthItem('2026-06-11T10:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 50),
-      createEcosystemHealthItem('2026-06-10T11:00:00.000Z', 10),
+      createActivityItem('2026-06-11T10:00:00.000Z', 90),
+      createActivityItem('2026-06-10T10:00:00.000Z', 50),
+      createActivityItem('2026-06-10T11:00:00.000Z', 10),
     ])
 
     expect(Object.keys(result)).toEqual(['2026-06-10', '2026-06-11'])
@@ -57,12 +54,12 @@ describe('getClassificationStatsByDate', () => {
 
   it('ignores insufficient-data entries', () => {
     const result = getClassificationStatsByDate([
-      createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-06-10T11:00:00.000Z', 10),
-      createEcosystemHealthItem('2026-06-10T12:00:00.000Z', -1),
+      createActivityItem('2026-06-10T10:00:00.000Z', 90),
+      createActivityItem('2026-06-10T11:00:00.000Z', 10),
+      createActivityItem('2026-06-10T12:00:00.000Z', -1),
 
       // a date with only insufficient-data never gets a bucket
-      createEcosystemHealthItem('2026-06-11T10:00:00.000Z', -1),
+      createActivityItem('2026-06-11T10:00:00.000Z', -1),
     ])
 
     expect(Object.keys(result)).toEqual(['2026-06-10'])
@@ -75,14 +72,14 @@ describe('getClassificationStatsByDate', () => {
 
   it('returns counts, percentages, and default trends for each date', () => {
     const result = getClassificationStatsByDate([
-      createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-06-10T11:00:00.000Z', 50),
-      createEcosystemHealthItem('2026-06-10T12:00:00.000Z', 10),
-      createEcosystemHealthItem('2026-06-10T13:00:00.000Z', 10),
+      createActivityItem('2026-06-10T10:00:00.000Z', 90),
+      createActivityItem('2026-06-10T11:00:00.000Z', 50),
+      createActivityItem('2026-06-10T12:00:00.000Z', 10),
+      createActivityItem('2026-06-10T13:00:00.000Z', 10),
 
-      createEcosystemHealthItem('2026-06-11T10:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-06-11T11:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-06-11T12:00:00.000Z', 50),
+      createActivityItem('2026-06-11T10:00:00.000Z', 90),
+      createActivityItem('2026-06-11T11:00:00.000Z', 90),
+      createActivityItem('2026-06-11T12:00:00.000Z', 50),
     ])
 
     expectClassificationCounts(result['2026-06-10'], {
@@ -139,15 +136,15 @@ describe('getCategoryDeltas', () => {
 
   it('returns category deltas keyed by category', () => {
     const result = getCategoryDeltas([
-      createEcosystemHealthItem(lastDate, 90),
-      createEcosystemHealthItem(lastDate, 50),
-      createEcosystemHealthItem(lastDate, 50),
-      createEcosystemHealthItem(lastDate, 10),
+      createActivityItem(lastDate, 90),
+      createActivityItem(lastDate, 50),
+      createActivityItem(lastDate, 50),
+      createActivityItem(lastDate, 10),
 
-      createEcosystemHealthItem(previousDate, 90),
-      createEcosystemHealthItem(previousDate, 90),
-      createEcosystemHealthItem(previousDate, 50),
-      createEcosystemHealthItem(previousDate, 10),
+      createActivityItem(previousDate, 90),
+      createActivityItem(previousDate, 90),
+      createActivityItem(previousDate, 50),
+      createActivityItem(previousDate, 10),
     ])
 
     expect(result).toEqual({
@@ -192,9 +189,9 @@ describe('getCategoryDeltas', () => {
 
   it('returns null previous values when there is only one date', () => {
     const result = getCategoryDeltas([
-      createEcosystemHealthItem(lastDate, 90),
-      createEcosystemHealthItem(lastDate, 50),
-      createEcosystemHealthItem(lastDate, 10),
+      createActivityItem(lastDate, 90),
+      createActivityItem(lastDate, 50),
+      createActivityItem(lastDate, 10),
     ])
 
     expect(result).toEqual({
@@ -287,20 +284,20 @@ describe('getClassificationForPreviousDays', () => {
       date: '2026-06-10T18:30:00.000Z',
       days: 3,
       data: [
-        createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-08T11:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-09T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-10T11:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-10T12:00:00.000Z', 10),
+        createActivityItem('2026-06-08T10:00:00.000Z', 90),
+        createActivityItem('2026-06-08T11:00:00.000Z', 90),
+        createActivityItem('2026-06-09T10:00:00.000Z', 50),
+        createActivityItem('2026-06-10T10:00:00.000Z', 10),
+        createActivityItem('2026-06-10T11:00:00.000Z', 10),
+        createActivityItem('2026-06-10T12:00:00.000Z', 10),
 
-        createEcosystemHealthItem('2026-06-05T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-06T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-06T11:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-07T10:00:00.000Z', 10),
+        createActivityItem('2026-06-05T10:00:00.000Z', 90),
+        createActivityItem('2026-06-06T10:00:00.000Z', 50),
+        createActivityItem('2026-06-06T11:00:00.000Z', 50),
+        createActivityItem('2026-06-07T10:00:00.000Z', 10),
 
-        createEcosystemHealthItem('2026-06-04T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-11T10:00:00.000Z', 90),
+        createActivityItem('2026-06-04T10:00:00.000Z', 90),
+        createActivityItem('2026-06-11T10:00:00.000Z', 90),
       ],
     })
 
@@ -332,7 +329,7 @@ describe('getClassificationForPreviousDays', () => {
     const result = getClassificationForPreviousDays({
       date: '2026-06-10T18:30:00.000Z',
       days: 0,
-      data: [createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 90)],
+      data: [createActivityItem('2026-06-10T10:00:00.000Z', 90)],
     })
 
     expectClassificationCounts(result, {
@@ -364,8 +361,8 @@ describe('getClassificationForPreviousDays', () => {
       date: '2026-06-10T18:30:00.000Z',
       days: 2,
       data: [
-        createEcosystemHealthItem('2026-06-09T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 10),
+        createActivityItem('2026-06-09T10:00:00.000Z', 90),
+        createActivityItem('2026-06-10T10:00:00.000Z', 10),
       ],
     })
 
@@ -411,15 +408,15 @@ describe('getClassificationByDateChunks', () => {
       dates,
       days: 3,
       data: [
-        createEcosystemHealthItem('2026-06-01T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-02T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-03T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-04T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-04T11:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-05T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-06T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-07T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 10),
+        createActivityItem('2026-06-01T10:00:00.000Z', 90),
+        createActivityItem('2026-06-02T10:00:00.000Z', 50),
+        createActivityItem('2026-06-03T10:00:00.000Z', 10),
+        createActivityItem('2026-06-04T10:00:00.000Z', 90),
+        createActivityItem('2026-06-04T11:00:00.000Z', 90),
+        createActivityItem('2026-06-05T10:00:00.000Z', 50),
+        createActivityItem('2026-06-06T10:00:00.000Z', 10),
+        createActivityItem('2026-06-07T10:00:00.000Z', 50),
+        createActivityItem('2026-06-08T10:00:00.000Z', 10),
       ],
     })
 
@@ -514,10 +511,10 @@ describe('getClassificationByDateChunks', () => {
         '2026-06-02T10:00:00.000Z',
       ],
       data: [
-        createEcosystemHealthItem('2026-06-01T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-02T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-03T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-04T10:00:00.000Z', 90),
+        createActivityItem('2026-06-01T10:00:00.000Z', 90),
+        createActivityItem('2026-06-02T10:00:00.000Z', 50),
+        createActivityItem('2026-06-03T10:00:00.000Z', 10),
+        createActivityItem('2026-06-04T10:00:00.000Z', 90),
       ],
     })
 
@@ -544,11 +541,11 @@ describe('getClassificationByDateChunks', () => {
         '2026-06-06T10:00:00.000Z',
       ],
       data: [
-        createEcosystemHealthItem('2026-06-01T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-02T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-03T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-05T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-06T10:00:00.000Z', 10),
+        createActivityItem('2026-06-01T10:00:00.000Z', 90),
+        createActivityItem('2026-06-02T10:00:00.000Z', 50),
+        createActivityItem('2026-06-03T10:00:00.000Z', 10),
+        createActivityItem('2026-06-05T10:00:00.000Z', 90),
+        createActivityItem('2026-06-06T10:00:00.000Z', 10),
       ],
     })
 
@@ -583,7 +580,7 @@ describe('getClassificationByDateChunks', () => {
     const result = getClassificationByDateChunks({
       dates: [],
       days: 7,
-      data: [createEcosystemHealthItem('2026-06-01T10:00:00.000Z', 90)],
+      data: [createActivityItem('2026-06-01T10:00:00.000Z', 90)],
     })
 
     expect(result).toEqual([])
@@ -593,7 +590,7 @@ describe('getClassificationByDateChunks', () => {
     const result = getClassificationByDateChunks({
       dates: ['2026-06-01T10:00:00.000Z'],
       days: 0,
-      data: [createEcosystemHealthItem('2026-06-01T10:00:00.000Z', 90)],
+      data: [createActivityItem('2026-06-01T10:00:00.000Z', 90)],
     })
 
     expect(result).toEqual([])
@@ -613,12 +610,12 @@ describe('getClassificationByDateChunks', () => {
         '2026-06-14T10:00:00.000Z',
       ],
       data: [
-        createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-09T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-12T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-13T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-14T10:00:00.000Z', 10),
+        createActivityItem('2026-06-08T10:00:00.000Z', 90),
+        createActivityItem('2026-06-09T10:00:00.000Z', 50),
+        createActivityItem('2026-06-10T10:00:00.000Z', 10),
+        createActivityItem('2026-06-12T10:00:00.000Z', 90),
+        createActivityItem('2026-06-13T10:00:00.000Z', 50),
+        createActivityItem('2026-06-14T10:00:00.000Z', 10),
       ],
     })
 
@@ -652,16 +649,16 @@ describe('getClassificationByDateChunks', () => {
         '2026-06-23T10:00:00.000Z',
       ],
       data: [
-        createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-09T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-14T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-15T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-16T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-17T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-18T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-21T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-22T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-23T10:00:00.000Z', 10),
+        createActivityItem('2026-06-08T10:00:00.000Z', 90),
+        createActivityItem('2026-06-09T10:00:00.000Z', 50),
+        createActivityItem('2026-06-14T10:00:00.000Z', 10),
+        createActivityItem('2026-06-15T10:00:00.000Z', 90),
+        createActivityItem('2026-06-16T10:00:00.000Z', 90),
+        createActivityItem('2026-06-17T10:00:00.000Z', 50),
+        createActivityItem('2026-06-18T10:00:00.000Z', 10),
+        createActivityItem('2026-06-21T10:00:00.000Z', 10),
+        createActivityItem('2026-06-22T10:00:00.000Z', 50),
+        createActivityItem('2026-06-23T10:00:00.000Z', 10),
       ],
     })
 
@@ -723,17 +720,17 @@ describe('getClassificationByDateChunks', () => {
 
 describe('getWeeklyClassification', () => {
   const rollingWindowData = [
-    createEcosystemHealthItem('2026-06-05T10:00:00.000Z', 90),
-    createEcosystemHealthItem('2026-06-06T10:00:00.000Z', 50),
-    createEcosystemHealthItem('2026-06-07T10:00:00.000Z', 50),
-    createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 10),
-    createEcosystemHealthItem('2026-06-12T10:00:00.000Z', 90),
-    createEcosystemHealthItem('2026-06-13T10:00:00.000Z', 90),
-    createEcosystemHealthItem('2026-06-14T10:00:00.000Z', 50),
-    createEcosystemHealthItem('2026-06-15T10:00:00.000Z', 10),
-    createEcosystemHealthItem('2026-06-16T10:00:00.000Z', 10),
-    createEcosystemHealthItem('2026-06-18T10:00:00.000Z', 10),
-    createEcosystemHealthItem('2026-06-19T10:00:00.000Z', 90),
+    createActivityItem('2026-06-05T10:00:00.000Z', 90),
+    createActivityItem('2026-06-06T10:00:00.000Z', 50),
+    createActivityItem('2026-06-07T10:00:00.000Z', 50),
+    createActivityItem('2026-06-08T10:00:00.000Z', 10),
+    createActivityItem('2026-06-12T10:00:00.000Z', 90),
+    createActivityItem('2026-06-13T10:00:00.000Z', 90),
+    createActivityItem('2026-06-14T10:00:00.000Z', 50),
+    createActivityItem('2026-06-15T10:00:00.000Z', 10),
+    createActivityItem('2026-06-16T10:00:00.000Z', 10),
+    createActivityItem('2026-06-18T10:00:00.000Z', 10),
+    createActivityItem('2026-06-19T10:00:00.000Z', 90),
   ]
 
   it('uses a rolling 7 day window by default', () => {
@@ -800,17 +797,17 @@ describe('getWeeklyClassification', () => {
   it('uses full Monday to Sunday weeks when rolling is false', () => {
     const result = getWeeklyClassification(
       [
-        createEcosystemHealthItem('2026-06-08T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-09T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-10T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-14T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-15T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-16T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-17T10:00:00.000Z', 50),
-        createEcosystemHealthItem('2026-06-18T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-21T10:00:00.000Z', 10),
-        createEcosystemHealthItem('2026-06-07T10:00:00.000Z', 90),
-        createEcosystemHealthItem('2026-06-22T10:00:00.000Z', 90),
+        createActivityItem('2026-06-08T10:00:00.000Z', 90),
+        createActivityItem('2026-06-09T10:00:00.000Z', 50),
+        createActivityItem('2026-06-10T10:00:00.000Z', 50),
+        createActivityItem('2026-06-14T10:00:00.000Z', 10),
+        createActivityItem('2026-06-15T10:00:00.000Z', 90),
+        createActivityItem('2026-06-16T10:00:00.000Z', 90),
+        createActivityItem('2026-06-17T10:00:00.000Z', 50),
+        createActivityItem('2026-06-18T10:00:00.000Z', 10),
+        createActivityItem('2026-06-21T10:00:00.000Z', 10),
+        createActivityItem('2026-06-07T10:00:00.000Z', 90),
+        createActivityItem('2026-06-22T10:00:00.000Z', 90),
       ],
       '2026-06-18T18:30:00.000Z',
       false,
@@ -848,8 +845,8 @@ describe('fillEmptyHourlyBuckets', () => {
 
   it('reinstates hours that recorded no entry as empty buckets', () => {
     const countsByHour = getClassificationStatsByScanTime([
-      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-08-08T08:00:00.000Z', 10),
+      createActivityItem('2026-08-08T05:00:00.000Z', 90),
+      createActivityItem('2026-08-08T08:00:00.000Z', 10),
     ])
 
     const result = fillEmptyHourlyBuckets({ countsByHour })
@@ -872,8 +869,8 @@ describe('fillEmptyHourlyBuckets', () => {
 
   it('keeps the recorded buckets untouched', () => {
     const countsByHour = getClassificationStatsByScanTime([
-      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-08-08T07:00:00.000Z', 10),
+      createActivityItem('2026-08-08T05:00:00.000Z', 90),
+      createActivityItem('2026-08-08T07:00:00.000Z', 10),
     ])
 
     const result = fillEmptyHourlyBuckets({ countsByHour })
@@ -888,8 +885,8 @@ describe('fillEmptyHourlyBuckets', () => {
 
   it('caps the timeline to maxHours counted back from the latest bucket', () => {
     const countsByHour = getClassificationStatsByScanTime([
-      createEcosystemHealthItem('2026-08-08T01:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
+      createActivityItem('2026-08-08T01:00:00.000Z', 90),
+      createActivityItem('2026-08-08T05:00:00.000Z', 90),
     ])
 
     const result = fillEmptyHourlyBuckets({ countsByHour, maxHours: 3 })
@@ -903,10 +900,10 @@ describe('fillEmptyHourlyBuckets', () => {
 
   it('keeps one bucket per clock hour when scan times drift off the hour', () => {
     const countsByHour = getClassificationStatsByScanTime([
-      createEcosystemHealthItem('2026-08-08T05:00:12.000Z', 90),
-      createEcosystemHealthItem('2026-08-08T06:14:47.000Z', 10),
-      createEcosystemHealthItem('2026-08-08T06:41:03.000Z', 10),
-      createEcosystemHealthItem('2026-08-08T08:03:29.000Z', 50),
+      createActivityItem('2026-08-08T05:00:12.000Z', 90),
+      createActivityItem('2026-08-08T06:14:47.000Z', 10),
+      createActivityItem('2026-08-08T06:41:03.000Z', 10),
+      createActivityItem('2026-08-08T08:03:29.000Z', 50),
     ])
 
     const result = fillEmptyHourlyBuckets({ countsByHour })
@@ -941,17 +938,17 @@ describe('fillEmptyHourlyBuckets', () => {
   })
 })
 
-describe('getHealthStatsByBuckets', () => {
+describe('getActivityStatsByBuckets', () => {
   const countsByHour = getClassificationStatsByScanTime([
-    createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
-    createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 50),
-    createEcosystemHealthItem('2026-08-08T06:00:00.000Z', 10),
-    createEcosystemHealthItem('2026-08-08T06:00:00.000Z', 10),
-    createEcosystemHealthItem('2026-08-08T06:00:00.000Z', 90),
+    createActivityItem('2026-08-08T05:00:00.000Z', 90),
+    createActivityItem('2026-08-08T05:00:00.000Z', 50),
+    createActivityItem('2026-08-08T06:00:00.000Z', 10),
+    createActivityItem('2026-08-08T06:00:00.000Z', 10),
+    createActivityItem('2026-08-08T06:00:00.000Z', 90),
   ])
 
   it('sums every bucket instead of reading the last one', () => {
-    expect(getHealthStatsByBuckets(countsByHour)).toEqual({
+    expect(getActivityStatsByBuckets(countsByHour)).toEqual({
       organic: { count: 2, percentage: '40.0' },
       mixed: { count: 1, percentage: '20.0' },
       automation: { count: 2, percentage: '40.0' },
@@ -960,7 +957,7 @@ describe('getHealthStatsByBuckets', () => {
 
   it('only counts the buckets it is given', () => {
     expect(
-      getHealthStatsByBuckets(countsByHour, ['2026-08-08T05:00:00.000Z']),
+      getActivityStatsByBuckets(countsByHour, ['2026-08-08T05:00:00.000Z']),
     ).toEqual({
       organic: { count: 1, percentage: '50.0' },
       mixed: { count: 1, percentage: '50.0' },
@@ -970,11 +967,11 @@ describe('getHealthStatsByBuckets', () => {
 
   it('ignores insufficient data scans', () => {
     const counts = getClassificationStatsByScanTime([
-      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', 90),
-      createEcosystemHealthItem('2026-08-08T05:00:00.000Z', -1),
+      createActivityItem('2026-08-08T05:00:00.000Z', 90),
+      createActivityItem('2026-08-08T05:00:00.000Z', -1),
     ])
 
-    expect(getHealthStatsByBuckets(counts)).toEqual({
+    expect(getActivityStatsByBuckets(counts)).toEqual({
       organic: { count: 1, percentage: '100.0' },
       mixed: { count: 0, percentage: '0.0' },
       automation: { count: 0, percentage: '0.0' },
@@ -982,10 +979,10 @@ describe('getHealthStatsByBuckets', () => {
   })
 
   it('returns null without any data', () => {
-    expect(getHealthStatsByBuckets(undefined)).toBeNull()
-    expect(getHealthStatsByBuckets({})).toBeNull()
+    expect(getActivityStatsByBuckets(undefined)).toBeNull()
+    expect(getActivityStatsByBuckets({})).toBeNull()
     expect(
-      getHealthStatsByBuckets(countsByHour, ['2026-08-08T09:00:00.000Z']),
+      getActivityStatsByBuckets(countsByHour, ['2026-08-08T09:00:00.000Z']),
     ).toBeNull()
   })
 })

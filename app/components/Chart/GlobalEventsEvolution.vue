@@ -15,13 +15,13 @@ import { landmarks, type Landmark } from './global-events-evolution-landmarks'
 import type {
   EventsEvolutionSeries,
   VueUiXySeriesWithCounts,
-} from '~~/shared/types/ecosystem-health'
+} from '~~/shared/types/activity'
 import {
   CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
   getTotalPrScanned,
 } from '~~/shared/utils/charts.ts'
 
-const { data: ecosystemHealth } = useEcosystemHealth()
+const { data: activity } = useActivity()
 
 const chartContainer = useTemplateRef<HTMLElement>('chartContainer')
 const { width, height } = useElementSize(chartContainer)
@@ -30,16 +30,14 @@ const isMobile = useIsMobile()
 const MOBILE_SLICE_DAYS = 14
 
 const dates = computed(() =>
-  ecosystemHealth.value?.dates.slice(isMobile.value ? -MOBILE_SLICE_DAYS : 0),
+  activity.value?.dates.slice(isMobile.value ? -MOBILE_SLICE_DAYS : 0),
 )
 
 const scanTimes = computed(() =>
-  ecosystemHealth.value?.scanTimes.slice(
-    isMobile.value ? -MOBILE_SLICE_DAYS : 0,
-  ),
+  activity.value?.scanTimes.slice(isMobile.value ? -MOBILE_SLICE_DAYS : 0),
 )
 
-const countsByDate = computed(() => ecosystemHealth.value?.countsByDate)
+const countsByDate = computed(() => activity.value?.countsByDate)
 
 const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,

@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import type { EcosystemHealthDailyResponse } from '~~/shared/types/logs-api'
+import type { ActivityDailyResponse } from '~~/shared/types/logs-api'
 
 const fullHistoryFlag = (event: H3Event) => {
   return String(getQuery(event).full ?? 'false')
@@ -7,7 +7,7 @@ const fullHistoryFlag = (event: H3Event) => {
 
 export default defineCachedEventHandler(
   async (event) =>
-    fetchFromLogs<EcosystemHealthDailyResponse>('/api/health', {
+    fetchFromLogs<ActivityDailyResponse>('/api/activity', {
       query: {
         full: fullHistoryFlag(event),
       },

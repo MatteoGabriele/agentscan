@@ -1,10 +1,10 @@
 import { identityConfig } from '@unveil/identity'
 import type {
-  EcosystemHealthCategory,
-  EcosystemHealthCategoryProgression,
-} from '../types/ecosystem-health'
+  ActivityCategory,
+  ActivityCategoryProgression,
+} from '../types/activity'
 import { round } from './numbers'
-import { formatPercentage, INSUFFICIENT_DATA_SCORE } from './health-stats'
+import { formatPercentage, INSUFFICIENT_DATA_SCORE } from './activity-stats'
 import { calcLinearProgression } from './calc-linear-progression'
 
 export type ClassificationMetric = {
@@ -33,7 +33,7 @@ export const CLASSIFICATION_CATEGORIES = [
 ] as const
 
 type CategoryPercentageComparison = {
-  category: EcosystemHealthCategory
+  category: ActivityCategory
   lastDate: string | undefined
   lastCount: number | null
   lastTotal: number | null
@@ -46,7 +46,7 @@ type CategoryPercentageComparison = {
 }
 
 type CategoryPercentageComparisons = Record<
-  EcosystemHealthCategory,
+  ActivityCategory,
   CategoryPercentageComparison
 >
 
@@ -65,7 +65,7 @@ export function createEmptyClassificationStats(): ClassificationStats {
 }
 
 function getClassificationStatsByBucket(
-  data: EcosystemHealthItem[],
+  data: ActivityItem[],
   getBucketKey: (createdAt: string) => string,
 ): GetClassificationStatsByDateResults {
   const result: GetClassificationStatsByDateResults = {}
@@ -119,23 +119,20 @@ function getClassificationStatsByBucket(
 }
 
 export function getClassificationStatsByDate(
-  data: EcosystemHealthItem[] = [],
+  data: ActivityItem[] = [],
 ): GetClassificationStatsByDateResults {
   return getClassificationStatsByBucket(data, getDateKey)
 }
 
-export function getHealthStatsByBuckets(
+export function getActivityStatsByBuckets(
   countsByBucket: GetClassificationStatsByDateResults | undefined,
   buckets: string[] = Object.keys(countsByBucket ?? {}),
-): Record<
-  EcosystemHealthCategory,
-  { count: number; percentage: string }
-> | null {
+): Record<ActivityCategory, { count: number; percentage: string }> | null {
   if (!countsByBucket) {
     return null
   }
 
-  const counts: Record<EcosystemHealthCategory, number> = {
+  const counts: Record<ActivityCategory, number> = {
     organic: 0,
     mixed: 0,
     automation: 0,
@@ -181,15 +178,15 @@ export function getHealthStatsByBuckets(
 // Entries written by the same scan run share a `created_at`, so a run is
 // already its own bucket — the hourly scan gives one bucket per hour.
 export function getClassificationStatsByScanTime(
-  data: EcosystemHealthItem[] = [],
+  data: ActivityItem[] = [],
 ): GetClassificationStatsByDateResults {
   return getClassificationStatsByBucket(data, (createdAt) => createdAt)
 }
 
 export function applyCumulativeTrends(
   countsByBucket: GetClassificationStatsByDateResults,
-): EcosystemHealthCategoryProgression {
-  const percentages: Record<EcosystemHealthCategory, number[]> = {
+): ActivityCategoryProgression {
+  const percentages: Record<ActivityCategory, number[]> = {
     automation: [],
     mixed: [],
     organic: [],
@@ -335,7 +332,7 @@ function getTotalClassificationCount(
 
 function getCategoryPercentage(
   counts: ClassificationStats | undefined,
-  category: EcosystemHealthCategory,
+  category: ActivityCategory,
 ): number | null {
   if (!counts || counts.total.count === 0) {
     return null
@@ -350,7 +347,7 @@ function getCategoryPercentageComparison({
   previousDate,
   countsByDate,
 }: {
-  category: EcosystemHealthCategory
+  category: ActivityCategory
   lastDate: string | undefined
   previousDate: string | undefined
   countsByDate: GetClassificationStatsByDateResults
@@ -399,7 +396,7 @@ export function getCategoryDeltasByDate(
 }
 
 export function getCategoryDeltas(
-  results: EcosystemHealthItem[],
+  results: ActivityItem[],
 ): CategoryPercentageComparisons {
   return getCategoryDeltasByDate(getClassificationStatsByDate(results))
 }
@@ -593,7 +590,7 @@ export function getClassificationForPreviousDays({
   date,
   days,
 }: {
-  data?: EcosystemHealthItem[]
+  data?: ActivityItem[]
   date: string
   days: number
 }): ClassificationStats {
@@ -644,7 +641,7 @@ export function getWeeklyClassificationByDate(
 }
 
 export function getWeeklyClassification(
-  data: EcosystemHealthItem[] = [],
+  data: ActivityItem[] = [],
   date: string,
   rolling = true,
 ): ClassificationStats {
@@ -801,7 +798,7 @@ export function getClassificationByDateChunks({
   days = 7,
   rolling = true,
 }: {
-  data?: EcosystemHealthItem[]
+  data?: ActivityItem[]
   dates?: string[]
   days?: number
   rolling?: boolean

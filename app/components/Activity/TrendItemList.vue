@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { EcosystemHealthCategory } from '~~/shared/types/ecosystem-health'
+import type { ActivityCategory } from '~~/shared/types/activity'
 
 type ClassificationStats = Record<
-  EcosystemHealthCategory,
+  ActivityCategory,
   { count: number; percentage: string }
 >
 
@@ -12,9 +12,9 @@ const { view = 'daily' } = defineProps<{
 
 const isHourly = computed(() => view === 'hourly')
 
-const { data: ecosystemHealth } = await useEcosystemHealth()
+const { data: activity } = await useActivity()
 const { data: hourlyWindow, execute: loadHourlyWindow } =
-  useEcosystemHealthHourlyWindow({ immediate: false })
+  useActivityHourlyWindow({ immediate: false })
 
 watch(
   isHourly,
@@ -26,24 +26,24 @@ watch(
   { immediate: true },
 )
 
-const entries = computed(() => ecosystemHealth.value?.entries ?? [])
+const entries = computed(() => activity.value?.entries ?? [])
 
 const categoryProgression = computed(() => {
   return isHourly.value
     ? hourlyWindow.value?.categoryProgression
-    : ecosystemHealth.value?.categoryProgression
+    : activity.value?.categoryProgression
 })
 
 const stats = computed<ClassificationStats | null>(() => {
   if (isHourly.value) {
     // Totals over the whole scan window the hourly chart plots, not the last scan
-    return getHealthStatsByBuckets(
+    return getActivityStatsByBuckets(
       hourlyWindow.value?.countsByScanTime,
       hourlyWindow.value?.scanTimes,
     )
   }
 
-  return getDailyHealthStats(entries.value)
+  return getDailyActivityStats(entries.value)
 })
 </script>
 
@@ -52,7 +52,7 @@ const stats = computed<ClassificationStats | null>(() => {
     class="text-center flex flex-col md:flex-row gap-2 items-center md:text-left w-full justify-evenly"
   >
     <li>
-      <HealthTrend
+      <ActivityTrend
         classification="organic"
         label="Organic"
         :trend="categoryProgression?.organic.trend"
@@ -60,7 +60,7 @@ const stats = computed<ClassificationStats | null>(() => {
       />
     </li>
     <li>
-      <HealthTrend
+      <ActivityTrend
         classification="mixed"
         label="Mixed"
         :trend="categoryProgression?.mixed.trend"
@@ -68,7 +68,7 @@ const stats = computed<ClassificationStats | null>(() => {
       />
     </li>
     <li>
-      <HealthTrend
+      <ActivityTrend
         classification="automation"
         label="Automation"
         :trend="categoryProgression?.automation.trend"

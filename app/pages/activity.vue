@@ -2,7 +2,7 @@
 import {
   DEFAULT_HISTORY_MONTHS,
   WINDOW_MAX_HOURS,
-} from '~~/shared/utils/health-history-window'
+} from '~~/shared/utils/activity-history-window'
 import { libraries } from '~~/shared/daily-scan'
 import { useUrlSearchParams } from '@vueuse/core'
 
@@ -19,7 +19,7 @@ useHead({
         'A snapshot of community contribution patterns across the ecosystem.',
     },
     { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
-    { property: 'og:image', content: '/health.png' },
+    { property: 'og:image', content: '/activity.png' },
     {
       property: 'og:description',
       content:
@@ -87,7 +87,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
             </header>
 
             <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-ui-border/40">
-              <HealthTrendItemList :view="urlParams.view" />
+              <ActivityTrendItemList :view="urlParams.view" />
             </div>
 
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
