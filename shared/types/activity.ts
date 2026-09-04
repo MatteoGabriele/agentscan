@@ -4,14 +4,14 @@ import type { IdentityClassification } from '@unveil/identity'
 
 export type PrStatus = 'open' | 'closed' | 'merged'
 
-// Categories plotted on the health graph. "insufficient-data" scans are stored
+// Categories plotted on the activity graph. "insufficient-data" scans are stored
 // with a negative score and excluded from every aggregate.
-export type EcosystemHealthCategory = Exclude<
+export type ActivityCategory = Exclude<
   IdentityClassification,
   'insufficient-data'
 >
 
-export type EcosystemHealthItem = {
+export type ActivityItem = {
   created_at: string
   score: number
   pr_key: string
@@ -23,14 +23,14 @@ export type EcosystemHealthItem = {
   is_bounty: boolean
 }
 
-export type EcosystemHealthCategoryCounts = {
+export type ActivityCategoryCounts = {
   automation: number
   mixed: number
   organic: number
 }
 
-export type EcosystemHealthCategoryProgression = Record<
-  EcosystemHealthCategory,
+export type ActivityCategoryProgression = Record<
+  ActivityCategory,
   ReturnType<typeof calcLinearProgression>
 >
 
@@ -43,7 +43,7 @@ export type VueUiXySeriesWithCounts = Array<
 >
 
 export type EventsEvolutionSeries = VueUiXyDatasetItem & {
-  category: EcosystemHealthCategory
+  category: ActivityCategory
   trends: number[]
   counts: number[]
   totals: number[]

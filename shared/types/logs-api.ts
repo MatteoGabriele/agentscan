@@ -3,24 +3,21 @@
 // server/api/automation-tally here only pass them through, so these types are
 // the contract between the two.
 
-import type {
-  EcosystemHealthCategoryProgression,
-  EcosystemHealthItem,
-} from './ecosystem-health'
+import type { ActivityCategoryProgression, ActivityItem } from './activity'
 import type { GetClassificationStatsByDateResults } from '../utils/count-classification-by-date'
 import type { DailyScanEntry } from '../utils/daily-rollup'
 
-export type EcosystemHealthDailyResponse = {
+export type ActivityDailyResponse = {
   entries: DailyScanEntry[]
-  categoryProgression: EcosystemHealthCategoryProgression
+  categoryProgression: ActivityCategoryProgression
   countsByDate: GetClassificationStatsByDateResults
   dates: string[]
   scanTimes: string[]
 }
 
-export type EcosystemHealthHourlyWindowResponse = {
-  results: EcosystemHealthItem[]
-  categoryProgression: EcosystemHealthCategoryProgression
+export type ActivityHourlyWindowResponse = {
+  results: ActivityItem[]
+  categoryProgression: ActivityCategoryProgression
   countsByScanTime: GetClassificationStatsByDateResults
   scanTimes: string[]
 }
@@ -30,7 +27,7 @@ type TrmnlCategory = {
   trend: number
 }
 
-export type EcosystemHealthTrmnlResponse = {
+export type ActivityTrmnlResponse = {
   updated_at: string | null
   total_scanned: number
   week: {

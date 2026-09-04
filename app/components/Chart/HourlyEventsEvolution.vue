@@ -13,7 +13,7 @@ import { round } from '~~/shared/utils/numbers'
 import type {
   EventsEvolutionSeries,
   VueUiXySeriesWithCounts,
-} from '~~/shared/types/ecosystem-health.ts'
+} from '~~/shared/types/activity.ts'
 import {
   CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
   getTotalPrScanned,
@@ -23,7 +23,7 @@ dayjs.extend(utc)
 
 import('vue-data-ui/style.css')
 
-const { data: hourlyWindow, status } = useEcosystemHealthHourlyWindow()
+const { data: hourlyWindow, status } = useActivityHourlyWindow()
 
 const ready = shallowRef(false)
 

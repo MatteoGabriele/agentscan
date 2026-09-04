@@ -12,7 +12,7 @@ import { round } from '~~/shared/utils/numbers'
 
 import('vue-data-ui/style.css')
 
-const { data: hourly } = useEcosystemHealthHourlyWindow()
+const { data: hourly } = useActivityHourlyWindow()
 
 type ScoreDistributionRange = {
   label: string
@@ -81,7 +81,7 @@ const scoreDistributionRanges = computed<ScoreDistributionRange[]>(() => {
   })
 })
 
-function distribute(entries: EcosystemHealthItem[]) {
+function distribute(entries: ActivityItem[]) {
   const result = Object.fromEntries(
     scoreDistributionRanges.value.map((range) => [range.label, 0]),
   ) as Record<string, number>
