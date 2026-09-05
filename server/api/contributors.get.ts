@@ -1,4 +1,4 @@
-import { isKnownBot } from '~~/shared/cicd-known-bots'
+import { isGitHubAppAccount } from '@unveil/identity'
 import { projectRepositories } from '~~/shared/project-repositories'
 import type { RepositoryContributors } from '~~/shared/types/contributor'
 
@@ -21,7 +21,10 @@ export default defineEventHandler(
             label,
             url: `https://github.com/${owner}/${repo}`,
             contributors: data
-              .filter((account) => !isKnownBot(account.login ?? ''))
+              .filter(
+                (account): account is (typeof data)[number] & { id: number } =>
+                  account.id !== undefined && !isGitHubAppAccount(account),
+              )
               .map((account) => ({
                 id: account.id,
                 name: account.login ?? '',

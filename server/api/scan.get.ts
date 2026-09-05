@@ -1,5 +1,4 @@
-import { identify } from '@unveil/identity'
-import { isKnownBot } from '~~/shared/cicd-known-bots'
+import { identify, isGitHubAppAccount } from '@unveil/identity'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_COUNT } from '~~/shared/scan'
 import type { Endpoints } from '@octokit/types'
@@ -71,7 +70,7 @@ export default defineEventHandler(async (event) => {
           continue
         }
 
-        if (isKnownBot(pr.user.login)) {
+        if (isGitHubAppAccount(pr.user)) {
           continue
         }
 
