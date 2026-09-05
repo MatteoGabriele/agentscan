@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import unveilIdentityPackage from '@unveil/identity/package.json'
-
-const unveilIdentityVersion = unveilIdentityPackage.version
-</script>
-
 <template>
   <footer class="border-t border-ui-border">
     <div class="max-w-screen-lg mx-auto px-4 py-12">
@@ -148,18 +142,7 @@ const unveilIdentityVersion = unveilIdentityPackage.version
       <div
         class="border-t border-ui-border/50 mt-6 pt-6 flex flex-col md:items-center md:justify-center gap-4"
       >
-        <div class="flex gap-2">
-          <span class="text-xs text-ui-muted/60">Detection using</span>
-          <NuxtLink
-            external
-            target="_blank"
-            to="https://github.com/unveil-project/identity"
-            class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
-            :title="`@unveil/identity v${unveilIdentityVersion}`"
-          >
-            @unveil/identity v{{ unveilIdentityVersion }}
-          </NuxtLink>
-        </div>
+        <DetectionVersion show-name />
 
         <NuxtLink
           to="/privacy-policy"

@@ -243,6 +243,8 @@ useSeoAnalysis(identifyAnalysis, {
               >
               from this account
             </p>
+
+            <DetectionVersion class="hidden md:inline-flex" />
           </div>
         </template>
 
