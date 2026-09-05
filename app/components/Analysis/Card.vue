@@ -91,10 +91,6 @@ const isBountyHunter = computed<boolean>(() => {
   return !!data.value?.analysis.isBountyHunter
 })
 
-const isGitHubApp = computed<boolean>(() => {
-  return !!data.value?.analysis.isGitHubApp
-})
-
 const { nearestClassification } = useNearestClassification(score)
 
 const confidence = computed<number | undefined>(() => {
@@ -215,14 +211,6 @@ useSeoAnalysis(identifyAnalysis, {
                       {{ classificationDetails.label }}
                     </h3>
                   </div>
-
-                  <span
-                    v-if="isGitHubApp"
-                    class="flex items-center gap-1 rounded-full border-1 border-solid border-ui-border px-2 py-0.5 text-xs font-mono text-ui-muted"
-                  >
-                    <span class="i-lucide:plug text-xs" aria-hidden="true" />
-                    GitHub App
-                  </span>
                 </div>
               </div>
               <p class="mt-1 text-ui-text">
