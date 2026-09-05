@@ -181,16 +181,14 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           Which repositories
         </h3>
         <p>
-          For now, we track {{ librariesData?.total ?? 0 }}. Some we picked by
-          hand because we care about them; others were chosen at random from the
-          GitHub trending repositories page. They go from TypeScript,
-          JavaScript, Go, Python, and Rust to toolchains, frameworks, testing
-          libraries, learning websites, and even AI-related projects.
+          For now, we track {{ librariesData?.total ?? 0 }} repositories. Some
+          we picked by hand because we care about them; others were chosen at
+          random from the GitHub trending repositories page. They go from
+          TypeScript, JavaScript, Go, Python, and Rust to toolchains,
+          frameworks, testing libraries, learning websites, and even AI-related
+          projects.
         </p>
-        <p>
-          The list keeps growing. We would love to cover many more projects, but
-          we have to stay within GitHub's API rate limits.
-        </p>
+
         <ScannedRepositoryList />
       </div>
     </section>

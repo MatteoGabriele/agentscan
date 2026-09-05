@@ -6,6 +6,3 @@ minimumReleaseAgeExclude:
   - '@unveil/identity'
   - 'vue-data-ui'
   - '@unveil/vk'
-
-overrides:
-  '@unveil/vk>@unveil/identity': '2.0.4-beta.1'

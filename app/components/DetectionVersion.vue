@@ -5,7 +5,7 @@ const fullText = computed<string>(() => `${engine.name} ${engine.label}`)
 
 const tooltipLabel = computed<string>(() => {
   const base =
-    'The detection library version behind this result. Another tool running a different version can rate the same account differently.'
+    'The detection library version used for this result. A different version may score the same account differently.'
 
   if (engine.isPrerelease) {
     return `${base} This is a pre-release build.`
