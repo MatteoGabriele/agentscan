@@ -71,7 +71,7 @@ onBeforeUnmount(() => {
           </ul>
         </div>
 
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
+        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
         <LazyMainMenuItem
           class="text-xl"
@@ -79,7 +79,7 @@ onBeforeUnmount(() => {
           label="Ecosystem Activity"
         />
 
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
+        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
         <div class="flex flex-col items-center gap-3">
           <p
@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
           </ul>
         </div>
 
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/80"></div>
+        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
         <LazyMainMenuItem
           class="text-xl"
@@ -120,8 +120,6 @@ onBeforeUnmount(() => {
           label="Install AgentScan"
           @click="trackEvent('get_agentscan_clicked')"
         />
-
-        <LazyCommunityStrip class="mt-4 max-w-2/3" />
       </div>
     </div>
   </div>

@@ -2,67 +2,67 @@
   {
     "name": "nodejs/node",
     "url": "https://github.com/nodejs/node",
-    "stars": 120609,
+    "stars": 120633,
     "avatar": "https://avatars.githubusercontent.com/u/9950313?s=50&v=4"
   },
   {
     "name": "storybookjs/storybook",
     "url": "https://github.com/storybookjs/storybook",
-    "stars": 90996,
+    "stars": 91014,
     "avatar": "https://avatars.githubusercontent.com/u/22632046?s=50&v=4"
   },
   {
     "name": "vitejs/vite",
     "url": "https://github.com/vitejs/vite",
-    "stars": 82668,
+    "stars": 82690,
     "avatar": "https://avatars.githubusercontent.com/u/65625612?s=50&v=4"
   },
   {
     "name": "nuxt/nuxt",
     "url": "https://github.com/nuxt/nuxt",
-    "stars": 60815,
+    "stars": 60818,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4"
   },
   {
     "name": "DIYgod/RSSHub",
     "url": "https://github.com/DIYgod/RSSHub",
-    "stars": 46006,
+    "stars": 46037,
     "avatar": "https://avatars.githubusercontent.com/u/8266075?s=50&u=9de49c9b3eaf4db02e685458cb64b64c172034bf&v=4"
   },
   {
     "name": "babel/babel",
     "url": "https://github.com/babel/babel",
-    "stars": 43989,
+    "stars": 43991,
     "avatar": "https://avatars.githubusercontent.com/u/9637642?s=50&v=4"
   },
   {
     "name": "biomejs/biome",
     "url": "https://github.com/biomejs/biome",
-    "stars": 25704,
+    "stars": 25713,
     "avatar": "https://avatars.githubusercontent.com/u/140182603?v=4&s=50"
   },
   {
     "name": "vueuse/vueuse",
     "url": "https://github.com/vueuse/vueuse",
-    "stars": 22341,
+    "stars": 22342,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50"
   },
   {
     "name": "vitest-dev/vitest",
     "url": "https://github.com/vitest-dev/vitest",
-    "stars": 17044,
+    "stars": 17054,
     "avatar": "https://avatars.githubusercontent.com/u/95747107?s=50&v=4"
   },
   {
     "name": "aio-libs/aiohttp",
     "url": "https://github.com/aio-libs/aiohttp",
-    "stars": 16533,
+    "stars": 16532,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?s=50&v=4"
   },
   {
     "name": "typescript-eslint/typescript-eslint",
     "url": "https://github.com/typescript-eslint/typescript-eslint",
-    "stars": 16377,
+    "stars": 16381,
     "avatar": "https://avatars.githubusercontent.com/u/46634674?s=50&v=4"
   },
   {
@@ -74,13 +74,13 @@
   {
     "name": "dubzzz/fast-check",
     "url": "https://github.com/dubzzz/fast-check",
-    "stars": 5132,
+    "stars": 5136,
     "avatar": "https://avatars.githubusercontent.com/u/5300235?v=4&s=50"
   },
   {
     "name": "npmx-dev/npmx.dev",
     "url": "https://github.com/npmx-dev/npmx.dev",
-    "stars": 3612,
+    "stars": 3611,
     "avatar": "https://avatars.githubusercontent.com/u/257109910?v=4&s=50"
   },
   {
@@ -98,7 +98,7 @@
   {
     "name": "nuxt/movies",
     "url": "https://github.com/nuxt/movies",
-    "stars": 2216,
+    "stars": 2217,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4"
   },
   {
@@ -116,7 +116,7 @@
   {
     "name": "nuxt-modules/color-mode",
     "url": "https://github.com/nuxt-modules/color-mode",
-    "stars": 1226,
+    "stars": 1225,
     "avatar": "https://avatars.githubusercontent.com/u/111748132?s=50&v=4"
   },
   {
@@ -152,7 +152,7 @@
   {
     "name": "danielroe/beasties",
     "url": "https://github.com/danielroe/beasties",
-    "stars": 693,
+    "stars": 695,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
@@ -164,7 +164,7 @@
   {
     "name": "nuxt/fonts",
     "url": "https://github.com/nuxt/fonts",
-    "stars": 599,
+    "stars": 600,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4"
   },
   {
@@ -206,7 +206,7 @@
   {
     "name": "nuxt-modules/ionic",
     "url": "https://github.com/nuxt-modules/ionic",
-    "stars": 456,
+    "stars": 457,
     "avatar": "https://avatars.githubusercontent.com/u/111748132?s=50&v=4"
   },
   {
@@ -222,16 +222,16 @@
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
-    "name": "nuxt/test-utils",
-    "url": "https://github.com/nuxt/test-utils",
-    "stars": 439,
-    "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4"
-  },
-  {
     "name": "nuxt-modules/fontaine",
     "url": "https://github.com/nuxt-modules/fontaine",
-    "stars": 437,
+    "stars": 438,
     "avatar": "https://avatars.githubusercontent.com/u/111748132?s=50&v=4"
+  },
+  {
+    "name": "nuxt/test-utils",
+    "url": "https://github.com/nuxt/test-utils",
+    "stars": 438,
+    "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4"
   },
   {
     "name": "vueuse/vue-chemistry",
@@ -470,7 +470,7 @@
   {
     "name": "danielroe/uppt",
     "url": "https://github.com/danielroe/uppt",
-    "stars": 170,
+    "stars": 171,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
@@ -572,7 +572,7 @@
   {
     "name": "danielroe/errx",
     "url": "https://github.com/danielroe/errx",
-    "stars": 94,
+    "stars": 95,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
@@ -598,6 +598,12 @@
     "url": "https://github.com/danielroe/n3rdle",
     "stars": 90,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
+  },
+  {
+    "name": "roostorg/coop",
+    "url": "https://github.com/roostorg/coop",
+    "stars": 90,
+    "avatar": "https://avatars.githubusercontent.com/u/189051351?s=50&v=4"
   },
   {
     "name": "danielroe/rollup-plugin-pure",
@@ -648,16 +654,16 @@
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
+    "name": "npmx-dev/vscode-npmx",
+    "url": "https://github.com/npmx-dev/vscode-npmx",
+    "stars": 73,
+    "avatar": "https://avatars.githubusercontent.com/u/257109910?v=4&s=50"
+  },
+  {
     "name": "danielroe/empathy",
     "url": "https://github.com/danielroe/empathy",
     "stars": 71,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
-  },
-  {
-    "name": "npmx-dev/vscode-npmx",
-    "url": "https://github.com/npmx-dev/vscode-npmx",
-    "stars": 71,
-    "avatar": "https://avatars.githubusercontent.com/u/257109910?v=4&s=50"
   },
   {
     "name": "redspah/HATE",
@@ -669,6 +675,12 @@
     "name": "danielroe/nuxt-rebundle",
     "url": "https://github.com/danielroe/nuxt-rebundle",
     "stars": 64,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
+  },
+  {
+    "name": "danielroe/my-bad",
+    "url": "https://github.com/danielroe/my-bad",
+    "stars": 63,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
@@ -780,6 +792,12 @@
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50"
   },
   {
+    "name": "unveil-project/identity",
+    "url": "https://github.com/unveil-project/identity",
+    "stars": 43,
+    "avatar": "https://avatars.githubusercontent.com/u/272005597?v=4&s=50"
+  },
+  {
     "name": "node-modules/optimized",
     "url": "https://github.com/node-modules/optimized",
     "stars": 42,
@@ -790,12 +808,6 @@
     "url": "https://github.com/node-modules/stream-wormhole",
     "stars": 42,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50"
-  },
-  {
-    "name": "unveil-project/identity",
-    "url": "https://github.com/unveil-project/identity",
-    "stars": 42,
-    "avatar": "https://avatars.githubusercontent.com/u/272005597?v=4&s=50"
   },
   {
     "name": "node-modules/copy-to",
@@ -814,6 +826,12 @@
     "url": "https://github.com/redspah/meow_hash_cpp",
     "stars": 40,
     "avatar": "https://avatars.githubusercontent.com/u/11236384?v=4&s=50"
+  },
+  {
+    "name": "e18e/framework-tracker",
+    "url": "https://github.com/e18e/framework-tracker",
+    "stars": 39,
+    "avatar": "https://avatars.githubusercontent.com/u/166689785?s=50&v=4"
   },
   {
     "name": "danielroe/spooon",
@@ -1020,15 +1038,15 @@
     "avatar": "https://avatars.githubusercontent.com/u/261795258?v=4&s=50"
   },
   {
-    "name": "danielroe/nuxt-vue3-module",
-    "url": "https://github.com/danielroe/nuxt-vue3-module",
+    "name": "danielroe/clickable-path",
+    "url": "https://github.com/danielroe/clickable-path",
     "stars": 21,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
-    "name": "danielroe/clickable-path",
-    "url": "https://github.com/danielroe/clickable-path",
-    "stars": 20,
+    "name": "danielroe/nuxt-vue3-module",
+    "url": "https://github.com/danielroe/nuxt-vue3-module",
+    "stars": 21,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
@@ -1336,12 +1354,6 @@
     "url": "https://github.com/node-modules/install-node",
     "stars": 8,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50"
-  },
-  {
-    "name": "danielroe/my-bad",
-    "url": "https://github.com/danielroe/my-bad",
-    "stars": 7,
-    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50"
   },
   {
     "name": "danielroe/nuxt-site-template",
