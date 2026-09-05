@@ -1,9 +1,6 @@
 // @unocss-include
 import { identityConfig, type IdentityClassification } from '@unveil/identity'
-import type {
-  EcosystemHealthCategory,
-  EcosystemHealthItem,
-} from '../types/ecosystem-health'
+import type { ActivityCategory, ActivityItem } from '../types/activity'
 import { round } from './numbers'
 
 export const INSUFFICIENT_DATA_SCORE = -1
@@ -38,12 +35,9 @@ export function formatProgressionPoints(value: number) {
   return `${sign}${rounded}${unit}`
 }
 
-export function getHealthStats(
-  data: EcosystemHealthItem[] = [],
-): Record<
-  EcosystemHealthCategory,
-  { count: number; percentage: string }
-> | null {
+export function getActivityStats(
+  data: ActivityItem[] = [],
+): Record<ActivityCategory, { count: number; percentage: string }> | null {
   if (!data.length) {
     return null
   }
@@ -55,16 +49,14 @@ export function getHealthStats(
     return null
   }
 
-  const counts: Record<EcosystemHealthCategory, number> = {
+  const counts: Record<ActivityCategory, number> = {
     organic: 0,
     mixed: 0,
     automation: 0,
   }
 
   scored.forEach((item) => {
-    const classification = classifyByScore(
-      item.score,
-    ) as EcosystemHealthCategory
+    const classification = classifyByScore(item.score) as ActivityCategory
     counts[classification]++
   })
 

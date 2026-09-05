@@ -1,9 +1,6 @@
 import type { IdentityClassification } from '@unveil/identity'
-import type {
-  EcosystemHealthCategory,
-  PrStatus,
-} from '../types/ecosystem-health'
-import { formatPercentage } from './health-stats'
+import type { ActivityCategory, PrStatus } from '../types/activity'
+import { formatPercentage } from './activity-stats'
 import { CLASSIFICATION_CATEGORIES } from './count-classification-by-date'
 
 export type DailyClassificationCounts = {
@@ -19,13 +16,10 @@ export type DailyScanEntry = {
   classifications: Record<IdentityClassification, DailyClassificationCounts>
 }
 
-export function getDailyHealthStats(
+export function getDailyActivityStats(
   entries: DailyScanEntry[],
-): Record<
-  EcosystemHealthCategory,
-  { count: number; percentage: string }
-> | null {
-  const counts: Record<EcosystemHealthCategory, number> = {
+): Record<ActivityCategory, { count: number; percentage: string }> | null {
+  const counts: Record<ActivityCategory, number> = {
     organic: 0,
     mixed: 0,
     automation: 0,

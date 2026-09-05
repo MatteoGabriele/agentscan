@@ -69,10 +69,10 @@ function showRest() {
         </li>
 
         <li v-if="restItemsCount" class="md:-mx-1 hover:z-10">
-          <Tooltip v-if="moreUrl" :label="`See all ${items.length} on GitHub`">
+          <Tooltip v-if="moreUrl" :label="`See all ${items.length}`">
             <NuxtLink
               :to="moreUrl"
-              :aria-label="`See all ${items.length} on GitHub`"
+              :aria-label="`See all ${items.length}`"
               class="flex items-center justify-center size-7.5 rounded-full ring-2 ring-ui-bg bg-ui-bg border border-ui-border/40 text-[0.65rem] font-medium tabular-nums text-ui-muted hover:text-ui-text hover:scale-115 transition-all"
             >
               +{{ restItemsCount }}

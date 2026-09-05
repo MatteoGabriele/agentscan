@@ -1,4 +1,4 @@
-import type { VueUiXySeriesWithCounts } from '../types/ecosystem-health'
+import type { VueUiXySeriesWithCounts } from '../types/activity'
 
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
@@ -60,7 +60,7 @@ export const SVG_ICON = {
 
 export const CLASSIFICATIONS_WITH_NAME_AND_CATEGORY: Array<{
   name: string
-  category: EcosystemHealthCategory
+  category: ActivityCategory
 }> = [
   { name: 'Organic', category: 'organic' },
   { name: 'Mixed', category: 'mixed' },

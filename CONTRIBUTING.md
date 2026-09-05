@@ -63,7 +63,7 @@ data/
 
 The hourly GitHub scan, the data it writes and the endpoints that serve it live
 in [agentscan-logs](https://github.com/MatteoGabriele/agentscan-logs). The
-routes under `server/api/health/` and `server/api/automation-tally` here are
+routes under `server/api/activity/` and `server/api/automation-tally` here are
 pass-throughs to that service.
 
 ## Making changes

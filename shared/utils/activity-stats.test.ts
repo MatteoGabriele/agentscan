@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import type { EcosystemHealthItem } from '../types/ecosystem-health'
+import type { ActivityItem } from '../types/activity'
 import {
   classifyByScore,
   formatTrend,
-  getHealthStats,
+  getActivityStats,
   formatProgressionPoints,
   INSUFFICIENT_DATA_SCORE,
-} from './health-stats'
-import { MOCK_ECOSYSTEM_HEALTH_ITEMS } from '../../test/unit/mocks/ecosystem-health-items'
+} from './activity-stats'
+import { MOCK_ACTIVITY_ITEMS } from '../../test/unit/mocks/activity-items'
 
 describe('formatTrend', () => {
   it('formats a ratio to a signed and rounded percentage string', () => {
@@ -35,9 +35,9 @@ describe('classifyByScore', () => {
   })
 })
 
-describe('getHealthStats', () => {
+describe('getActivityStats', () => {
   it('returns a classified dataset from ecosystem data', () => {
-    const result = getHealthStats(MOCK_ECOSYSTEM_HEALTH_ITEMS)
+    const result = getActivityStats(MOCK_ACTIVITY_ITEMS)
     expect(result).not.toBeNull()
     Object.values(result!).forEach((value) => {
       expect(value).toEqual(
@@ -54,9 +54,9 @@ describe('getHealthStats', () => {
       { score: 100 },
       { score: 0 },
       { score: INSUFFICIENT_DATA_SCORE },
-    ] as EcosystemHealthItem[]
+    ] as ActivityItem[]
 
-    const result = getHealthStats(items)
+    const result = getActivityStats(items)
 
     expect(result!.organic).toEqual({ count: 1, percentage: '50.0' })
     expect(result!.automation).toEqual({ count: 1, percentage: '50.0' })
@@ -67,9 +67,9 @@ describe('getHealthStats', () => {
     const items = [
       { score: INSUFFICIENT_DATA_SCORE },
       { score: INSUFFICIENT_DATA_SCORE },
-    ] as EcosystemHealthItem[]
+    ] as ActivityItem[]
 
-    expect(getHealthStats(items)).toBeNull()
+    expect(getActivityStats(items)).toBeNull()
   })
 })
 

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-const { position = 'top' } = defineProps<{
+const { position = 'top', wide = false } = defineProps<{
   label: string
   position?: 'top' | 'bottom'
+  wide?: boolean
 }>()
 
 const positionClasses = computed<string>(() => {
@@ -10,6 +11,14 @@ const positionClasses = computed<string>(() => {
   }
 
   return 'top-full mt-2'
+})
+
+const widthClasses = computed<string>(() => {
+  if (wide) {
+    return 'w-60 whitespace-normal text-pretty leading-relaxed'
+  }
+
+  return 'whitespace-nowrap'
 })
 </script>
 
@@ -20,8 +29,8 @@ const positionClasses = computed<string>(() => {
     <span
       v-if="label"
       role="tooltip"
-      class="absolute left-1/2 z-20 -translate-x-1/2 pointer-events-none whitespace-nowrap rounded-2 border-1 border-solid border-ui-border/60 bg-ui-card px-2 py-1 text-xs font-medium text-ui-text opacity-0 transition-opacity duration-150 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100"
-      :class="positionClasses"
+      class="absolute left-1/2 z-20 -translate-x-1/2 pointer-events-none rounded-2 border-1 border-solid border-ui-border/60 bg-ui-card px-2 py-1 text-xs font-medium text-ui-text opacity-0 transition-opacity duration-150 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100"
+      :class="[positionClasses, widthClasses]"
     >
       {{ label }}
     </span>

@@ -2,8 +2,7 @@
 import {
   DEFAULT_HISTORY_MONTHS,
   WINDOW_MAX_HOURS,
-} from '~~/shared/utils/health-history-window'
-import { libraries } from '~~/shared/daily-scan'
+} from '~~/shared/utils/activity-history-window'
 import { useUrlSearchParams } from '@vueuse/core'
 
 definePageMeta({
@@ -19,7 +18,7 @@ useHead({
         'A snapshot of community contribution patterns across the ecosystem.',
     },
     { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
-    { property: 'og:image', content: '/health.png' },
+    { property: 'og:image', content: '/activity.png' },
     {
       property: 'og:description',
       content:
@@ -35,6 +34,8 @@ type ChartRangeOption = {
   label: string
   caption: string
 }
+
+const { data: librariesData } = await useLibraries()
 
 const isMobile = useIsMobile()
 
@@ -87,7 +88,7 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
             </header>
 
             <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-ui-border/40">
-              <HealthTrendItemList :view="urlParams.view" />
+              <ActivityTrendItemList :view="urlParams.view" />
             </div>
 
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
@@ -180,16 +181,14 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           Which repositories
         </h3>
         <p>
-          For now, we track {{ libraries.length }} repositories. Some we picked
-          by hand because we care about them; others were chosen at random from
-          the GitHub trending repositories page. They go from TypeScript,
-          JavaScript, Go, Python, and Rust to toolchains, frameworks, testing
-          libraries, learning websites, and even AI-related projects.
+          For now, we track {{ librariesData?.total ?? 0 }} repositories. Some
+          we picked by hand because we care about them; others were chosen at
+          random from the GitHub trending repositories page. They go from
+          TypeScript, JavaScript, Go, Python, and Rust to toolchains,
+          frameworks, testing libraries, learning websites, and even AI-related
+          projects.
         </p>
-        <p>
-          The list keeps growing. We would love to cover many more projects, but
-          we have to stay within GitHub's API rate limits.
-        </p>
+
         <ScannedRepositoryList />
       </div>
     </section>

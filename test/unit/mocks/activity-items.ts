@@ -1,6 +1,6 @@
-import type { EcosystemHealthItem } from '../../../shared/types/ecosystem-health'
+import type { ActivityItem } from '../../../shared/types/activity'
 
-export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
+export const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
   {
     created_at: '2026-05-26T19:27:30.519Z',
     score: 100,
@@ -70,5 +70,5 @@ export const MOCK_ECOSYSTEM_HEALTH_ITEMS: EcosystemHealthItem[] = [
 ]
 
 export const EXPECTED_NB_UNIQUE_REPOS = new Set(
-  MOCK_ECOSYSTEM_HEALTH_ITEMS.map((s) => s.repo_name),
+  MOCK_ACTIVITY_ITEMS.map((s) => s.repo_name),
 ).size

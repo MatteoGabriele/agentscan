@@ -15,9 +15,9 @@ import('vue-data-ui/style.css')
 
 dayjs.extend(isoWeek)
 
-type EcosystemHealthCategory = 'organic' | 'mixed' | 'automation'
+type ActivityCategory = 'organic' | 'mixed' | 'automation'
 
-type EcosystemHealthHeatmapSource = {
+type ActivityHeatmapSource = {
   dates: string[]
   countsByDate: Record<
     string,
@@ -35,7 +35,7 @@ type EcosystemHealthHeatmapSource = {
   >
 }
 
-const { data: ecosystemHealth } = await useEcosystemHealth()
+const { data: activity } = await useActivity()
 const rootEl = shallowRef<HTMLElement | null>(null)
 
 onMounted(() => {
@@ -60,7 +60,7 @@ const dayIndexes = daysOfWeek.reduce(
   {} as Record<string, number>,
 )
 
-const timestamps = computed(() => ecosystemHealth.value?.dates ?? [])
+const timestamps = computed(() => activity.value?.dates ?? [])
 
 const weekKeys = computed(() => {
   return [
@@ -83,7 +83,7 @@ const weekLabels = computed(() => {
 
 const heatmapSeries = computed(
   (): Array<{
-    key: EcosystemHealthCategory
+    key: ActivityCategory
     name: string
     color: string
   }> => [
@@ -106,12 +106,12 @@ const heatmapSeries = computed(
 )
 
 function createHeatmapDataset(
-  ecosystemHealth: EcosystemHealthHeatmapSource,
-  category: EcosystemHealthCategory,
+  activity: ActivityHeatmapSource,
+  category: ActivityCategory,
 ): VueUiHeatmapDatasetItem[] {
   const valuesByWeekAndDay = new Map<string, number[]>()
 
-  ecosystemHealth.dates.forEach((dateString) => {
+  activity.dates.forEach((dateString) => {
     const date = dayjs(dateString)
     const weekKey = date.startOf('isoWeek').format('YYYY-MM-DD')
     const dayIndex = date.isoWeekday() - 1
@@ -120,7 +120,7 @@ function createHeatmapDataset(
       valuesByWeekAndDay.get(weekKey) ?? Array<number>(7).fill(0)
 
     weekValues[dayIndex] =
-      ecosystemHealth.countsByDate[dateString]?.[category]?.percentage ?? 0
+      activity.countsByDate[dateString]?.[category]?.percentage ?? 0
 
     valuesByWeekAndDay.set(weekKey, weekValues)
   })
@@ -201,9 +201,9 @@ const heatmaps = computed(() => {
   return heatmapSeries.value.map((seriesItem) => ({
     name: seriesItem.name,
     color: seriesItem.color,
-    dataset: ecosystemHealth.value
+    dataset: activity.value
       ? createHeatmapDataset(
-          ecosystemHealth.value as EcosystemHealthHeatmapSource,
+          activity.value as ActivityHeatmapSource,
           seriesItem.key,
         )
       : [],

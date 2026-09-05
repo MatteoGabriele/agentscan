@@ -22,7 +22,7 @@ const repo = computed<string>(() => {
 const { data, status, error } = useAsyncData(
   () => `scan-${repo.value}`,
   () => {
-    return $fetch(`/api/scan`, {
+    return $fetch('/api/scan', {
       query: {
         repo: repo.value,
       },

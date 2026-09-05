@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 
 import('vue-data-ui/style.css')
 
-const { data: hourlyWindow } = await useEcosystemHealthHourlyWindow()
+const { data: hourlyWindow } = await useActivityHourlyWindow()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 const colors = useColors(rootEl)

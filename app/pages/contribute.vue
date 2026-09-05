@@ -94,6 +94,17 @@ const contributions: Contribution[] = [
 
 const { trackEvent } = useSaEvent()
 
+const { data: repositories, status: repositoriesStatus } =
+  await useContributorsList()
+
+const contributorsCount = computed<number>(() => {
+  const everyone = (repositories.value ?? []).flatMap((repository) =>
+    repository.contributors.map((person) => person.name),
+  )
+
+  return new Set(everyone).size
+})
+
 useHead({
   title: 'Contribute | AgentScan',
   meta: [
@@ -115,6 +126,95 @@ useHead({
       improving the copy or the UI, sharpening the analysis, or finding a bug.
     </p>
   </header>
+
+  <section
+    v-if="repositoriesStatus === 'pending' || contributorsCount"
+    class="mt-12"
+  >
+    <div class="flex items-baseline gap-2">
+      <h2 class="text-base font-semibold">Already contributing</h2>
+      <span v-if="contributorsCount" class="text-xs text-ui-muted tabular-nums">
+        {{ contributorsCount }} people
+      </span>
+    </div>
+
+    <p class="mt-2 text-sm leading-relaxed text-ui-muted">
+      The people who have shipped code to the repositories behind AgentScan,
+      split up by project.
+    </p>
+
+    <ul class="mt-6 grid gap-4 md:grid-cols-3">
+      <template v-if="repositoriesStatus === 'pending'">
+        <li
+          v-for="index in 3"
+          :key="`repository-skeleton-${index}`"
+          class="border border-ui-border/50 rounded-lg bg-white/1 p-6"
+        >
+          <Skeleton width="w-32" height="h-4" />
+
+          <ul class="mt-4 flex flex-wrap gap-y-1.5">
+            <li
+              v-for="avatar in 6"
+              :key="`avatar-skeleton-${avatar}`"
+              class="-mx-1"
+            >
+              <Skeleton width="w-7.5" height="h-7.5" rounded="full" />
+            </li>
+          </ul>
+        </li>
+      </template>
+
+      <li
+        v-for="repository in repositories"
+        v-else
+        :key="repository.repo"
+        class="border border-ui-border/50 rounded-lg bg-white/1 p-6 hover:border-ui-border transition-colors"
+      >
+        <div class="flex items-baseline justify-between gap-2">
+          <NuxtLink
+            external
+            target="_blank"
+            rel="noopener"
+            :to="repository.url"
+            class="text-sm font-semibold hover:underline"
+            @click="
+              trackEvent('contribute_link_clicked', { link: repository.url })
+            "
+          >
+            {{ repository.label }}
+          </NuxtLink>
+
+          <span class="text-xs text-ui-muted tabular-nums">
+            {{ repository.contributors.length }}
+          </span>
+        </div>
+
+        <ul class="mt-4 flex flex-wrap gap-y-1.5">
+          <li
+            v-for="person in repository.contributors"
+            :key="person.id"
+            class="-mx-1 hover:z-10"
+          >
+            <Tooltip :label="person.name">
+              <NuxtLink
+                external
+                target="_blank"
+                rel="noopener"
+                :to="person.url"
+                class="block size-7.5 overflow-hidden rounded-full bg-ui-card ring-2 ring-ui-bg hover:scale-115 transition-all"
+              >
+                <img
+                  :src="person.avatar"
+                  :alt="person.name"
+                  class="size-full"
+                />
+              </NuxtLink>
+            </Tooltip>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
 
   <ul class="mt-12 flex flex-col gap-4">
     <li

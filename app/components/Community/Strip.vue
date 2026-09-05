@@ -1,11 +1,23 @@
 <script setup lang="ts">
-const maxVisibleRepositories = 9
+const maxVisibleItems = 9
 
 const { data: contributors, status: contributorsStatus } =
   await useContributorsList()
 const { data: adopters, status: adoptersStatus } = await useAdopters()
 
-const people = computed<AvatarStackItem[]>(() => contributors.value ?? [])
+const people = computed<AvatarStackItem[]>(() => {
+  const everyone = (contributors.value ?? []).flatMap(
+    (repository) => repository.contributors,
+  )
+
+  return [...new Map(everyone.map((person) => [person.name, person])).values()]
+    .sort((a, b) => b.contributions - a.contributions)
+    .map((person) => ({
+      name: person.name,
+      avatar: person.avatar,
+      url: person.url,
+    }))
+})
 
 const projects = computed<AvatarStackItem[]>(() => {
   return (adopters.value ?? []).map((repository) => ({
@@ -27,6 +39,8 @@ const showProjects = computed<boolean>(() => {
       label="Built by"
       :items="people"
       :pending="contributorsStatus === 'pending'"
+      :max="maxVisibleItems"
+      more-url="/contribute"
     />
 
     <template v-if="showProjects">
@@ -39,7 +53,7 @@ const showProjects = computed<boolean>(() => {
         label="Used by"
         :items="projects"
         :pending="adoptersStatus === 'pending'"
-        :max="maxVisibleRepositories"
+        :max="maxVisibleItems"
         more-url="/adopters"
       />
     </template>
