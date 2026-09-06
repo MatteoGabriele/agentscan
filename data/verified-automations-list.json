@@ -681,5 +681,19 @@
       "ematipico",
       "trueberryless"
     ]
+  },
+  {
+    "username": "cryptotify",
+    "id": 322678619,
+    "reason": "Spamming hundreds of major projects with possible scam links to random resources.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/427",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-09-06",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "danielroe",
+      "trueberryless"
+    ]
   }
 ]
