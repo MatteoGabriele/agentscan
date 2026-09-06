@@ -15,9 +15,7 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-        '@vue/devtools-core',
-        '@vue/devtools-kit',
-        'dayjs', // CJS
+        'dayjs',
         '@unveil/identity',
         '@vueuse/core',
         'vue-data-ui/vue-ui-xy',
