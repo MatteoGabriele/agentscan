@@ -279,8 +279,8 @@ const { copy, copied } = useClipboard({ source: yaml })
         <div>
           <p class="text-sm font-medium text-ui-text">Allowed users</p>
           <p class="text-xs text-ui-muted mt-1">
-            GitHub usernames to exclude from scanning. Major known CI bots (e.g.
-            dependabot[bot]) are already excluded by default.
+            GitHub usernames to exclude from scanning. GitHub Apps (e.g.
+            dependabot[bot]) are detected automatically and never flagged.
           </p>
         </div>
         <div class="self-start">

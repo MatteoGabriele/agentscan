@@ -204,11 +204,13 @@ useSeoAnalysis(identifyAnalysis, {
                   </ul>
                 </div>
 
-                <div class="flex gap-2 items-center" :class="scoreStyle.text">
-                  <span :class="classificationIcon" class="text-base" />
-                  <h3 class="text-xl font-mono">
-                    {{ classificationDetails.label }}
-                  </h3>
+                <div class="flex flex-wrap gap-2 items-center">
+                  <div class="flex gap-2 items-center" :class="scoreStyle.text">
+                    <span :class="classificationIcon" class="text-base" />
+                    <h3 class="text-xl font-mono">
+                      {{ classificationDetails.label }}
+                    </h3>
+                  </div>
                 </div>
               </div>
               <p class="mt-1 text-ui-text">
