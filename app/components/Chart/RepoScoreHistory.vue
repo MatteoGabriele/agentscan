@@ -265,16 +265,17 @@ function getTooltipTimeLabel(index: number): string {
   return tooltipTimeLabels.value[index] ?? ''
 }
 
+function getScoreColor(score: number) {
+  return score >= 70
+    ? colors.value.organic
+    : score >= 50 && score < 70
+      ? colors.value.mixed
+      : colors.value.automation
+}
+
 function getDatapointScore(datapoint: VueUiXyTooltipSlotProps['datapoint']) {
   const score = Math.round((datapoint[0] ?? { value: 0 }).value ?? 0)
-
-  const color =
-    score >= 70
-      ? colors.value.organic
-      : score >= 50 && score < 70
-        ? colors.value.mixed
-        : colors.value.automation
-
+  const color = getScoreColor(score)
   return {
     score,
     color,
@@ -796,7 +797,21 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               </td>
 
               <td class="px-2 py-3 text-right tabular-nums sm:px-4">
-                {{ sparkline.averageScore }}
+                <div class="flex items-center justify-end gap-2">
+                  <div class="w-2 h-2">
+                    <svg viewBox="0 0 2 2" class="w-full h-full">
+                      <circle
+                        :cx="1"
+                        :cy="1"
+                        :r="1"
+                        :fill="getScoreColor(sparkline.averageScore)"
+                      />
+                    </svg>
+                  </div>
+                  <span>
+                    {{ sparkline.averageScore }}
+                  </span>
+                </div>
               </td>
 
               <td
