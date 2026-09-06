@@ -504,9 +504,10 @@ function getSparklineConfig(item: RepoRow) {
           <path
             :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.3 - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.3 - 2}`"
             :stroke="colors.organic"
-            stroke-width="1"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            fill="none"
           />
 
           <text
@@ -520,9 +521,10 @@ function getSparklineConfig(item: RepoRow) {
           <path
             :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.3 + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.3 + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.5 - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.5 - 2}`"
             :stroke="colors.mixed"
-            stroke-width="1"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            fill="none"
           />
 
           <text
@@ -536,9 +538,10 @@ function getSparklineConfig(item: RepoRow) {
           <path
             :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.5 + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.5 + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height - 2}`"
             :stroke="colors.automation"
-            stroke-width="1"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            fill="none"
           />
 
           <text
