@@ -45,11 +45,11 @@ importers:
         specifier: ^66.10.0
         version: 66.10.0
       '@unveil/identity':
-        specifier: 2.0.5-beta.1
-        version: 2.0.5-beta.1
+        specifier: 2.1.0
+        version: 2.1.0
       '@unveil/vk':
         specifier: ^0.6.0
-        version: 0.6.0(@unveil/identity@2.0.5-beta.1)
+        version: 0.6.0(@unveil/identity@2.1.0)
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.35(typescript@6.0.3))
@@ -2831,8 +2831,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@unveil/identity@2.0.5-beta.1':
-    resolution: {integrity: sha512-C5iReyszt607RliuAjO5Z7WtGZNpWVBWHsxJcEb4F34BkwK/4tu/4EYMZt+nkHcufIzFZZpk8mY09KsXGm68/A==}
+  '@unveil/identity@2.1.0':
+    resolution: {integrity: sha512-2lnXAOKRZQ3OkCwlfMqD5uQ5UE5H96ab89Z0TOlJwSNanAn/5ERMeM1amkOrvMhRgNOkWwMdgLWk1Xikfc8ZQQ==}
 
   '@unveil/vk@0.6.0':
     resolution: {integrity: sha512-G/uX3QdnPCGsBPxTrBZJ86JaBy3qeGKtijk2SPKx5Gro7NbYu2+PyNMZ+Or5JJQIxR389CpH0gf0tN+S1Sdhmg==}
@@ -9629,11 +9629,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@unveil/identity@2.0.5-beta.1': {}
+  '@unveil/identity@2.1.0': {}
 
-  '@unveil/vk@0.6.0(@unveil/identity@2.0.5-beta.1)':
+  '@unveil/vk@0.6.0(@unveil/identity@2.1.0)':
     dependencies:
-      '@unveil/identity': 2.0.5-beta.1
+      '@unveil/identity': 2.1.0
 
   '@valibot/to-json-schema@1.7.1(valibot@1.4.2(typescript@6.0.3))':
     dependencies:
@@ -9801,7 +9801,7 @@ snapshots:
 
   '@vue/compiler-core@3.5.40':
     dependencies:
-      '@babel/parser': 7.29.7
+      '@babel/parser': 7.29.8
       '@vue/shared': 3.5.40
       entities: 7.0.1
       estree-walker: 2.0.2
@@ -9844,14 +9844,14 @@ snapshots:
 
   '@vue/compiler-sfc@3.5.40':
     dependencies:
-      '@babel/parser': 7.29.7
+      '@babel/parser': 7.29.8
       '@vue/compiler-core': 3.5.40
       '@vue/compiler-dom': 3.5.40
       '@vue/compiler-ssr': 3.5.40
       '@vue/shared': 3.5.40
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.23
+      postcss: 8.5.28
       source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.5.35':
@@ -10038,9 +10038,9 @@ snapshots:
     dependencies:
       acorn: 8.16.0
 
-  acorn-import-phases@1.0.4(acorn@8.16.0):
+  acorn-import-phases@1.0.4(acorn@8.18.0):
     dependencies:
-      acorn: 8.16.0
+      acorn: 8.18.0
 
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:
@@ -11237,7 +11237,7 @@ snapshots:
       buffer-image-size: 0.6.4
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
-      ws: 8.21.0
+      ws: 8.21.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -11708,8 +11708,8 @@ snapshots:
 
   magicast@0.5.4:
     dependencies:
-      '@babel/parser': 7.29.7
-      '@babel/types': 7.29.7
+      '@babel/parser': 7.29.8
+      '@babel/types': 7.29.8
       source-map-js: 1.2.1
 
   markdown-it-task-lists@2.1.1: {}
@@ -13172,7 +13172,7 @@ snapshots:
   terser@5.46.0:
     dependencies:
       '@jridgewell/source-map': 0.3.11
-      acorn: 8.16.0
+      acorn: 8.18.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -13862,8 +13862,8 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@webassemblyjs/wasm-edit': 1.14.1
       '@webassemblyjs/wasm-parser': 1.14.1
-      acorn: 8.16.0
-      acorn-import-phases: 1.0.4(acorn@8.16.0)
+      acorn: 8.18.0
+      acorn-import-phases: 1.0.4(acorn@8.18.0)
       browserslist: 4.28.7
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.20.1
