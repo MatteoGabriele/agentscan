@@ -183,7 +183,6 @@ const configLine = computed<VueUiXyConfig>(() => ({
     backgroundColor: colors.value.bg,
     color: colors.value.text,
     padding: {
-      top: 48,
       right: 48,
     },
     grid: {
@@ -472,6 +471,29 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
     <ClientOnly>
       <!-- REPO CHART VIEW -->
       <div v-if="!isAllRepos && !pending && !error">
+        <div class="flex flex-row gap-2 justify-center mt-8">
+          <Tooltip label="Open repository scan">
+            <NuxtLink
+              :to="`/scan/${encodeURIComponent(selectedRepo)}`"
+              class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+              :aria-label="`Open repository scan for ${selectedRepo}`"
+            >
+              <span class="i-lucide:scan-search text-sm" aria-hidden="true" />
+            </NuxtLink>
+          </Tooltip>
+
+          <Tooltip label="Open repository on GitHub">
+            <a
+              :href="`https://github.com/${selectedRepo}`"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+              :aria-label="`Open ${selectedRepo} on GitHub`"
+            >
+              <span class="i-lucide:github text-sm" aria-hidden="true" />
+            </a>
+          </Tooltip>
+        </div>
         <VueUiXy
           v-if="!isAllRepos && !pending && !error"
           ref="chartRef"
@@ -557,29 +579,6 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
             </text>
           </template>
         </VueUiXy>
-        <div class="flex flex-row gap-2 justify-center">
-          <Tooltip label="Open repository scan">
-            <NuxtLink
-              :to="`/scan/${encodeURIComponent(selectedRepo)}`"
-              class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
-              :aria-label="`Open repository scan for ${selectedRepo}`"
-            >
-              <span class="i-lucide:scan-search text-sm" aria-hidden="true" />
-            </NuxtLink>
-          </Tooltip>
-
-          <Tooltip label="Open repository on GitHub">
-            <a
-              :href="`https://github.com/${selectedRepo}`"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
-              :aria-label="`Open ${selectedRepo} on GitHub`"
-            >
-              <span class="i-lucide:github text-sm" aria-hidden="true" />
-            </a>
-          </Tooltip>
-        </div>
       </div>
 
       <!-- TABLE VIEW (all repos) -->
