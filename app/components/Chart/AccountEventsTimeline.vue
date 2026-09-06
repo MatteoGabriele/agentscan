@@ -44,7 +44,10 @@ function selectLegend(items: Array<{ color: string; name: string }>) {
 }
 
 const eventConfig = computed(() => {
-  const classification = props.classification || 'mixed'
+  const classification = (props.classification || 'mixed') as Exclude<
+    IdentityClassification,
+    'insufficient-data'
+  >
   const palette = {
     organic: {
       pr: colors.value.eventOrganicPr,
@@ -373,6 +376,8 @@ const xAxisLabelValues = computed<string[]>(() => {
 
 const tooltipPositionLine = useTooltipPosition(chartLineRef)
 
+const XAXIS_LABELS_MOD_THRESHOLD = 12
+
 const configLine = computed<VueUiXyConfig>(() => ({
   downsample: {
     threshold: 5000,
@@ -414,8 +419,15 @@ const configLine = computed<VueUiXyConfig>(() => ({
           show: true,
           color: colors.value.textMuted,
           values: xAxisLabelValues.value,
-          showOnlyAtModulo: !usesHourlyGranularity.value,
-          modulo: 12,
+          showOnlyAtModulo:
+            !usesHourlyGranularity.value &&
+            xAxisLabelValues.value.length > XAXIS_LABELS_MOD_THRESHOLD,
+          modulo: Math.max(
+            1,
+            Math.round(
+              xAxisLabelValues.value.length / XAXIS_LABELS_MOD_THRESHOLD,
+            ),
+          ),
           rotation: -30,
           autoRotate: { enable: false },
           datetimeFormatter: { enable: false },
