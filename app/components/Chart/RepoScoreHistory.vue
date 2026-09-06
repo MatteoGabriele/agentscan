@@ -28,7 +28,6 @@ const { data, pending, error } = await useActivityRepoScores({
 })
 
 const rootEl = shallowRef<HTMLElement | null>(null)
-const containerRef = useTemplateRef('containerRef')
 const chartRef = useTemplateRef('chartRef')
 
 onMounted(() => {
@@ -406,7 +405,7 @@ function getSparklineConfig(item: RepoRow) {
 </script>
 
 <template>
-  <div ref="containerRef">
+  <div>
     <div class="mb-5">
       <h2 class="text-center">Average score evolution</h2>
 
