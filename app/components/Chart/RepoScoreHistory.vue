@@ -288,6 +288,7 @@ type RepoRow = {
   progression: number
   averageScore: number
   count: number
+  visible: boolean
 }
 
 const sparklines = computed<RepoRow[]>(() => {
@@ -299,6 +300,7 @@ const sparklines = computed<RepoRow[]>(() => {
       progression: calcLinearProgression(dataset.map((d) => d.value ?? 0))
         .trend,
       averageScore: count ? Math.round(scoreSum / count) : 0,
+      visible: dataset.length > 1,
     }),
   )
 })
@@ -468,6 +470,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
     </div>
 
     <ClientOnly>
+      <!-- REPO CHART VIEW -->
       <VueUiXy
         v-if="!isAllRepos && !pending && !error"
         ref="chartRef"
@@ -554,6 +557,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
         </template>
       </VueUiXy>
 
+      <!-- TABLE VIEW (all repos) -->
       <div
         v-else
         class="mt-6 max-h-[min(70vh,48rem)] overflow-y-auto overflow-x-hidden rounded-lg border border-current/10"
@@ -722,7 +726,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
                   </span>
 
                   <div class="flex items-center gap-1">
-                    <Tooltip label="View chart">
+                    <Tooltip label="View chart" v-if="sparkline.visible">
                       <button
                         type="button"
                         class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
@@ -778,11 +782,22 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               </td>
 
               <td class="hidden w-44 px-4 py-2 lg:table-cell">
-                <div class="ml-auto w-40 pointer-events-none">
-                  <VueUiSparkline
-                    :dataset="sparkline.dataset"
-                    :config="getSparklineConfig(sparkline)"
-                  />
+                <div class="ml-auto w-40">
+                  <button
+                    v-if="sparkline.visible"
+                    class="w-full cursor-pointer"
+                    @click="viewRepoChart(sparkline)"
+                    :aria-label="`View chart for ${sparkline.repo}`"
+                  >
+                    <VueUiSparkline
+                      :dataset="sparkline.dataset"
+                      :config="getSparklineConfig(sparkline)"
+                      class="pointer-events-none"
+                    />
+                  </button>
+                  <div v-else class="text-[--text-muted] text-xs text-center">
+                    Insufficient data
+                  </div>
                 </div>
               </td>
             </tr>
