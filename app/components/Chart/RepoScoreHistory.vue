@@ -601,7 +601,7 @@ function getSparklineConfig(item: RepoRow) {
               >
                 <button
                   type="button"
-                  class="flex w-full items-center justify-center gap-1 rounded-sm transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:justify-start sm:gap-2"
+                  class="flex w-full items-center justify-center gap-1 rounded-sm transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:justify-start sm:gap-2 cursor-pointer"
                   @click="sortBy('progression')"
                 >
                   <span class="hidden sm:inline">Trend</span>
@@ -625,7 +625,7 @@ function getSparklineConfig(item: RepoRow) {
               >
                 <button
                   type="button"
-                  class="flex w-full min-w-0 items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
+                  class="flex w-full min-w-0 items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2 cursor-pointer"
                   @click="sortBy('repo')"
                 >
                   <span class="truncate lg:overflow-visible lg:text-clip">
@@ -649,7 +649,7 @@ function getSparklineConfig(item: RepoRow) {
               >
                 <button
                   type="button"
-                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
+                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2 cursor-pointer"
                   @click="sortBy('averageScore')"
                 >
                   <span class="hidden sm:inline">Average score</span>
@@ -674,7 +674,7 @@ function getSparklineConfig(item: RepoRow) {
               >
                 <button
                   type="button"
-                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
+                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2 cursor-pointer"
                   @click="sortBy('count')"
                 >
                   <span class="hidden sm:inline">Scanned PRs</span>
