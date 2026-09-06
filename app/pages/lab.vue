@@ -32,6 +32,9 @@
       class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto py-12 w-full"
     >
       <div class="w-full">
+        <LazyChartRepoScoreHistory />
+      </div>
+      <div class="w-full">
         <LazyChartHourlyEventsWaffle />
       </div>
       <div class="w-full">
@@ -44,9 +47,6 @@
       </div>
       <div class="w-full">
         <LazyChartGlobalEventsHeatmap />
-      </div>
-      <div class="w-full">
-        <LazyChartRepoScoreHistory />
       </div>
       <div class="w-full">
         <div class="mb-6">
