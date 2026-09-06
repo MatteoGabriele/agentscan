@@ -414,16 +414,18 @@ function getSparklineConfig(item: RepoRow) {
     </div>
 
     <div class="flex flex-row flex-nowrap items-end gap-4">
-      <button
-        class="shrink-0 inline-flex items-center rounded-sm border border-ui-border-subtle/60 p-3 text-xs text-ui-muted tabular-nums transition-colors cursor-pointer"
-        :class="{
-          'cursor-not-allowed opacity-50': !selectedRepo,
-          'hover:text-ui-text hover:border-ui-border/80': !!selectedRepo,
-        }"
-        @click="selectedRepo = ''"
-      >
-        <span class="i-lucide:table" />
-      </button>
+      <Tooltip :label="selectedRepo === '' ? '' : 'Toggle table view'">
+        <button
+          class="shrink-0 inline-flex items-center rounded-sm border border-ui-border-subtle/60 p-3 text-xs text-ui-muted tabular-nums transition-colors cursor-pointer"
+          :class="{
+            'cursor-not-allowed opacity-50': !selectedRepo,
+            'hover:text-ui-text hover:border-ui-border/80': !!selectedRepo,
+          }"
+          @click="selectedRepo = ''"
+        >
+          <span class="i-lucide:table" />
+        </button>
+      </Tooltip>
 
       <div
         v-if="availableDates.length"
@@ -703,8 +705,7 @@ function getSparklineConfig(item: RepoRow) {
             <tr
               v-for="sparkline in sortedSparklines"
               :key="sparkline.repo"
-              class="cursor-pointer border-t border-current/10 transition-colors hover:bg-[--card]"
-              @click="viewRepoChart(sparkline)"
+              class="border-t border-current/10 transition-colors hover:bg-[--card]"
             >
               <td class="px-2 py-3 text-center sm:px-4 sm:text-left">
                 <span
@@ -713,15 +714,59 @@ function getSparklineConfig(item: RepoRow) {
                 />
               </td>
 
-              <td
-                class="min-w-0 px-2 py-3 font-medium sm:px-4"
-                :title="sparkline.repo"
-              >
-                <span
-                  class="block truncate lg:overflow-visible lg:text-clip lg:whitespace-normal"
-                >
-                  {{ sparkline.repo }}
-                </span>
+              <td class="min-w-0 px-2 py-3 font-medium sm:px-4">
+                <div class="flex min-w-0 flex-col items-start gap-2">
+                  <span
+                    class="block max-w-full truncate lg:overflow-visible lg:text-clip lg:whitespace-normal"
+                    :title="sparkline.repo"
+                  >
+                    {{ sparkline.repo }}
+                  </span>
+
+                  <div class="flex items-center gap-1">
+                    <Tooltip label="View chart">
+                      <button
+                        type="button"
+                        class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+                        :aria-label="`View chart for ${sparkline.repo}`"
+                        @click="viewRepoChart(sparkline)"
+                      >
+                        <span
+                          class="i-lucide:chart-line text-sm"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </Tooltip>
+
+                    <Tooltip label="Open repository scan">
+                      <NuxtLink
+                        :to="`/scan/${encodeURIComponent(sparkline.repo)}`"
+                        class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+                        :aria-label="`Open repository scan for ${sparkline.repo}`"
+                      >
+                        <span
+                          class="i-lucide:scan-search text-sm"
+                          aria-hidden="true"
+                        />
+                      </NuxtLink>
+                    </Tooltip>
+
+                    <Tooltip label="Open repository on GitHub">
+                      <a
+                        :href="`https://github.com/${sparkline.repo}`"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+                        :aria-label="`Open ${sparkline.repo} on GitHub`"
+                      >
+                        <span
+                          class="i-lucide:github text-sm"
+                          aria-hidden="true"
+                        />
+                      </a>
+                    </Tooltip>
+                  </div>
+                </div>
               </td>
 
               <td class="px-2 py-3 text-right tabular-nums sm:px-4">
