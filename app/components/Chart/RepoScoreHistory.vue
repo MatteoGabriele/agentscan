@@ -471,91 +471,116 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
 
     <ClientOnly>
       <!-- REPO CHART VIEW -->
-      <VueUiXy
-        v-if="!isAllRepos && !pending && !error"
-        ref="chartRef"
-        :dataset="datasetLine"
-        :config="configLine"
-      >
-        <template #tooltip="{ datapoint, seriesIndex }">
-          <div class="flex flex-col">
-            <div class="mb-1">
-              {{ getTooltipTimeLabel(seriesIndex) }}
-            </div>
-
-            <div class="flex flex-row gap-2 items-center">
-              <div class="w-2 h-2">
-                <svg viewBox="0 0 2 2" class="w-full h-full">
-                  <circle
-                    :cx="1"
-                    :cy="1"
-                    :r="1"
-                    :fill="getDatapointScore(datapoint).color"
-                  />
-                </svg>
+      <div v-if="!isAllRepos && !pending && !error">
+        <VueUiXy
+          v-if="!isAllRepos && !pending && !error"
+          ref="chartRef"
+          :dataset="datasetLine"
+          :config="configLine"
+        >
+          <template #tooltip="{ datapoint, seriesIndex }">
+            <div class="flex flex-col">
+              <div class="mb-1">
+                {{ getTooltipTimeLabel(seriesIndex) }}
               </div>
 
-              <div>
-                Average score:
-                {{ getDatapointScore(datapoint).score }}
+              <div class="flex flex-row gap-2 items-center">
+                <div class="w-2 h-2">
+                  <svg viewBox="0 0 2 2" class="w-full h-full">
+                    <circle
+                      :cx="1"
+                      :cy="1"
+                      :r="1"
+                      :fill="getDatapointScore(datapoint).color"
+                    />
+                  </svg>
+                </div>
+
+                <div>
+                  Average score:
+                  {{ getDatapointScore(datapoint).score }}
+                </div>
               </div>
             </div>
-          </div>
-        </template>
+          </template>
 
-        <template #svg="{ svg }">
-          <path
-            :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.3 - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.3 - 2}`"
-            :stroke="colors.organic"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            fill="none"
-          />
+          <template #svg="{ svg }">
+            <path
+              :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.3 - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.3 - 2}`"
+              :stroke="colors.organic"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+            />
 
-          <text
-            text-anchor="middle"
-            :fill="colors.textMuted"
-            :transform="`translate(${svg.drawingArea.right + 76},${svg.drawingArea.top + svg.drawingArea.height * 0.15}) rotate(-90)`"
-          >
-            Organic
-          </text>
+            <text
+              text-anchor="middle"
+              :fill="colors.textMuted"
+              :transform="`translate(${svg.drawingArea.right + 76},${svg.drawingArea.top + svg.drawingArea.height * 0.15}) rotate(-90)`"
+            >
+              Organic
+            </text>
 
-          <path
-            :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.3 + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.3 + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.5 - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.5 - 2}`"
-            :stroke="colors.mixed"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            fill="none"
-          />
+            <path
+              :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.3 + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.3 + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.5 - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.5 - 2}`"
+              :stroke="colors.mixed"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+            />
 
-          <text
-            text-anchor="middle"
-            :fill="colors.textMuted"
-            :transform="`translate(${svg.drawingArea.right + 76},${svg.drawingArea.top + svg.drawingArea.height * 0.4}) rotate(-90)`"
-          >
-            Mixed
-          </text>
+            <text
+              text-anchor="middle"
+              :fill="colors.textMuted"
+              :transform="`translate(${svg.drawingArea.right + 76},${svg.drawingArea.top + svg.drawingArea.height * 0.4}) rotate(-90)`"
+            >
+              Mixed
+            </text>
 
-          <path
-            :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.5 + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.5 + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height - 2}`"
-            :stroke="colors.automation"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            fill="none"
-          />
+            <path
+              :d="`M${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height * 0.5 + 2} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height * 0.5 + 6} ${svg.drawingArea.right + 52},${svg.drawingArea.top + svg.drawingArea.height - 6} ${svg.drawingArea.right + 48},${svg.drawingArea.top + svg.drawingArea.height - 2}`"
+              :stroke="colors.automation"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+            />
 
-          <text
-            text-anchor="middle"
-            :fill="colors.textMuted"
-            :transform="`translate(${svg.drawingArea.right + 76},${svg.drawingArea.top + svg.drawingArea.height * 0.75}) rotate(-90)`"
-          >
-            Automation
-          </text>
-        </template>
-      </VueUiXy>
+            <text
+              text-anchor="middle"
+              :fill="colors.textMuted"
+              :transform="`translate(${svg.drawingArea.right + 76},${svg.drawingArea.top + svg.drawingArea.height * 0.75}) rotate(-90)`"
+            >
+              Automation
+            </text>
+          </template>
+        </VueUiXy>
+        <div class="flex flex-row gap-2 justify-center">
+          <Tooltip label="Open repository scan">
+            <NuxtLink
+              :to="`/scan/${encodeURIComponent(selectedRepo)}`"
+              class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+              :aria-label="`Open repository scan for ${selectedRepo}`"
+            >
+              <span class="i-lucide:scan-search text-sm" aria-hidden="true" />
+            </NuxtLink>
+          </Tooltip>
+
+          <Tooltip label="Open repository on GitHub">
+            <a
+              :href="`https://github.com/${selectedRepo}`"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
+              :aria-label="`Open ${selectedRepo} on GitHub`"
+            >
+              <span class="i-lucide:github text-sm" aria-hidden="true" />
+            </a>
+          </Tooltip>
+        </div>
+      </div>
 
       <!-- TABLE VIEW (all repos) -->
       <div
