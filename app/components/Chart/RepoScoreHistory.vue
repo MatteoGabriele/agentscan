@@ -783,18 +783,23 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
 
               <td class="hidden w-44 px-4 py-2 lg:table-cell">
                 <div class="ml-auto w-40">
-                  <button
+                  <Tooltip
                     v-if="sparkline.visible"
-                    class="w-full cursor-pointer"
-                    @click="viewRepoChart(sparkline)"
-                    :aria-label="`View chart for ${sparkline.repo}`"
+                    label="View chart"
+                    class="w-full"
                   >
-                    <VueUiSparkline
-                      :dataset="sparkline.dataset"
-                      :config="getSparklineConfig(sparkline)"
-                      class="pointer-events-none"
-                    />
-                  </button>
+                    <button
+                      class="w-full cursor-pointer"
+                      @click="viewRepoChart(sparkline)"
+                      :aria-label="`View chart for ${sparkline.repo}`"
+                    >
+                      <VueUiSparkline
+                        :dataset="sparkline.dataset"
+                        :config="getSparklineConfig(sparkline)"
+                        class="pointer-events-none"
+                      />
+                    </button>
+                  </Tooltip>
                   <div v-else class="text-[--text-muted] text-xs text-center">
                     Insufficient data
                   </div>
