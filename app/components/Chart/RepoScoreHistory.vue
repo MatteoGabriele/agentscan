@@ -4,6 +4,7 @@ import { useTooltipPosition } from 'vue-data-ui/composables'
 import { getTrendArrow } from '#imports'
 import {
   VueUiSparkline,
+  type VueUiSparklineConfig,
   type VueUiSparklineDatasetItem,
 } from 'vue-data-ui/vue-ui-sparkline'
 import {
@@ -12,16 +13,6 @@ import {
   type VueUiXyDatasetItem,
   type VueUiXyTooltipSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
-
-const selectedRepo = ref('')
-const repoSearch = ref('')
-const from = ref<string>()
-const to = ref<string>()
-
-const isAllRepos = computed(() => selectedRepo.value === '')
-
-const controlClass =
-  'h-10 border border-current/20 rounded-md bg-transparent px-3 text-sm text-inherit outline-none transition-colors hover:border-current/40 focus:border-current/60 focus-visible:ring-1 focus-visible:ring-current/20'
 
 const { data, pending, error } = await useActivityRepoScores({
   full: true,
@@ -35,6 +26,17 @@ onMounted(() => {
 })
 
 const colors = useColors(rootEl)
+
+const locale = computed(() => 'en') // in case i18n is implemented in the future
+const selectedRepo = ref('')
+const repoSearch = ref('')
+const from = ref<string>()
+const to = ref<string>()
+
+const isAllRepos = computed(() => selectedRepo.value === '')
+
+const controlClass =
+  'h-10 border border-current/20 rounded-md bg-transparent px-3 text-sm text-inherit outline-none transition-colors hover:border-current/40 focus:border-current/60 focus-visible:ring-1 focus-visible:ring-current/20'
 
 const days = computed(() => {
   const value = data.value
@@ -250,8 +252,6 @@ const datasetLine = computed<VueUiXyDatasetItem[]>(() => {
   ]
 })
 
-const locale = computed(() => 'en')
-
 const tooltipTimeLabels = computed<string[]>(() => {
   return timeLabels.value.map((timestamp) => {
     return new Intl.DateTimeFormat(locale.value, {
@@ -324,7 +324,6 @@ const sortedSparklines = computed(() => {
     if (sortKey.value === 'repo') {
       return a.repo.localeCompare(b.repo) * direction
     }
-
     return (a[sortKey.value] - b[sortKey.value]) * direction
   })
 })
@@ -332,10 +331,8 @@ const sortedSparklines = computed(() => {
 function sortBy(key: SortKey) {
   if (sortKey.value === key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-
     return
   }
-
   sortKey.value = key
   sortDirection.value = 'asc'
 }
@@ -382,7 +379,7 @@ async function viewRepoChart(item: RepoRow) {
   selectedRepo.value = item.repo
 }
 
-function getSparklineConfig(item: RepoRow) {
+function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
   return {
     style: {
       animation: { show: false },
