@@ -97,6 +97,7 @@ const toMin = computed(() => {
 type RepoSeries = {
   dataset: VueUiSparklineDatasetItem[]
   count: number
+  scoreSum: number
 }
 
 const repoSeries = computed(() => {
@@ -106,6 +107,7 @@ const repoSeries = computed(() => {
     datasets.set(repo, {
       dataset: [],
       count: 0,
+      scoreSum: 0,
     })
   }
 
@@ -137,6 +139,7 @@ const repoSeries = computed(() => {
       })
 
       entry.count += repo.count
+      entry.scoreSum += repo.scoreSum
     }
   }
 
@@ -289,17 +292,16 @@ type RepoRow = {
 }
 
 const sparklines = computed<RepoRow[]>(() => {
-  return [...repoSeries.value.entries()].map(([repo, { dataset, count }]) => ({
-    repo,
-    dataset,
-    count,
-    progression: calcLinearProgression(dataset.map((d) => d.value ?? 0)).trend,
-    averageScore: dataset.length
-      ? Math.round(
-          dataset.reduce((sum, d) => sum + (d.value ?? 0), 0) / dataset.length,
-        )
-      : 0,
-  }))
+  return [...repoSeries.value.entries()].map(
+    ([repo, { dataset, count, scoreSum }]) => ({
+      repo,
+      dataset,
+      count,
+      progression: calcLinearProgression(dataset.map((d) => d.value ?? 0))
+        .trend,
+      averageScore: count ? Math.round(scoreSum / count) : 0,
+    }),
+  )
 })
 
 type SortKey = 'progression' | 'repo' | 'averageScore' | 'count'
