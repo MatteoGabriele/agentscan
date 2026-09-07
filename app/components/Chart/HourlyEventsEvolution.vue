@@ -10,14 +10,8 @@ import { useElementSize, useTimeout } from '@vueuse/core'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { round } from '~~/shared/utils/numbers'
-import type {
-  EventsEvolutionSeries,
-  VueUiXySeriesWithCounts,
-} from '~~/shared/types/activity.ts'
-import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  getTotalPrScanned,
-} from '~~/shared/utils/charts.ts'
+import type { EventsEvolutionSeries } from '~~/shared/types/activity.ts'
+import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
 
 dayjs.extend(utc)
 
@@ -43,6 +37,12 @@ const scanTimes = computed(() =>
   hourlyWindow.value?.scanTimes.slice(isMobile.value ? -MOBILE_SLICE_HOURS : 0),
 )
 const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
+
+const prCounts = computed(() =>
+  (scanTimes.value ?? []).map(
+    (scanTime) => countsByScanTime.value?.[scanTime]?.total.count ?? 0,
+  ),
+)
 
 const scanTimesOffset = computed(() => {
   if (!isMobile.value) {
@@ -287,6 +287,15 @@ function handleChartMouseleave() {
             </template>
 
             <template #svg="{ svg }">
+              <ChartPrVolumeLine
+                v-if="!isLoading"
+                :svg
+                :counts="prCounts"
+                :color="colors.textMuted"
+                :visible="isChartHovered || isMobile"
+                :stroke-width="isMobile ? 1.5 : 2"
+              />
+
               <text
                 v-if="isLoading"
                 :x="svg.drawingArea.left + svg.drawingArea.width / 2"
@@ -305,18 +314,10 @@ function handleChartMouseleave() {
               </text>
             </template>
 
-            <template
-              #tooltip="{ datapoint, timeLabel, series, absoluteIndex }"
-            >
+            <template #tooltip="{ datapoint, timeLabel, series }">
               <div class="flex flex-col tabular-nums">
                 <ChartEventsEvolutionTooltipHeader
                   :time-label="formatScanTime(timeLabel.absoluteIndex)"
-                  :count="
-                    getTotalPrScanned(
-                      series as VueUiXySeriesWithCounts,
-                      absoluteIndex,
-                    )
-                  "
                 />
 
                 <!-- TODO: dedicated tooltip component for the repo drill view -->
@@ -335,6 +336,7 @@ function handleChartMouseleave() {
                   :colors
                   :can-compare="timeLabel.absoluteIndex > 0"
                   :raw-dataset="rawDataset"
+                  :pr-counts="prCounts"
                 >
                   <template #thead>
                     <th class="px-2 text-center">vs Hour-1</th>

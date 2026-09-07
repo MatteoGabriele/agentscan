@@ -1,5 +1,3 @@
-import type { VueUiXySeriesWithCounts } from '../types/activity'
-
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
     return []
@@ -67,12 +65,5 @@ export const CLASSIFICATIONS_WITH_NAME_AND_CATEGORY: Array<{
   { name: 'Automation', category: 'automation' },
 ]
 
-export function getTotalPrScanned(
-  items: VueUiXySeriesWithCounts,
-  absoluteIndex: number,
-): number {
-  const totals = items
-    .map((item) => item.counts[absoluteIndex])
-    .reduce((a, b) => (a ?? 0) + (b ?? 0), 0)
-  return totals ?? 0
-}
+export const PR_VOLUME_DASH_ARRAY = '0.1 4'
+export const PR_VOLUME_STROKE_WIDTH = 2

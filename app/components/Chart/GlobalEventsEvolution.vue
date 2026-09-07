@@ -12,14 +12,8 @@ import { useColors } from '~/composables/useColors'
 import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
-import type {
-  EventsEvolutionSeries,
-  VueUiXySeriesWithCounts,
-} from '~~/shared/types/activity'
-import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  getTotalPrScanned,
-} from '~~/shared/utils/charts.ts'
+import type { EventsEvolutionSeries } from '~~/shared/types/activity'
+import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
 
 const { data: activity } = useActivity()
 
@@ -38,6 +32,12 @@ const scanTimes = computed(() =>
 )
 
 const countsByDate = computed(() => activity.value?.countsByDate)
+
+const prCounts = computed(() =>
+  (dates.value ?? []).map(
+    (scanTime) => countsByDate.value?.[scanTime]?.total.count ?? 0,
+  ),
+)
 
 const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,
@@ -277,6 +277,14 @@ function placeLandmark({
             :config
           >
             <template #svg="{ svg }">
+              <ChartPrVolumeLine
+                :svg
+                :counts="prCounts"
+                :color="colors.textMuted"
+                :visible="isChartHovered || isMobile"
+                :stroke-width="isMobile ? 1.5 : 2"
+              />
+
               <!-- LANDMARKS -->
               <g
                 v-for="(plot, i) in svg?.data?.[0]?.plots"
@@ -351,18 +359,10 @@ function placeLandmark({
               </linearGradient>
             </template>
 
-            <template
-              #tooltip="{ datapoint, timeLabel, series, absoluteIndex }"
-            >
+            <template #tooltip="{ datapoint, timeLabel, series }">
               <div class="flex flex-col tabular-nums">
                 <ChartEventsEvolutionTooltipHeader
                   :time-label="timeLabel.text"
-                  :count="
-                    getTotalPrScanned(
-                      series as VueUiXySeriesWithCounts,
-                      absoluteIndex,
-                    )
-                  "
                 />
 
                 <ChartEventsEvolutionTooltipTable
@@ -370,6 +370,7 @@ function placeLandmark({
                   :colors
                   :can-compare="timeLabel.absoluteIndex > 0"
                   :raw-dataset="rawDataset"
+                  :pr-counts="prCounts"
                 >
                   <template #thead>
                     <th class="px-2 text-center">vs Day-1</th>
