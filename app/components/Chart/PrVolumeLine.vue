@@ -10,8 +10,10 @@ const props = withDefaults(
     svg: VueUiXySvgSlotProps['svg']
     counts: number[]
     color: string
+    backgroundColor: string
     visible?: boolean
     strokeWidth?: number
+    hoveredIndex: number | null
   }>(),
   {
     visible: false,
@@ -23,25 +25,32 @@ const props = withDefaults(
 // Pretty much visual tweaking
 const PEAK_HEIGHT_RATIO = 0.85
 
-const points = computed(() => {
+const plotCoordinates = computed(() => {
   const plots = props.svg.data?.[0]?.plots ?? []
   const sliceStart = props.svg.slicer?.start ?? 0
   const maxCount = props.counts.length ? Math.max(...props.counts) : 0
 
   if (plots.length < 2 || maxCount <= 0) {
-    return ''
+    return null
   }
 
   const { bottom, height } = props.svg.drawingArea
 
-  return plots
-    .map((plot, index) => {
-      const count = props.counts[index + sliceStart] ?? 0
-      const y = bottom - (count / maxCount) * height * PEAK_HEIGHT_RATIO
-      return `${plot.x},${y}`
-    })
-    .join(' ')
+  return plots.map((plot, index) => {
+    const count = props.counts[index + sliceStart] ?? 0
+    const y = bottom - (count / maxCount) * height * PEAK_HEIGHT_RATIO
+    return {
+      x: plot.x,
+      y,
+    }
+  })
 })
+
+const points = computed(() =>
+  plotCoordinates.value === null
+    ? ''
+    : plotCoordinates.value.map(({ x, y }) => `${x},${y}`).join(' '),
+)
 </script>
 
 <template>
@@ -56,6 +65,15 @@ const points = computed(() => {
     :stroke-dasharray="PR_VOLUME_DASH_ARRAY"
     :opacity="visible ? 0.75 : 0"
     class="pr-volume-line"
+  />
+  <circle
+    v-if="hoveredIndex !== null && plotCoordinates !== null"
+    :cx="plotCoordinates[hoveredIndex]?.x"
+    :cy="plotCoordinates[hoveredIndex]?.y"
+    :r="4.5"
+    :fill="color"
+    :stroke="backgroundColor"
+    stroke-width="2"
   />
 </template>
 
