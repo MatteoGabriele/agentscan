@@ -359,8 +359,8 @@ function placeLandmark({
                     <text
                       :fill="colors.textMuted"
                       :stroke="colors.bg"
-                      :opacity="isChartHovered ? 0.6 : 0"
-                      stroke-width="3"
+                      :opacity="isChartHovered ? 1 : 0"
+                      stroke-width="8"
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       :font-size="LANDMARK_LABEL_FONT_SIZE"
