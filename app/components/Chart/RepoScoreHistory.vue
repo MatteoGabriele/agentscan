@@ -236,6 +236,9 @@ const configLine = computed<VueUiXyConfig>(() => ({
       offsetX: 24,
       offsetY: -32,
     },
+    zoom: {
+      show: false,
+    },
   },
 }))
 
