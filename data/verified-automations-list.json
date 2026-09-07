@@ -723,5 +723,34 @@
       "danielroe",
       "ematipico"
     ]
+  },
+  {
+    "username": "theQuizQuest",
+    "id": 322012461,
+    "reason": "Spamming major projects with possible scam links to random resources.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/442",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-09-06",
+    "approvedBy": [
+      "ematipico",
+      "MatteoGabriele",
+      "graphieros",
+      "trueberryless"
+    ]
+  },
+  {
+    "username": "devwez",
+    "id": 108820288,
+    "reason": "Posts low quality PRs and responds with emdashes",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/440",
+    "reportedBy": "dyc3",
+    "createdAt": "2026-09-06",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico",
+      "trueberryless",
+      "gameroman"
+    ]
   }
 ]
