@@ -94,12 +94,12 @@ const contributions: Contribution[] = [
 
 const { trackEvent } = useSaEvent()
 
-const { data: repositories, status: repositoriesStatus } =
+const { data: contribution, status: contributionStatus } =
   await useContributorsList()
 
 const contributorsCount = computed<number>(() => {
-  const everyone = (repositories.value ?? []).flatMap((repository) =>
-    repository.contributors.map((person) => person.name),
+  const everyone = (contribution.value?.repositories ?? []).flatMap(
+    (repository) => repository.contributors.map((person) => person.name),
   )
 
   return new Set(everyone).size
@@ -128,7 +128,7 @@ useHead({
   </header>
 
   <section
-    v-if="repositoriesStatus === 'pending' || contributorsCount"
+    v-if="contributionStatus === 'pending' || contributorsCount"
     class="mt-12"
   >
     <div class="flex items-baseline gap-2">
@@ -144,7 +144,7 @@ useHead({
     </p>
 
     <ul class="mt-6 grid gap-4 md:grid-cols-3">
-      <template v-if="repositoriesStatus === 'pending'">
+      <template v-if="contributionStatus === 'pending'">
         <li
           v-for="index in 3"
           :key="`repository-skeleton-${index}`"
@@ -165,7 +165,7 @@ useHead({
       </template>
 
       <li
-        v-for="repository in repositories"
+        v-for="repository in contribution?.repositories"
         v-else
         :key="repository.repo"
         class="border border-ui-border/50 rounded-lg bg-white/1 p-6 hover:border-ui-border transition-colors"

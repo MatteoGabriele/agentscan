@@ -1,22 +1,20 @@
 <script setup lang="ts">
 const maxVisibleItems = 9
 
-const { data: contributors, status: contributorsStatus } =
+const { data: contribution, status: contributorsStatus } =
   await useContributorsList()
 const { data: adopters, status: adoptersStatus } = await useAdopters()
 
-const people = computed<AvatarStackItem[]>(() => {
-  const everyone = (contributors.value ?? []).flatMap(
-    (repository) => repository.contributors,
-  )
+const allContributors = computed<AvatarStackItem[]>(() => {
+  const items = contribution.value?.contributors ?? []
 
-  return [...new Map(everyone.map((person) => [person.name, person])).values()]
-    .sort((a, b) => b.contributions - a.contributions)
-    .map((person) => ({
-      name: person.name,
-      avatar: person.avatar,
-      url: person.url,
-    }))
+  return items.map((contributor) => ({
+    id: contributor.id,
+    name: contributor.name,
+    avatar: `${contributor.avatar}&s=50`,
+    url: `https://github.com/${contributor.name}`,
+    contributions: contributor.contributions,
+  }))
 })
 
 const projects = computed<AvatarStackItem[]>(() => {
@@ -37,7 +35,7 @@ const showProjects = computed<boolean>(() => {
   <div class="flex flex-col md:flex-row items-center justify-center gap-6">
     <CommunityAvatarStack
       label="Built by"
-      :items="people"
+      :items="allContributors"
       :pending="contributorsStatus === 'pending'"
       :max="maxVisibleItems"
       more-url="/contribute"

@@ -6,9 +6,14 @@ export type Contributor = {
   contributions: number
 }
 
-export type RepositoryContributors = {
+export type Repository = {
   repo: string
   label: string
   url: string
+  contributors: Contributor[]
+}
+
+export type ContributorsResponse = {
+  repositories: Repository[]
   contributors: Contributor[]
 }

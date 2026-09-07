@@ -1,9 +1,9 @@
-import type { RepositoryContributors } from '~~/shared/types/contributor'
+import type { ContributorsResponse } from '~~/shared/types/contributor'
 
 export async function useContributorsList() {
   return useAsyncData(
-    'contributors-list',
-    () => $fetch<RepositoryContributors[]>('/api/contributors'),
+    'contributors',
+    () => $fetch<ContributorsResponse>('/api/contributors'),
     {
       getCachedData: payloadCachedData,
     },
