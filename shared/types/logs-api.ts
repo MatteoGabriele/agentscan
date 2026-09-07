@@ -58,3 +58,36 @@ export type LibrariesResponse = {
   total: number
   repos: string[]
 }
+
+export type ActivityRepoScore = {
+  name: string
+  count: number
+  scoreSum: number
+}
+
+export type ActivityRepoScoreDay = {
+  date: string
+  repos: ActivityRepoScore[]
+}
+
+export type ActivityRepoScoresDatesResponse = {
+  dates: string[]
+}
+
+export type ActivityRepoScoresDateResponse = {
+  date: string
+  dates: string[]
+  repos: ActivityRepoScore[]
+}
+
+export type ActivityRepoScoresRangeResponse = {
+  from: string
+  to: string
+  dates: string[]
+  days: ActivityRepoScoreDay[]
+}
+
+export type ActivityRepoScoresResponse =
+  | ActivityRepoScoresDatesResponse
+  | ActivityRepoScoresDateResponse
+  | ActivityRepoScoresRangeResponse

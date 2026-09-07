@@ -268,9 +268,10 @@ function getClassificationAnnotations(svg: VueUiXySvgSlotProps['svg']) {
             <path
               :d="`M${annotation.x1 - 3},${annotation.y - 3} ${annotation.x1},${annotation.y} ${annotation.x2},${annotation.y} ${annotation.x2 + 3},${annotation.y - 3}`"
               :stroke="annotation.color"
-              stroke-width="1"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              fill="none"
             />
             <text
               :x="annotation.x1 + (annotation.x2 - annotation.x1) / 2"
