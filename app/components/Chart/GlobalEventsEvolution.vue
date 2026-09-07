@@ -119,7 +119,15 @@ const viewBoxPadding = computed(() => {
 
 const tooltipTimeFormat = 'dddd • MMM dd • HH:mm'
 
+const hoveredIndex = ref<number | null>(null)
+
 const config = computed<VueUiXyConfig>(() => ({
+  events: {
+    datapointEnter: ({ seriesIndex }) => {
+      hoveredIndex.value = seriesIndex
+    },
+    datapointLeave: () => (hoveredIndex.value = null),
+  },
   useCssAnimation: false,
   downsample: {
     threshold: 5000,
@@ -340,8 +348,10 @@ function placeLandmark({
                 :svg
                 :counts="prCounts"
                 :color="colors.textMuted"
+                :background-color="colors.bg"
                 :visible="isChartHovered || isMobile"
                 :stroke-width="isMobile ? 1.5 : 2"
+                :hovered-index="hoveredIndex"
               />
 
               <!-- LANDMARKS -->

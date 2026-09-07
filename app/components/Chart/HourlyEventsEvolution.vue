@@ -117,7 +117,15 @@ const hasSingleEntry = computed(() => dataset.value[0]?.series.length === 1)
 
 const axisTimeFormat = 'HH:mm'
 
+const hoveredIndex = ref<number | null>(null)
+
 const config = computed<VueUiXyConfig>(() => ({
+  events: {
+    datapointEnter: ({ seriesIndex }) => {
+      hoveredIndex.value = seriesIndex
+    },
+    datapointLeave: () => (hoveredIndex.value = null),
+  },
   useCssAnimation: false,
   transitions: {
     enable: ready.value,
@@ -292,8 +300,10 @@ function handleChartMouseleave() {
                 :svg
                 :counts="prCounts"
                 :color="colors.textMuted"
+                :background-color="colors.bg"
                 :visible="isChartHovered || isMobile"
                 :stroke-width="isMobile ? 1.5 : 2"
+                :hovered-index="hoveredIndex"
               />
 
               <text
