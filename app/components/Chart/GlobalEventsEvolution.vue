@@ -13,7 +13,10 @@ import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
 import type { EventsEvolutionSeries } from '~~/shared/types/activity'
-import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
+import {
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
+  SVG_ICON,
+} from '~~/shared/utils/charts.ts'
 
 const { data: activity } = useActivity()
 
@@ -22,6 +25,11 @@ const { width, height } = useElementSize(chartContainer)
 const isMobile = useIsMobile()
 
 const MOBILE_SLICE_DAYS = 14
+
+const LANDMARK_LABEL_FONT_SIZE = 11
+// Rough average glyph width at the label font size, used to keep the label inside the chart
+const LANDMARK_LABEL_CHAR_WIDTH = 5.6
+const LANDMARK_LABEL_PADDING = 4
 
 const dates = computed(() =>
   activity.value?.dates.slice(isMobile.value ? -MOBILE_SLICE_DAYS : 0),
@@ -223,13 +231,64 @@ const visibleLandmarksByIndex = computed(() => {
   return landmarkMap
 })
 
+/**
+ * "Stack 'em, pack 'em and rack 'em" - Die Hard 2
+ */
+const landmarkGroups = computed(() =>
+  [...visibleLandmarksByIndex.value.entries()].flatMap(([index, items]) => {
+    const first = items[0]
+    if (!first) {
+      return []
+    }
+
+    const isGrouped = items.length > 1
+
+    return [
+      {
+        index,
+        count: items.length,
+        name: isGrouped ? `${items.length} updates` : first.name,
+        title: items.map((item) => item.name).join(' + '),
+        iconSvg: isGrouped ? SVG_ICON.layers : first.iconSvg,
+        series: isGrouped ? undefined : first.series,
+        offsetY: isGrouped ? undefined : first.offsetY,
+      },
+    ]
+  }),
+)
+
+/**
+ * Landmarks close to the first or last date would render their centered label
+ * outside of the chart, where it gets cut off. Keeping the label anchored in
+ * the middle
+ */
+function placeLandmarkLabelX({
+  svg,
+  name,
+  x,
+}: {
+  svg: VueUiXySvgSlotProps['svg']
+  name: string
+  x: number
+}): number {
+  const halfLabelWidth = (name.length * LANDMARK_LABEL_CHAR_WIDTH) / 2
+  const minX = LANDMARK_LABEL_PADDING + halfLabelWidth
+  const maxX = svg.width - LANDMARK_LABEL_PADDING - halfLabelWidth
+
+  if (minX > maxX) {
+    return svg.width / 2
+  }
+
+  return Math.min(Math.max(x, minX), maxX)
+}
+
 function placeLandmark({
   svg,
   landmark,
   plotIndex,
 }: {
   svg: VueUiXySvgSlotProps['svg']
-  landmark: Landmark
+  landmark: Pick<Landmark, 'series' | 'offsetY'>
   plotIndex: number
 }): {
   translate: string // for the landmark group wrapper
@@ -292,16 +351,10 @@ function placeLandmark({
                 style="pointer-events: none"
               >
                 <template
-                  v-for="(landmark, j) in keyDates"
-                  :key="`${landmark?.date}-${landmark?.name}-${j}`"
+                  v-for="landmark in landmarkGroups"
+                  :key="`${landmark.index}-${landmark.name}`"
                 >
-                  <g
-                    v-if="
-                      landmark &&
-                      landmark.index === i + svg.slicer.start &&
-                      landmark.visible
-                    "
-                  >
+                  <g v-if="landmark.index === i + svg.slicer.start">
                     <!-- Landmark label -->
                     <text
                       :fill="colors.textMuted"
@@ -310,8 +363,14 @@ function placeLandmark({
                       stroke-width="3"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      font-size="11"
-                      :x="plot.x"
+                      :font-size="LANDMARK_LABEL_FONT_SIZE"
+                      :x="
+                        placeLandmarkLabelX({
+                          svg,
+                          name: landmark.name,
+                          x: plot.x,
+                        })
+                      "
                       :y="svg.drawingArea.bottom - 4"
                       text-anchor="middle"
                       dominant-baseline="middle"
@@ -330,7 +389,8 @@ function placeLandmark({
                       style="pointer-events: all; cursor: default"
                       opacity="1"
                     >
-                      <title>{{ landmark.name }}</title>
+                      <title>{{ landmark.title }}</title>
+                      <circle r="12" :fill="colors.bg" />
                       <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
                       <g
                         transform="translate(-7.68, -7.68) scale(0.64)"
@@ -342,6 +402,22 @@ function placeLandmark({
                         v-html="landmark.iconSvg"
                       />
                       <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
+                      <!-- Number of landmarks sharing the same day -->
+                      <text
+                        v-if="landmark.count > 1"
+                        :fill="colors.textMuted"
+                        :stroke="colors.bg"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        paint-order="stroke fill"
+                        font-size="10"
+                        x="11"
+                        y="-8"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                      >
+                      </text>
                     </g>
                   </g>
                 </template>
