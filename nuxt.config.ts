@@ -148,12 +148,12 @@ export default defineNuxtConfig({
         maxAge: 60 * 5,
       },
     },
+
     '/api/scan/**': {
       isr: {
         expiration: 60 * 10,
         passQuery: true,
       },
-      cache: { maxAge: 600 },
     },
     '/feed.xml': {
       cache: {
