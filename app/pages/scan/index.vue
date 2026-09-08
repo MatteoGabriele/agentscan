@@ -52,8 +52,10 @@ async function handleSubmit(value: string) {
     @submit="handleSubmit"
   />
 
+  <LazyRepoSuggestions :query="repoInput" hydrate-on-visible class="mt-8" />
+
   <p
-    class="mt-4 mx-auto max-w-lg text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
+    class="mt-8 mx-auto max-w-lg text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
   >
     Results are based on pattern analysis and should be interpreted as possible
     signals, not conclusions. Always verify findings with additional context.
