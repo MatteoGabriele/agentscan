@@ -42,7 +42,7 @@
     "@unocss/preset-icons": "^66.10.0",
     "@unveil/identity": "2.1.0",
     "@unveil/vk": "^0.6.0",
-    "@vueuse/core": "^14.2.1",
+    "@vueuse/core": "^14.4.0",
     "dayjs": "^1.11.19",
     "nuxt": "^4.5.2",
     "octokit": "^5.0.5",
