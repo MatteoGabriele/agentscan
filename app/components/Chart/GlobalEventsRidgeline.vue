@@ -67,7 +67,8 @@ const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
 
     week.percentages.set(
       weekdayIndex,
-      countsByDate.value?.[scanTime]?.[classification.category].percentage ?? 0,
+      countsByDate.value?.[scanTime]?.[classification.category]?.percentage ??
+        0,
     )
 
     weeks.set(weekKey, week)

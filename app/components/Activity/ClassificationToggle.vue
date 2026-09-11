@@ -33,5 +33,5 @@ const options = computed(() => [
 </script>
 
 <template>
-  <Toggle :options="options" v-model="selected" />
+  <Toggle v-model="selected" :options="options" />
 </template>
