@@ -41,6 +41,9 @@
         <LazyChartScoreDistribution hydrate-on-visible />
       </div>
       <div class="w-full">
+        <LazyChartGlobalEventsRidgeline hydrate-on-visible />
+      </div>
+      <div class="w-full">
         <LazyReportWeeklyClassification
           :hydrate-on-visible="{ rootMargin: '0px 0px 600px 0px' }"
         />
