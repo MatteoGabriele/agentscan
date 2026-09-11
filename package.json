@@ -38,7 +38,7 @@
     "@tiptap/extension-placeholder": "^3.27.1",
     "@tiptap/extension-text": "^3.27.1",
     "@tiptap/starter-kit": "^3.31.3",
-    "@tiptap/vue-3": "^3.27.1",
+    "@tiptap/vue-3": "^3.31.3",
     "@unocss/preset-icons": "^66.10.0",
     "@unveil/identity": "2.1.0",
     "@unveil/vk": "^0.6.0",
