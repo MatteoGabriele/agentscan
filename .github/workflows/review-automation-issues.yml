@@ -70,6 +70,23 @@ jobs:
           ref: main
           # Full history, so the approvals branch can be rebased onto main.
           fetch-depth: 0
+          # No token left in .git/config. The steps below hand one to the git
+          # commands that need it, and to those only.
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      # Installed before the branch is checked out and without lifecycle
+      # scripts, so nothing from the dependency tree runs next to a token or a
+      # pushable branch.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       # Approvals are staged on $BRANCH. When its PR is still open the branch is
       # checked out and brought up to date with main first, so `add:automation`
@@ -79,6 +96,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Credentials per command, so they outlive none of them.
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 | tr -d '\n')"
+          git_auth() {
+            git -c http.extraheader="AUTHORIZATION: basic $auth" "$@"
+          }
+
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
@@ -86,7 +109,7 @@ jobs:
 
           if [ -n "$pr" ]; then
             echo "Reusing the open PR #$pr on $BRANCH"
-            git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+            git_auth fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
             git checkout -B "$BRANCH" "origin/$BRANCH"
 
             if ! git rebase origin/main; then
@@ -100,17 +123,6 @@ jobs:
           fi
 
           echo "PR_NUMBER=$pr" >> "$GITHUB_ENV"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Enable corepack
-        run: corepack enable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Count reactions and stage approvals
         env:
@@ -138,6 +150,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 | tr -d '\n')"
+          git_auth() {
+            git -c http.extraheader="AUTHORIZATION: basic $auth" "$@"
+          }
+
           git add data/verified-automations-list.json
 
           if git diff --cached --quiet; then
@@ -162,14 +179,14 @@ jobs:
           pushed=''
 
           for attempt in 1 2 3; do
-            if git push $force origin "HEAD:refs/heads/$BRANCH"; then
+            if git_auth push $force origin "HEAD:refs/heads/$BRANCH"; then
               pushed='yes'
               echo "Pushed on attempt $attempt ($count line(s) added)"
               break
             fi
 
             # Someone pushed to the PR in the meantime; replay on top of it.
-            git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+            git_auth fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
 
             if ! git rebase "origin/$BRANCH"; then
               git rebase --abort || true
@@ -235,9 +252,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          # Nothing here pushes, so the checkout keeps no token at all.
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 
@@ -245,7 +265,7 @@ jobs:
         run: corepack enable
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Post the pending report digest
         env:
