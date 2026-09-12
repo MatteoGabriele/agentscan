@@ -9,17 +9,17 @@
  *                    write the outcomes to --decisions=<file>
  *   --mode=finalize  replay that file: comment, relabel and close the issues
  *
- * main is protected, so the entries are committed to BRANCH through the GitHub
- * API (see lib/approvals-branch) and merged by hand from one pull request.
- * Nothing is cloned or pushed. If staging fails, the decisions file is never
- * written, finalize has nothing to replay, the issues stay open and the next
- * run redoes the work from scratch.
+ * main is protected, so the entries are committed through the GitHub API (see
+ * lib/approvals-branch) to a branch of this run's own, opened as a pull request
+ * and merged by hand. Nothing is cloned or pushed. If staging fails, the
+ * decisions file is never written, finalize has nothing to replay, the issues
+ * stay open and the next run redoes the work from scratch.
  *
  * Configuration comes from the environment (see the workflow):
  *   REVIEWERS       newline- or comma-separated GitHub handles that may vote
  *   MIN_APPROVALS   👍 from reviewers needed to flag the account
  *   MIN_REJECTIONS  👎 from reviewers needed to reject outright
- *   BRANCH          branch the approved entries are staged on
+ *   BRANCH          branch this run stages the approved entries on
  *   ISSUE           review only this issue number (same as --issue=)
  */
 
@@ -36,15 +36,22 @@ import { stageApprovals, type Repository } from './lib/approvals-branch'
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
 const BASE = 'main'
-const DEFAULT_BRANCH = 'automation/approved-reports'
 
 const COMMIT_MESSAGE = 'chore: add approved automation reports'
 const PR_TITLE = COMMIT_MESSAGE
 const PR_BODY = [
   'Automation reports that reached the required approvals, staged by [the review workflow](https://github.com/MatteoGabriele/agentscan/actions/workflows/review-automation-issues.yml).',
   '',
-  'Later approvals are appended to this pull request until it is merged.',
+  'The issues behind these entries are already closed, so merging this is all that is left.',
 ].join('\n')
+
+/**
+ * The branch this run stages on. One run, one branch, one pull request: the
+ * workflow passes a name built from the run id, and a local run falls back to
+ * the clock so it never collides with a branch already on the remote.
+ */
+const branchName = (): string =>
+  process.env.BRANCH || `automation/approvals-${Date.now()}`
 
 const PENDING_LABEL = 'automation:pending'
 const CONFIRMED_LABEL = 'automation:confirmed'
@@ -280,9 +287,9 @@ function entryFor(report: Report, approvedBy: string[]): AutomationEntry {
 }
 
 /**
- * Puts the approved entries on the approvals branch and opens or reuses its
- * pull request, then records on each decision whether it actually
- * added anything — the closing comment says so.
+ * Puts the approved entries on this run's branch and opens the pull request for
+ * it, then records on each decision whether it actually added anything — the
+ * closing comment says so.
  */
 async function stage(
   octokit: Octokit,
@@ -297,7 +304,7 @@ async function stage(
     owner: OWNER,
     repo: REPO,
     base: BASE,
-    branch: process.env.BRANCH || DEFAULT_BRANCH,
+    branch: branchName(),
   }
 
   const { added, alreadyListed, pull } = await stageApprovals(
@@ -320,7 +327,7 @@ async function stage(
 
   if (pull) {
     console.log(
-      `\n${pull.created ? '🔀 Opened' : '➕ Appended to'} pull request #${pull.number} (${added.length} entries)`,
+      `\n🔀 Opened pull request #${pull.number} (${added.length} entries)`,
     )
   }
 }

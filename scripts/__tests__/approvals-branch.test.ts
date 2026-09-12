@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { Octokit } from 'octokit'
 import {
+  LIST_PATH,
   serializeList,
   split,
   stageApprovals,
@@ -11,7 +12,7 @@ import type { AutomationEntry } from '../parse-automation-issue'
 const repository: Repository = {
   owner: 'MatteoGabriele',
   repo: 'agentscan',
-  branch: 'automation/approved-reports',
+  branch: 'automation/approvals-123',
   base: 'main',
 }
 
@@ -31,14 +32,10 @@ const entry = (username: string): AutomationEntry => ({
 })
 
 /**
- * The API surface stageApprovals touches: the open pull request, the list on
- * whichever ref it reads, and the calls that reset the branch and write to it.
+ * The API surface stageApprovals touches: the list on main, the branch it cuts
+ * for this run, and the commit and pull request it puts on it.
  */
-function fakeOctokit({
-  open = null as number | null,
-  list = [] as AutomationEntry[],
-  branchMissing = false,
-}) {
+function fakeOctokit({ list = [] as AutomationEntry[] } = {}) {
   const calls = {
     getContent: vi.fn(async () => ({
       data: {
@@ -46,15 +43,6 @@ function fakeOctokit({
         content: Buffer.from(serializeList(list)).toString('base64'),
       },
     })),
-    updateRef: vi.fn(async () => {
-      if (branchMissing) {
-        throw Object.assign(new Error('Reference does not exist'), {
-          status: 422,
-        })
-      }
-
-      return { data: {} }
-    }),
     createRef: vi.fn(async () => ({ data: {} })),
     createOrUpdateFileContents: vi.fn(async () => ({ data: {} })),
     create: vi.fn(async () => ({ data: { number: 99 } })),
@@ -62,19 +50,13 @@ function fakeOctokit({
 
   const octokit = {
     rest: {
-      pulls: {
-        list: vi.fn(async () => ({
-          data: open === null ? [] : [{ number: open }],
-        })),
-        create: calls.create,
-      },
+      pulls: { create: calls.create },
       repos: {
         getContent: calls.getContent,
         createOrUpdateFileContents: calls.createOrUpdateFileContents,
       },
       git: {
         getRef: vi.fn(async () => ({ data: { object: { sha: 'main-sha' } } })),
-        updateRef: calls.updateRef,
         createRef: calls.createRef,
       },
     },
@@ -115,7 +97,7 @@ describe('split', () => {
 })
 
 describe('stageApprovals', () => {
-  it('resets the branch to main and opens a pull request', async () => {
+  it('appends to the list on main and opens a pull request for it', async () => {
     const { octokit, calls, written } = fakeOctokit({ list: [entry('old')] })
 
     const result = await stageApprovals(
@@ -125,19 +107,19 @@ describe('stageApprovals', () => {
       pullRequest,
     )
 
-    // The branch is rebuilt on main's tip, so the list is read from main.
-    expect(calls.updateRef).toHaveBeenCalledWith(
-      expect.objectContaining({ sha: 'main-sha', force: true }),
-    )
+    // Read from main, never from a branch: nothing is staged anywhere else.
     expect(calls.getContent).toHaveBeenCalledWith(
-      expect.objectContaining({ ref: 'main' }),
+      expect.objectContaining({ path: LIST_PATH, ref: 'main' }),
     )
     expect(written().map((e) => e.username)).toEqual(['old', 'new'])
-    expect(result.pull).toEqual({ number: 99, created: true })
+    expect(result.pull).toEqual({ number: 99 })
+    expect(calls.create).toHaveBeenCalledWith(
+      expect.objectContaining({ head: repository.branch, base: 'main' }),
+    )
   })
 
-  it('creates the branch when it does not exist yet', async () => {
-    const { octokit, calls } = fakeOctokit({ branchMissing: true })
+  it('cuts this run’s branch from main’s tip', async () => {
+    const { octokit, calls } = fakeOctokit()
 
     await stageApprovals(octokit, repository, [entry('new')], pullRequest)
 
@@ -147,31 +129,6 @@ describe('stageApprovals', () => {
         sha: 'main-sha',
       }),
     )
-  })
-
-  it('appends to the open pull request instead of resetting the branch', async () => {
-    const { octokit, calls, written } = fakeOctokit({
-      open: 7,
-      list: [entry('staged')],
-    })
-
-    const result = await stageApprovals(
-      octokit,
-      repository,
-      [entry('new'), entry('staged')],
-      pullRequest,
-    )
-
-    expect(calls.updateRef).not.toHaveBeenCalled()
-    // The list is read from the branch, so entries waiting in the pull request
-    // are deduped against too.
-    expect(calls.getContent).toHaveBeenCalledWith(
-      expect.objectContaining({ ref: repository.branch }),
-    )
-    expect(written().map((e) => e.username)).toEqual(['staged', 'new'])
-    expect(result.alreadyListed).toEqual(['staged'])
-    expect(result.pull).toEqual({ number: 7, created: false })
-    expect(calls.create).not.toHaveBeenCalled()
   })
 
   it('writes nothing when every entry is already listed', async () => {
@@ -184,6 +141,7 @@ describe('stageApprovals', () => {
       pullRequest,
     )
 
+    expect(calls.createRef).not.toHaveBeenCalled()
     expect(calls.createOrUpdateFileContents).not.toHaveBeenCalled()
     expect(calls.create).not.toHaveBeenCalled()
     expect(result).toMatchObject({ added: [], alreadyListed: ['listed'] })
@@ -191,12 +149,27 @@ describe('stageApprovals', () => {
   })
 
   it('sends the blob sha it read, so a concurrent write is rejected', async () => {
-    const { octokit, calls } = fakeOctokit({})
+    const { octokit, calls } = fakeOctokit()
 
     await stageApprovals(octokit, repository, [entry('new')], pullRequest)
 
     expect(calls.createOrUpdateFileContents).toHaveBeenCalledWith(
       expect.objectContaining({ sha: 'blob-sha', branch: repository.branch }),
     )
+  })
+
+  it('surfaces a failed branch creation instead of staging anyway', async () => {
+    const { octokit, calls } = fakeOctokit()
+    calls.createRef.mockRejectedValueOnce(
+      Object.assign(new Error('Reference already exists'), { status: 422 }),
+    )
+
+    await expect(
+      stageApprovals(octokit, repository, [entry('new')], pullRequest),
+    ).rejects.toThrow('Reference already exists')
+
+    // The caller leaves the issues open, so the next run stages them again.
+    expect(calls.createOrUpdateFileContents).not.toHaveBeenCalled()
+    expect(calls.create).not.toHaveBeenCalled()
   })
 })

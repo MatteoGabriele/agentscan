@@ -1,17 +1,18 @@
 /// <reference types="node" />
 /**
- * Stage approved automation entries on the approvals branch through the GitHub
- * API.
+ * Stage approved automation entries on a branch through the GitHub API.
  *
  * main is protected, so approvals cannot be committed to it directly. Nothing
- * is cloned or pushed from the runner: the list is read, the new entries are
- * appended in memory, and the result is written back as a single file commit.
+ * is cloned or pushed from the runner: the list is read from main, the new
+ * entries are appended in memory, and the result is written back as a single
+ * file commit on a branch of its own, which is then opened as a pull request
+ * for a maintainer to merge.
  *
- * One long-lived branch, one open pull request. While that pull request is
- * open the commit is added on top of the branch, so later approvals are
- * appended to it. Once it is merged (or closed) the branch is reset to main and
- * the next approval starts a fresh pull request, which is what keeps the branch
- * from ever falling behind main.
+ * One run, one branch, one pull request, always cut from main's tip — there is
+ * no branch to keep in sync and no open pull request to append to. Nothing
+ * here recovers from a failure either: the caller only closes the issues once
+ * staging has landed, so a failed run leaves every report open and the next
+ * scheduled run stages them again from scratch.
  */
 
 import type { Octokit } from 'octokit'
@@ -22,7 +23,7 @@ export const LIST_PATH = 'data/verified-automations-list.json'
 export interface Repository {
   owner: string
   repo: string
-  /** Long-lived branch the approvals are staged on. */
+  /** Branch this run stages its approvals on. Must not exist yet. */
   branch: string
   /** Branch the approvals are ultimately merged into. */
   base: string
@@ -31,10 +32,10 @@ export interface Repository {
 export interface StageResult {
   /** Entries written to the branch by this run. */
   added: AutomationEntry[]
-  /** Usernames that were already listed, on main or on the open pull request. */
+  /** Usernames that were already on the list. */
   alreadyListed: string[]
   /** The pull request holding the entries, or null when nothing was added. */
-  pull: { number: number; created: boolean } | null
+  pull: { number: number } | null
 }
 
 /** How the list is written to disk, matching what prettier produces. */
@@ -75,81 +76,27 @@ export function split(
   return { added, alreadyListed }
 }
 
-/** The open pull request for the branch, or null when there is none. */
-async function openPull(
-  octokit: Octokit,
-  { owner, repo, branch, base }: Repository,
-): Promise<number | null> {
-  const { data } = await octokit.rest.pulls.list({
-    owner,
-    repo,
-    head: `${owner}:${branch}`,
-    base,
-    state: 'open',
-    per_page: 1,
-  })
-
-  return data[0]?.number ?? null
-}
-
-/** Points the branch at main's tip, creating it when it does not exist yet. */
-async function resetToBase(
-  octokit: Octokit,
-  { owner, repo, branch, base }: Repository,
-): Promise<void> {
-  const { data: tip } = await octokit.rest.git.getRef({
-    owner,
-    repo,
-    ref: `heads/${base}`,
-  })
-
-  try {
-    await octokit.rest.git.updateRef({
-      owner,
-      repo,
-      ref: `heads/${branch}`,
-      sha: tip.object.sha,
-      force: true,
-    })
-  } catch (error) {
-    if ((error as { status?: number })?.status !== 422) {
-      throw error
-    }
-
-    await octokit.rest.git.createRef({
-      owner,
-      repo,
-      ref: `refs/heads/${branch}`,
-      sha: tip.object.sha,
-    })
-  }
-}
-
 /**
- * Adds `incoming` to the approvals branch and makes sure a pull request is open
- * for it, deduped against main and against whatever that pull request already
- * stages.
+ * Adds `incoming` to a branch of its own and opens a pull request for it,
+ * deduped against the list on main.
+ *
+ * Only main is deduped against. The report behind an entry waiting in an
+ * earlier, still-open pull request was closed when that pull request was
+ * opened, so it is never counted twice — but a *second* report for the same
+ * account would be, and staging it here would add the account again. Merging
+ * the open pull request is what closes that window.
  */
 export async function stageApprovals(
   octokit: Octokit,
-  repository: Repository,
+  { owner, repo, branch, base }: Repository,
   incoming: AutomationEntry[],
   { message, title, body }: { message: string; title: string; body: string },
 ): Promise<StageResult> {
-  const { owner, repo, branch, base } = repository
-  const pull = await openPull(octokit, repository)
-
-  if (pull === null) {
-    // No pull request to append to, so the branch starts again from main and
-    // the list is read from there.
-    await resetToBase(octokit, repository)
-  }
-
   const { data: file } = await octokit.rest.repos.getContent({
     owner,
     repo,
     path: LIST_PATH,
-    ref: pull === null ? base : branch,
+    ref: base,
   })
 
   if (!('content' in file)) {
@@ -166,24 +113,33 @@ export async function stageApprovals(
     return { added, alreadyListed, pull: null }
   }
 
+  const { data: tip } = await octokit.rest.git.getRef({
+    owner,
+    repo,
+    ref: `heads/${base}`,
+  })
+
+  await octokit.rest.git.createRef({
+    owner,
+    repo,
+    ref: `refs/heads/${branch}`,
+    sha: tip.object.sha,
+  })
+
   await octokit.rest.repos.createOrUpdateFileContents({
     owner,
     repo,
     path: LIST_PATH,
     branch,
     message,
-    // The blob being replaced. The branch is at main's tip or is the one this
-    // sha was read from, so a stale sha means a concurrent run and the call is
-    // rejected rather than overwriting it.
+    // The blob being replaced. The branch is at the tip this sha was read
+    // from, so a stale sha means main moved mid-run and the call is rejected
+    // rather than overwriting it.
     sha: file.sha,
     content: Buffer.from(serializeList([...list, ...added])).toString('base64'),
   })
 
-  if (pull !== null) {
-    return { added, alreadyListed, pull: { number: pull, created: false } }
-  }
-
-  const { data: created } = await octokit.rest.pulls.create({
+  const { data: pull } = await octokit.rest.pulls.create({
     owner,
     repo,
     head: branch,
@@ -192,9 +148,5 @@ export async function stageApprovals(
     body,
   })
 
-  return {
-    added,
-    alreadyListed,
-    pull: { number: created.number, created: true },
-  }
+  return { added, alreadyListed, pull: { number: pull.number } }
 }

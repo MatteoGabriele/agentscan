@@ -48,10 +48,10 @@ env:
 
   DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
 
-  # main is protected, so approvals land on this branch and are merged by hand.
-  # One long-lived branch, one open PR: later approvals are appended to it, and
-  # the branch restarts from main once that PR is merged.
-  BRANCH: automation/approved-reports
+  # main is protected, so approvals land on a branch and are merged by hand.
+  # One branch per run, cut from main's tip and left behind once its pull
+  # request is merged, so no run has to reconcile with an earlier one.
+  BRANCH: automation/approvals-${{ github.run_id }}
 
 jobs:
   review:
@@ -88,8 +88,8 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       # Counts the reactions, commits the approved entries to $BRANCH through the
-      # API, and opens the pull request or appends to the one already open.
-      # Issues are left alone until all of that has landed.
+      # API, and opens the pull request for it. Issues are left alone until all
+      # of that has landed.
       - name: Count reactions and stage approvals
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
