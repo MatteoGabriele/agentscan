@@ -21,7 +21,8 @@ on:
         default: false
         type: boolean
 
-# The hourly scan pushes to main too, so the two take turns instead of racing.
+# The hourly scan pushes to main, and this run rebases the approvals branch onto
+# it, so the two take turns instead of racing.
 concurrency:
   group: scan-results
   cancel-in-progress: false
@@ -47,6 +48,10 @@ env:
 
   DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
 
+  # main is protected, so approvals land on this branch and are merged by hand.
+  # One long-lived branch, one open PR: later approvals are appended to it.
+  BRANCH: automation/approved-reports
+
 jobs:
   review:
     if: github.repository == 'MatteoGabriele/agentscan'
@@ -54,14 +59,47 @@ jobs:
     permissions:
       contents: write
       issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           # Approvals are finalized against main, so a workflow_dispatch from
           # another ref cannot land entries anywhere else.
           ref: main
+          # Full history, so the approvals branch can be rebased onto main.
+          fetch-depth: 0
+
+      # Approvals are staged on $BRANCH. When its PR is still open the branch is
+      # checked out and brought up to date with main first, so `add:automation`
+      # dedupes against the entries waiting in that PR as well as the ones on
+      # main, and the new approvals are appended to the same PR.
+      - name: Check out the approvals branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          pr="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+
+          if [ -n "$pr" ]; then
+            echo "Reusing the open PR #$pr on $BRANCH"
+            git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::$BRANCH does not rebase cleanly onto main. Resolve PR #$pr by hand; issues stay open and the next run retries."
+              exit 1
+            fi
+          else
+            echo "No open PR on $BRANCH — starting it from main"
+            git checkout -B "$BRANCH" origin/main
+          fi
+
+          echo "PR_NUMBER=$pr" >> "$GITHUB_ENV"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -72,7 +110,7 @@ jobs:
         run: corepack enable
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Count reactions and stage approvals
         env:
@@ -96,11 +134,10 @@ jobs:
             --decisions="$DECISIONS_FILE" \
             "${args[@]}"
 
-      - name: Commit and push approvals
+      - name: Commit approvals and open a pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
           git add data/verified-automations-list.json
 
           if git diff --cached --quiet; then
@@ -111,24 +148,58 @@ jobs:
           count="$(git diff --cached --numstat -- data/verified-automations-list.json | awk '{print $1}')"
           git commit -m "chore: add approved automation reports"
 
-          # Main moves on its own (hourly scan, merged PRs), so rebase onto
-          # whatever landed while this run was working.
-          git fetch origin main
+          if [ -n "$PR_NUMBER" ]; then
+            # The branch was rebased onto main above, so the push has to be
+            # forced — with a lease, so anything pushed to the open PR since the
+            # fetch stops it instead of being overwritten.
+            force='--force-with-lease'
+          else
+            # No open PR: the branch was re-created from main, so whatever a
+            # closed or merged PR left behind on the remote is replaced.
+            force='--force'
+          fi
+
+          pushed=''
 
           for attempt in 1 2 3; do
-            if git rebase origin/main && git push origin HEAD:main; then
+            if git push $force origin "HEAD:refs/heads/$BRANCH"; then
+              pushed='yes'
               echo "Pushed on attempt $attempt ($count line(s) added)"
-              exit 0
+              break
             fi
-            git rebase --abort || true
+
+            # Someone pushed to the PR in the meantime; replay on top of it.
+            git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+
+            if ! git rebase "origin/$BRANCH"; then
+              git rebase --abort || true
+              break
+            fi
+
+            # The remote is known now, so the retry can hold a lease on it.
+            force='--force-with-lease'
+
             sleep $((attempt * 5))
-            git fetch origin main
           done
 
-          echo "::error::Could not push the approved automation entries to main; issues were left open and will be retried next run."
-          exit 1
+          if [ -z "$pushed" ]; then
+            echo "::error::Could not push the approved automation entries to $BRANCH; issues were left open and will be retried next run."
+            exit 1
+          fi
 
-      # Only now that the entries are on main: comment, relabel and close.
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Appended to the open PR #$PR_NUMBER"
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: add approved automation reports" \
+            --body "Automation reports that reached the required approvals, staged by [the review workflow](https://github.com/$GITHUB_REPOSITORY/actions/workflows/review-automation-issues.yml). Later approvals are appended to this PR until it is merged."
+
+      # Only now that the entries are safely on the branch: comment, relabel
+      # and close.
       - name: Close reviewed issues
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -163,10 +234,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: '24'
 
@@ -174,7 +245,7 @@ jobs:
         run: corepack enable
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Post the pending report digest
         env:

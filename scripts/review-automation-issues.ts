@@ -3,13 +3,13 @@
  * Review community-reported automation issues by counting reviewer reactions.
  *
  * It runs in two modes, so an issue is never closed before its entry is safely
- * on main:
+ * staged for main:
  *   --mode=decide    count reactions, run `add:automation` for approved issues
  *                    and write the outcomes to --decisions=<file>
  *   --mode=finalize  replay that file: comment, relabel and close the issues
- * The workflow commits and pushes in between. If that push fails, finalize
- * never runs, the issues stay open, and the next run redoes the work from
- * scratch.
+ * main is protected, so the workflow commits in between onto a branch and opens
+ * (or appends to) a pull request. If that push fails, finalize never runs, the
+ * issues stay open, and the next run redoes the work from scratch.
  *
  * Configuration comes from the environment (see the workflow):
  *   REVIEWERS       newline- or comma-separated GitHub handles that may vote
