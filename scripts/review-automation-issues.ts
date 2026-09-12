@@ -3,26 +3,48 @@
  * Review community-reported automation issues by counting reviewer reactions.
  *
  * It runs in two modes, so an issue is never closed before its entry is safely
- * on main:
- *   --mode=decide    count reactions, run `add:automation` for approved issues
- *                    and write the outcomes to --decisions=<file>
+ * staged for main:
+ *   --mode=decide    count reactions, stage the approved entries on the
+ *                    approvals branch, open or reuse its pull request, and
+ *                    write the outcomes to --decisions=<file>
  *   --mode=finalize  replay that file: comment, relabel and close the issues
- * The workflow commits and pushes in between. If that push fails, finalize
- * never runs, the issues stay open, and the next run redoes the work from
- * scratch.
+ *
+ * main is protected, so the entries are committed to BRANCH through the GitHub
+ * API (see lib/approvals-branch) and merged by hand from one pull request.
+ * Nothing is cloned or pushed. If staging fails, the decisions file is never
+ * written, finalize has nothing to replay, the issues stay open and the next
+ * run redoes the work from scratch.
  *
  * Configuration comes from the environment (see the workflow):
  *   REVIEWERS       newline- or comma-separated GitHub handles that may vote
  *   MIN_APPROVALS   👍 from reviewers needed to flag the account
  *   MIN_REJECTIONS  👎 from reviewers needed to reject outright
+ *   BRANCH          branch the approved entries are staged on
+ *   ISSUE           review only this issue number (same as --issue=)
  */
 
 import fs from 'fs'
-import { execFileSync } from 'child_process'
 import { Octokit } from 'octokit'
+import {
+  generateEntry,
+  parseIssueBody,
+  validateEntry,
+  type AutomationEntry,
+} from './parse-automation-issue'
+import { stageApprovals, type Repository } from './lib/approvals-branch'
 
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
+const BASE = 'main'
+const DEFAULT_BRANCH = 'automation/approved-reports'
+
+const COMMIT_MESSAGE = 'chore: add approved automation reports'
+const PR_TITLE = COMMIT_MESSAGE
+const PR_BODY = [
+  'Automation reports that reached the required approvals, staged by [the review workflow](https://github.com/MatteoGabriele/agentscan/actions/workflows/review-automation-issues.yml).',
+  '',
+  'Later approvals are appended to this pull request until it is merged.',
+].join('\n')
 
 const PENDING_LABEL = 'automation:pending'
 const CONFIRMED_LABEL = 'automation:confirmed'
@@ -143,10 +165,20 @@ function client(): Octokit {
   return new Octokit({ auth })
 }
 
+/** An open report, with everything needed to build its list entry. */
+export interface Report {
+  number: number
+  labels: string[]
+  body: string
+  issueUrl: string
+  reportedBy: string
+  createdAt: string
+}
+
 export async function openReports(
   octokit: Octokit,
   only?: number,
-): Promise<{ number: number; labels: string[] }[]> {
+): Promise<Report[]> {
   const issues = only
     ? [
         (
@@ -175,6 +207,10 @@ export async function openReports(
         labels: issue.labels.map((label) =>
           typeof label === 'string' ? label : label.name || '',
         ),
+        body: issue.body || '',
+        issueUrl: issue.html_url,
+        reportedBy: issue.user?.login || '',
+        createdAt: issue.created_at.split('T')[0],
       }))
       .filter((issue) => issue.labels.includes('automation'))
       // Already ruled on by hand; leave it alone.
@@ -222,38 +258,70 @@ export async function tally(
   }
 }
 
-/** Returns true when the entry is already in the list, so nothing was added. */
-function addAutomation(issue: number, approvedBy: string[]): boolean {
-  try {
-    const output = execFileSync(
-      'pnpm',
-      [
-        'add:automation',
-        String(issue),
-        // The 👍 that carried it, recorded on the entry itself.
-        `--approved-by=${approvedBy.join(',')}`,
-      ],
-      {
-        encoding: 'utf-8',
-        stdio: 'pipe',
-        env: process.env,
-      },
+/**
+ * The list entry a report becomes. Built here from the issue already fetched,
+ * rather than by shelling out to `add:automation`, so a report that does not
+ * parse fails the run instead of being reported through a subprocess’s stderr.
+ */
+function entryFor(report: Report, approvedBy: string[]): AutomationEntry {
+  const entry = generateEntry(
+    parseIssueBody(report.body),
+    report.issueUrl,
+    report.reportedBy,
+    report.createdAt,
+    approvedBy,
+  )
+
+  if (!validateEntry(entry)) {
+    throw new Error(`Issue #${report.number} does not parse into a list entry`)
+  }
+
+  return entry
+}
+
+/**
+ * Puts the approved entries on the approvals branch and opens or reuses its
+ * pull request, then records on each decision whether it actually
+ * added anything — the closing comment says so.
+ */
+async function stage(
+  octokit: Octokit,
+  approved: { decision: Decision; entry: AutomationEntry }[],
+): Promise<void> {
+  if (approved.length === 0) {
+    console.log('\nNothing approved, so nothing to stage')
+    return
+  }
+
+  const repository: Repository = {
+    owner: OWNER,
+    repo: REPO,
+    base: BASE,
+    branch: process.env.BRANCH || DEFAULT_BRANCH,
+  }
+
+  const { added, alreadyListed, pull } = await stageApprovals(
+    octokit,
+    repository,
+    approved.map(({ entry }) => entry),
+    { message: COMMIT_MESSAGE, title: PR_TITLE, body: PR_BODY },
+  )
+
+  for (const { decision, entry } of approved) {
+    decision.alreadyListed = !added.includes(entry)
+  }
+
+  for (const entry of added) {
+    console.log(`✓ Staged @${entry.username}`)
+  }
+  for (const username of alreadyListed) {
+    console.log(`ℹ @${username} is already on the list`)
+  }
+
+  if (pull) {
+    console.log(
+      `\n${pull.created ? '🔀 Opened' : '➕ Appended to'} pull request #${pull.number} (${added.length} entries)`,
     )
-    console.log(output.trim())
-    return false
-  } catch (error) {
-    const failure = error as { stdout?: string; stderr?: string }
-    const output = `${failure.stdout || ''}${failure.stderr || ''}`
-
-    if (output.includes('already exists in the list')) {
-      console.log(`ℹ️ Issue #${issue} is already in the list`)
-      return true
-    }
-
-    console.error(output.trim())
-    throw new Error(`add:automation failed for issue #${issue}`, {
-      cause: error,
-    })
   }
 }
 
@@ -358,19 +426,39 @@ function flag(name: string): string | undefined {
   return match?.split('=').slice(1).join('=')
 }
 
+/**
+ * The single issue to review, from `--issue=` or the ISSUE environment variable
+ * the workflow passes its input through. Validated here rather than in yaml, so
+ * the workflow never has to interpolate the input into a shell command.
+ */
+function onlyIssue(): number | undefined {
+  const raw = (flag('issue') ?? process.env.ISSUE ?? '').trim()
+
+  if (!raw) {
+    return undefined
+  }
+
+  if (!/^\d+$/.test(raw)) {
+    console.error(`✗ issue must be an issue number, got: ${raw}`)
+    process.exit(1)
+  }
+
+  return parseInt(raw, 10)
+}
+
 async function decidePhase(
   octokit: Octokit,
   config: Config,
   decisionsPath: string,
 ): Promise<void> {
-  const only = flag('issue') ? parseInt(flag('issue')!, 10) : undefined
-  const reports = await openReports(octokit, only)
+  const reports = await openReports(octokit, onlyIssue())
 
   console.log(
     `🔍 Reviewing ${reports.length} open automation report(s) against ${config.reviewers.length} reviewer(s)\n`,
   )
 
   const decisions: Decision[] = []
+  const approved: { decision: Decision; entry: AutomationEntry }[] = []
 
   for (const report of reports) {
     const counted = await tally(octokit, report.number, config.reviewers)
@@ -387,11 +475,18 @@ async function decidePhase(
     const decision: Decision = { issue: report.number, outcome, ...counted }
 
     if (outcome === 'approved') {
-      decision.alreadyListed = addAutomation(report.number, counted.approvedBy)
+      approved.push({
+        decision,
+        entry: entryFor(report, counted.approvedBy),
+      })
     }
 
     decisions.push(decision)
   }
+
+  // Written last: an issue is only closed once its entry is on the branch, so a
+  // failure here leaves every report open for the next run.
+  await stage(octokit, approved)
 
   fs.writeFileSync(decisionsPath, JSON.stringify(decisions, null, 2) + '\n')
   console.log(`\nWrote ${decisions.length} decision(s) to ${decisionsPath}`)

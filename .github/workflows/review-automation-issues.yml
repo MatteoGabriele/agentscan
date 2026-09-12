@@ -21,9 +21,10 @@ on:
         default: false
         type: boolean
 
-# The hourly scan pushes to main too, so the two take turns instead of racing.
+# Two runs of this workflow would stage the same approvals twice, so they queue.
+# The hourly scan is no longer part of the group: nothing here pushes to main.
 concurrency:
-  group: scan-results
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 env:
@@ -47,6 +48,11 @@ env:
 
   DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
 
+  # main is protected, so approvals land on this branch and are merged by hand.
+  # One long-lived branch, one open PR: later approvals are appended to it, and
+  # the branch restarts from main once that PR is merged.
+  BRANCH: automation/approved-reports
+
 jobs:
   review:
     if: github.repository == 'MatteoGabriele/agentscan'
@@ -54,81 +60,48 @@ jobs:
     permissions:
       contents: write
       issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           # Approvals are finalized against main, so a workflow_dispatch from
-          # another ref cannot land entries anywhere else.
+          # another ref cannot run a different version of the scripts.
           ref: main
+          # Only the scripts are needed here: the entries are staged through the
+          # API, so nothing is committed or pushed from the runner and no token
+          # is left in .git/config.
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 
       - name: Enable corepack
         run: corepack enable
 
+      # Installed without lifecycle scripts, so nothing from the dependency tree
+      # runs next to a token that can write to the repository.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      # Counts the reactions, commits the approved entries to $BRANCH through the
+      # API, and opens the pull request or appends to the one already open.
+      # Issues are left alone until all of that has landed.
       - name: Count reactions and stage approvals
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_INPUT: ${{ inputs.issue }}
-        run: |
-          args=()
+          # Read by the script, never interpolated into a command.
+          ISSUE: ${{ inputs.issue }}
+        run: >
+          pnpm exec tsx scripts/review-automation-issues.ts
+          --mode=decide
+          --decisions="$DECISIONS_FILE"
 
-          if [ -n "$ISSUE_INPUT" ]; then
-            case "$ISSUE_INPUT" in
-              *[!0-9]*)
-                echo "::error::issue input must be an issue number, got: $ISSUE_INPUT"
-                exit 1
-                ;;
-            esac
-            args+=("--issue=$ISSUE_INPUT")
-          fi
-
-          pnpm exec tsx scripts/review-automation-issues.ts \
-            --mode=decide \
-            --decisions="$DECISIONS_FILE" \
-            "${args[@]}"
-
-      - name: Commit and push approvals
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          git add data/verified-automations-list.json
-
-          if git diff --cached --quiet; then
-            echo "No new automations to commit"
-            exit 0
-          fi
-
-          count="$(git diff --cached --numstat -- data/verified-automations-list.json | awk '{print $1}')"
-          git commit -m "chore: add approved automation reports"
-
-          # Main moves on its own (hourly scan, merged PRs), so rebase onto
-          # whatever landed while this run was working.
-          git fetch origin main
-
-          for attempt in 1 2 3; do
-            if git rebase origin/main && git push origin HEAD:main; then
-              echo "Pushed on attempt $attempt ($count line(s) added)"
-              exit 0
-            fi
-            git rebase --abort || true
-            sleep $((attempt * 5))
-            git fetch origin main
-          done
-
-          echo "::error::Could not push the approved automation entries to main; issues were left open and will be retried next run."
-          exit 1
-
-      # Only now that the entries are on main: comment, relabel and close.
+      # Only now that the entries are safely on the branch: comment, relabel
+      # and close.
       - name: Close reviewed issues
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -163,10 +136,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          # Nothing here pushes, so the checkout keeps no token at all.
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 
