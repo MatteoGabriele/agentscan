@@ -98,8 +98,8 @@ export function decidedMessage(
 
   const outcome = approved
     ? decision.alreadyListed
-      ? `\`@${report.username}\` was already on the automation list, so no new entry was added.`
-      : `\`@${report.username}\` has been added to the automation list.`
+      ? `\`@${report.username}\` is already on the automation list, so no new entry will be added.`
+      : `\`@${report.username}\` will be added to the automation list.`
     : `\`@${report.username}\` was not flagged.`
 
   return [

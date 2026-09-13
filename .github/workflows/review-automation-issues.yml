@@ -5,73 +5,47 @@ name: Review Automation Reports
 on:
   schedule:
     # Half past the hour, so this does not queue behind the hourly scan.
-    # - cron: '30 * * * *'
-    # # Daily digest. 14:45 UTC is the widest window where Europe and both US
-    # # coasts are awake
-    # - cron: '45 14 * * *'
-  # workflow_dispatch:
-  #   inputs:
-  #     issue:
-  #       description: 'Review only this issue number (leave empty for all open reports)'
-  #       required: false
-  #       type: string
-  #     digest:
-  #       description: 'Also post the pending-report digest to Discord'
-  #       required: false
-  #       default: false
-  #       type: boolean
+    - cron: '30 * * * *'
+    # Daily digest. 14:45 UTC is the widest window where Europe and both US
+    # coasts are awake
+    - cron: '45 14 * * *'
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: 'Review only this issue number (leave empty for all open reports)'
+        required: false
+        type: string
+      digest:
+        description: 'Also post the pending-report digest to Discord'
+        required: false
+        default: false
+        type: boolean
 
-# Two runs of this workflow would stage the same approvals twice, so they queue.
-# The hourly scan is no longer part of the group: nothing here pushes to main.
+# Two runs would comment on and close the same reports twice, so they queue.
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
-
-env:
-  # The Rosen Association
-  REVIEWERS: |
-    MatteoGabriele
-    huang-julien
-    danielroe
-    gameroman
-    sheremet-va
-    ematipico
-    graphieros
-    TheAlexLichter
-    orbisk
-    bluwy
-    trueberryless
-    bnb
-
-  MIN_APPROVALS: '4'
-  MIN_REJECTIONS: '2'
-
-  DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
-
-  # main is protected, so approvals land on a branch and are merged by hand.
-  # One branch per run, cut from main's tip and left behind once its pull
-  # request is merged, so no run has to reconcile with an earlier one.
-  BRANCH: automation/approvals-${{ github.run_id }}
 
 jobs:
   review:
     if: github.repository == 'MatteoGabriele/agentscan'
     runs-on: ubuntu-latest
+    # Issues are the only thing this writes. Approved reports are recorded by
+    # closing them as automation:confirmed; the list entries themselves are
+    # appended by `pnpm publish:automations`, run by a maintainer, so nothing
+    # here needs write access to the repository.
     permissions:
-      contents: write
+      contents: read
       issues: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          # Approvals are finalized against main, so a workflow_dispatch from
-          # another ref cannot run a different version of the scripts.
+          # Approvals are counted against the roster in lib/reviewers, so a
+          # workflow_dispatch from another ref cannot vote itself a new one.
           ref: main
-          # Only the scripts are needed here: the entries are staged through the
-          # API, so nothing is committed or pushed from the runner and no token
-          # is left in .git/config.
+          # Nothing pushes, so the checkout keeps no token at all.
           persist-credentials: false
 
       - name: Setup Node.js
@@ -83,32 +57,19 @@ jobs:
         run: corepack enable
 
       # Installed without lifecycle scripts, so nothing from the dependency tree
-      # runs next to a token that can write to the repository.
+      # runs next to the token.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # Counts the reactions, commits the approved entries to $BRANCH through the
-      # API, and opens the pull request for it. Issues are left alone until all
-      # of that has landed.
-      - name: Count reactions and stage approvals
+      # Counts the reactions, then comments on, relabels and closes whatever has
+      # settled. The outcomes go to automation-decisions.json for the next step,
+      # which both scripts default to; it stays on the runner.
+      - name: Review the open reports
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Read by the script, never interpolated into a command.
           ISSUE: ${{ inputs.issue }}
-        run: >
-          pnpm exec tsx scripts/review-automation-issues.ts
-          --mode=decide
-          --decisions="$DECISIONS_FILE"
-
-      # Only now that the entries are safely on the branch: comment, relabel
-      # and close.
-      - name: Close reviewed issues
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          pnpm exec tsx scripts/review-automation-issues.ts
-          --mode=finalize
-          --decisions="$DECISIONS_FILE"
+        run: pnpm review:automations
 
       # Settled reports only: a pending one never reaches the decisions file, so
       # the channel hears about a report twice at most — once when it opens, and
@@ -117,10 +78,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_REPORT: ${{ secrets.OSS_GUILD_REPORTS_DISCORD_WEBHOOK }}
-        run: >
-          pnpm exec tsx scripts/notify-report-discord.ts
-          --event=decided
-          --decisions="$DECISIONS_FILE"
+        run: pnpm exec tsx scripts/notify-report-discord.ts --event=decided
 
   # A daily digest
   digest:
@@ -138,7 +96,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          # Nothing here pushes, so the checkout keeps no token at all.
           persist-credentials: false
 
       - name: Setup Node.js

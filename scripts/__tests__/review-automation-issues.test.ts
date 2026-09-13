@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { decide, parseReviewers, type Tally } from '../review-automation-issues'
+import { decide, readConfig, type Tally } from '../review-automation-issues'
 
 const config = {
   reviewers: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
@@ -14,21 +14,19 @@ const tally = (approvals: number, rejections: number): Tally => ({
   rejectedBy: [],
 })
 
-describe('parseReviewers', () => {
-  it('splits on newlines and commas', () => {
-    expect(parseReviewers('a\nb, c')).toEqual(['a', 'b', 'c'])
+describe('readConfig', () => {
+  it('counts against a lowercased roster, so reaction logins match', () => {
+    const { reviewers } = readConfig()
+
+    expect(reviewers).toContain('matteogabriele')
+    expect(reviewers).toEqual(reviewers.map((name) => name.toLowerCase()))
   })
 
-  it('strips @ and lowercases', () => {
-    expect(parseReviewers('@MatteoGabriele')).toEqual(['matteogabriele'])
-  })
+  it('keeps a bar that some report could actually clear', () => {
+    const { reviewers, minApprovals, minRejections } = readConfig()
 
-  it('drops duplicates and empties', () => {
-    expect(parseReviewers('a\n\na, A ,')).toEqual(['a'])
-  })
-
-  it('handles an undefined value', () => {
-    expect(parseReviewers(undefined)).toEqual([])
+    expect(minApprovals).toBeLessThanOrEqual(reviewers.length)
+    expect(minRejections).toBeGreaterThan(0)
   })
 })
 

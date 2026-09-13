@@ -76,7 +76,7 @@ describe('decidedMessage', () => {
     const message = decidedMessage(report, decision(), thresholds)
 
     expect(message).toContain('Report approved')
-    expect(message).toContain('has been added to the automation list')
+    expect(message).toContain('will be added to the automation list')
     expect(message).toContain(report.url)
   })
 
@@ -87,8 +87,8 @@ describe('decidedMessage', () => {
       thresholds,
     )
 
-    expect(message).toContain('was already on the automation list')
-    expect(message).not.toContain('has been added')
+    expect(message).toContain('is already on the automation list')
+    expect(message).not.toContain('will be added to the automation list')
   })
 
   it('announces a rejection', () => {

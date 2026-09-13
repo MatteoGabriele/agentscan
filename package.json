@@ -13,6 +13,8 @@
     "postinstall": "nuxt prepare",
     "add:automation": "pnpm exec tsx scripts/parse-automation-issue.ts",
     "review:automations": "pnpm exec tsx scripts/review-automation-issues.ts",
+    "publish:automations": "pnpm exec tsx scripts/publish-automations.ts",
+    "publish:automations:dry-run": "pnpm exec tsx scripts/publish-automations.ts --dry-run",
     "collect:adopters": "pnpm exec tsx --env-file=.env scripts/collect-adopters.ts",
     "collect:adopters:dry-run": "pnpm exec tsx --env-file=.env scripts/collect-adopters.ts --dry-run",
     "trigger:discord:report": "pnpm exec tsx --env-file=.env scripts/notify-report-discord.ts",
