@@ -752,5 +752,19 @@
       "trueberryless",
       "gameroman"
     ]
+  },
+  {
+    "username": "pengzh1",
+    "id": 24854675,
+    "reason": "Closed many PRs across many repositories in quick succession",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/447",
+    "reportedBy": "trueberryless",
+    "createdAt": "2026-09-08",
+    "approvedBy": [
+      "gameroman",
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico"
+    ]
   }
 ]
