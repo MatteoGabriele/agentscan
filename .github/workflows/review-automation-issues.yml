@@ -30,10 +30,11 @@ jobs:
   review:
     if: github.repository == 'MatteoGabriele/agentscan'
     runs-on: ubuntu-latest
-    # Issues are the only thing this writes. Approved reports are recorded by
-    # closing them as automation:confirmed; the list entries themselves are
-    # appended by `pnpm publish:automations`, run by a maintainer, so nothing
-    # here needs write access to the repository.
+    # Issues are the only thing this writes. Rejected reports are closed here;
+    # approved ones are relabelled automation:approved and left open, because
+    # their list entries are appended by `pnpm publish:automations`, run by a
+    # maintainer — the commit that carries them is what closes the reports. So
+    # nothing here needs write access to the repository.
     permissions:
       contents: read
       issues: write
@@ -61,8 +62,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # Counts the reactions, then comments on, relabels and closes whatever has
-      # settled. The outcomes go to automation-decisions.json for the next step,
+      # Counts the reactions, then comments on and relabels whatever has
+      # settled, closing everything but the approvals still waiting on a list
+      # update. The outcomes go to automation-decisions.json for the next step,
       # which both scripts default to; it stays on the runner.
       - name: Review the open reports
         env:

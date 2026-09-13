@@ -19,20 +19,33 @@ import { readGithubToken } from './lib/github-token'
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
 
-const CONFIRMED_LABEL = 'automation:confirmed'
+const APPROVED_LABEL = 'automation:approved'
 
-/** Every report the reviewers approved, whether or not it is on the list yet. */
-async function confirmedReports(octokit: Octokit): Promise<Report[]> {
+/**
+ * The approved reports still waiting on a list entry. The review workflow
+ * leaves them open on purpose; they are closed by the commit this run's
+ * `closes` lines go into.
+ */
+async function approvedReports(octokit: Octokit): Promise<Report[]> {
   const issues = await octokit.paginate(octokit.rest.issues.listForRepo, {
     owner: OWNER,
     repo: REPO,
-    state: 'closed',
-    // Both labels, so a pull request or an unrelated closed issue cannot match.
-    labels: `automation,${CONFIRMED_LABEL}`,
+    state: 'open',
+    // Both labels, so a pull request or an unrelated open issue cannot match.
+    labels: `automation,${APPROVED_LABEL}`,
     per_page: 100,
   })
 
   return issues.filter((issue) => !issue.pull_request).map(toReport)
+}
+
+/** Ascending, so the lines read in the order the reports were filed. */
+export function closesLines(issues: number[]): string {
+  return issues
+    .slice()
+    .sort((a, b) => a - b)
+    .map((issue) => `closes #${issue}`)
+    .join('\n')
 }
 
 async function stillOnGitHub(
@@ -72,7 +85,7 @@ async function main() {
   const octokit = new Octokit({ auth: readGithubToken() })
   const { reviewers } = readConfig()
 
-  const reports = await confirmedReports(octokit)
+  const reports = await approvedReports(octokit)
   const list = readList()
 
   // Deduped before the reactions are read, so an account that is already listed
@@ -86,7 +99,7 @@ async function main() {
   const { added, alreadyListed } = split(list, [...entries.keys()])
 
   for (const username of alreadyListed) {
-    console.log(`ℹ @${username} is already on the list`)
+    console.log(`ℹ @${username} is already on the list — close the report`)
   }
 
   if (added.length === 0) {
@@ -95,12 +108,15 @@ async function main() {
   }
 
   const publishable: AutomationEntry[] = []
+  const published: number[] = []
 
   for (const entry of added) {
     const report = entries.get(entry)!
 
     if (!(await stillOnGitHub(octokit, entry.username))) {
-      console.log(`⏭ @${entry.username} (#${report.number}) no longer exists`)
+      console.log(
+        `⏭ @${entry.username} (#${report.number}) no longer exists — close the report by hand`,
+      )
       continue
     }
 
@@ -113,6 +129,7 @@ async function main() {
     }
 
     publishable.push(entry)
+    published.push(report.number)
     console.log(`✓ @${entry.username} (#${report.number})`)
   }
 
@@ -123,15 +140,23 @@ async function main() {
 
   if (dryRun) {
     console.log(`\nDry run: ${publishable.length} entr(y/ies) not written`)
+    console.log(`\n${closesLines(published)}`)
     return
   }
 
   writeList([...list, ...publishable])
   console.log(`\nAdded ${publishable.length} entr(y/ies) to ${LIST_PATH}`)
   console.log('Commit it on a branch and open a pull request to publish.')
+  // Pasted into the commit message, so merging the list update closes every
+  // report it covers.
+  console.log('\nPaste into the commit message to close the reports:\n')
+  console.log(closesLines(published))
 }
 
-main().catch((err) => {
-  console.error('Error:', err.message)
-  process.exit(1)
-})
+// Guarded so importing a helper from here — the tests do — does not publish.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error('Error:', err.message)
+    process.exit(1)
+  })
+}

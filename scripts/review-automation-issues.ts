@@ -16,8 +16,10 @@ const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
 
 const PENDING_LABEL = 'automation:pending'
-const CONFIRMED_LABEL = 'automation:confirmed'
+const APPROVED_LABEL = 'automation:approved'
 const REJECTED_LABEL = 'automation:rejected'
+/** Approved reports that were closed before the approvals were left open. */
+const CONFIRMED_LABEL = 'automation:confirmed'
 
 export type Outcome = 'approved' | 'rejected' | 'pending'
 
@@ -137,16 +139,17 @@ export async function openReports(
         per_page: 100,
       })
 
+  // A settled report is skipped by its label: an approved one stays open until
+  // `pnpm publish:automations` lands its entry, and without this every run
+  // would comment on it again.
+  const settled = [APPROVED_LABEL, CONFIRMED_LABEL, REJECTED_LABEL]
+
   return issues
     .filter((issue) => issue.state === 'open')
     .filter((issue) => !issue.pull_request)
     .map(toReport)
     .filter((issue) => issue.labels.includes('automation'))
-    .filter(
-      (issue) =>
-        !issue.labels.includes(CONFIRMED_LABEL) &&
-        !issue.labels.includes(REJECTED_LABEL),
-    )
+    .filter((issue) => !issue.labels.some((label) => settled.includes(label)))
 }
 
 export async function tally(
@@ -231,7 +234,7 @@ function scoreboard(decision: Decision, config: Config): string {
 function approvalComment(decision: Decision, config: Config): string {
   const added = decision.alreadyListed
     ? 'This account is already on the list, so no new entry will be added.'
-    : 'The account will be added to the [automations list](https://agentscan.tools/automations) with the next list update.'
+    : 'The account will be added to the [automations list](https://agentscan.tools/automations) with the next list update. This report stays open until that lands.'
 
   return [
     `## Approved`,
@@ -265,12 +268,22 @@ function rejectionComment(decision: Decision, config: Config): string {
   ].join('\n')
 }
 
-async function closeIssue(
+/**
+ * Comments on a settled report and swaps its label over.
+ *
+ * Rejected reports are done here, so they are closed right away. An approved
+ * one still needs its entry appended by `pnpm publish:automations`, which a
+ * maintainer runs locally — it stays open under automation:approved as the
+ * reminder to do that, and the commit carrying the entry closes it. Nothing is
+ * left to run for an account that is already listed, so that one is closed too.
+ */
+async function settleIssue(
   octokit: Octokit,
   decision: Decision,
   config: Config,
 ): Promise<void> {
   const approved = decision.outcome === 'approved'
+  const staysOpen = approved && !decision.alreadyListed
 
   await octokit.rest.issues.createComment({
     owner: OWNER,
@@ -281,19 +294,11 @@ async function closeIssue(
       : rejectionComment(decision, config),
   })
 
-  await octokit.rest.issues.update({
-    owner: OWNER,
-    repo: REPO,
-    issue_number: decision.issue,
-    state: 'closed',
-    state_reason: approved ? 'completed' : 'not_planned',
-  })
-
   await octokit.rest.issues.addLabels({
     owner: OWNER,
     repo: REPO,
     issue_number: decision.issue,
-    labels: [approved ? CONFIRMED_LABEL : REJECTED_LABEL],
+    labels: [approved ? APPROVED_LABEL : REJECTED_LABEL],
   })
 
   try {
@@ -306,6 +311,21 @@ async function closeIssue(
   } catch {
     // The label may have been removed by hand already.
   }
+
+  if (staysOpen) {
+    console.log(
+      `✅ Issue #${decision.issue} approved — left open for the next list update`,
+    )
+    return
+  }
+
+  await octokit.rest.issues.update({
+    owner: OWNER,
+    repo: REPO,
+    issue_number: decision.issue,
+    state: 'closed',
+    state_reason: approved ? 'completed' : 'not_planned',
+  })
 
   console.log(
     `${approved ? '✅' : '❌'} Issue #${decision.issue} closed as ${approved ? 'approved' : 'rejected'}`,
@@ -379,7 +399,7 @@ async function review(
   markAlreadyListed(approved)
 
   for (const decision of decisions) {
-    await closeIssue(octokit, decision, config)
+    await settleIssue(octokit, decision, config)
   }
 
   fs.writeFileSync(decisionsPath, JSON.stringify(decisions, null, 2) + '\n')
