@@ -10,6 +10,7 @@ import {
 } from './parse-automation-issue'
 import { readList, split } from './lib/automations-list'
 import { MIN_APPROVALS, MIN_REJECTIONS, REVIEWERS } from './lib/reviewers'
+import { readGithubToken } from './lib/github-token'
 
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
@@ -81,14 +82,7 @@ export function readConfig(): Config {
 }
 
 function client(): Octokit {
-  const auth = process.env.GITHUB_TOKEN
-
-  if (!auth) {
-    console.error('✗ GITHUB_TOKEN is not set')
-    process.exit(1)
-  }
-
-  return new Octokit({ auth })
+  return new Octokit({ auth: readGithubToken() })
 }
 
 /** An open report, with everything needed to build its list entry. */

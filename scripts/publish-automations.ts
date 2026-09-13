@@ -14,6 +14,7 @@ import {
   toReport,
   type Report,
 } from './review-automation-issues'
+import { readGithubToken } from './lib/github-token'
 
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
@@ -68,16 +69,7 @@ function entryFor(report: Report): AutomationEntry {
 async function main() {
   const dryRun = process.argv.slice(2).includes('--dry-run')
 
-  const auth = process.env.GITHUB_TOKEN
-
-  if (!auth) {
-    console.error(
-      '✗ GITHUB_TOKEN is not set — try `export GITHUB_TOKEN=$(gh auth token)`',
-    )
-    process.exit(1)
-  }
-
-  const octokit = new Octokit({ auth })
+  const octokit = new Octokit({ auth: readGithubToken() })
   const { reviewers } = readConfig()
 
   const reports = await confirmedReports(octokit)

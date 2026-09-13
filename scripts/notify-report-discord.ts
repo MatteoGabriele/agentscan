@@ -10,7 +10,7 @@
  *
  * Configuration comes from the environment (see the workflows):
  *   DISCORD_WEBHOOK_REPORT  webhook URL for the reviewers' channel
- *   GITHUB_TOKEN            used to read the issues
+ *   NUXT_GITHUB_TOKEN / GITHUB_TOKEN  used to read the issues
  *   REVIEWERS               digest only: whose 👍 / 👎 count
  *   MIN_APPROVALS           the 👍 n/N denominator, and the digest's bar
  *   MIN_REJECTIONS          the 👎 n/N denominator, and the digest's bar
@@ -27,6 +27,7 @@ import {
   tally,
 } from './review-automation-issues'
 import type { Decision, Thresholds } from './review-automation-issues'
+import { readGithubToken } from './lib/github-token'
 
 export type { Thresholds }
 
@@ -188,14 +189,7 @@ export function digestMessages(
 }
 
 function client(): Octokit {
-  const auth = process.env.GITHUB_TOKEN
-
-  if (!auth) {
-    console.error('✗ GITHUB_TOKEN is not set')
-    process.exit(1)
-  }
-
-  return new Octokit({ auth })
+  return new Octokit({ auth: readGithubToken() })
 }
 
 /**
