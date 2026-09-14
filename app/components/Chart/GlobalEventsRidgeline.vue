@@ -33,8 +33,8 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const countsByDate = computed(() => activity.value?.countsByDate)
 const selectedClassification = ref<IdentityClassification>('organic')
 
-type Metric = 'percentage' | 'quantity'
-const metricOptions = [
+type Unit = 'percentage' | 'quantity'
+const unitOptions = [
   {
     value: 'percentage',
     label: 'Percentage',
@@ -44,7 +44,7 @@ const metricOptions = [
     label: 'Quantity',
   },
 ]
-const selectedMetric = ref<Metric>('percentage')
+const selectedUnit = ref<Unit>('percentage')
 
 const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
   const classification = CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.find(
@@ -80,7 +80,7 @@ const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
 
     week.values.set(
       weekdayIndex,
-      selectedMetric.value === 'percentage'
+      selectedUnit.value === 'percentage'
         ? (countsByDate.value?.[scanTime]?.[classification.category]
             ?.percentage ?? 0)
         : (countsByDate.value?.[scanTime]?.[classification.category]?.count ??
@@ -139,7 +139,7 @@ const config = computed<VueUiRidgelineConfig>(() => ({
           color: colors.value.text,
           fontSize: 10,
           formatter: ({ value }) => {
-            return `${Math.round(value)}${selectedMetric.value === 'percentage' ? '%' : ''}`
+            return `${Math.round(value)}${selectedUnit.value === 'percentage' ? '%' : ''}`
           },
           showLast: true,
         },
@@ -175,7 +175,7 @@ const config = computed<VueUiRidgelineConfig>(() => ({
     </div>
     <div class="my-6 flex justify-center gap-6 flex-wrap">
       <ClassificationToggle v-model="selectedClassification" />
-      <Toggle v-model="selectedMetric" :options="metricOptions" />
+      <Toggle v-model="selectedUnit" :options="unitOptions" />
     </div>
     <ClientOnly>
       <VueUiRidgeline :dataset :config> </VueUiRidgeline>
