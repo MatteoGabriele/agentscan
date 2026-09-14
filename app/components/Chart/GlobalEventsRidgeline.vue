@@ -125,6 +125,7 @@ const config = computed<VueUiRidgelineConfig>(() => ({
           formatter: ({ value }) => {
             return `${Math.round(value)}%`
           },
+          showLast: true,
         },
       },
       xAxis: {
