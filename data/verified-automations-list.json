@@ -710,5 +710,47 @@
       "graphieros",
       "ematipico"
     ]
+  },
+  {
+    "username": "dvd233",
+    "id": 111864431,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe and very little resting hours.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/454",
+    "reportedBy": "trueberryless",
+    "createdAt": "2026-09-12",
+    "approvedBy": [
+      "gameroman",
+      "graphieros",
+      "MatteoGabriele",
+      "bluwy"
+    ]
+  },
+  {
+    "username": "dajiaohuang",
+    "id": 108231307,
+    "reason": "Clearly spamming repositories with many automated PRs. Opened 30+ consecutive PRs in the Turso repository at the same time.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/451",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-09-10",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "trueberryless",
+      "bluwy"
+    ]
+  },
+  {
+    "username": "TVick64889",
+    "id": 313520879,
+    "reason": "Newly created account, active on GitHub issues and comments discussing AI usage. One comment leaked a local file path instead of actual content, a sign it's an AI agent posting from a dedicated account rather than a human.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/459",
+    "reportedBy": "huang-julien",
+    "createdAt": "2026-09-14",
+    "approvedBy": [
+      "ematipico",
+      "huang-julien",
+      "graphieros",
+      "sheremet-va"
+    ]
   }
 ]
