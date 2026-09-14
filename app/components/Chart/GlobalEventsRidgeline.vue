@@ -33,6 +33,19 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const countsByDate = computed(() => activity.value?.countsByDate)
 const selectedClassification = ref<IdentityClassification>('organic')
 
+type Metric = 'percentage' | 'quantity'
+const metricOptions = [
+  {
+    value: 'percentage',
+    label: 'Percentage',
+  },
+  {
+    value: 'quantity',
+    label: 'Quantity',
+  },
+]
+const selectedMetric = ref<Metric>('percentage')
+
 const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
   const classification = CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.find(
     ({ category }) => category === selectedClassification.value,
@@ -46,7 +59,7 @@ const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
     string,
     {
       monday: Dayjs
-      percentages: Map<number, number>
+      values: Map<number, number>
     }
   >()
 
@@ -62,27 +75,30 @@ const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
     const weekKey = monday.format('YYYY-MM-DD')
     const week = weeks.get(weekKey) ?? {
       monday,
-      percentages: new Map<number, number>(),
+      values: new Map<number, number>(),
     }
 
-    week.percentages.set(
+    week.values.set(
       weekdayIndex,
-      countsByDate.value?.[scanTime]?.[classification.category]?.percentage ??
-        0,
+      selectedMetric.value === 'percentage'
+        ? (countsByDate.value?.[scanTime]?.[classification.category]
+            ?.percentage ?? 0)
+        : (countsByDate.value?.[scanTime]?.[classification.category]?.count ??
+            0),
     )
 
     weeks.set(weekKey, week)
   }
 
   return [...weeks.values()]
-    .filter(({ percentages }) => percentages.size === WEEKDAYS.length)
+    .filter(({ values }) => values.size === WEEKDAYS.length)
     .sort((a, b) => a.monday.valueOf() - b.monday.valueOf())
-    .map(({ monday, percentages }) => ({
+    .map(({ monday, values }) => ({
       name: `${monday.format('YYYY-MM-DD')} - ${monday.add(6, 'day').format('YYYY-MM-DD')}`,
       datapoints: [
         {
           name: classification.name,
-          values: WEEKDAYS.map((_, index) => percentages.get(index) ?? 0),
+          values: WEEKDAYS.map((_, index) => values.get(index) ?? 0),
           color: colors.value[classification.category],
         },
       ],
@@ -123,7 +139,7 @@ const config = computed<VueUiRidgelineConfig>(() => ({
           color: colors.value.text,
           fontSize: 10,
           formatter: ({ value }) => {
-            return `${Math.round(value)}%`
+            return `${Math.round(value)}${selectedMetric.value === 'percentage' ? '%' : ''}`
           },
           showLast: true,
         },
@@ -157,8 +173,9 @@ const config = computed<VueUiRidgelineConfig>(() => ({
         Daily ecosystem activity evolution split by weeks
       </p>
     </div>
-    <div class="my-6 flex justify-center">
+    <div class="my-6 flex justify-center gap-6 flex-wrap">
       <ClassificationToggle v-model="selectedClassification" />
+      <Toggle v-model="selectedMetric" :options="metricOptions" />
     </div>
     <ClientOnly>
       <VueUiRidgeline :dataset :config> </VueUiRidgeline>
