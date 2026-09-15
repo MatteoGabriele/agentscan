@@ -14,6 +14,8 @@ The only way you can use AI in this repository is if we don't know and we don't 
 
 AI is not a layer of your workflow we need to know about. As far as we're concerned, you're a real developer who wants to collaborate with us in making OSS a beautiful place to keep innovating and sharing.
 
+We apologize in advance if this affects contributions made with good intentions, but these are challenging times, and we're making deliberate choices about how we want this project to evolve.
+
 ## Local development
 
 ### Prerequisites

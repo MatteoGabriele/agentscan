@@ -70,10 +70,5 @@ members of the project's leadership.
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
 available at [http://contributor-covenant.org/version/1/4][version]
 
-## AI Usage
-
-This is an AI-free zone. If AgentScan's analysis fails, we will close your PR or issue.
-We apologize in advance if this affects contributions made with good intentions, but these are challenging times, and we're making deliberate choices about how we want this project to evolve.
-
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/
