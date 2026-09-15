@@ -103,6 +103,7 @@ const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
         },
       ],
     }))
+    .toReversed()
 })
 
 const config = computed<VueUiRidgelineConfig>(() => ({
