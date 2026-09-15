@@ -13,6 +13,7 @@ import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.t
 import 'vue-data-ui/style.css'
 import ClassificationToggle from '../Activity/ClassificationToggle.vue'
 import type { IdentityClassification } from '@unveil/identity'
+import UnitToggle from '../Activity/UnitToggle.vue'
 
 dayjs.extend(isoWeek)
 dayjs.extend(utc)
@@ -33,18 +34,7 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const countsByDate = computed(() => activity.value?.countsByDate)
 const selectedClassification = ref<IdentityClassification>('organic')
 
-type Unit = 'percentage' | 'quantity'
-const unitOptions = [
-  {
-    value: 'percentage',
-    label: 'Percentage',
-  },
-  {
-    value: 'quantity',
-    label: 'Quantity',
-  },
-]
-const selectedUnit = ref<Unit>('percentage')
+const selectedUnit = ref<'percentage' | 'quantity'>('percentage')
 
 const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
   const classification = CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.find(
@@ -176,7 +166,7 @@ const config = computed<VueUiRidgelineConfig>(() => ({
     </div>
     <div class="my-6 flex justify-center gap-6 flex-wrap">
       <ClassificationToggle v-model="selectedClassification" />
-      <Toggle v-model="selectedUnit" :options="unitOptions" />
+      <UnitToggle v-model="selectedUnit" />
     </div>
     <ClientOnly>
       <VueUiRidgeline :dataset :config> </VueUiRidgeline>
