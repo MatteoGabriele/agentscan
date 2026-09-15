@@ -23,6 +23,9 @@ useHead({
       content: 'Automation pattern detection for open source maintainers',
     },
     { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://agentscan.tools/agentscan.png' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
     { name: 'color-scheme', content: colorScheme },
   ],
   link: [
