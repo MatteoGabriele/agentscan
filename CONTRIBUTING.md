@@ -2,6 +2,18 @@
 
 Thanks for your interest in contributing. This is an open experiment and contributions of all kinds are welcome: bug fixes, new signals, copy improvements, or just opening an issue with an idea.
 
+## Using AI
+
+Obviously, this project does not accept AI usage.
+
+- If we smell AI, we close the Issue/PR.
+- If we see automated comments, we close the Issue/PR.
+- If AgentScan flags you as automation, we close the Issue/PR.
+
+The only way you can use AI in this repository is if we don't know and we don't find out. Fake it till you make it.
+
+AI is not a layer of your workflow we need to know about. As far as we're concerned, you're a real developer who wants to collaborate with us in making OSS a beautiful place to keep innovating and sharing.
+
 ## Local development
 
 ### Prerequisites
