@@ -278,7 +278,10 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
             <span>{{ heatmap.name }}</span>
 
             <span :style="{ color: colors.textMuted }">
-              {{ round(datapoint.value ?? 0, 1) + '%' }}
+              {{
+                round(datapoint.value ?? 0, 1) +
+                (selectedUnit === 'percentage' ? '%' : '')
+              }}
             </span>
           </div>
         </template>
