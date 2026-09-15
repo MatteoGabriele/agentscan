@@ -10,6 +10,7 @@ import isoWeek from 'dayjs/plugin/isoWeek'
 import { mergeConfigs } from 'vue-data-ui/utils'
 import { round } from '~~/shared/utils/numbers'
 import { useTimeout } from '@vueuse/core'
+import UnitToggle from '../Activity/UnitToggle.vue'
 
 import('vue-data-ui/style.css')
 
@@ -24,12 +25,15 @@ type ActivityHeatmapSource = {
     {
       organic?: {
         percentage?: number
+        count?: number
       }
       mixed?: {
         percentage?: number
+        count?: number
       }
       automation?: {
         percentage?: number
+        count?: number
       }
     }
   >
@@ -49,6 +53,8 @@ const ready = shallowRef(false)
 useTimeout(200, {
   callback: () => (ready.value = true),
 })
+
+const selectedUnit = ref<'percentage' | 'quantity'>('percentage')
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 
@@ -119,8 +125,12 @@ function createHeatmapDataset(
     const weekValues =
       valuesByWeekAndDay.get(weekKey) ?? Array<number>(7).fill(0)
 
-    weekValues[dayIndex] =
+    const percentage =
       activity.countsByDate[dateString]?.[category]?.percentage ?? 0
+    const quantity = activity.countsByDate[dateString]?.[category]?.count ?? 0
+
+    weekValues[dayIndex] =
+      selectedUnit.value === 'percentage' ? percentage : quantity
 
     valuesByWeekAndDay.set(weekKey, weekValues)
   })
@@ -236,6 +246,9 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
     }"
   >
     <h2 class="text-center">Daily Ecosystem Activity heatmap</h2>
+  </div>
+  <div class="flex justify-center mb-6">
+    <UnitToggle v-model="selectedUnit" />
   </div>
   <div
     class="flex w-full flex-col items-center gap-6 px-12 md:flex-row md:px-0 transition-opacity"

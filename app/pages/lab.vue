@@ -51,15 +51,6 @@
       <div class="w-full">
         <LazyChartGlobalEventsHeatmap />
       </div>
-      <div class="w-full">
-        <div class="mb-6">
-          <h2 class="text-center">Experimental account scan mapping</h2>
-          <p class="text-sm text-ui-muted text-center">
-            Search for a user to view all flags graphed in a radar chart.
-          </p>
-        </div>
-        <LazyChartAccountEventsRadar />
-      </div>
     </div>
   </section>
 </template>
