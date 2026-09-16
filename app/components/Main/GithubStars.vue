@@ -1,20 +1,26 @@
 <script setup lang="ts">
-import { formatCompactNumber } from '~~/shared/utils/numbers'
+type Repo = {
+  name: string
+  url: string
+}
 
-const { data } = await useRepoStars()
+const repos: Repo[] = [
+  {
+    name: 'agentscan',
+    url: 'https://github.com/MatteoGabriele/agentscan',
+  },
+  {
+    name: 'agentscan-action',
+    url: 'https://github.com/MatteoGabriele/agentscan-action',
+  },
+  {
+    name: 'identity',
+    url: 'https://github.com/unveil-project/identity',
+  },
+]
 
 const root = useTemplateRef<HTMLElement>('root')
 const isOpen = ref<boolean>(false)
-
-const stars = computed<string | null>(() => {
-  const count = data.value?.stars
-
-  return typeof count === 'number' ? formatCompactNumber(count) : null
-})
-
-const repos = computed(() => {
-  return data.value?.repos ?? []
-})
 
 function onFocusOut(event: FocusEvent) {
   const target = event.relatedTarget
@@ -47,14 +53,8 @@ function onFocusOut(event: FocusEvent) {
       aria-label="AgentScan on GitHub"
     >
       <span class="i-lucide-github"></span>
-
-      <template v-if="stars">
-        <span class="h-3 w-px bg-ui-border/70"></span>
-        <span class="inline-flex items-center gap-1 tabular-nums">
-          <span class="i-lucide:star text-[0.9em]"></span>
-          {{ stars }}
-        </span>
-      </template>
+      <span class="h-3 w-px bg-ui-border/70"></span>
+      <span>source code</span>
     </NuxtLink>
 
     <Transition
@@ -75,16 +75,10 @@ function onFocusOut(event: FocusEvent) {
           rel="noopener"
           :to="repo.url"
           class="inline-flex items-center gap-2 rounded-full border border-solid border-ui-border/80 bg-ui-card px-2.5 py-1 text-xs text-ui-muted hover:text-ui-text hover:border-ui-border/60 transition-colors whitespace-nowrap"
-          :title="`${repo.label} on GitHub`"
-          :aria-label="`${repo.label} on GitHub`"
+          :title="`${repo.name} on GitHub`"
+          :aria-label="`${repo.name} on GitHub`"
         >
-          {{ repo.label }}
-
-          <span class="h-3 w-px bg-ui-border/70"></span>
-          <span class="inline-flex items-center gap-1 tabular-nums">
-            <span class="i-lucide:star text-[0.9em]"></span>
-            {{ formatCompactNumber(repo.stars) }}
-          </span>
+          {{ repo.name }}
         </NuxtLink>
       </div>
     </Transition>
