@@ -4,7 +4,7 @@ Thanks for your interest in contributing. This is an open experiment and contrib
 
 ## Using AI
 
-Obviously, this project does not accept AI usage.
+This project does not accept AI usage.
 
 - If we smell AI, we close the Issue/PR.
 - If we see automated comments, we close the Issue/PR.
