@@ -752,5 +752,19 @@
       "graphieros",
       "sheremet-va"
     ]
+  },
+  {
+    "username": "auroraxo",
+    "id": 325296939,
+    "reason": "Recently created account showing fully automated behavior. Bio contains a hidden identifier string and a link suggesting it belongs to a larger coordinated network, possibly for karma farming.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/460",
+    "reportedBy": "webknjaz",
+    "createdAt": "2026-09-15",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "sheremet-va",
+      "OrbisK"
+    ]
   }
 ]
