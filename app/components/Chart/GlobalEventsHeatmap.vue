@@ -256,6 +256,7 @@ function mergeHeatmapConfig(defaultConfig: VueUiHeatmapConfig) {
 
 const maxValue = computed(() =>
   Math.max(
+    0,
     ...heatmaps.value
       .flatMap((h) => h.dataset.flatMap((d) => d.values))
       .map((v) => v ?? 0),
