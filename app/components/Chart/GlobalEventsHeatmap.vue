@@ -87,6 +87,19 @@ const weekLabels = computed(() => {
   })
 })
 
+type HeatmapScale = 'relative' | 'absolute'
+const selectedScale = ref<HeatmapScale>('relative')
+const scaleOptions = computed(() => [
+  {
+    value: 'relative',
+    label: 'Relative',
+  },
+  {
+    value: 'absolute',
+    label: 'Absolute',
+  },
+])
+
 const heatmapSeries = computed(
   (): Array<{
     key: ActivityCategory
@@ -221,6 +234,34 @@ const heatmaps = computed(() => {
   }))
 })
 
+function mergeHeatmapConfig(defaultConfig: VueUiHeatmapConfig) {
+  return mergeConfigs({
+    defaultConfig,
+    userConfig: {
+      style: {
+        layout: {
+          cells: {
+            scaleMax:
+              selectedScale.value === 'relative'
+                ? null
+                : selectedUnit.value === 'percentage'
+                  ? maxValue.value
+                  : maxValue.value,
+          },
+        },
+      },
+    },
+  })
+}
+
+const maxValue = computed(() =>
+  Math.max(
+    ...heatmaps.value
+      .flatMap((h) => h.dataset.flatMap((d) => d.values))
+      .map((v) => v ?? 0),
+  ),
+)
+
 function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
   const xName = datapoint?.xAxisName ?? ''
   const yName = datapoint?.yAxisName ?? ''
@@ -247,8 +288,18 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
   >
     <h2 class="text-center">Daily Ecosystem Activity heatmap</h2>
   </div>
-  <div class="flex justify-center mb-6">
+  <p class="text-sm text-ui-muted text-center">
+    The higher the value the stronger the color.<br />
+    {{
+      selectedScale === 'relative'
+        ? 'Each heatmap computes color strength based on its individual max value.'
+        : `All heatmaps color strengths are related to the absolute max value (${Math.round(maxValue)}${selectedUnit === 'percentage' ? '%' : ''}).`
+    }}
+  </p>
+
+  <div class="flex justify-center my-6 gap-6">
     <UnitToggle v-model="selectedUnit" />
+    <Toggle v-model="selectedScale" :options="scaleOptions" />
   </div>
   <div
     class="flex w-full flex-col items-center gap-6 px-12 md:flex-row md:px-0 transition-opacity"
@@ -261,7 +312,7 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
         v-for="heatmap in heatmaps"
         :key="heatmap.name"
         :dataset="heatmap.dataset"
-        :config="heatmap.config"
+        :config="mergeHeatmapConfig(heatmap.config)"
       >
         <template #tooltip="{ datapoint }">
           <div class="mb-1" :style="{ color: colors.textMuted }">
