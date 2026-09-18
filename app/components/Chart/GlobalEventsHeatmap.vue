@@ -242,11 +242,7 @@ function mergeHeatmapConfig(defaultConfig: VueUiHeatmapConfig) {
         layout: {
           cells: {
             scaleMax:
-              selectedScale.value === 'relative'
-                ? null
-                : selectedUnit.value === 'percentage'
-                  ? maxValue.value
-                  : maxValue.value,
+              selectedScale.value === 'relative' ? null : maxValue.value,
           },
         },
       },
