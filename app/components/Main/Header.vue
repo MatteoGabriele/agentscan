@@ -84,7 +84,7 @@ const communityItems: MenuDropdownItem[] = [
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-3 justify-end">
       <LazyMainBookmarksLink hydrate-on-visible />
 
-      <LazyMainGithubStars hydrate-on-visible />
+      <LazyMainSources class="hidden md:block" hydrate-on-visible />
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>
