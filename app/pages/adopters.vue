@@ -53,24 +53,7 @@ useHead({
   <header class="text-center md:text-left">
     <h1 class="text-2xl font-semibold">Used by</h1>
     <p class="text-ui-muted mt-2">
-      Public repositories that run AgentScan in CI, using either the
-      <NuxtLink
-        to="https://github.com/MatteoGabriele/agentscan-action"
-        target="_blank"
-        external
-        class="underline hover:text-ui-text"
-      >
-        action</NuxtLink
-      >
-      or the
-      <NuxtLink
-        to="https://github.com/apps/agentscanapp"
-        target="_blank"
-        external
-        class="underline hover:text-ui-text"
-      >
-        app</NuxtLink
-      >.
+      Public repositories that run AgentScan in CI.
     </p>
 
     <p class="mt-6 text-sm text-ui-text">

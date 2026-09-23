@@ -149,3 +149,13 @@ body {
     transparent
   );
 }
+
+/* Desktop only: the header sticks to the top of the page. */
+@container (min-width: 56rem) {
+  .sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--bg);
+  }
+}

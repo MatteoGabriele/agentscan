@@ -59,7 +59,6 @@ const communityItems: MenuDropdownItem[] = [
         aria-label="Homepage"
       >
         <MainLogo size="xs" />
-        AgentScan
       </NuxtLink>
     </div>
     <div v-if="!onlyLogo" class="hidden @4xl:block">
@@ -71,6 +70,7 @@ const communityItems: MenuDropdownItem[] = [
         <li>
           <LazyMainMenuDropdown label="Community" :items="communityItems" />
         </li>
+        <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
         <li>
           <LazyMainMenuItem
             to="/app"
@@ -82,9 +82,7 @@ const communityItems: MenuDropdownItem[] = [
     </div>
 
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-3 justify-end">
-      <LazyMainBookmarksLink hydrate-on-visible />
-
-      <LazyMainSources class="hidden md:block" hydrate-on-visible />
+      <LazyMainSourceLink hydrate-on-visible />
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>
