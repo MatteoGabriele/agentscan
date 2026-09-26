@@ -1,16 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import { mergeAdopters } from '../collect-adopters'
-import type { AdopterRepository } from '../../shared/types/adopter-repository'
+import type {
+  AdopterPlatform,
+  AdopterRepository,
+} from '../../shared/types/adopter-repository'
 
 const repository = (
   name: string,
   stars: number,
   avatar = 'https://avatars.githubusercontent.com/u/1?s=50',
+  platform: AdopterPlatform = 'action',
 ): AdopterRepository => ({
   name,
   url: `https://github.com/${name}`,
   stars,
   avatar,
+  platform,
 })
 
 describe('mergeAdopters', () => {
@@ -44,12 +49,13 @@ describe('mergeAdopters', () => {
 
   it('counts a repository running both the action and the app once', () => {
     const merged = mergeAdopters(
-      [repository('owner/both', 5, 'action-avatar')],
-      [repository('owner/both', 5, 'app-avatar')],
+      [repository('owner/both', 5, 'action-avatar', 'action')],
+      [repository('owner/both', 5, 'app-avatar', 'app')],
     )
 
     expect(merged).toHaveLength(1)
     expect(merged[0].avatar).toBe('app-avatar')
+    expect(merged[0].platform).toBe('app')
   })
 
   it('returns an empty list when nothing was collected', () => {

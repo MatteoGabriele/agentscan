@@ -120,6 +120,7 @@ export async function collectActionRepositories(
     url: repository.url,
     stars: repository.stargazerCount,
     avatar: repository.owner.avatarUrl,
+    platform: 'action',
   }))
 }
 
@@ -167,6 +168,7 @@ export async function collectAppRepositories(
         url: repository.html_url,
         stars: repository.stargazers_count,
         avatar: withAvatarSize(repository.owner.avatar_url),
+        platform: 'app',
       })
     }
   }
@@ -175,7 +177,8 @@ export async function collectAppRepositories(
 }
 
 /**
- * A repository running both the action and the app is one adopter. Ties are
+ * A repository running both the action and the app is one adopter, and the
+ * list passed last wins, so it is recorded with that platform. Ties are
  * broken by name so a week without star changes produces no diff at all.
  */
 export function mergeAdopters(
