@@ -82,7 +82,7 @@ const communityItems: MenuDropdownItem[] = [
     </div>
 
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-3 justify-end">
-      <LazyMainSourceLink hydrate-on-visible />
+      <LazyMainSourceLink hydrate-on-visible class="hidden @4xl:inline-flex" />
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>
