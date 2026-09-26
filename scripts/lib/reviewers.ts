@@ -15,6 +15,7 @@ export const REVIEWERS: string[] = [
   'trueberryless',
   'bnb',
   'ghostdevv',
+  'sapphi-red',
 ]
 
 /** 👍 from reviewers needed to flag the account. */
