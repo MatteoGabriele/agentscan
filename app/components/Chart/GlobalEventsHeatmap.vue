@@ -158,6 +158,24 @@ function createHeatmapDataset(
 
 const numberOfWeeks = computed(() => weekKeys.value.length)
 
+const monthLabels = computed(() => {
+  const seen = new Set<string>()
+
+  return weekLabels.value.map((label) => {
+    const month = label.match(
+      /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/,
+    )?.[0]
+
+    if (!month || seen.has(month)) {
+      return ''
+    }
+
+    seen.add(month)
+
+    return month
+  })
+})
+
 const baseConfig = computed<VueUiHeatmapConfig>(() => ({
   userOptions: {
     show: false,
@@ -166,7 +184,7 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     layout: {
-      width: 43 + numberOfWeeks.value * 32,
+      width: 90 + numberOfWeeks.value * 32,
       cells: {
         spacing: 0,
         colors: {
@@ -184,10 +202,13 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
         xAxis: {
           show: true,
           color: colors.value.textMuted,
-          values: weekLabels.value,
+          values: monthLabels.value,
+          showOnlyAtModulo: 1,
+          fontSize: 16,
         },
         yAxis: {
           color: colors.value.textMuted,
+          fontSize: 16,
         },
       },
     },
@@ -278,6 +299,212 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 
   return targetDate.format('DD MMM (ddd)')
 }
+
+// NOTE:
+// Below is the algo to create paths to wrap cells in their corresponding months.
+// Some of this code could be part of some broader utility, but this is a lab one-off for now.
+
+type HeatmapSvgCell = {
+  rowIndex: number
+  columnIndex: number
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+type Point = {
+  x: number
+  y: number
+}
+
+function getMonthKey(date: dayjs.Dayjs) {
+  return date.format('YYYY-MM')
+}
+
+function getCellDate(cell: HeatmapSvgCell) {
+  const weekKey = weekKeys.value[cell.columnIndex]
+
+  if (!weekKey) {
+    return null
+  }
+
+  return dayjs(weekKey).add(cell.rowIndex, 'day')
+}
+
+function getPointKey(point: Point) {
+  return `${point.x.toFixed(6)}:${point.y.toFixed(6)}`
+}
+
+function simplifyContour(points: Point[]) {
+  if (points.length < 4) {
+    return points
+  }
+
+  const firstKey = getPointKey(points[0]!)
+  const lastKey = getPointKey(points[points.length - 1]!)
+  const ring = firstKey === lastKey ? points.slice(0, -1) : points.slice()
+  const epsilon = 0.000001
+
+  return ring.filter((point, index) => {
+    const previous = ring[(index - 1 + ring.length) % ring.length]!
+    const next = ring[(index + 1) % ring.length]!
+
+    const vertical =
+      Math.abs(previous.x - point.x) < epsilon &&
+      Math.abs(point.x - next.x) < epsilon
+    const horizontal =
+      Math.abs(previous.y - point.y) < epsilon &&
+      Math.abs(point.y - next.y) < epsilon
+
+    return !vertical && !horizontal
+  })
+}
+
+function getMonthOutline(cells: HeatmapSvgCell[]) {
+  const occupied = new Set(
+    cells.map((cell) => `${cell.rowIndex}:${cell.columnIndex}`),
+  )
+
+  const edges: Array<{ start: Point; end: Point }> = []
+
+  function addEdge(x1: number, y1: number, x2: number, y2: number) {
+    edges.push({
+      start: { x: x1, y: y1 },
+      end: { x: x2, y: y2 },
+    })
+  }
+
+  for (const cell of cells) {
+    const row = cell.rowIndex
+    const column = cell.columnIndex
+    const x1 = cell.x
+    const y1 = cell.y
+    const x2 = cell.x + cell.width
+    const y2 = cell.y + cell.height
+
+    if (!occupied.has(`${row - 1}:${column}`)) {
+      addEdge(x1, y1, x2, y1)
+    }
+
+    if (!occupied.has(`${row}:${column + 1}`)) {
+      addEdge(x2, y1, x2, y2)
+    }
+
+    if (!occupied.has(`${row + 1}:${column}`)) {
+      addEdge(x2, y2, x1, y2)
+    }
+
+    if (!occupied.has(`${row}:${column - 1}`)) {
+      addEdge(x1, y2, x1, y1)
+    }
+  }
+
+  const outgoing = new Map<string, number[]>()
+
+  edges.forEach((edge, index) => {
+    const key = getPointKey(edge.start)
+    const indices = outgoing.get(key) ?? []
+    indices.push(index)
+    outgoing.set(key, indices)
+  })
+
+  const used = new Set<number>()
+  const contours: Point[][] = []
+
+  for (let index = 0; index < edges.length; index += 1) {
+    if (used.has(index)) {
+      continue
+    }
+
+    const startEdge = edges[index]!
+    const startKey = getPointKey(startEdge.start)
+    const points: Point[] = [startEdge.start]
+    let currentIndex: number | undefined = index
+
+    while (currentIndex !== undefined) {
+      const edge = edges[currentIndex]!
+      used.add(currentIndex)
+      points.push(edge.end)
+      const endKey = getPointKey(edge.end)
+
+      if (endKey === startKey) {
+        break
+      }
+
+      currentIndex = outgoing
+        .get(endKey)
+        ?.find((candidateIndex) => !used.has(candidateIndex))
+    }
+
+    if (getPointKey(points[points.length - 1]!) === startKey) {
+      contours.push(simplifyContour(points))
+    }
+  }
+
+  // Spare the DOM from unnecessary decimals in path coords
+  const formatCoordinate = (value: number) => Number(value.toFixed(1))
+
+  return contours
+    .map((points) => {
+      if (!points.length) {
+        return ''
+      }
+
+      const [first, ...rest] = points
+      const commands = rest
+        .map(
+          (point) =>
+            `L ${formatCoordinate(point.x)} ${formatCoordinate(point.y)}`,
+        )
+        .join(' ')
+
+      return [
+        `M ${formatCoordinate(first!.x)} ${formatCoordinate(first!.y)}`,
+        commands,
+        'Z',
+      ]
+        .filter(Boolean)
+        .join(' ')
+    })
+    .join(' ')
+}
+
+function getMonthPaths(cells: HeatmapSvgCell[]) {
+  const months = new Map<
+    string,
+    {
+      key: string
+      date: dayjs.Dayjs
+      cells: HeatmapSvgCell[]
+    }
+  >()
+
+  for (const cell of cells ?? []) {
+    const date = getCellDate(cell)
+
+    if (!date) {
+      continue
+    }
+
+    const key = getMonthKey(date)
+    const month = months.get(key) ?? {
+      key,
+      date,
+      cells: [],
+    }
+
+    month.cells.push(cell)
+    months.set(key, month)
+  }
+
+  return Array.from(months.values())
+    .sort((a, b) => a.date.valueOf() - b.date.valueOf())
+    .map((month) => ({
+      key: month.key,
+      d: getMonthOutline(month.cells),
+    }))
+}
 </script>
 
 <template>
@@ -315,6 +542,21 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
         :dataset="heatmap.dataset"
         :config="mergeHeatmapConfig(heatmap.config)"
       >
+        <template #svg="{ svg }">
+          <path
+            v-for="month in getMonthPaths(svg.cells)"
+            :key="month.key"
+            :d="month.d"
+            fill="none"
+            :stroke="colors.bg"
+            stroke-width="2"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+            pointer-events="none"
+            opacity="0.5"
+          />
+        </template>
+
         <template #tooltip="{ datapoint }">
           <div class="mb-1" :style="{ color: colors.textMuted }">
             {{ getDateFromHeatmapCell(datapoint) }}
