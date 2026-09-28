@@ -58,4 +58,12 @@ export const landmarks: Landmark[] = [
     icon: 'i-lucide:newspaper',
     iconSvg: SVG_ICON.newspaper,
   },
+
+  {
+    date: '2026-09-22',
+    name: 'Opus 5.5 release',
+    description: "New version of Anthropic's Opus model.",
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+  },
 ]

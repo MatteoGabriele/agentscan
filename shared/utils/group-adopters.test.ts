@@ -10,7 +10,13 @@ function repository(
   stars = 0,
   avatar = `${name.split('/')[0]}.png`,
 ): AdopterRepository {
-  return { name, stars, avatar, url: `https://github.com/${name}` }
+  return {
+    name,
+    stars,
+    avatar,
+    url: `https://github.com/${name}`,
+    platform: 'action',
+  }
 }
 
 describe('groupAdoptersByOwner', () => {

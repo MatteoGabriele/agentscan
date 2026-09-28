@@ -15,7 +15,7 @@ defineProps<{
       <img :src="`${user.avatar_url}&s=160`" :alt="`Avatar of ${user.login}`" />
     </div>
 
-    <div class="w-full flex flex-col">
+    <div class="w-full min-w-0 flex flex-col">
       <div class="flex items-start justify-between gap-4">
         <h2 class="text-ui-text text-xl font-mono">
           {{ user.name || user.login }}
@@ -28,11 +28,11 @@ defineProps<{
         :external="true"
         target="_blank"
         :to="`https://github.com/${user.login}`"
-        class="text-ui-muted underline text-sm"
+        class="text-ui-muted underline text-sm break-words"
       >
         @{{ user.login }}
       </NuxtLink>
-      <p v-if="user.bio" class="my-2 text-sm @md:text-base">
+      <p v-if="user.bio" class="my-2 text-sm @md:text-base break-words">
         {{ user.bio }}
       </p>
       <ul
