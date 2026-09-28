@@ -184,7 +184,7 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     layout: {
-      width: 90 + numberOfWeeks.value * 32,
+      width: 130 + numberOfWeeks.value * 32,
       cells: {
         spacing: 0,
         colors: {
@@ -201,14 +201,16 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
       dataLabels: {
         xAxis: {
           show: true,
-          color: colors.value.textMuted,
-          values: monthLabels.value,
+          // We need real week labels as the x-axis values so datapoint.xAxisName can identify the exact week used by the tooltip
+          values: weekLabels.value,
+          // Hide the built-in labels, since month names are injected in the #svg slot
+          color: 'transparent',
           showOnlyAtModulo: 1,
-          fontSize: 16,
+          fontSize: 0,
         },
         yAxis: {
           color: colors.value.textMuted,
-          fontSize: 16,
+          fontSize: 18,
         },
       },
     },
@@ -505,6 +507,35 @@ function getMonthPaths(cells: HeatmapSvgCell[]) {
       d: getMonthOutline(month.cells),
     }))
 }
+
+function getMonthLabelPositions(cells: HeatmapSvgCell[]) {
+  const firstRowCells = cells
+    .filter((cell) => cell.rowIndex === 0)
+    .sort((a, b) => a.columnIndex - b.columnIndex)
+
+  if (!firstRowCells.length) {
+    return []
+  }
+
+  const y = Math.min(...firstRowCells.map((cell) => cell.y)) - 10
+
+  return firstRowCells.flatMap((cell) => {
+    const label = monthLabels.value[cell.columnIndex]
+
+    if (!label) {
+      return []
+    }
+
+    return [
+      {
+        key: `${cell.columnIndex}-${label}`,
+        label,
+        x: cell.x + cell.width / 2,
+        y,
+      },
+    ]
+  })
+}
 </script>
 
 <template>
@@ -525,7 +556,7 @@ function getMonthPaths(cells: HeatmapSvgCell[]) {
     }}
   </p>
 
-  <div class="flex justify-center my-6 gap-6">
+  <div class="flex justify-center mt-6 mb-8 gap-6">
     <UnitToggle v-model="selectedUnit" />
     <Toggle v-model="selectedScale" :options="scaleOptions" />
   </div>
@@ -555,6 +586,19 @@ function getMonthPaths(cells: HeatmapSvgCell[]) {
             pointer-events="none"
             opacity="0.5"
           />
+
+          <text
+            v-for="monthLabel in getMonthLabelPositions(svg.cells)"
+            :key="monthLabel.key"
+            :x="monthLabel.x"
+            :y="monthLabel.y"
+            :fill="colors.textMuted"
+            font-size="18"
+            text-anchor="middle"
+            pointer-events="none"
+          >
+            {{ monthLabel.label }}
+          </text>
         </template>
 
         <template #tooltip="{ datapoint }">
