@@ -18,7 +18,11 @@ const { data, pending, error } = await useActivityRepoScores({
   full: true,
 })
 
-const { data: activePoolSource } = await useLibraries()
+const {
+  data: activePoolSource,
+  status: poolStatus,
+  error: poolError,
+} = await useLibraries()
 
 const activePool = computed(() => activePoolSource.value?.repos ?? [])
 
@@ -47,6 +51,14 @@ const isAllRepos = computed(() =>
 const isActivePool = computed(() => selectedRepo.value === ACTIVE_POOL_LABEL)
 const isStalePool = computed(() => selectedRepo.value === STALE_POOL_LABEL)
 
+const needsPoolData = computed(() => isActivePool.value || isStalePool.value)
+
+const isPoolPending = computed(
+  () => poolStatus.value === 'idle' || poolStatus.value === 'pending',
+)
+
+const isPoolReady = computed(() => poolStatus.value === 'success')
+
 const controlClass =
   'h-10 border border-current/20 rounded-md bg-transparent px-3 text-sm text-inherit outline-none transition-colors hover:border-current/40 focus:border-current/60 focus-visible:ring-1 focus-visible:ring-current/20'
 
@@ -57,17 +69,7 @@ const days = computed(() => {
     return []
   }
 
-  return value.days.map((day) => {
-    return {
-      ...day,
-      repos: day.repos.map((repo) => {
-        return {
-          ...repo,
-          stale: !activePool.value.includes(repo.name),
-        }
-      }),
-    }
-  })
+  return value.days
 })
 
 const availableDates = computed(() => {
@@ -132,7 +134,7 @@ const repoSeries = computed(() => {
       dataset: [],
       count: 0,
       scoreSum: 0,
-      stale: !activePool.value.includes(repo),
+      stale: isPoolReady.value ? !activePool.value.includes(repo) : false,
     })
   }
 
@@ -166,6 +168,10 @@ const repoSeries = computed(() => {
       entry.count += repo.count
       entry.scoreSum += repo.scoreSum
     }
+  }
+
+  if (!isPoolReady.value) {
+    return datasets
   }
 
   if (isActivePool.value) {
@@ -425,6 +431,7 @@ async function viewRepoChart(item: RepoRow) {
 
 function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
   const trendColor = getLineColor(item.progression)
+
   return {
     style: {
       animation: {
@@ -526,8 +533,22 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
     </div>
 
     <ClientOnly>
+      <div
+        v-if="needsPoolData && isPoolPending"
+        class="mt-6 flex min-h-40 items-center justify-center rounded-lg border border-current/10 text-sm text-ui-muted"
+      >
+        Loading repository pool…
+      </div>
+
+      <div
+        v-else-if="needsPoolData && poolError"
+        class="mt-6 flex min-h-40 items-center justify-center rounded-lg border border-current/10 px-4 text-center text-sm text-ui-muted"
+      >
+        Unable to load repository pool.
+      </div>
+
       <!-- REPO CHART VIEW -->
-      <div v-if="!isAllRepos && !pending && !error">
+      <div v-else-if="!isAllRepos && !pending && !error">
         <div class="flex flex-row gap-2 justify-center mt-8">
           <Tooltip label="Open repository scan">
             <NuxtLink
@@ -727,7 +748,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
                   class="flex w-full min-w-0 cursor-pointer items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('repo')"
                 >
-                  <span class="min-w-0 truncate"> Repository </span>
+                  <span class="min-w-0 truncate">Repository</span>
 
                   <span
                     class="shrink-0 text-xs"
@@ -860,6 +881,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
                         />
                       </a>
                     </Tooltip>
+
                     <div
                       v-if="sparkline.stale"
                       class="text-xs border border-ui-border-subtle/40 bg-ui-card text-ui-muted px-2 rounded-full"
