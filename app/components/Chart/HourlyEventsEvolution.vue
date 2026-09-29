@@ -10,12 +10,17 @@ import { useElementSize, useTimeout } from '@vueuse/core'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { round } from '~~/shared/utils/numbers'
-import type { EventsEvolutionSeries } from '~~/shared/types/activity.ts'
+import type {
+  ActivityUnit,
+  EventsEvolutionSeries,
+} from '~~/shared/types/activity.ts'
 import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
 
 dayjs.extend(utc)
 
 import('vue-data-ui/style.css')
+
+const { unit = 'percentage' } = defineProps<{ unit?: ActivityUnit }>()
 
 const { data: hourlyWindow, status } = useActivityHourlyWindow()
 
@@ -75,7 +80,9 @@ const rawDataset = computed<EventsEvolutionSeries[]>(() =>
       ? skeletonSeries.value
       : (scanTimes.value ?? []).map(
           (scanTime) =>
-            countsByScanTime.value?.[scanTime]?.[category].percentage ?? 0,
+            countsByScanTime.value?.[scanTime]?.[category][
+              unit === 'percentage' ? 'percentage' : 'count'
+            ] ?? 0,
         ),
     trends: (scanTimes.value ?? []).map(
       (scanTime) => countsByScanTime.value?.[scanTime]?.[category].trend ?? 0,
@@ -101,6 +108,10 @@ const scaleMax = computed(() => {
     (serie.series as Array<number | null>).map((point) => point ?? 0),
   )
   const max = values.length ? Math.max(...values) : 0
+
+  if (unit === 'quantity') {
+    return Math.max(1, max)
+  }
 
   return Math.min(100, Math.max(10, Math.ceil(max / 10) * 10))
 })
@@ -172,7 +183,8 @@ const config = computed<VueUiXyConfig>(() => ({
           useIndividualScale: false,
           scaleMin: 0,
           scaleMax: scaleMax.value,
-          formatter: ({ value }) => `${round(Number(value), 0)}%`,
+          formatter: ({ value }) =>
+            `${round(Number(value), 0)}${unit === 'percentage' ? '%' : ''}`,
         },
         xAxisLabels: {
           show: true,
@@ -347,6 +359,7 @@ function handleChartMouseleave() {
                   :can-compare="timeLabel.absoluteIndex > 0"
                   :raw-dataset="rawDataset"
                   :pr-counts="prCounts"
+                  :unit
                 >
                   <template #thead>
                     <th class="px-2 text-center">vs Hour-1</th>

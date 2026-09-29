@@ -4,6 +4,7 @@ import {
   WINDOW_MAX_HOURS,
 } from '~~/shared/utils/activity-history-window'
 import { useUrlSearchParams } from '@vueuse/core'
+import type { ActivityUnit } from '~~/shared/types/activity'
 
 definePageMeta({
   layout: false,
@@ -32,34 +33,33 @@ type ChartRange = 'daily' | 'hourly'
 type ChartRangeOption = {
   value: ChartRange
   label: string
-  caption: string
 }
 
 const { data: librariesData } = await useLibraries()
 
 const isMobile = useIsMobile()
 
-const rangeOptions = computed<ChartRangeOption[]>(() => [
-  {
-    value: 'daily',
-    label: 'Daily',
-    caption: `Daily totals from the last ${isMobile.value ? 2 : DEFAULT_HISTORY_MONTHS} ${isMobile.value ? 'weeks' : 'months'}`,
-  },
-  {
-    value: 'hourly',
-    label: 'Hourly',
-    // In mobile we actually show 13 datapoints, but saying 12 looks better on the UI
-    caption: `Last ${isMobile.value ? 12 : WINDOW_MAX_HOURS} hours, updated every hour`,
-  },
-])
+const rangeOptions: ChartRangeOption[] = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'hourly', label: 'Hourly' },
+]
 
-const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
-  'history',
-  {
-    initialValue: {
-      view: 'daily',
-    },
+const urlParams = useUrlSearchParams<{
+  view: ChartRange | undefined
+  unit: ActivityUnit | undefined
+}>('history', {
+  initialValue: {
+    view: 'daily',
+    unit: 'percentage',
   },
+})
+
+// Rendered outside the Toggle so it sits below both toggles
+const rangeCaption = computed(() =>
+  urlParams.view === 'hourly'
+    ? // In mobile we actually show 13 datapoints, but saying 12 looks better on the UI
+      `Last ${isMobile.value ? 12 : WINDOW_MAX_HOURS} hours, updated every hour`
+    : `Daily totals from the last ${isMobile.value ? 2 : DEFAULT_HISTORY_MONTHS} ${isMobile.value ? 'weeks' : 'months'}`,
 )
 </script>
 
@@ -93,15 +93,25 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
 
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
               <ClientOnly>
-                <Toggle v-model="urlParams.view" :options="rangeOptions" />
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                  <Toggle v-model="urlParams.view" :options="rangeOptions" />
+                  <ActivityUnitToggle v-model="urlParams.unit" />
+                </div>
+                <p class="text-xs text-ui-muted/70">{{ rangeCaption }}</p>
 
                 <template #fallback>
-                  <Skeleton
-                    class="mb-1"
-                    width="w-[122px]"
-                    height="h-[26px]"
-                    rounded="full"
-                  />
+                  <div class="mb-1 flex gap-2">
+                    <Skeleton
+                      width="w-[122px]"
+                      height="h-[26px]"
+                      rounded="full"
+                    />
+                    <Skeleton
+                      width="w-[170px]"
+                      height="h-[26px]"
+                      rounded="full"
+                    />
+                  </div>
                   <Skeleton
                     width="w-[192px]"
                     height="h-[10px]"
@@ -117,8 +127,9 @@ const urlParams = useUrlSearchParams<{ view: ChartRange | undefined }>(
           >
             <LazyChartHourlyEventsEvolution
               v-if="urlParams.view === 'hourly'"
+              :unit="urlParams.unit"
             />
-            <LazyChartGlobalEventsEvolution v-else />
+            <LazyChartGlobalEventsEvolution v-else :unit="urlParams.unit" />
           </div>
         </div>
       </section>
