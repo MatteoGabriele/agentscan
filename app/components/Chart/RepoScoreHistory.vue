@@ -18,6 +18,10 @@ const { data, pending, error } = await useActivityRepoScores({
   full: true,
 })
 
+const { data: activePoolSource } = await useLibraries()
+
+const activePool = computed(() => activePoolSource.value?.repos ?? [])
+
 const rootEl = shallowRef<HTMLElement | null>(null)
 const chartRef = useTemplateRef('chartRef')
 
@@ -27,13 +31,21 @@ onMounted(() => {
 
 const colors = useColors(rootEl)
 
-const locale = computed(() => 'en') // in case i18n is implemented in the future
-const selectedRepo = ref('')
+const ACTIVE_POOL_LABEL = 'Active repositories'
+const STALE_POOL_LABEL = 'Stale repositories'
+
+const locale = computed(() => 'en')
+const selectedRepo = ref(ACTIVE_POOL_LABEL)
 const repoSearch = ref('')
 const from = ref<string>()
 const to = ref<string>()
 
-const isAllRepos = computed(() => selectedRepo.value === '')
+const isAllRepos = computed(() =>
+  ['', ACTIVE_POOL_LABEL, STALE_POOL_LABEL].includes(selectedRepo.value),
+)
+
+const isActivePool = computed(() => selectedRepo.value === ACTIVE_POOL_LABEL)
+const isStalePool = computed(() => selectedRepo.value === STALE_POOL_LABEL)
 
 const controlClass =
   'h-10 border border-current/20 rounded-md bg-transparent px-3 text-sm text-inherit outline-none transition-colors hover:border-current/40 focus:border-current/60 focus-visible:ring-1 focus-visible:ring-current/20'
@@ -45,7 +57,17 @@ const days = computed(() => {
     return []
   }
 
-  return value.days
+  return value.days.map((day) => {
+    return {
+      ...day,
+      repos: day.repos.map((repo) => {
+        return {
+          ...repo,
+          stale: !activePool.value.includes(repo.name),
+        }
+      }),
+    }
+  })
 })
 
 const availableDates = computed(() => {
@@ -99,6 +121,7 @@ type RepoSeries = {
   dataset: VueUiSparklineDatasetItem[]
   count: number
   scoreSum: number
+  stale: boolean
 }
 
 const repoSeries = computed(() => {
@@ -109,6 +132,7 @@ const repoSeries = computed(() => {
       dataset: [],
       count: 0,
       scoreSum: 0,
+      stale: !activePool.value.includes(repo),
     })
   }
 
@@ -142,6 +166,16 @@ const repoSeries = computed(() => {
       entry.count += repo.count
       entry.scoreSum += repo.scoreSum
     }
+  }
+
+  if (isActivePool.value) {
+    return new Map(
+      [...datasets.entries()].filter(([, series]) => !series.stale),
+    )
+  }
+
+  if (isStalePool.value) {
+    return new Map([...datasets.entries()].filter(([, series]) => series.stale))
   }
 
   return datasets
@@ -279,6 +313,7 @@ function getScoreColor(score: number) {
 function getDatapointScore(datapoint: VueUiXyTooltipSlotProps['datapoint']) {
   const score = Math.round((datapoint[0] ?? { value: 0 }).value ?? 0)
   const color = getScoreColor(score)
+
   return {
     score,
     color,
@@ -292,14 +327,16 @@ type RepoRow = {
   averageScore: number
   count: number
   visible: boolean
+  stale: boolean
 }
 
 const sparklines = computed<RepoRow[]>(() => {
   return [...repoSeries.value.entries()].map(
-    ([repo, { dataset, count, scoreSum }]) => ({
+    ([repo, { dataset, count, scoreSum, stale }]) => ({
       repo,
       dataset,
       count,
+      stale,
       progression: calcLinearProgression(dataset.map((d) => d.value ?? 0))
         .trend,
       averageScore: count ? Math.round(scoreSum / count) : 0,
@@ -329,6 +366,7 @@ const sortedSparklines = computed(() => {
     if (sortKey.value === 'repo') {
       return a.repo.localeCompare(b.repo) * direction
     }
+
     return (a[sortKey.value] - b[sortKey.value]) * direction
   })
 })
@@ -338,6 +376,7 @@ function sortBy(key: SortKey) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
     return
   }
+
   sortKey.value = key
   sortDirection.value = 'asc'
 }
@@ -385,22 +424,26 @@ async function viewRepoChart(item: RepoRow) {
 }
 
 function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
+  const trendColor = getLineColor(item.progression)
   return {
     style: {
-      animation: { show: false },
-      area: {
+      animation: {
         show: false,
+      },
+      area: {
+        show: true,
+        color: trendColor,
+        opacity: 10,
+        useGradient: false,
       },
       backgroundColor: 'transparent',
       dataLabel: {
         show: false,
       },
       line: {
-        color: getLineColor(item.progression),
+        color: trendColor,
         smooth: true,
       },
-      scaleMin: 0,
-      scaleMax: 100,
     },
   }
 }
@@ -438,7 +481,17 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
           <span class="text-sm">Repository</span>
 
           <select v-model="selectedRepo" :class="[controlClass, 'w-full']">
+            <option :value="ACTIVE_POOL_LABEL">
+              {{ ACTIVE_POOL_LABEL }}
+            </option>
+
+            <option :value="STALE_POOL_LABEL">
+              {{ STALE_POOL_LABEL }}
+            </option>
+
             <option value="">All repositories</option>
+
+            <hr />
 
             <option v-for="repo in availableRepos" :key="repo" :value="repo">
               {{ repo }}
@@ -498,12 +551,8 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
             </a>
           </Tooltip>
         </div>
-        <VueUiXy
-          v-if="!isAllRepos && !pending && !error"
-          ref="chartRef"
-          :dataset="datasetLine"
-          :config="configLine"
-        >
+
+        <VueUiXy ref="chartRef" :dataset="datasetLine" :config="configLine">
           <template #tooltip="{ datapoint, seriesIndex }">
             <div class="flex flex-col">
               <div class="mb-1">
@@ -581,14 +630,32 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
             >
               Automation
             </text>
+
+            <line
+              :x1="svg.drawingArea.left"
+              :x2="svg.drawingArea.right"
+              :y1="svg.drawingArea.top + svg.drawingArea.height * 0.3"
+              :y2="svg.drawingArea.top + svg.drawingArea.height * 0.3"
+              :stroke="colors.border"
+              stroke-dasharray="2 6"
+            />
+
+            <line
+              :x1="svg.drawingArea.left"
+              :x2="svg.drawingArea.right"
+              :y1="svg.drawingArea.top + svg.drawingArea.height * 0.5"
+              :y2="svg.drawingArea.top + svg.drawingArea.height * 0.5"
+              :stroke="colors.border"
+              stroke-dasharray="2 6"
+            />
           </template>
         </VueUiXy>
       </div>
 
-      <!-- TABLE VIEW (all repos) -->
+      <!-- TABLE VIEW -->
       <div
         v-else
-        class="mt-6 max-h-[min(70vh,48rem)] overflow-y-auto overflow-x-hidden rounded-lg border border-current/10"
+        class="mt-6 max-h-[min(70vh,48rem)] overflow-x-auto overflow-y-auto rounded-lg border border-current/10"
       >
         <div
           class="sticky top-0 z-20 h-11 border-b border-current/10 bg-[--card]"
@@ -606,7 +673,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               type="search"
               autocomplete="off"
               placeholder="Search repositories..."
-              class="h-full w-full bg-transparent pl-9 pr-10 text-sm text-inherit outline-none placeholder:text-ui-muted/70 focus:bg-current/[0.025] sm:pl-10"
+              class="h-full w-full bg-transparent pl-9 pr-10 text-sm text-inherit outline-none placeholder:text-ui-muted/70 focus:bg-current/[0.025] sm:pl-10 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
             />
 
             <button
@@ -622,7 +689,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
         </div>
 
         <table
-          class="w-full table-fixed border-separate border-spacing-0 text-xs sm:text-sm lg:table-auto"
+          class="w-full table-fixed border-separate border-spacing-0 text-xs sm:text-sm"
         >
           <thead class="sticky top-11 z-10 bg-[--card] text-ui-muted">
             <tr class="bg-[--card]">
@@ -633,7 +700,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full items-center justify-center gap-1 rounded-sm transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:justify-start sm:gap-2 cursor-pointer"
+                  class="flex w-full cursor-pointer items-center justify-center gap-1 rounded-sm transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:justify-start sm:gap-2"
                   @click="sortBy('progression')"
                 >
                   <span class="hidden sm:inline">Trend</span>
@@ -657,12 +724,10 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full min-w-0 items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2 cursor-pointer"
+                  class="flex w-full min-w-0 cursor-pointer items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('repo')"
                 >
-                  <span class="truncate lg:overflow-visible lg:text-clip">
-                    Repository
-                  </span>
+                  <span class="min-w-0 truncate"> Repository </span>
 
                   <span
                     class="shrink-0 text-xs"
@@ -681,7 +746,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2 cursor-pointer"
+                  class="flex w-full cursor-pointer items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('averageScore')"
                 >
                   <span class="hidden sm:inline">Average score</span>
@@ -706,7 +771,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2 cursor-pointer"
+                  class="flex w-full cursor-pointer items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('count')"
                 >
                   <span class="hidden sm:inline">Scanned PRs</span>
@@ -724,7 +789,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
 
               <th
                 scope="col"
-                class="hidden w-44 bg-[--card] px-4 py-3 text-right font-medium lg:table-cell"
+                class="hidden w-44 bg-[--card] px-4 py-3 text-center font-medium lg:table-cell"
               >
                 Evolution
               </th>
@@ -747,14 +812,14 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               <td class="min-w-0 px-2 py-3 font-medium sm:px-4">
                 <div class="flex min-w-0 flex-col items-start gap-2">
                   <span
-                    class="block max-w-full truncate lg:overflow-visible lg:text-clip lg:whitespace-normal"
+                    class="block max-w-full truncate"
                     :title="sparkline.repo"
                   >
                     {{ sparkline.repo }}
                   </span>
 
                   <div class="flex items-center gap-1">
-                    <Tooltip label="View chart" v-if="sparkline.visible">
+                    <Tooltip v-if="sparkline.visible" label="View chart">
                       <button
                         type="button"
                         class="inline-flex items-center justify-center rounded-sm border border-current/15 p-1.5 text-ui-muted transition-colors hover:border-current/30 hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20"
@@ -795,14 +860,20 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
                         />
                       </a>
                     </Tooltip>
+                    <div
+                      v-if="sparkline.stale"
+                      class="text-xs border border-ui-border-subtle/40 bg-ui-card text-ui-muted px-2 rounded-full"
+                    >
+                      Stale
+                    </div>
                   </div>
                 </div>
               </td>
 
               <td class="px-2 py-3 text-right tabular-nums sm:px-4">
                 <div class="flex items-center justify-end gap-2">
-                  <div class="w-2 h-2">
-                    <svg viewBox="0 0 2 2" class="w-full h-full">
+                  <div class="h-2 w-2 shrink-0">
+                    <svg viewBox="0 0 2 2" class="h-full w-full">
                       <circle
                         :cx="1"
                         :cy="1"
@@ -811,6 +882,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
                       />
                     </svg>
                   </div>
+
                   <span>
                     {{ sparkline.averageScore }}
                   </span>
@@ -824,25 +896,27 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               </td>
 
               <td class="hidden w-44 px-4 py-2 lg:table-cell">
-                <div class="ml-auto w-40">
+                <div class="ml-auto w-40 max-w-full">
                   <Tooltip
                     v-if="sparkline.visible"
                     label="View chart"
                     class="w-full"
                   >
                     <button
+                      type="button"
                       class="w-full cursor-pointer"
-                      @click="viewRepoChart(sparkline)"
                       :aria-label="`View chart for ${sparkline.repo}`"
+                      @click="viewRepoChart(sparkline)"
                     >
                       <VueUiSparkline
                         :dataset="sparkline.dataset"
                         :config="getSparklineConfig(sparkline)"
-                        class="pointer-events-none"
+                        class="pointer-events-none w-full"
                       />
                     </button>
                   </Tooltip>
-                  <div v-else class="text-[--text-muted] text-xs text-center">
+
+                  <div v-else class="text-center text-xs text-[--text-muted]">
                     Insufficient data
                   </div>
                 </div>
