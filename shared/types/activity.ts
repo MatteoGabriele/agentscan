@@ -44,3 +44,5 @@ export type EventsEvolutionSeries = VueUiXyDatasetItem & {
   counts: number[]
   totals: number[]
 }
+
+export type ActivityUnit = 'percentage' | 'quantity'
