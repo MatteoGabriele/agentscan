@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useTimeout } from '@vueuse/core'
 import {
   VueUiXy,
   type VueUiXyDatasetItem,
@@ -12,11 +12,16 @@ import { useColors } from '~/composables/useColors'
 import 'vue-data-ui/style.css'
 import { useIsMobile } from '~/composables/useIsMobile'
 import { landmarks, type Landmark } from './global-events-evolution-landmarks'
-import type { EventsEvolutionSeries } from '~~/shared/types/activity'
+import type {
+  ActivityUnit,
+  EventsEvolutionSeries,
+} from '~~/shared/types/activity'
 import {
   CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
   SVG_ICON,
 } from '~~/shared/utils/charts.ts'
+
+const { unit = 'percentage' } = defineProps<{ unit?: ActivityUnit }>()
 
 const { data: activity } = useActivity()
 
@@ -47,6 +52,12 @@ const prCounts = computed(() =>
   ),
 )
 
+const ready = shallowRef(false)
+
+useTimeout(200, {
+  callback: () => (ready.value = true),
+})
+
 const hasStableChartDimensions = computed(
   () => width.value > 0 && height.value > 0,
 )
@@ -65,7 +76,10 @@ const rawDataset = computed<EventsEvolutionSeries[]>(() =>
     name,
     category,
     series: (dates.value ?? []).map(
-      (scanTime) => countsByDate.value?.[scanTime]?.[category].percentage ?? 0,
+      (scanTime) =>
+        countsByDate.value?.[scanTime]?.[category][
+          unit === 'percentage' ? 'percentage' : 'count'
+        ] ?? 0,
     ),
     trends: (dates.value ?? []).map(
       (scanTime) => countsByDate.value?.[scanTime]?.[category].trend ?? 0,
@@ -129,6 +143,10 @@ const config = computed<VueUiXyConfig>(() => ({
     datapointLeave: () => (hoveredIndex.value = null),
   },
   useCssAnimation: false,
+  transitions: {
+    enable: ready.value,
+    pauseOnDatasetChange: false,
+  },
   downsample: {
     threshold: 5000,
   },
@@ -299,7 +317,7 @@ function placeLandmark({
   landmark: Pick<Landmark, 'series' | 'offsetY'>
   plotIndex: number
 }): {
-  translate: string // for the landmark group wrapper
+  translate: string // CSS transform for the landmark group wrapper, so it can transition
   y: number // can be used for the landmark label
 } {
   const fallbackY = svg.drawingArea.bottom - 22
@@ -307,7 +325,7 @@ function placeLandmark({
 
   if (!landmark.series) {
     return {
-      translate: `translate(${x}, ${fallbackY})`,
+      translate: `translate(${x}px, ${fallbackY}px)`,
       y: fallbackY,
     }
   }
@@ -322,13 +340,16 @@ function placeLandmark({
     (landmark.offsetY ?? 0)
 
   return {
-    translate: `translate(${x}, ${y})`,
+    translate: `translate(${x}px, ${y}px)`,
     y,
   }
 }
 </script>
 <template>
-  <div class="relative h-full w-full flex flex-col">
+  <div
+    class="daily-chart relative h-full w-full flex flex-col"
+    :class="{ ready }"
+  >
     <div
       ref="chartContainer"
       class="flex-1 h-full no-chart-transition"
@@ -392,10 +413,14 @@ function placeLandmark({
                     </text>
                     <!-- Landmark icon -->
                     <g
-                      :transform="
-                        placeLandmark({ svg, landmark, plotIndex: i }).translate
-                      "
-                      class="hidden md:block"
+                      :style="{
+                        transform: placeLandmark({
+                          svg,
+                          landmark,
+                          plotIndex: i,
+                        }).translate,
+                      }"
+                      class="landmark-icon hidden md:block"
                       style="pointer-events: all; cursor: default"
                       opacity="1"
                     >
@@ -457,6 +482,7 @@ function placeLandmark({
                   :can-compare="timeLabel.absoluteIndex > 0"
                   :raw-dataset="rawDataset"
                   :pr-counts="prCounts"
+                  :unit
                 >
                   <template #thead>
                     <th class="px-2 text-center">vs Day-1</th>
@@ -510,6 +536,21 @@ function placeLandmark({
 .no-chart-transition circle {
   transition: none !important;
   animation: none !important;
+}
+
+.daily-chart.ready .vue-data-ui-component path {
+  transition: all 0.2s !important;
+}
+
+.daily-chart.ready .landmark-icon {
+  transition: transform 0.2s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-chart.ready .vue-data-ui-component path,
+  .daily-chart.ready .landmark-icon {
+    transition: none !important;
+  }
 }
 
 .landmark-label {

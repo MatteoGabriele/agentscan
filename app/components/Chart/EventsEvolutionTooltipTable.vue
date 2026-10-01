@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { VueUiXyTooltipSlotProps } from 'vue-data-ui/vue-ui-xy'
-import type { VueUiXyDatasetItemWithTrends } from '~~/shared/types/activity'
+import type {
+  ActivityUnit,
+  VueUiXyDatasetItemWithTrends,
+} from '~~/shared/types/activity'
 import { formatProgressionPoints } from '~~/shared/utils/activity-stats'
 import {
   PR_VOLUME_DASH_ARRAY,
@@ -17,7 +20,20 @@ const props = defineProps<{
   canCompare?: boolean
   rawDataset: VueUiXyDatasetItemWithTrends[]
   prCounts: number[]
+  unit?: ActivityUnit
 }>()
+
+function formatValue(value: number | null | undefined) {
+  return props.unit === 'quantity'
+    ? String(value ?? 0)
+    : `${round(value ?? 0, 1)}%`
+}
+
+function formatDelta(delta: number) {
+  return props.unit === 'quantity'
+    ? `${delta > 0 ? '+' : ''}${delta}`
+    : formatProgressionPoints(delta)
+}
 
 type DatapointItem = {
   item: { slotAbsoluteIndex: number; name: string }
@@ -46,7 +62,7 @@ function getProgressionVsPrevious({ item, index }: DatapointItem) {
 
   return {
     color: getTrendColor({ value: delta, reversed: item.name !== 'Organic' }),
-    formattedValue: formatProgressionPoints(delta),
+    formattedValue: formatDelta(delta),
   }
 }
 
@@ -102,7 +118,7 @@ const prCountDelta = computed(() => {
 
         <td class="px-2 text-right">
           <span :style="{ color: colors.text }">
-            {{ round(dp.value ?? 0, 1) + '%' }}
+            {{ formatValue(dp.value) }}
           </span>
         </td>
 
