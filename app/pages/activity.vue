@@ -54,6 +54,10 @@ const urlParams = useUrlSearchParams<{
   },
 })
 
+const unit = computed<ActivityUnit>(() => {
+  return urlParams.unit === 'quantity' ? 'quantity' : 'percentage'
+})
+
 // Rendered outside the Toggle so it sits below both toggles
 const rangeCaption = computed(() =>
   urlParams.view === 'hourly'
@@ -127,9 +131,9 @@ const rangeCaption = computed(() =>
           >
             <LazyChartHourlyEventsEvolution
               v-if="urlParams.view === 'hourly'"
-              :unit="urlParams.unit"
+              :unit
             />
-            <LazyChartGlobalEventsEvolution v-else :unit="urlParams.unit" />
+            <LazyChartGlobalEventsEvolution v-else :unit />
           </div>
         </div>
       </section>

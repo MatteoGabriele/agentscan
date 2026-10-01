@@ -538,9 +538,19 @@ function placeLandmark({
   animation: none !important;
 }
 
-.daily-chart.ready .vue-data-ui-component path,
-.daily-chart.ready .landmark-icon {
+.daily-chart.ready .vue-data-ui-component path {
   transition: all 0.2s !important;
+}
+
+.daily-chart.ready .landmark-icon {
+  transition: transform 0.2s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-chart.ready .vue-data-ui-component path,
+  .daily-chart.ready .landmark-icon {
+    transition: none !important;
+  }
 }
 
 .landmark-label {
