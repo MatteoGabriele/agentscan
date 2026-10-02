@@ -2,84 +2,84 @@
   {
     "name": "nodejs/node",
     "url": "https://github.com/nodejs/node",
-    "stars": 122193,
+    "stars": 122225,
     "avatar": "https://avatars.githubusercontent.com/u/9950313?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "storybookjs/storybook",
     "url": "https://github.com/storybookjs/storybook",
-    "stars": 91177,
+    "stars": 91196,
     "avatar": "https://avatars.githubusercontent.com/u/22632046?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "vitejs/vite",
     "url": "https://github.com/vitejs/vite",
-    "stars": 83075,
+    "stars": 83099,
     "avatar": "https://avatars.githubusercontent.com/u/65625612?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "nuxt/nuxt",
     "url": "https://github.com/nuxt/nuxt",
-    "stars": 60909,
+    "stars": 60917,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "prettier/prettier",
     "url": "https://github.com/prettier/prettier",
-    "stars": 52319,
+    "stars": 52315,
     "avatar": "https://avatars.githubusercontent.com/u/25822731?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "DIYgod/RSSHub",
     "url": "https://github.com/DIYgod/RSSHub",
-    "stars": 46366,
+    "stars": 46394,
     "avatar": "https://avatars.githubusercontent.com/u/8266075?s=50&u=9de49c9b3eaf4db02e685458cb64b64c172034bf&v=4",
     "platform": "action"
   },
   {
     "name": "babel/babel",
     "url": "https://github.com/babel/babel",
-    "stars": 44042,
+    "stars": 44044,
     "avatar": "https://avatars.githubusercontent.com/u/9637642?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "biomejs/biome",
     "url": "https://github.com/biomejs/biome",
-    "stars": 25880,
+    "stars": 25887,
     "avatar": "https://avatars.githubusercontent.com/u/140182603?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "matplotlib/matplotlib",
     "url": "https://github.com/matplotlib/matplotlib",
-    "stars": 23305,
+    "stars": 23317,
     "avatar": "https://avatars.githubusercontent.com/u/215947?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "mochajs/mocha",
     "url": "https://github.com/mochajs/mocha",
-    "stars": 22891,
+    "stars": 22890,
     "avatar": "https://avatars.githubusercontent.com/u/8770005?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "vueuse/vueuse",
     "url": "https://github.com/vueuse/vueuse",
-    "stars": 22383,
+    "stars": 22386,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "vitest-dev/vitest",
     "url": "https://github.com/vitest-dev/vitest",
-    "stars": 17174,
+    "stars": 17178,
     "avatar": "https://avatars.githubusercontent.com/u/95747107?s=50&v=4",
     "platform": "action"
   },
@@ -87,41 +87,41 @@
     "name": "aio-libs/aiohttp",
     "url": "https://github.com/aio-libs/aiohttp",
     "stars": 16567,
-    "avatar": "https://avatars.githubusercontent.com/u/7049303?s=50&v=4",
-    "platform": "action"
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "typescript-eslint/typescript-eslint",
     "url": "https://github.com/typescript-eslint/typescript-eslint",
-    "stars": 16406,
+    "stars": 16409,
     "avatar": "https://avatars.githubusercontent.com/u/46634674?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "sqlfluff/sqlfluff",
     "url": "https://github.com/sqlfluff/sqlfluff",
-    "stars": 9898,
+    "stars": 9910,
     "avatar": "https://avatars.githubusercontent.com/u/71874918?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "usekaneo/kaneo",
     "url": "https://github.com/usekaneo/kaneo",
-    "stars": 9285,
+    "stars": 9318,
     "avatar": "https://avatars.githubusercontent.com/u/192649426?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "dubzzz/fast-check",
     "url": "https://github.com/dubzzz/fast-check",
-    "stars": 5163,
+    "stars": 5173,
     "avatar": "https://avatars.githubusercontent.com/u/5300235?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "npmx-dev/npmx.dev",
     "url": "https://github.com/npmx-dev/npmx.dev",
-    "stars": 3634,
+    "stars": 3635,
     "avatar": "https://avatars.githubusercontent.com/u/257109910?v=4&s=50",
     "platform": "app"
   },
@@ -135,7 +135,7 @@
   {
     "name": "vueuse/motion",
     "url": "https://github.com/vueuse/motion",
-    "stars": 2763,
+    "stars": 2765,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
     "platform": "app"
   },
@@ -149,7 +149,7 @@
   {
     "name": "nuxt/movies",
     "url": "https://github.com/nuxt/movies",
-    "stars": 2225,
+    "stars": 2224,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
   },
@@ -161,11 +161,60 @@
     "platform": "action"
   },
   {
+    "name": "cherrypy/cherrypy",
+    "url": "https://github.com/cherrypy/cherrypy",
+    "stars": 1948,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiomysql",
+    "url": "https://github.com/aio-libs/aiomysql",
+    "stars": 1897,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "nuxt/image",
     "url": "https://github.com/nuxt/image",
     "stars": 1548,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "aio-libs/yarl",
+    "url": "https://github.com/aio-libs/yarl",
+    "stars": 1497,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiocache",
+    "url": "https://github.com/aio-libs/aiocache",
+    "stars": 1437,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiopg",
+    "url": "https://github.com/aio-libs/aiopg",
+    "stars": 1432,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiobotocore",
+    "url": "https://github.com/aio-libs/aiobotocore",
+    "stars": 1425,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiokafka",
+    "url": "https://github.com/aio-libs/aiokafka",
+    "stars": 1403,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "node-modules/utility",
@@ -182,6 +231,20 @@
     "platform": "action"
   },
   {
+    "name": "pypa/gh-action-pypi-publish",
+    "url": "https://github.com/pypa/gh-action-pypi-publish",
+    "stars": 1184,
+    "avatar": "https://avatars.githubusercontent.com/u/647025?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/ansible-runner",
+    "url": "https://github.com/ansible/ansible-runner",
+    "stars": 1086,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "nuxt/modules",
     "url": "https://github.com/nuxt/modules",
     "stars": 1052,
@@ -196,6 +259,20 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/janus",
+    "url": "https://github.com/aio-libs/janus",
+    "stars": 968,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/async-lru",
+    "url": "https://github.com/aio-libs/async-lru",
+    "stars": 954,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "vueuse/head",
     "url": "https://github.com/vueuse/head",
     "stars": 949,
@@ -203,11 +280,32 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiojobs",
+    "url": "https://github.com/aio-libs/aiojobs",
+    "stars": 930,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "apisyouwonthate/openapi.tools",
     "url": "https://github.com/apisyouwonthate/openapi.tools",
-    "stars": 844,
+    "stars": 846,
     "avatar": "https://avatars.githubusercontent.com/u/35378327?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "aio-libs/aiomonitor",
+    "url": "https://github.com/aio-libs/aiomonitor",
+    "stars": 777,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-demos",
+    "url": "https://github.com/aio-libs/aiohttp-demos",
+    "stars": 751,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "node-modules/urllib",
@@ -245,10 +343,24 @@
     "platform": "action"
   },
   {
+    "name": "aio-libs/aiodns",
+    "url": "https://github.com/aio-libs/aiodns",
+    "stars": 592,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "vueuse/sound",
     "url": "https://github.com/vueuse/sound",
     "stars": 559,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiodocker",
+    "url": "https://github.com/aio-libs/aiodocker",
+    "stars": 537,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -259,9 +371,16 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/multidict",
+    "url": "https://github.com/aio-libs/multidict",
+    "stars": 494,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "oddbird/css-anchor-positioning",
     "url": "https://github.com/oddbird/css-anchor-positioning",
-    "stars": 493,
+    "stars": 492,
     "avatar": "https://avatars.githubusercontent.com/u/780830?s=50&v=4",
     "platform": "action"
   },
@@ -280,17 +399,17 @@
     "platform": "app"
   },
   {
+    "name": "nuxt/nuxt.com",
+    "url": "https://github.com/nuxt/nuxt.com",
+    "stars": 459,
+    "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
+    "platform": "action"
+  },
+  {
     "name": "nuxt-modules/ionic",
     "url": "https://github.com/nuxt-modules/ionic",
     "stars": 458,
     "avatar": "https://avatars.githubusercontent.com/u/111748132?s=50&v=4",
-    "platform": "action"
-  },
-  {
-    "name": "nuxt/nuxt.com",
-    "url": "https://github.com/nuxt/nuxt.com",
-    "stars": 458,
-    "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
   },
   {
@@ -317,9 +436,16 @@
   {
     "name": "nuxt/test-utils",
     "url": "https://github.com/nuxt/test-utils",
-    "stars": 438,
+    "stars": 439,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "aio-libs/aiozmq",
+    "url": "https://github.com/aio-libs/aiozmq",
+    "stars": 431,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "vueuse/vue-chemistry",
@@ -378,6 +504,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiosmtpd",
+    "url": "https://github.com/aio-libs/aiosmtpd",
+    "stars": 373,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/nuxt-vitest",
     "url": "https://github.com/danielroe/nuxt-vitest",
     "stars": 364,
@@ -392,10 +525,31 @@
     "platform": "action"
   },
   {
+    "name": "ansible/ansible-builder",
+    "url": "https://github.com/ansible/ansible-builder",
+    "stars": 352,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/typed-vuex",
     "url": "https://github.com/danielroe/typed-vuex",
-    "stars": 352,
+    "stars": 351,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aioodbc",
+    "url": "https://github.com/aio-libs/aioodbc",
+    "stars": 325,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/create-aio-app",
+    "url": "https://github.com/aio-libs/create-aio-app",
+    "stars": 309,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -462,6 +616,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiohttp-devtools",
+    "url": "https://github.com/aio-libs/aiohttp-devtools",
+    "stars": 267,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "nuxt-modules/sanity",
     "url": "https://github.com/nuxt-modules/sanity",
     "stars": 265,
@@ -471,7 +632,7 @@
   {
     "name": "OpenLightingProject/open-fixture-library",
     "url": "https://github.com/OpenLightingProject/open-fixture-library",
-    "stars": 258,
+    "stars": 259,
     "avatar": "https://avatars.githubusercontent.com/u/6199314?s=50&v=4",
     "platform": "action"
   },
@@ -480,6 +641,34 @@
     "url": "https://github.com/node-modules/graceful",
     "stars": 249,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-session",
+    "url": "https://github.com/aio-libs/aiohttp-session",
+    "stars": 245,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-jinja2",
+    "url": "https://github.com/aio-libs/aiohttp-jinja2",
+    "stars": 240,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-security",
+    "url": "https://github.com/aio-libs/aiohttp-security",
+    "stars": 240,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-sse",
+    "url": "https://github.com/aio-libs/aiohttp-sse",
+    "stars": 238,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -518,6 +707,20 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiohttp-cors",
+    "url": "https://github.com/aio-libs/aiohttp-cors",
+    "stars": 220,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-admin",
+    "url": "https://github.com/aio-libs/aiohttp-admin",
+    "stars": 219,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/unplugin-purge-polyfills",
     "url": "https://github.com/danielroe/unplugin-purge-polyfills",
     "stars": 218,
@@ -525,10 +728,31 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aioftp",
+    "url": "https://github.com/aio-libs/aioftp",
+    "stars": 211,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/autod",
     "url": "https://github.com/node-modules/autod",
     "stars": 207,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/cheroot",
+    "url": "https://github.com/cherrypy/cheroot",
+    "stars": 203,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-debugtoolbar",
+    "url": "https://github.com/aio-libs/aiohttp-debugtoolbar",
+    "stars": 202,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -543,6 +767,13 @@
     "url": "https://github.com/node-modules/js-to-java",
     "stars": 201,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiozipkin",
+    "url": "https://github.com/aio-libs/aiozipkin",
+    "stars": 193,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -569,7 +800,7 @@
   {
     "name": "nuxt/nuxters",
     "url": "https://github.com/nuxt/nuxters",
-    "stars": 187,
+    "stars": 188,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
   },
@@ -597,8 +828,15 @@
   {
     "name": "danielroe/zero-vue",
     "url": "https://github.com/danielroe/zero-vue",
-    "stars": 178,
+    "stars": 179,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiorwlock",
+    "url": "https://github.com/aio-libs/aiorwlock",
+    "stars": 176,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -609,10 +847,24 @@
     "platform": "app"
   },
   {
+    "name": "re-actors/alls-green",
+    "url": "https://github.com/re-actors/alls-green",
+    "stars": 174,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/uppt",
     "url": "https://github.com/danielroe/uppt",
     "stars": 173,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiosignal",
+    "url": "https://github.com/aio-libs/aiosignal",
+    "stars": 170,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -625,7 +877,7 @@
   {
     "name": "danielroe/airspace",
     "url": "https://github.com/danielroe/airspace",
-    "stars": 161,
+    "stars": 162,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -634,6 +886,13 @@
     "url": "https://github.com/node-modules/mm",
     "stars": 159,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiomcache",
+    "url": "https://github.com/aio-libs/aiomcache",
+    "stars": 158,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -658,6 +917,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/pytest-aiohttp",
+    "url": "https://github.com/aio-libs/pytest-aiohttp",
+    "stars": 143,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/urlencode",
     "url": "https://github.com/node-modules/urlencode",
     "stars": 140,
@@ -672,6 +938,13 @@
     "platform": "action"
   },
   {
+    "name": "aio-libs/aioelasticsearch",
+    "url": "https://github.com/aio-libs/aioelasticsearch",
+    "stars": 137,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/unsight.dev",
     "url": "https://github.com/danielroe/unsight.dev",
     "stars": 135,
@@ -683,6 +956,13 @@
     "url": "https://github.com/node-modules/cluster-client",
     "stars": 132,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/frozenlist",
+    "url": "https://github.com/aio-libs/frozenlist",
+    "stars": 126,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -721,6 +1001,20 @@
     "platform": "app"
   },
   {
+    "name": "ansible/creator-ee",
+    "url": "https://github.com/ansible/creator-ee",
+    "stars": 120,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/sockjs",
+    "url": "https://github.com/aio-libs/sockjs",
+    "stars": 117,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "dubzzz/pure-rand",
     "url": "https://github.com/dubzzz/pure-rand",
     "stars": 117,
@@ -730,7 +1024,7 @@
   {
     "name": "MatteoGabriele/agentscan",
     "url": "https://github.com/MatteoGabriele/agentscan",
-    "stars": 113,
+    "stars": 114,
     "avatar": "https://avatars.githubusercontent.com/u/5337152?v=4&s=50",
     "platform": "app"
   },
@@ -791,6 +1085,13 @@
     "platform": "app"
   },
   {
+    "name": "cherrypy/cherrypy-obsolete",
+    "url": "https://github.com/cherrypy/cherrypy-obsolete",
+    "stars": 87,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/goff",
     "url": "https://github.com/danielroe/goff",
     "stars": 87,
@@ -805,11 +1106,32 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiocassandra",
+    "url": "https://github.com/aio-libs/aiocassandra",
+    "stars": 85,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-remotes",
+    "url": "https://github.com/aio-libs/aiohttp-remotes",
+    "stars": 85,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "nuxt-modules/harlem",
     "url": "https://github.com/nuxt-modules/harlem",
     "stars": 83,
     "avatar": "https://avatars.githubusercontent.com/u/111748132?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "ansible/pylibssh",
+    "url": "https://github.com/ansible/pylibssh",
+    "stars": 80,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "node-modules/clet",
@@ -875,6 +1197,13 @@
     "platform": "action"
   },
   {
+    "name": "ansible-community/antsibull-build",
+    "url": "https://github.com/ansible-community/antsibull-build",
+    "stars": 62,
+    "avatar": "https://avatars.githubusercontent.com/u/36424623?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/vue-sanity",
     "url": "https://github.com/danielroe/vue-sanity",
     "stars": 62,
@@ -905,7 +1234,7 @@
   {
     "name": "MatteoGabriele/agentscan-action",
     "url": "https://github.com/MatteoGabriele/agentscan-action",
-    "stars": 60,
+    "stars": 61,
     "avatar": "https://avatars.githubusercontent.com/u/5337152?v=4&s=50",
     "platform": "app"
   },
@@ -924,10 +1253,31 @@
     "platform": "app"
   },
   {
+    "name": "sanitizers/octomachinery",
+    "url": "https://github.com/sanitizers/octomachinery",
+    "stars": 58,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiologstash",
+    "url": "https://github.com/aio-libs/aiologstash",
+    "stars": 57,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/mz-modules",
     "url": "https://github.com/node-modules/mz-modules",
     "stars": 55,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiocouchdb",
+    "url": "https://github.com/aio-libs/aiocouchdb",
+    "stars": 54,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -973,6 +1323,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiohappyeyeballs",
+    "url": "https://github.com/aio-libs/aiohappyeyeballs",
+    "stars": 46,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/nuxt-pre-hydrate",
     "url": "https://github.com/danielroe/nuxt-pre-hydrate",
     "stars": 46,
@@ -998,6 +1355,13 @@
     "url": "https://github.com/vueuse/vueuse-vue2-example",
     "stars": 44,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/trembita",
+    "url": "https://github.com/itkpi/trembita",
+    "stars": 43,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1036,10 +1400,31 @@
     "platform": "app"
   },
   {
+    "name": "itkpi/cakeless",
+    "url": "https://github.com/itkpi/cakeless",
+    "stars": 40,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "redspah/meow_hash_cpp",
     "url": "https://github.com/redspah/meow_hash_cpp",
     "stars": 40,
     "avatar": "https://avatars.githubusercontent.com/u/11236384?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "xsyetopz/OpenJoystickDriver",
+    "url": "https://github.com/xsyetopz/OpenJoystickDriver",
+    "stars": 39,
+    "avatar": "https://avatars.githubusercontent.com/u/187086553?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/propcache",
+    "url": "https://github.com/aio-libs/propcache",
+    "stars": 38,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1064,17 +1449,24 @@
     "platform": "app"
   },
   {
-    "name": "xsyetopz/OpenJoystickDriver",
-    "url": "https://github.com/xsyetopz/OpenJoystickDriver",
-    "stars": 37,
-    "avatar": "https://avatars.githubusercontent.com/u/187086553?v=4&s=50",
-    "platform": "app"
-  },
-  {
     "name": "vueuse/vscode-vueuse",
     "url": "https://github.com/vueuse/vscode-vueuse",
     "stars": 36,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aioamqp_consumer",
+    "url": "https://github.com/aio-libs/aioamqp_consumer",
+    "stars": 35,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiofastnet",
+    "url": "https://github.com/aio-libs/aiofastnet",
+    "stars": 35,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1127,6 +1519,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/sort-all",
+    "url": "https://github.com/aio-libs/sort-all",
+    "stars": 32,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/nuxt-timings-module",
     "url": "https://github.com/danielroe/nuxt-timings-module",
     "stars": 32,
@@ -1166,6 +1565,20 @@
     "url": "https://github.com/danielroe/trellis-valet-driver",
     "stars": 29,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aioneo4j",
+    "url": "https://github.com/aio-libs/aioneo4j",
+    "stars": 28,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible-community/ansible-test-gh-action",
+    "url": "https://github.com/ansible-community/ansible-test-gh-action",
+    "stars": 28,
+    "avatar": "https://avatars.githubusercontent.com/u/36424623?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1225,10 +1638,38 @@
     "platform": "action"
   },
   {
+    "name": "webknjaz/check-in",
+    "url": "https://github.com/webknjaz/check-in",
+    "stars": 25,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiosparql",
+    "url": "https://github.com/aio-libs/aiosparql",
+    "stars": 24,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/docsite",
+    "url": "https://github.com/ansible/docsite",
+    "stars": 24,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/postcss-capsize",
     "url": "https://github.com/danielroe/postcss-capsize",
     "stars": 24,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aioga",
+    "url": "https://github.com/aio-libs/aioga",
+    "stars": 23,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1260,6 +1701,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs-abandoned/aioslacker",
+    "url": "https://github.com/aio-libs-abandoned/aioslacker",
+    "stars": 22,
+    "avatar": "https://avatars.githubusercontent.com/u/36029166?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/nuxt-vscode-template",
     "url": "https://github.com/danielroe/nuxt-vscode-template",
     "stars": 22,
@@ -1281,6 +1729,20 @@
     "platform": "app"
   },
   {
+    "name": "webknjaz/ansible-gentoo-laptop",
+    "url": "https://github.com/webknjaz/ansible-gentoo-laptop",
+    "stars": 22,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/sphinxcontrib-asyncio",
+    "url": "https://github.com/aio-libs/sphinxcontrib-asyncio",
+    "stars": 21,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "colibri-social/appview",
     "url": "https://github.com/colibri-social/appview",
     "stars": 21,
@@ -1299,6 +1761,13 @@
     "url": "https://github.com/danielroe/nuxt-vue3-module",
     "stars": 21,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aioppspp",
+    "url": "https://github.com/aio-libs/aioppspp",
+    "stars": 20,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1330,6 +1799,20 @@
     "platform": "app"
   },
   {
+    "name": "sphinx-contrib/sphinxcontrib-towncrier",
+    "url": "https://github.com/sphinx-contrib/sphinxcontrib-towncrier",
+    "stars": 20,
+    "avatar": "https://avatars.githubusercontent.com/u/31936682?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiolibs-executor",
+    "url": "https://github.com/aio-libs/aiolibs-executor",
+    "stars": 19,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/enable",
     "url": "https://github.com/node-modules/enable",
     "stars": 19,
@@ -1358,6 +1841,20 @@
     "platform": "app"
   },
   {
+    "name": "webknjaz/intersphinx-untangled",
+    "url": "https://github.com/webknjaz/intersphinx-untangled",
+    "stars": 18,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aioloop-proxy",
+    "url": "https://github.com/aio-libs/aioloop-proxy",
+    "stars": 17,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/glob-native",
     "url": "https://github.com/danielroe/glob-native",
     "stars": 17,
@@ -1383,6 +1880,13 @@
     "url": "https://github.com/node-modules/time-profile",
     "stars": 17,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-benchmarks",
+    "url": "https://github.com/aio-libs/aiohttp-benchmarks",
+    "stars": 16,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1421,10 +1925,24 @@
     "platform": "app"
   },
   {
+    "name": "GDG-Ukraine/devfest-ukraine-13",
+    "url": "https://github.com/GDG-Ukraine/devfest-ukraine-13",
+    "stars": 15,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "huang-julien/nitro-applicationinsights",
     "url": "https://github.com/huang-julien/nitro-applicationinsights",
     "stars": 15,
     "avatar": "https://avatars.githubusercontent.com/u/63512348?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible-community/sphinx_ansible_theme",
+    "url": "https://github.com/ansible-community/sphinx_ansible_theme",
+    "stars": 14,
+    "avatar": "https://avatars.githubusercontent.com/u/36424623?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1456,6 +1974,13 @@
     "platform": "app"
   },
   {
+    "name": "sanitizers/patchback-github-app",
+    "url": "https://github.com/sanitizers/patchback-github-app",
+    "stars": 14,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/logfilestream",
     "url": "https://github.com/node-modules/logfilestream",
     "stars": 13,
@@ -1484,6 +2009,13 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiohttp-apischema",
+    "url": "https://github.com/aio-libs/aiohttp-apischema",
+    "stars": 12,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/vuejslive",
     "url": "https://github.com/danielroe/vuejslive",
     "stars": 12,
@@ -1509,6 +2041,27 @@
     "url": "https://github.com/node-modules/default-user-agent",
     "stars": 11,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "sanitizers/chronographer-github-app",
+    "url": "https://github.com/sanitizers/chronographer-github-app",
+    "stars": 11,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-flashbag",
+    "url": "https://github.com/aio-libs/aiohttp-flashbag",
+    "stars": 10,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/tools",
+    "url": "https://github.com/cherrypy/tools",
+    "stars": 10,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1568,6 +2121,27 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/aiohttp-bot",
+    "url": "https://github.com/aio-libs/aiohttp-bot",
+    "stars": 9,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/idna-ssl",
+    "url": "https://github.com/aio-libs/idna-ssl",
+    "stars": 9,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/awx-plugins",
+    "url": "https://github.com/ansible/awx-plugins",
+    "stars": 9,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/future-of-coding-2024",
     "url": "https://github.com/danielroe/future-of-coding-2024",
     "stars": 9,
@@ -1589,6 +2163,20 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/.github",
+    "url": "https://github.com/aio-libs/.github",
+    "stars": 8,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible-collections/community.molecule",
+    "url": "https://github.com/ansible-collections/community.molecule",
+    "stars": 8,
+    "avatar": "https://avatars.githubusercontent.com/u/44586252?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/botornot",
     "url": "https://github.com/danielroe/botornot",
     "stars": 8,
@@ -1607,6 +2195,13 @@
     "url": "https://github.com/danielroe/renovate",
     "stars": 8,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "graphieros/raindrops-on-roses",
+    "url": "https://github.com/graphieros/raindrops-on-roses",
+    "stars": 8,
+    "avatar": "https://avatars.githubusercontent.com/u/55991794?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1659,6 +2254,20 @@
     "platform": "app"
   },
   {
+    "name": "aio-libs/dynoname",
+    "url": "https://github.com/aio-libs/dynoname",
+    "stars": 7,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/magicbus",
+    "url": "https://github.com/cherrypy/magicbus",
+    "stars": 7,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/nuxt-site-template",
     "url": "https://github.com/danielroe/nuxt-site-template",
     "stars": 7,
@@ -1694,13 +2303,6 @@
     "platform": "app"
   },
   {
-    "name": "graphieros/raindrops-on-roses",
-    "url": "https://github.com/graphieros/raindrops-on-roses",
-    "stars": 7,
-    "avatar": "https://avatars.githubusercontent.com/u/55991794?v=4&s=50",
-    "platform": "app"
-  },
-  {
     "name": "node-modules/memory-tripwire",
     "url": "https://github.com/node-modules/memory-tripwire",
     "stars": 7,
@@ -1712,6 +2314,48 @@
     "url": "https://github.com/node-modules/vmto",
     "stars": 7,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "OSS-NORUS/mit-norus",
+    "url": "https://github.com/OSS-NORUS/mit-norus",
+    "stars": 7,
+    "avatar": "https://avatars.githubusercontent.com/u/159480881?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "tox-dev/gh-action-tox",
+    "url": "https://github.com/tox-dev/gh-action-tox",
+    "stars": 7,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/webknjaz",
+    "url": "https://github.com/webknjaz/webknjaz",
+    "stars": 7,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "zizmorcore/workflow",
+    "url": "https://github.com/zizmorcore/workflow",
+    "stars": 7,
+    "avatar": "https://avatars.githubusercontent.com/u/210636713?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/get-releasenote",
+    "url": "https://github.com/aio-libs/get-releasenote",
+    "stars": 6,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible-community/ansible-pygments",
+    "url": "https://github.com/ansible-community/ansible-pygments",
+    "stars": 6,
+    "avatar": "https://avatars.githubusercontent.com/u/36424623?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1733,6 +2377,20 @@
     "url": "https://github.com/danielroe/nuxt-emoji-blast",
     "stars": 6,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "douhack/douhack",
+    "url": "https://github.com/douhack/douhack",
+    "stars": 6,
+    "avatar": "https://avatars.githubusercontent.com/u/9968828?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/gdg.org.ua",
+    "url": "https://github.com/GDG-Ukraine/gdg.org.ua",
+    "stars": 6,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1764,10 +2422,24 @@
     "platform": "app"
   },
   {
+    "name": "tox-dev/workflow",
+    "url": "https://github.com/tox-dev/workflow",
+    "stars": 6,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "unveil-project/vk",
     "url": "https://github.com/unveil-project/vk",
     "stars": 6,
     "avatar": "https://avatars.githubusercontent.com/u/272005597?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/triagers",
+    "url": "https://github.com/aio-libs/triagers",
+    "stars": 5,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1813,6 +2485,20 @@
     "platform": "app"
   },
   {
+    "name": "re-actors/cache-python-deps",
+    "url": "https://github.com/re-actors/cache-python-deps",
+    "stars": 5,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/checkout-python-sdist",
+    "url": "https://github.com/re-actors/checkout-python-sdist",
+    "stars": 5,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "recaptime-dev/verify",
     "url": "https://github.com/recaptime-dev/verify",
     "stars": 5,
@@ -1825,6 +2511,20 @@
     "stars": 5,
     "avatar": "https://avatars.githubusercontent.com/u/167881517?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "aio-libs/aiohttp-theme",
+    "url": "https://github.com/aio-libs/aiohttp-theme",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/prepare-coverage",
+    "url": "https://github.com/aio-libs/prepare-coverage",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "danielroe/_productivity_app",
@@ -1904,6 +2604,13 @@
     "platform": "app"
   },
   {
+    "name": "GDG-Ukraine/devfest-ukraine-14",
+    "url": "https://github.com/GDG-Ukraine/devfest-ukraine-14",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/aggregate-base",
     "url": "https://github.com/node-modules/aggregate-base",
     "stars": 4,
@@ -1939,11 +2646,46 @@
     "platform": "app"
   },
   {
+    "name": "webknjaz/ansible-galaxy-collection-resolver",
+    "url": "https://github.com/webknjaz/ansible-galaxy-collection-resolver",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansiwatch-bot",
+    "url": "https://github.com/webknjaz/ansiwatch-bot",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/docker-freecad-cli",
+    "url": "https://github.com/webknjaz/docker-freecad-cli",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/create-release",
+    "url": "https://github.com/aio-libs/create-release",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "anolilab/workflows",
     "url": "https://github.com/anolilab/workflows",
     "stars": 3,
     "avatar": "https://avatars.githubusercontent.com/u/11498666?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "ansible/foreman-test-container",
+    "url": "https://github.com/ansible/foreman-test-container",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "danielroe/gdg-portlaoise-2024",
@@ -1999,6 +2741,62 @@
     "url": "https://github.com/danielroe/werewolves-assistant-web-next",
     "stars": 3,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/devfest.gdg.org.ua",
+    "url": "https://github.com/GDG-Ukraine/devfest.gdg.org.ua",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/gdg-org-ua-site",
+    "url": "https://github.com/GDG-Ukraine/gdg-org-ua-site",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/logo",
+    "url": "https://github.com/itkpi/logo",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/logo.js",
+    "url": "https://github.com/itkpi/logo.js",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/primat-bot",
+    "url": "https://github.com/itkpi/primat-bot",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-mike-011",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-mike-011",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kyiv-team-hacktbilisi/web-app",
+    "url": "https://github.com/kyiv-team-hacktbilisi/web-app",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/10245698?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "lvov-douhack/socialtrack-frontend",
+    "url": "https://github.com/lvov-douhack/socialtrack-frontend",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/2217318?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2086,10 +2884,87 @@
     "platform": "app"
   },
   {
+    "name": "sanitizers/diactoros-github-app",
+    "url": "https://github.com/sanitizers/diactoros-github-app",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "tox-dev/tox-pre-commit",
+    "url": "https://github.com/tox-dev/tox-pre-commit",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ukrainians-gh/.github",
+    "url": "https://github.com/ukrainians-gh/.github",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/11205818?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ukrainians-gh/invites",
+    "url": "https://github.com/ukrainians-gh/invites",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/11205818?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ukrainians-gh/ukrainians-gh.github.io",
+    "url": "https://github.com/ukrainians-gh/ukrainians-gh.github.io",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/11205818?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "unveil-project/interlinked",
+    "url": "https://github.com/unveil-project/interlinked",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/272005597?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "vueuse/playground.vueuse.org",
     "url": "https://github.com/vueuse/playground.vueuse.org",
     "stars": 3,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/.me",
+    "url": "https://github.com/webknjaz/.me",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ep2024-multilock-toy-template",
+    "url": "https://github.com/webknjaz/ep2024-multilock-toy-template",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pip-with-requires-python",
+    "url": "https://github.com/webknjaz/pip-with-requires-python",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/review-requests",
+    "url": "https://github.com/webknjaz/review-requests",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/sphnx-link-by-labels-ext",
+    "url": "https://github.com/webknjaz/sphnx-link-by-labels-ext",
+    "stars": 3,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2098,6 +2973,41 @@
     "stars": 3,
     "avatar": "https://avatars.githubusercontent.com/u/167881517?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "aio-libs/aiohttp-asyncmdnsresolver",
+    "url": "https://github.com/aio-libs/aiohttp-asyncmdnsresolver",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/upload-coverage",
+    "url": "https://github.com/aio-libs/upload-coverage",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/aut",
+    "url": "https://github.com/ansible/aut",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/cherrypy.github.io",
+    "url": "https://github.com/cherrypy/cherrypy.github.io",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/zappa-cherrypy",
+    "url": "https://github.com/cherrypy/zappa-cherrypy",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "danielroe/.github",
@@ -2170,6 +3080,76 @@
     "platform": "app"
   },
   {
+    "name": "GDG-Ukraine/gdgregform",
+    "url": "https://github.com/GDG-Ukraine/gdgregform",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/mapmaker-crx",
+    "url": "https://github.com/GDG-Ukraine/mapmaker-crx",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/chats",
+    "url": "https://github.com/itkpi/chats",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/docker-utils",
+    "url": "https://github.com/itkpi/docker-utils",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/itkpimail",
+    "url": "https://github.com/itkpi/itkpimail",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/tedx",
+    "url": "https://github.com/itkpi/tedx",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/tickets",
+    "url": "https://github.com/itkpi/tickets",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/devspace",
+    "url": "https://github.com/kpi-web-guild/devspace",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kyiv-team-hacktbilisi/android-app",
+    "url": "https://github.com/kyiv-team-hacktbilisi/android-app",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/10245698?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "lvov-douhack/socialtrack-backend",
+    "url": "https://github.com/lvov-douhack/socialtrack-backend",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/2217318?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "node-modules/get-ready",
     "url": "https://github.com/node-modules/get-ready",
     "stars": 2,
@@ -2209,6 +3189,20 @@
     "url": "https://github.com/npmx-dev/.github",
     "stars": 2,
     "avatar": "https://avatars.githubusercontent.com/u/257109910?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/python-smsfly",
+    "url": "https://github.com/open-craft-guild/python-smsfly",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/python-dist-meta",
+    "url": "https://github.com/re-actors/python-dist-meta",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2289,10 +3283,115 @@
     "platform": "app"
   },
   {
+    "name": "reStructuredText/startup",
+    "url": "https://github.com/reStructuredText/startup",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/73187149?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "tox-dev/tox-towncrier",
+    "url": "https://github.com/tox-dev/tox-towncrier",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/dpl-gh-pages",
+    "url": "https://github.com/webknjaz/dpl-gh-pages",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/gentoo-overlay",
+    "url": "https://github.com/webknjaz/gentoo-overlay",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "xsyetopz/vscode-bnf-intellisense",
     "url": "https://github.com/xsyetopz/vscode-bnf-intellisense",
     "stars": 2,
     "avatar": "https://avatars.githubusercontent.com/u/187086553?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aio-libs.github.io",
+    "url": "https://github.com/aio-libs/aio-libs.github.io",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "aio-libs/aiohttp-client-middlewares",
+    "url": "https://github.com/aio-libs/aiohttp-client-middlewares",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible-community/nightly-builds",
+    "url": "https://github.com/ansible-community/nightly-builds",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/36424623?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/awx_plugins.interfaces",
+    "url": "https://github.com/ansible/awx_plugins.interfaces",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/gh-action-record-test-results",
+    "url": "https://github.com/ansible/gh-action-record-test-results",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/issue-forms-demo-for-ansible",
+    "url": "https://github.com/ansible/issue-forms-demo-for-ansible",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/oauth-client-example",
+    "url": "https://github.com/cherrypy/oauth-client-example",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible-minimal",
+    "url": "https://github.com/coll-test/ansible-minimal",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.crypto",
+    "url": "https://github.com/coll-test/community.crypto",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/dellemc_networking.os10",
+    "url": "https://github.com/coll-test/dellemc_networking.os10",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/gavinfish.azuretest",
+    "url": "https://github.com/coll-test/gavinfish.azuretest",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2387,6 +3486,132 @@
     "platform": "app"
   },
   {
+    "name": "GDG-Ukraine/git-submodule-subtree-showcase",
+    "url": "https://github.com/GDG-Ukraine/git-submodule-subtree-showcase",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "github-actions-playground/enroll-me",
+    "url": "https://github.com/github-actions-playground/enroll-me",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/10198101?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/.github",
+    "url": "https://github.com/itkpi/.github",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/awesome-list",
+    "url": "https://github.com/itkpi/awesome-list",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/events-admin",
+    "url": "https://github.com/itkpi/events-admin",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/events-parser",
+    "url": "https://github.com/itkpi/events-parser",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/events-storage",
+    "url": "https://github.com/itkpi/events-storage",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/fortuna-incognita",
+    "url": "https://github.com/itkpi/fortuna-incognita",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/FuncSharp",
+    "url": "https://github.com/itkpi/FuncSharp",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/jobs",
+    "url": "https://github.com/itkpi/jobs",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-artisodua",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-artisodua",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Miseracle",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Miseracle",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-OlenaEfymenko",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-OlenaEfymenko",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-pavlenk0",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-pavlenk0",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-vitaliiotverchenko",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-vitaliiotverchenko",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-wack17s",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-wack17s",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/Pyramid-Miseracle",
+    "url": "https://github.com/kpi-web-guild/Pyramid-Miseracle",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kyiv-team-hacktbilisi/face-keeper-2016",
+    "url": "https://github.com/kyiv-team-hacktbilisi/face-keeper-2016",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/10245698?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "nguyenhy/d11f",
     "url": "https://github.com/nguyenhy/d11f",
     "stars": 1,
@@ -2426,6 +3651,62 @@
     "url": "https://github.com/node-modules/userauth",
     "stars": 1,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/aio-feature-flags",
+    "url": "https://github.com/open-craft-guild/aio-feature-flags",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/crm-smsfly",
+    "url": "https://github.com/open-craft-guild/crm-smsfly",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/gentoo-overlay",
+    "url": "https://github.com/open-craft-guild/gentoo-overlay",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/restartr",
+    "url": "https://github.com/open-craft-guild/restartr",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "OSS-NORUS/Apache-License-2-norus",
+    "url": "https://github.com/OSS-NORUS/Apache-License-2-norus",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/159480881?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/bindep",
+    "url": "https://github.com/re-actors/bindep",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/build-python-dists",
+    "url": "https://github.com/re-actors/build-python-dists",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/upload-artifact",
+    "url": "https://github.com/re-actors/upload-artifact",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2583,6 +3864,216 @@
     "platform": "app"
   },
   {
+    "name": "tox-dev/tox-build",
+    "url": "https://github.com/tox-dev/tox-build",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "tox-dev/tox-lock",
+    "url": "https://github.com/tox-dev/tox-lock",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "tox-dev/tox-sphinx",
+    "url": "https://github.com/tox-dev/tox-sphinx",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/20345659?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/.github",
+    "url": "https://github.com/webknjaz/.github",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/.well-known",
+    "url": "https://github.com/webknjaz/.well-known",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansible-collection-demo-2022-10.contrib.summit",
+    "url": "https://github.com/webknjaz/ansible-collection-demo-2022-10.contrib.summit",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansible-lightbulb-vagga",
+    "url": "https://github.com/webknjaz/ansible-lightbulb-vagga",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansible-network-infra",
+    "url": "https://github.com/webknjaz/ansible-network-infra",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansinight",
+    "url": "https://github.com/webknjaz/ansinight",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/astronvim-userspace-config",
+    "url": "https://github.com/webknjaz/astronvim-userspace-config",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/check-gha-test",
+    "url": "https://github.com/webknjaz/check-gha-test",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/comment-reactor-pyconsk-324",
+    "url": "https://github.com/webknjaz/comment-reactor-pyconsk-324",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/dfua-pwa-workshop",
+    "url": "https://github.com/webknjaz/dfua-pwa-workshop",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ep2024-multilock-toy",
+    "url": "https://github.com/webknjaz/ep2024-multilock-toy",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/fortunate-pkg",
+    "url": "https://github.com/webknjaz/fortunate-pkg",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ibcrawler",
+    "url": "https://github.com/webknjaz/ibcrawler",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/jquery-recursive-storage",
+    "url": "https://github.com/webknjaz/jquery-recursive-storage",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/keystone-barbican-docker",
+    "url": "https://github.com/webknjaz/keystone-barbican-docker",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/kpi-timetable-crawler",
+    "url": "https://github.com/webknjaz/kpi-timetable-crawler",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/mrgall-ansible",
+    "url": "https://github.com/webknjaz/mrgall-ansible",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/oxymoron",
+    "url": "https://github.com/webknjaz/oxymoron",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pycon-balkan-2019-bot-tutorial",
+    "url": "https://github.com/webknjaz/pycon-balkan-2019-bot-tutorial",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pycon-pl-2026-architecture-in-gha",
+    "url": "https://github.com/webknjaz/pycon-pl-2026-architecture-in-gha",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/roughly-flake8",
+    "url": "https://github.com/webknjaz/roughly-flake8",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/rpi4b-k3s",
+    "url": "https://github.com/webknjaz/rpi4b-k3s",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/talk-drafts",
+    "url": "https://github.com/webknjaz/talk-drafts",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/tc-informer.pp.ua",
+    "url": "https://github.com/webknjaz/tc-informer.pp.ua",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/transmit",
+    "url": "https://github.com/webknjaz/transmit",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/twitter-reporter",
+    "url": "https://github.com/webknjaz/twitter-reporter",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/webchallenge-ato-children",
+    "url": "https://github.com/webknjaz/webchallenge-ato-children",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "xsyetopz/awesome-command-line-tools",
     "url": "https://github.com/xsyetopz/awesome-command-line-tools",
     "stars": 1,
@@ -2623,6 +4114,27 @@
     "stars": 1,
     "avatar": "https://avatars.githubusercontent.com/u/167881517?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "aio-libs/.thanks.dev",
+    "url": "https://github.com/aio-libs/.thanks.dev",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible-community/tox-ansible-test",
+    "url": "https://github.com/ansible-community/tox-ansible-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/36424623?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ansible/sonarcloud-public-test",
+    "url": "https://github.com/ansible/sonarcloud-public-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/1507452?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "Antidington/RSSHub-personal",
@@ -2674,6 +4186,27 @@
     "platform": "app"
   },
   {
+    "name": "cherrypy/.github",
+    "url": "https://github.com/cherrypy/.github",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/cherrypy-cors",
+    "url": "https://github.com/cherrypy/cherrypy-cors",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "cherrypy/tools-legacy",
+    "url": "https://github.com/cherrypy/tools-legacy",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/6617466?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "colibri-social/.github",
     "url": "https://github.com/colibri-social/.github",
     "stars": 0,
@@ -2706,6 +4239,818 @@
     "url": "https://github.com/colibri-social/scoop-bucket",
     "stars": 0,
     "avatar": "https://avatars.githubusercontent.com/u/261795258?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/amazon.amazon",
+    "url": "https://github.com/coll-test/amazon.amazon",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible_community.grafana",
+    "url": "https://github.com/coll-test/ansible_community.grafana",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible-base",
+    "url": "https://github.com/coll-test/ansible-base",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible-nwo",
+    "url": "https://github.com/coll-test/ansible-nwo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible-wk",
+    "url": "https://github.com/coll-test/ansible-wk",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.a10",
+    "url": "https://github.com/coll-test/ansible.a10",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.acme",
+    "url": "https://github.com/coll-test/ansible.acme",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.aireos",
+    "url": "https://github.com/coll-test/ansible.aireos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.alicloud",
+    "url": "https://github.com/coll-test/ansible.alicloud",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.amazon",
+    "url": "https://github.com/coll-test/ansible.amazon",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.apconos",
+    "url": "https://github.com/coll-test/ansible.apconos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.aruba",
+    "url": "https://github.com/coll-test/ansible.aruba",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.asa",
+    "url": "https://github.com/coll-test/ansible.asa",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.avi",
+    "url": "https://github.com/coll-test/ansible.avi",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.cloudscale",
+    "url": "https://github.com/coll-test/ansible.cloudscale",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.cloudstack",
+    "url": "https://github.com/coll-test/ansible.cloudstack",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.cnos",
+    "url": "https://github.com/coll-test/ansible.cnos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.containers",
+    "url": "https://github.com/coll-test/ansible.containers",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.digital_ocean",
+    "url": "https://github.com/coll-test/ansible.digital_ocean",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.dimensiondata",
+    "url": "https://github.com/coll-test/ansible.dimensiondata",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.docker",
+    "url": "https://github.com/coll-test/ansible.docker",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.emc",
+    "url": "https://github.com/coll-test/ansible.emc",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.enos",
+    "url": "https://github.com/coll-test/ansible.enos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.exoscale",
+    "url": "https://github.com/coll-test/ansible.exoscale",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.fortios",
+    "url": "https://github.com/coll-test/ansible.fortios",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.frr",
+    "url": "https://github.com/coll-test/ansible.frr",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.gitlab",
+    "url": "https://github.com/coll-test/ansible.gitlab",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.hetzner",
+    "url": "https://github.com/coll-test/ansible.hetzner",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.infoblox",
+    "url": "https://github.com/coll-test/ansible.infoblox",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.intersight",
+    "url": "https://github.com/coll-test/ansible.intersight",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.ironware",
+    "url": "https://github.com/coll-test/ansible.ironware",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.keycloak",
+    "url": "https://github.com/coll-test/ansible.keycloak",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.kubernetes",
+    "url": "https://github.com/coll-test/ansible.kubernetes",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.layer2",
+    "url": "https://github.com/coll-test/ansible.layer2",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.layer3",
+    "url": "https://github.com/coll-test/ansible.layer3",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.misc",
+    "url": "https://github.com/coll-test/ansible.misc",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.netcommon",
+    "url": "https://github.com/coll-test/ansible.netcommon",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.nso",
+    "url": "https://github.com/coll-test/ansible.nso",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.ovs",
+    "url": "https://github.com/coll-test/ansible.ovs",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.posix",
+    "url": "https://github.com/coll-test/ansible.posix",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.skydive",
+    "url": "https://github.com/coll-test/ansible.skydive",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.tower",
+    "url": "https://github.com/coll-test/ansible.tower",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.unix",
+    "url": "https://github.com/coll-test/ansible.unix",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.vmware_rest",
+    "url": "https://github.com/coll-test/ansible.vmware_rest",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.vmware_soap",
+    "url": "https://github.com/coll-test/ansible.vmware_soap",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.vultr",
+    "url": "https://github.com/coll-test/ansible.vultr",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ansible.windows",
+    "url": "https://github.com/coll-test/ansible.windows",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/arista.eos",
+    "url": "https://github.com/coll-test/arista.eos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/awx.awx",
+    "url": "https://github.com/coll-test/awx.awx",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/azure.azcollection",
+    "url": "https://github.com/coll-test/azure.azcollection",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/check_point.mgmt",
+    "url": "https://github.com/coll-test/check_point.mgmt",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/checkpoint.checkpoint",
+    "url": "https://github.com/coll-test/checkpoint.checkpoint",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.aci",
+    "url": "https://github.com/coll-test/cisco.aci",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.asa",
+    "url": "https://github.com/coll-test/cisco.asa",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.intersight",
+    "url": "https://github.com/coll-test/cisco.intersight",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.ios",
+    "url": "https://github.com/coll-test/cisco.ios",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.iosxr",
+    "url": "https://github.com/coll-test/cisco.iosxr",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.meraki",
+    "url": "https://github.com/coll-test/cisco.meraki",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.mso",
+    "url": "https://github.com/coll-test/cisco.mso",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.nxos",
+    "url": "https://github.com/coll-test/cisco.nxos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cisco.ucs",
+    "url": "https://github.com/coll-test/cisco.ucs",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.amazon",
+    "url": "https://github.com/coll-test/community.amazon",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.general",
+    "url": "https://github.com/coll-test/community.general",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.grafana",
+    "url": "https://github.com/coll-test/community.grafana",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.kubernetes",
+    "url": "https://github.com/coll-test/community.kubernetes",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.mongo",
+    "url": "https://github.com/coll-test/community.mongo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.vmware",
+    "url": "https://github.com/coll-test/community.vmware",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.vmware_rest",
+    "url": "https://github.com/coll-test/community.vmware_rest",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/community.windows",
+    "url": "https://github.com/coll-test/community.windows",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/cyberark.bizdev",
+    "url": "https://github.com/coll-test/cyberark.bizdev",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/database.influxdb",
+    "url": "https://github.com/coll-test/database.influxdb",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/dell.os10",
+    "url": "https://github.com/coll-test/dell.os10",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/dell.os6",
+    "url": "https://github.com/coll-test/dell.os6",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/dell.os9",
+    "url": "https://github.com/coll-test/dell.os9",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/dellemc_networking.os6",
+    "url": "https://github.com/coll-test/dellemc_networking.os6",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/dellemc_networking.os9",
+    "url": "https://github.com/coll-test/dellemc_networking.os9",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/extremenetworks.exos",
+    "url": "https://github.com/coll-test/extremenetworks.exos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/extremenetworks.voss",
+    "url": "https://github.com/coll-test/extremenetworks.voss",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/f5networks.f5_modules",
+    "url": "https://github.com/coll-test/f5networks.f5_modules",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/fortinet.fortios",
+    "url": "https://github.com/coll-test/fortinet.fortios",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/frr.frr",
+    "url": "https://github.com/coll-test/frr.frr",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/google.cloud",
+    "url": "https://github.com/coll-test/google.cloud",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/hetzner.hcloud",
+    "url": "https://github.com/coll-test/hetzner.hcloud",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/huawei.cloud",
+    "url": "https://github.com/coll-test/huawei.cloud",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/huawei.cloudengine",
+    "url": "https://github.com/coll-test/huawei.cloudengine",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ibm.qradar",
+    "url": "https://github.com/coll-test/ibm.qradar",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/infinidat.infinity",
+    "url": "https://github.com/coll-test/infinidat.infinity",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/junipernetworks.junos",
+    "url": "https://github.com/coll-test/junipernetworks.junos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/misc.glob",
+    "url": "https://github.com/coll-test/misc.glob",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/nagios.nagios",
+    "url": "https://github.com/coll-test/nagios.nagios",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/netapp.aws",
+    "url": "https://github.com/coll-test/netapp.aws",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/netapp.common",
+    "url": "https://github.com/coll-test/netapp.common",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/netapp.elementsw",
+    "url": "https://github.com/coll-test/netapp.elementsw",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/netapp.ontap",
+    "url": "https://github.com/coll-test/netapp.ontap",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/netbox.netbox",
+    "url": "https://github.com/coll-test/netbox.netbox",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/new_azure_order.azure",
+    "url": "https://github.com/coll-test/new_azure_order.azure",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/nokia.sros",
+    "url": "https://github.com/coll-test/nokia.sros",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/notstdlib.moveitallout",
+    "url": "https://github.com/coll-test/notstdlib.moveitallout",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/openstack.cloud",
+    "url": "https://github.com/coll-test/openstack.cloud",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/openvswitch.openvswitch",
+    "url": "https://github.com/coll-test/openvswitch.openvswitch",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/ovirt.ovirt",
+    "url": "https://github.com/coll-test/ovirt.ovirt",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/purestorage.array",
+    "url": "https://github.com/coll-test/purestorage.array",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/purestorage.blade",
+    "url": "https://github.com/coll-test/purestorage.blade",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/purestorage.common",
+    "url": "https://github.com/coll-test/purestorage.common",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/purestorage.flasharray",
+    "url": "https://github.com/coll-test/purestorage.flasharray",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/purestorage.flashblade",
+    "url": "https://github.com/coll-test/purestorage.flashblade",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/servicenow.servicenow",
+    "url": "https://github.com/coll-test/servicenow.servicenow",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/skydive.skydive",
+    "url": "https://github.com/coll-test/skydive.skydive",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/splunk.enterprise_security",
+    "url": "https://github.com/coll-test/splunk.enterprise_security",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/storage.hpe3par",
+    "url": "https://github.com/coll-test/storage.hpe3par",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/storage.ibm",
+    "url": "https://github.com/coll-test/storage.ibm",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/theforeman.foreman",
+    "url": "https://github.com/coll-test/theforeman.foreman",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/vyatta.vyos",
+    "url": "https://github.com/coll-test/vyatta.vyos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/vyos.vyos",
+    "url": "https://github.com/coll-test/vyos.vyos",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/wti.remote",
+    "url": "https://github.com/coll-test/wti.remote",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "coll-test/yum_unit_test_migration_spec.yum_collection",
+    "url": "https://github.com/coll-test/yum_unit_test_migration_spec.yum_collection",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/55549766?v=4&s=50",
     "platform": "app"
   },
   {
@@ -3066,11 +5411,648 @@
     "platform": "action"
   },
   {
+    "name": "GDG-Ukraine/contact-form",
+    "url": "https://github.com/GDG-Ukraine/contact-form",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/devfest-ukraine-15",
+    "url": "https://github.com/GDG-Ukraine/devfest-ukraine-15",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/dfua-AR",
+    "url": "https://github.com/GDG-Ukraine/dfua-AR",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/dfua-generated-websites",
+    "url": "https://github.com/GDG-Ukraine/dfua-generated-websites",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "GDG-Ukraine/talks-feedback",
+    "url": "https://github.com/GDG-Ukraine/talks-feedback",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/2266906?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "git-skeletons/.github",
+    "url": "https://github.com/git-skeletons/.github",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/95866712?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "github-actions-playground/friends-asvetlov",
+    "url": "https://github.com/github-actions-playground/friends-asvetlov",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/10198101?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "github-actions-playground/friends-MaxymVlasov",
+    "url": "https://github.com/github-actions-playground/friends-MaxymVlasov",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/10198101?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "github-actions-playground/friends-pradyunsg",
+    "url": "https://github.com/github-actions-playground/friends-pradyunsg",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/10198101?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/codewars-bot",
+    "url": "https://github.com/itkpi/codewars-bot",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/digest-templates",
+    "url": "https://github.com/itkpi/digest-templates",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/digest-templates-v2",
+    "url": "https://github.com/itkpi/digest-templates-v2",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/events-public",
+    "url": "https://github.com/itkpi/events-public",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/hawkeye-central",
+    "url": "https://github.com/itkpi/hawkeye-central",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/hawkeye-front",
+    "url": "https://github.com/itkpi/hawkeye-front",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/hawkeye-node",
+    "url": "https://github.com/itkpi/hawkeye-node",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/itkpi-blog-ui",
+    "url": "https://github.com/itkpi/itkpi-blog-ui",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/itkpi.github.io",
+    "url": "https://github.com/itkpi/itkpi.github.io",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/jsug",
+    "url": "https://github.com/itkpi/jsug",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpi-med-bot",
+    "url": "https://github.com/itkpi/kpi-med-bot",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpi-quiz",
+    "url": "https://github.com/itkpi/kpi-quiz",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpi-schedule-bot",
+    "url": "https://github.com/itkpi/kpi-schedule-bot",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-admin-panel",
+    "url": "https://github.com/itkpi/kpimaps-admin-panel",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-client-android",
+    "url": "https://github.com/itkpi/kpimaps-client-android",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-client-ios",
+    "url": "https://github.com/itkpi/kpimaps-client-ios",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-client-windows-metro",
+    "url": "https://github.com/itkpi/kpimaps-client-windows-metro",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-nodejs-server",
+    "url": "https://github.com/itkpi/kpimaps-nodejs-server",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-resources",
+    "url": "https://github.com/itkpi/kpimaps-resources",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/kpimaps-server",
+    "url": "https://github.com/itkpi/kpimaps-server",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/old-itkpi.github.io",
+    "url": "https://github.com/itkpi/old-itkpi.github.io",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/scala-meta-compiler",
+    "url": "https://github.com/itkpi/scala-meta-compiler",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "itkpi/tedx-soon",
+    "url": "https://github.com/itkpi/tedx-soon",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/12073380?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-8ajarz",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-8ajarz",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-andreyrobota",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-andreyrobota",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-ArtemVasylchuck",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-ArtemVasylchuck",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-BlackSou",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-BlackSou",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-BogdanShevchenkoo",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-BogdanShevchenkoo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Bozonych",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Bozonych",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Client-Z",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Client-Z",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-darklord671",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-darklord671",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Denver78",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Denver78",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-DrEdi",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-DrEdi",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-ElenaGyllenhall",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-ElenaGyllenhall",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-ErvaAtol",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-ErvaAtol",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-gaupt",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-gaupt",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-igorkruglyak",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-igorkruglyak",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-klochenok",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-klochenok",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-l1storez",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-l1storez",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-makkaronis4e",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-makkaronis4e",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-MaksMaidaanov",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-MaksMaidaanov",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Martolivna",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Martolivna",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-mikescor",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-mikescor",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-mr4kbear",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-mr4kbear",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-nest1m4107",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-nest1m4107",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-noviybogq",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-noviybogq",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Omelchenkoff",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Omelchenkoff",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-PetrushynskyiOleksii",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-PetrushynskyiOleksii",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-phiNumber",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-phiNumber",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-pythonmag",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-pythonmag",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-RootenberG",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-RootenberG",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Rudya93",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Rudya93",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-rvatok",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-rvatok",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-schenkh",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-schenkh",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-serhii73",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-serhii73",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-siplyspell",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-siplyspell",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-slsh1o",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-slsh1o",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-Timo4",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-Timo4",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-yarik2010",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-yarik2010",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/django-girls-blog-ZVitaliy",
+    "url": "https://github.com/kpi-web-guild/django-girls-blog-ZVitaliy",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/email-validation-util",
+    "url": "https://github.com/kpi-web-guild/email-validation-util",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/fp-split-tables-serhii73",
+    "url": "https://github.com/kpi-web-guild/fp-split-tables-serhii73",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/jwt-PetrushynskyiOleksii",
+    "url": "https://github.com/kpi-web-guild/jwt-PetrushynskyiOleksii",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "kpi-web-guild/oop-in-python",
+    "url": "https://github.com/kpi-web-guild/oop-in-python",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/23158073?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "LibreKPI/librekpi",
+    "url": "https://github.com/LibreKPI/librekpi",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/10490121?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "LinguaHermeneus/hermeneus",
+    "url": "https://github.com/LinguaHermeneus/hermeneus",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/11381397?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "MikeMcC399/dependabot-node",
+    "url": "https://github.com/MikeMcC399/dependabot-node",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/66998419?s=50&u=630664c9b2cb63a89c05fbfdd0626fe1aedcdb17&v=4",
+    "platform": "action"
+  },
+  {
     "name": "NeuralInverse/base",
     "url": "https://github.com/NeuralInverse/base",
     "stars": 0,
     "avatar": "https://avatars.githubusercontent.com/u/147737614?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "Omikron-Voiceover/omikron.com.ua",
+    "url": "https://github.com/Omikron-Voiceover/omikron.com.ua",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/102763548?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/aiohttp-ripozo",
+    "url": "https://github.com/open-craft-guild/aiohttp-ripozo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/anthony-explains-subs",
+    "url": "https://github.com/open-craft-guild/anthony-explains-subs",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/liqpy",
+    "url": "https://github.com/open-craft-guild/liqpy",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/prze-merge-2017-kurwa",
+    "url": "https://github.com/open-craft-guild/prze-merge-2017-kurwa",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/testssl.sh",
+    "url": "https://github.com/open-craft-guild/testssl.sh",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-craft-guild/turbosms",
+    "url": "https://github.com/open-craft-guild/turbosms",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/19243558?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/.github",
+    "url": "https://github.com/re-actors/.github",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/ansible-molecule-action",
+    "url": "https://github.com/re-actors/ansible-molecule-action",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/download-artifact",
+    "url": "https://github.com/re-actors/download-artifact",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/dpl-action",
+    "url": "https://github.com/re-actors/dpl-action",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/gha",
+    "url": "https://github.com/re-actors/gha",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/manylinux1_x86_64-action",
+    "url": "https://github.com/re-actors/manylinux1_x86_64-action",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/release-note-generator-action",
+    "url": "https://github.com/re-actors/release-note-generator-action",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "re-actors/warning-cmd-test",
+    "url": "https://github.com/re-actors/warning-cmd-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "recaptime-dev/dotenvx-github-actions-integration",
@@ -3227,6 +6209,27 @@
     "platform": "app"
   },
   {
+    "name": "sanitizers/.github",
+    "url": "https://github.com/sanitizers/.github",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "sanitizers/ci-mediator-github-app",
+    "url": "https://github.com/sanitizers/ci-mediator-github-app",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "sanitizers/re-engager-github-app",
+    "url": "https://github.com/sanitizers/re-engager-github-app",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "SnapXL/freebsd-libskiasharp3",
     "url": "https://github.com/SnapXL/freebsd-libskiasharp3",
     "stars": 0,
@@ -3262,11 +6265,270 @@
     "platform": "app"
   },
   {
+    "name": "stdlib-workflows/.github",
+    "url": "https://github.com/stdlib-workflows/.github",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/174666435?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "stdlib-workflows/packaging",
+    "url": "https://github.com/stdlib-workflows/packaging",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/174666435?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "sxarsky/eval-directus",
     "url": "https://github.com/sxarsky/eval-directus",
     "stars": 0,
     "avatar": "https://avatars.githubusercontent.com/u/225940094?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "webknjaz/action-test",
+    "url": "https://github.com/webknjaz/action-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansible-collection-python-dist-boo",
+    "url": "https://github.com/webknjaz/ansible-collection-python-dist-boo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/ansible.module_utils._text",
+    "url": "https://github.com/webknjaz/ansible.module_utils._text",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/backport-test-repo",
+    "url": "https://github.com/webknjaz/backport-test-repo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/bindep-gha-test",
+    "url": "https://github.com/webknjaz/bindep-gha-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/blueberrypy-skeleton",
+    "url": "https://github.com/webknjaz/blueberrypy-skeleton",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/conftest_relative_import_repro",
+    "url": "https://github.com/webknjaz/conftest_relative_import_repro",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/cython-coverage-extern-bug-repro-issue3636",
+    "url": "https://github.com/webknjaz/cython-coverage-extern-bug-repro-issue3636",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/d3-heatmap",
+    "url": "https://github.com/webknjaz/d3-heatmap",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/debug-vars-gha-test",
+    "url": "https://github.com/webknjaz/debug-vars-gha-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/diffbot-api",
+    "url": "https://github.com/webknjaz/diffbot-api",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/docker-freecad-cli-dev",
+    "url": "https://github.com/webknjaz/docker-freecad-cli-dev",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/fqcn_conftest_repro",
+    "url": "https://github.com/webknjaz/fqcn_conftest_repro",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/gha-create-branch-exclusion",
+    "url": "https://github.com/webknjaz/gha-create-branch-exclusion",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/github-app-itkpi-webknjaz",
+    "url": "https://github.com/webknjaz/github-app-itkpi-webknjaz",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/keylightctl",
+    "url": "https://github.com/webknjaz/keylightctl",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/linux-preconfigure",
+    "url": "https://github.com/webknjaz/linux-preconfigure",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/lq-mgr",
+    "url": "https://github.com/webknjaz/lq-mgr",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/mc-robot-controller",
+    "url": "https://github.com/webknjaz/mc-robot-controller",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/netapp_solidfire_enum34_repro",
+    "url": "https://github.com/webknjaz/netapp_solidfire_enum34_repro",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/promua-chat",
+    "url": "https://github.com/webknjaz/promua-chat",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pycon-cz-bot-tutorial",
+    "url": "https://github.com/webknjaz/pycon-cz-bot-tutorial",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pyconby-github-bot",
+    "url": "https://github.com/webknjaz/pyconby-github-bot",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pyconby-github-bot-test",
+    "url": "https://github.com/webknjaz/pyconby-github-bot-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pypi-deployment",
+    "url": "https://github.com/webknjaz/pypi-deployment",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/pyproject-stack",
+    "url": "https://github.com/webknjaz/pyproject-stack",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/re-actors--download-artifact--test",
+    "url": "https://github.com/webknjaz/re-actors--download-artifact--test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/release-candidate",
+    "url": "https://github.com/webknjaz/release-candidate",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/rust-bridge-web-app",
+    "url": "https://github.com/webknjaz/rust-bridge-web-app",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/sdistmkr",
+    "url": "https://github.com/webknjaz/sdistmkr",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/setuptools-issue-forms-demo",
+    "url": "https://github.com/webknjaz/setuptools-issue-forms-demo",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/sphinx-ansible",
+    "url": "https://github.com/webknjaz/sphinx-ansible",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/tox-gha-test",
+    "url": "https://github.com/webknjaz/tox-gha-test",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/tutorle-chrome-extension",
+    "url": "https://github.com/webknjaz/tutorle-chrome-extension",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "webknjaz/web-tsp",
+    "url": "https://github.com/webknjaz/web-tsp",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/578543?v=4&s=50",
+    "platform": "app"
   },
   {
     "name": "xsyetopz/awesome-fully-upgradeable-laptops",
@@ -3456,5 +6718,12 @@
     "stars": 0,
     "avatar": "https://avatars.githubusercontent.com/u/167881517?s=50&v=4",
     "platform": "action"
+  },
+  {
+    "name": "zizmorcore/.github",
+    "url": "https://github.com/zizmorcore/.github",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/210636713?v=4&s=50",
+    "platform": "app"
   }
 ]
