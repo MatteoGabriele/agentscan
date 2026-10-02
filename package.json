@@ -64,7 +64,7 @@
   "devDependencies": {
     "@github/issue-parser": "^2.0.0",
     "@iconify-json/lucide": "^1.2.111",
-    "@nuxt/eslint": "^1.16.0",
+    "@nuxt/eslint": "^1.17.0",
     "@octokit/types": "^16.0.0",
     "@types/node": "^26.0.1",
     "@unocss/nuxt": "^66.10.0",
