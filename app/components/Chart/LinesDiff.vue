@@ -209,6 +209,13 @@ const config = computed<VueUiXyConfig>(() => ({
               absoluteIndex % XAXIS_LABELS_MOD_THRESHOLD === 1 ||
               absoluteIndex === selectedXIndex
             "
+            :style="{
+              transition: 'opacity 0.2s',
+              opacity:
+                selectedXIndex === undefined || selectedXIndex === absoluteIndex
+                  ? 1
+                  : 0.3,
+            }"
           >
             {{ content }}
           </text>
