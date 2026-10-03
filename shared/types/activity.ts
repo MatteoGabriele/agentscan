@@ -21,6 +21,8 @@ export type ActivityItem = {
   events_count: number
   repo_name: string
   is_bounty: boolean
+  additions: number
+  deletions: number
 }
 
 export type ActivityCategoryCounts = {

@@ -31,25 +31,17 @@
     <div
       class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto py-12 w-full"
     >
-      <div class="w-full">
-        <LazyChartRepoScoreHistory />
+      <div class="w-full min-h-screen-md">
+        <LazyChartHourlyLinesChanged />
       </div>
       <div class="w-full">
-        <LazyChartHourlyEventsWaffle />
+        <LazyChartRepoScoreHistory hydrate-on-visible />
       </div>
       <div class="w-full">
-        <LazyChartScoreDistribution hydrate-on-visible />
+        <LazyChartHourlyEventsWaffle hydrate-on-visible />
       </div>
       <div class="w-full">
-        <LazyChartGlobalEventsRidgeline hydrate-on-visible />
-      </div>
-      <div class="w-full">
-        <LazyReportWeeklyClassification
-          :hydrate-on-visible="{ rootMargin: '0px 0px 600px 0px' }"
-        />
-      </div>
-      <div class="w-full">
-        <LazyChartGlobalEventsHeatmap />
+        <LazyChartGlobalEventsHeatmap hydrate-on-visible />
       </div>
     </div>
   </section>
