@@ -118,7 +118,7 @@ const config = computed<VueUiXyConfig>(() => ({
     labels: {
       show: true,
       color: colors.value.text,
-      offsetY: -8,
+      offsetY: -10,
       formatter: ({ value }) =>
         `${value > 0 ? '+' : ''}${formatCompactNumber(value)}`,
     },
