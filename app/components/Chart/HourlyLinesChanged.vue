@@ -4,6 +4,7 @@ import type { ActivityCategory, ActivityItem } from '~~/shared/types/activity'
 import { classifyByScore } from '~~/shared/utils/activity-stats'
 import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts'
 import { formatCompactNumber, median } from '~~/shared/utils/numbers'
+import LinesDiff from './LinesDiff.vue'
 
 const { data: hourlyWindow } = useActivityHourlyWindow()
 
@@ -165,123 +166,12 @@ function isTickVisible(index: number) {
         </div>
       </dl>
 
-      <p class="mt-8 text-sm text-ui-muted">
+      <p class="mt-8 text-sm text-ui-muted mb-6">
         Median lines added (above the line) and deleted (below it) per pull
         request, for each hour and classification.
       </p>
 
-      <div class="mt-5 flex gap-2">
-        <div
-          aria-hidden="true"
-          class="relative shrink-0 text-right text-[10px] leading-none text-ui-muted tabular-nums"
-          :style="{ height: `${CHART_HEIGHT}px` }"
-        >
-          <span class="invisible">{{
-            formatLines(Math.max(scale.maxAdded, scale.maxDeleted), '+')
-          }}</span>
-          <span class="absolute right-0 top-0">{{
-            formatLines(scale.maxAdded, '+')
-          }}</span>
-          <span
-            class="absolute right-0 -translate-y-1/2"
-            :style="{ top: `${scale.addedHeight}px` }"
-            >0</span
-          >
-          <span class="absolute right-0 bottom-0">{{
-            formatLines(scale.maxDeleted, '−')
-          }}</span>
-        </div>
-
-        <div class="flex flex-1 items-stretch" @mouseleave="activeIndex = null">
-          <button
-            v-for="(hour, index) in hours"
-            :key="hour.iso"
-            type="button"
-            class="group flex flex-1 flex-col items-stretch border-0 bg-transparent p-0 px-px sm:px-0.5 cursor-default rounded-1 focus-visible:outline-1 focus-visible:outline-solid focus-visible:outline-ui-text"
-            :class="{ 'bg-ui-border/30': activeIndex === index }"
-            :aria-label="getHourLabel(hour)"
-            @mouseenter="activeIndex = index"
-            @focus="activeIndex = index"
-          >
-            <span
-              class="flex items-end justify-center gap-px"
-              :style="{ height: `${scale.addedHeight}px` }"
-            >
-              <span
-                v-for="stats in hour.categories"
-                :key="stats.category"
-                class="w-full max-w-2 rounded-t-0.5"
-                :class="SWATCH[stats.category]"
-                :style="{ height: getBarHeight(stats.added, scale.maxAdded) }"
-              />
-            </span>
-
-            <span aria-hidden="true" class="h-px bg-ui-border" />
-
-            <!-- Deleted -->
-            <span
-              class="flex items-start justify-center gap-px"
-              :style="{ height: `${scale.deletedHeight}px` }"
-            >
-              <span
-                v-for="stats in hour.categories"
-                :key="stats.category"
-                class="w-full max-w-2 rounded-b-0.5 opacity-55"
-                :class="SWATCH[stats.category]"
-                :style="{
-                  height: getBarHeight(stats.deleted, scale.maxDeleted),
-                }"
-              />
-            </span>
-
-            <span
-              aria-hidden="true"
-              class="mt-1.5 h-3 text-center text-[10px] leading-none text-ui-muted"
-            >
-              <template v-if="isTickVisible(index)">{{ hour.label }}</template>
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div
-        v-if="activeHour"
-        class="mt-4 rounded-2 border-1 border-solid border-ui-border/60 px-3 py-2.5 text-sm"
-        aria-live="polite"
-      >
-        <p class="text-xs text-ui-muted">
-          {{ dayjs(activeHour.iso).format('ddd, MMM D • HH:mm') }}
-        </p>
-        <table class="mt-1 w-full tabular-nums">
-          <thead class="text-xs text-ui-muted">
-            <tr>
-              <th class="text-left font-normal">Classification</th>
-              <th class="text-right font-normal">PRs</th>
-              <th class="text-right font-normal">Added</th>
-              <th class="text-right font-normal">Deleted</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="stats in activeHour.categories" :key="stats.category">
-              <td class="flex items-center gap-2 text-ui-text">
-                <span
-                  aria-hidden="true"
-                  class="h-2 w-2 shrink-0 rounded-full"
-                  :class="SWATCH[stats.category]"
-                />
-                {{ stats.name }}
-              </td>
-              <td class="text-right text-ui-muted">{{ stats.prs }}</td>
-              <td class="text-right text-ui-text">
-                {{ formatLines(stats.added, '+') }}
-              </td>
-              <td class="text-right text-ui-text">
-                {{ formatLines(stats.deleted, '−') }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <LinesDiff type="hourly" :data="hours" />
     </ClientOnly>
   </div>
 </template>
