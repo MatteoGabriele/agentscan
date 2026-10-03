@@ -68,3 +68,9 @@ export const CLASSIFICATIONS_WITH_NAME_AND_CATEGORY: Array<{
 
 export const PR_VOLUME_DASH_ARRAY = '0.1 4'
 export const PR_VOLUME_STROKE_WIDTH = 2
+
+export const SWATCH: Record<ActivityCategory, string> = {
+  organic: 'bg-ui-organic',
+  mixed: 'bg-ui-mixed',
+  automation: 'bg-ui-automation',
+}

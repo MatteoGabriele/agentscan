@@ -6,6 +6,7 @@ import {
   type VueUiXyDatasetItem,
 } from 'vue-data-ui/vue-ui-xy'
 import type { ActivityCategory } from '~~/shared/types/activity'
+import { SWATCH } from '~~/shared/utils/charts'
 import { formatCompactNumber } from '~~/shared/utils/numbers'
 
 interface Props {
@@ -24,12 +25,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
-const SWATCH: Record<ActivityCategory, string> = {
-  organic: 'bg-ui-organic',
-  mixed: 'bg-ui-mixed',
-  automation: 'bg-ui-automation',
-}
 
 const rootEl = shallowRef<HTMLElement | null>(null)
 onMounted(() => {

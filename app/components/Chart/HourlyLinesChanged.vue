@@ -2,19 +2,16 @@
 import dayjs from 'dayjs'
 import type { ActivityCategory, ActivityItem } from '~~/shared/types/activity'
 import { classifyByScore } from '~~/shared/utils/activity-stats'
-import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts'
+import {
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
+  SWATCH,
+} from '~~/shared/utils/charts'
 import { formatCompactNumber, median } from '~~/shared/utils/numbers'
 import LinesDiff from './LinesDiff.vue'
 
 const { data: hourlyWindow } = useActivityHourlyWindow()
 
 const isMobile = useIsMobile()
-
-const SWATCH: Record<ActivityCategory, string> = {
-  organic: 'bg-ui-organic',
-  mixed: 'bg-ui-mixed',
-  automation: 'bg-ui-automation',
-}
 
 type LineStats = {
   prs: number
