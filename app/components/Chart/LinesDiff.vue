@@ -58,6 +58,7 @@ function makeDatasets(cat: ActivityCategory): VueUiXyDatasetItem[] {
       smooth: true,
       useArea: true,
       dataLabels: false,
+      isPositive: true,
     },
     {
       name: 'Lines deleted',
@@ -67,6 +68,7 @@ function makeDatasets(cat: ActivityCategory): VueUiXyDatasetItem[] {
       smooth: true,
       useArea: true,
       dataLabels: false,
+      isPositive: false,
     },
   ]
 }
@@ -111,6 +113,13 @@ const config = computed<VueUiXyConfig>(() => ({
   },
 
   line: {
+    useGradient: false,
+    strokeWidth: 2,
+    dot: {
+      useSerieColor: false,
+      fill: '',
+      strokeWidth: 1,
+    },
     labels: {
       show: true,
       color: colors.value.text,
@@ -222,9 +231,21 @@ const config = computed<VueUiXyConfig>(() => ({
         </template>
 
         <template #area-gradient="{ series, id }">
-          <linearGradient :id x1="0" x2="0" y1="0" y2="1">
+          <linearGradient
+            :id
+            x1="0"
+            x2="0"
+            y1="0"
+            y2="1"
+            v-if="series.isPositive"
+          >
             <stop offset="0%" :stop-color="series.color" stop-opacity="0.5" />
             <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+          </linearGradient>
+
+          <linearGradient :id x1="0" x2="0" y1="0" y2="1" v-else>
+            <stop offset="0%" :stop-color="colors.bg" stop-opacity="0" />
+            <stop offset="100%" :stop-color="series.color" stop-opacity="0.5" />
           </linearGradient>
         </template>
       </VueUiXy>
