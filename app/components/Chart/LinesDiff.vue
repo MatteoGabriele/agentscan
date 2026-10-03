@@ -6,7 +6,10 @@ import {
   type VueUiXyDatasetItem,
 } from 'vue-data-ui/vue-ui-xy'
 import type { ActivityCategory } from '~~/shared/types/activity'
-import { SWATCH } from '~~/shared/utils/charts'
+import {
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
+  SWATCH,
+} from '~~/shared/utils/charts'
 import { formatCompactNumber } from '~~/shared/utils/numbers'
 
 interface Props {
@@ -45,13 +48,6 @@ function getSeries(type: 'added' | 'deleted', cat: ActivityCategory) {
   })
 }
 
-const categories: ActivityCategory[] = ['organic', 'mixed', 'automation']
-const categoryNames: Record<ActivityCategory, string> = {
-  organic: 'Organic',
-  mixed: 'Mixed',
-  automation: 'Automation',
-}
-
 function makeDatasets(cat: ActivityCategory): VueUiXyDatasetItem[] {
   return [
     {
@@ -76,11 +72,16 @@ function makeDatasets(cat: ActivityCategory): VueUiXyDatasetItem[] {
 }
 
 const datasets = computed<
-  Array<{ name: ActivityCategory; data: VueUiXyDatasetItem[] }>
+  Array<{
+    category: ActivityCategory
+    label: string
+    data: VueUiXyDatasetItem[]
+  }>
 >(() =>
-  categories.map((cat) => ({
-    name: cat,
-    data: makeDatasets(cat),
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map((classification) => ({
+    category: classification.category,
+    label: classification.name,
+    data: makeDatasets(classification.category),
   })),
 )
 
@@ -178,9 +179,9 @@ const config = computed<VueUiXyConfig>(() => ({
         <span
           aria-hidden="true"
           class="h-2.5 w-2.5 shrink-0 rounded-full"
-          :class="SWATCH[classification.name]"
+          :class="SWATCH[classification.category]"
         />
-        {{ categoryNames[classification.name] }}
+        {{ classification.label }}
       </dt>
       <VueUiXy
         :selected-x-index="selectedXIndex"
