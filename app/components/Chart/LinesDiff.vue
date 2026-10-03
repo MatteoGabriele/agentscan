@@ -6,7 +6,7 @@ import {
   type VueUiXyDatasetItem,
 } from 'vue-data-ui/vue-ui-xy'
 import type { ActivityCategory } from '~~/shared/types/activity'
-import { formatCompactNumber, median } from '~~/shared/utils/numbers'
+import { formatCompactNumber } from '~~/shared/utils/numbers'
 
 interface Props {
   data: {
@@ -209,7 +209,10 @@ const config = computed<VueUiXyConfig>(() => ({
             :font-size="fontSize"
             :fill="fill"
             :text-anchor="textAnchor"
-            v-if="absoluteIndex % 4 === 1 || absoluteIndex === selectedXIndex"
+            v-if="
+              absoluteIndex % XAXIS_LABELS_MOD_THRESHOLD === 1 ||
+              absoluteIndex === selectedXIndex
+            "
           >
             {{ content }}
           </text>
