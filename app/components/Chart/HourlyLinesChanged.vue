@@ -16,8 +16,6 @@ const SWATCH: Record<ActivityCategory, string> = {
   automation: 'bg-ui-automation',
 }
 
-const CHART_HEIGHT = 280
-
 type LineStats = {
   prs: number
   added: number | null
@@ -75,8 +73,6 @@ const hours = computed(() => {
   }))
 })
 
-type Hour = (typeof hours.value)[number]
-
 const windowStats = computed(() => {
   const isos = new Set(hours.value.map((hour) => hour.iso))
 
@@ -87,30 +83,6 @@ const windowStats = computed(() => {
   )
 })
 
-const scale = computed(() => {
-  const values = hours.value.flatMap((hour) => hour.categories)
-  const maxAdded = Math.max(1, ...values.map((stats) => stats.added ?? 0))
-  const maxDeleted = Math.max(1, ...values.map((stats) => stats.deleted ?? 0))
-  const total = maxAdded + maxDeleted
-
-  return {
-    maxAdded,
-    maxDeleted,
-    addedHeight: (CHART_HEIGHT * maxAdded) / total,
-    deletedHeight: (CHART_HEIGHT * maxDeleted) / total,
-  }
-})
-
-function getBarHeight(value: number | null, max: number) {
-  return value ? `${(value / max) * 100}%` : '0%'
-}
-
-const activeIndex = shallowRef<number | null>(null)
-
-const activeHour = computed(
-  () => hours.value[activeIndex.value ?? hours.value.length - 1],
-)
-
 function formatLines(value: number | null, sign: '+' | '−') {
   return value === null
     ? '—'
@@ -119,20 +91,6 @@ function formatLines(value: number | null, sign: '+' | '−') {
 
 function getPrLabel(count: number) {
   return `${count} PR${count === 1 ? '' : 's'}`
-}
-
-function getHourLabel(hour: Hour) {
-  const categories = hour.categories.map(
-    (stats) =>
-      `${stats.name} ${formatLines(stats.added, '+')} ${formatLines(stats.deleted, '−')}`,
-  )
-
-  return `${hour.label}: ${categories.join(', ')}`
-}
-
-function isTickVisible(index: number) {
-  const step = isMobile.value ? 3 : 6
-  return (hours.value.length - 1 - index) % step === 0
 }
 </script>
 
