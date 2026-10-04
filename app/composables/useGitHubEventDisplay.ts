@@ -128,8 +128,7 @@ export function useGitHubEventDisplay() {
       }
       case 'CommitCommentEvent': {
         const comment = payload?.comment as
-          | { commit_id?: string; id?: number }
-          | undefined
+          { commit_id?: string; id?: number } | undefined
         if (!comment?.commit_id) {
           return undefined
         }

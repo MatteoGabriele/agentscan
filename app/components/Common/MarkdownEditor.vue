@@ -92,8 +92,7 @@ function setLink() {
   }
 
   const previousUrl = editor.value.getAttributes('link').href as
-    | string
-    | undefined
+    string | undefined
   const url = window.prompt('URL', previousUrl ?? '')
 
   if (url === null) {
