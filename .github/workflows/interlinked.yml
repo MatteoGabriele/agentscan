@@ -12,6 +12,6 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: MatteoGabriele/interlinked@v0.2
+      - uses: MatteoGabriele/interlinked@v0.3
         with:
           mode: 'full'
