@@ -10,10 +10,7 @@ import {
 import { usePreferredDark } from '@vueuse/core'
 
 type CssVariableSource =
-  | HTMLElement
-  | null
-  | undefined
-  | Ref<HTMLElement | null | undefined>
+  HTMLElement | null | undefined | Ref<HTMLElement | null | undefined>
 
 type UseCssVariableOptions = {
   element?: CssVariableSource

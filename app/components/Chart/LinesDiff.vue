@@ -209,15 +209,15 @@ const config = computed<VueUiXyConfig>(() => ({
           }"
         >
           <text
+            v-if="
+              absoluteIndex % XAXIS_LABELS_MOD_THRESHOLD === 1 ||
+              absoluteIndex === selectedXIndex
+            "
             :x="x"
             :y="y + 24"
             :font-size="fontSize"
             :fill="fill"
             :text-anchor="textAnchor"
-            v-if="
-              absoluteIndex % XAXIS_LABELS_MOD_THRESHOLD === 1 ||
-              absoluteIndex === selectedXIndex
-            "
             :style="{
               transition: 'opacity 0.2s',
               opacity:
@@ -232,18 +232,18 @@ const config = computed<VueUiXyConfig>(() => ({
 
         <template #area-gradient="{ series, id }">
           <linearGradient
+            v-if="series.isPositive"
             :id
             x1="0"
             x2="0"
             y1="0"
             y2="1"
-            v-if="series.isPositive"
           >
             <stop offset="0%" :stop-color="series.color" stop-opacity="0.5" />
             <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
           </linearGradient>
 
-          <linearGradient :id x1="0" x2="0" y1="0" y2="1" v-else>
+          <linearGradient v-else :id x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" :stop-color="colors.bg" stop-opacity="0" />
             <stop offset="100%" :stop-color="series.color" stop-opacity="0.5" />
           </linearGradient>

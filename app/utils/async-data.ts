@@ -14,6 +14,5 @@ export function payloadCachedData<T>(
   }
 
   return (nuxtApp.payload.data[key] ?? nuxtApp.static.data[key]) as
-    | T
-    | undefined
+    T | undefined
 }

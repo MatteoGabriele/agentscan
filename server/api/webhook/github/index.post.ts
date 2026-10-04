@@ -119,8 +119,7 @@ export default defineEventHandler(async (event) => {
     payload.issue?.author_association
 
   const authorAssociation = rawAuthorAssociation?.toLowerCase() as
-    | AuthorAssociation
-    | undefined
+    AuthorAssociation | undefined
 
   // GitHub reports both for an author with no merged contribution here:
   // `first_timer` is new to GitHub entirely, `first_time_contributor` is new

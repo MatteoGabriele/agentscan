@@ -443,8 +443,7 @@ const { copy, copied } = useClipboard({ source: yaml })
               Default greeting
               <pre
                 class="mt-2 px-3 py-2 bg-ui-bg border border-ui-border/60 rounded font-mono text-ui-text/90 whitespace-pre-wrap"
-                >{{ defaultHoneypotGreeting }}</pre
-              >
+                >{{ defaultHoneypotGreeting }}</pre>
             </div>
 
             <CommonMarkdownEditor
@@ -469,8 +468,7 @@ const { copy, copied } = useClipboard({ source: yaml })
               repository
               <pre
                 class="mt-2 px-3 py-2 bg-ui-bg border border-ui-border/60 rounded font-mono text-ui-text/90 whitespace-pre-wrap"
-                >{{ defaultHoneypotFirstTimeGreeting }}</pre
-              >
+                >{{ defaultHoneypotFirstTimeGreeting }}</pre>
             </div>
 
             <CommonMarkdownEditor
