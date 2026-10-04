@@ -11,7 +11,7 @@
  *   --dry-run     print the comment instead of posting it
  *
  * Configuration comes from the environment (see the workflow):
- *   GITHUB_TOKEN    used to read the issue and post the comment
+ *   NUXT_GITHUB_TOKEN / GITHUB_TOKEN  reads the issue and posts the comment
  *   MIN_APPROVALS   👍 from reviewers needed to flag the account
  *   MIN_REJECTIONS  👎 from reviewers needed to reject outright
  */
@@ -19,6 +19,7 @@
 import { Octokit } from 'octokit'
 import { readThresholds } from './review-automation-issues'
 import type { Thresholds } from './review-automation-issues'
+import { readGithubToken } from './lib/github-token'
 
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
@@ -50,14 +51,7 @@ export function reviewProcessComment(thresholds: Thresholds): string {
 }
 
 function client(): Octokit {
-  const auth = process.env.GITHUB_TOKEN
-
-  if (!auth) {
-    console.error('✗ GITHUB_TOKEN is not set')
-    process.exit(1)
-  }
-
-  return new Octokit({ auth })
+  return new Octokit({ auth: readGithubToken() })
 }
 
 function flag(name: string): string | undefined {

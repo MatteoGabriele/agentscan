@@ -23,6 +23,9 @@ useHead({
       content: 'Automation pattern detection for open source maintainers',
     },
     { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://agentscan.tools/agentscan.png' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
     { name: 'color-scheme', content: colorScheme },
   ],
   link: [
@@ -47,7 +50,9 @@ useHead({
 
   <div class="flex flex-col">
     <div class="min-h-svh flex flex-col @container">
-      <MainHeader class="mx-auto w-full max-w-screen-xl" />
+      <div class="sticky-header">
+        <MainHeader class="mx-auto w-full max-w-screen-xl" />
+      </div>
 
       <main v-if="$slots.hero" class="main-height">
         <slot name="hero" />

@@ -10,6 +10,7 @@ import isoWeek from 'dayjs/plugin/isoWeek'
 import { mergeConfigs } from 'vue-data-ui/utils'
 import { round } from '~~/shared/utils/numbers'
 import { useTimeout } from '@vueuse/core'
+import UnitToggle from '../Activity/UnitToggle.vue'
 
 import('vue-data-ui/style.css')
 
@@ -24,12 +25,15 @@ type ActivityHeatmapSource = {
     {
       organic?: {
         percentage?: number
+        count?: number
       }
       mixed?: {
         percentage?: number
+        count?: number
       }
       automation?: {
         percentage?: number
+        count?: number
       }
     }
   >
@@ -49,6 +53,8 @@ const ready = shallowRef(false)
 useTimeout(200, {
   callback: () => (ready.value = true),
 })
+
+const selectedUnit = ref<'percentage' | 'quantity'>('percentage')
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 
@@ -80,6 +86,19 @@ const weekLabels = computed(() => {
     return `${start.format('MMM D')} - ${end.format('MMM D')}`
   })
 })
+
+type HeatmapScale = 'relative' | 'absolute'
+const selectedScale = ref<HeatmapScale>('relative')
+const scaleOptions = computed(() => [
+  {
+    value: 'relative',
+    label: 'Relative',
+  },
+  {
+    value: 'absolute',
+    label: 'Absolute',
+  },
+])
 
 const heatmapSeries = computed(
   (): Array<{
@@ -119,8 +138,12 @@ function createHeatmapDataset(
     const weekValues =
       valuesByWeekAndDay.get(weekKey) ?? Array<number>(7).fill(0)
 
-    weekValues[dayIndex] =
+    const percentage =
       activity.countsByDate[dateString]?.[category]?.percentage ?? 0
+    const quantity = activity.countsByDate[dateString]?.[category]?.count ?? 0
+
+    weekValues[dayIndex] =
+      selectedUnit.value === 'percentage' ? percentage : quantity
 
     valuesByWeekAndDay.set(weekKey, weekValues)
   })
@@ -135,6 +158,24 @@ function createHeatmapDataset(
 
 const numberOfWeeks = computed(() => weekKeys.value.length)
 
+const monthLabels = computed(() => {
+  const seen = new Set<string>()
+
+  return weekLabels.value.map((label) => {
+    const month = label.match(
+      /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/,
+    )?.[0]
+
+    if (!month || seen.has(month)) {
+      return ''
+    }
+
+    seen.add(month)
+
+    return month
+  })
+})
+
 const baseConfig = computed<VueUiHeatmapConfig>(() => ({
   userOptions: {
     show: false,
@@ -143,7 +184,7 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
     backgroundColor: colors.value.bg,
     color: colors.value.textMuted,
     layout: {
-      width: 43 + numberOfWeeks.value * 32,
+      width: 130 + numberOfWeeks.value * 32,
       cells: {
         spacing: 0,
         colors: {
@@ -160,11 +201,16 @@ const baseConfig = computed<VueUiHeatmapConfig>(() => ({
       dataLabels: {
         xAxis: {
           show: true,
-          color: colors.value.textMuted,
+          // We need real week labels as the x-axis values so datapoint.xAxisName can identify the exact week used by the tooltip
           values: weekLabels.value,
+          // Hide the built-in labels, since month names are injected in the #svg slot
+          color: 'transparent',
+          showOnlyAtModulo: 1,
+          fontSize: 0,
         },
         yAxis: {
           color: colors.value.textMuted,
+          fontSize: 18,
         },
       },
     },
@@ -211,6 +257,31 @@ const heatmaps = computed(() => {
   }))
 })
 
+function mergeHeatmapConfig(defaultConfig: VueUiHeatmapConfig) {
+  return mergeConfigs({
+    defaultConfig,
+    userConfig: {
+      style: {
+        layout: {
+          cells: {
+            scaleMax:
+              selectedScale.value === 'relative' ? null : maxValue.value,
+          },
+        },
+      },
+    },
+  })
+}
+
+const maxValue = computed(() =>
+  Math.max(
+    0,
+    ...heatmaps.value
+      .flatMap((h) => h.dataset.flatMap((d) => d.values))
+      .map((v) => v ?? 0),
+  ),
+)
+
 function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
   const xName = datapoint?.xAxisName ?? ''
   const yName = datapoint?.yAxisName ?? ''
@@ -226,6 +297,241 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
 
   return targetDate.format('DD MMM (ddd)')
 }
+
+// NOTE:
+// Below is the algo to create paths to wrap cells in their corresponding months.
+// Some of this code could be part of some broader utility, but this is a lab one-off for now.
+
+type HeatmapSvgCell = {
+  rowIndex: number
+  columnIndex: number
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+type Point = {
+  x: number
+  y: number
+}
+
+function getMonthKey(date: dayjs.Dayjs) {
+  return date.format('YYYY-MM')
+}
+
+function getCellDate(cell: HeatmapSvgCell) {
+  const weekKey = weekKeys.value[cell.columnIndex]
+
+  if (!weekKey) {
+    return null
+  }
+
+  return dayjs(weekKey).add(cell.rowIndex, 'day')
+}
+
+function getPointKey(point: Point) {
+  return `${point.x.toFixed(6)}:${point.y.toFixed(6)}`
+}
+
+function simplifyContour(points: Point[]) {
+  if (points.length < 4) {
+    return points
+  }
+
+  const firstKey = getPointKey(points[0]!)
+  const lastKey = getPointKey(points[points.length - 1]!)
+  const ring = firstKey === lastKey ? points.slice(0, -1) : points.slice()
+  const epsilon = 0.000001
+
+  return ring.filter((point, index) => {
+    const previous = ring[(index - 1 + ring.length) % ring.length]!
+    const next = ring[(index + 1) % ring.length]!
+
+    const vertical =
+      Math.abs(previous.x - point.x) < epsilon &&
+      Math.abs(point.x - next.x) < epsilon
+    const horizontal =
+      Math.abs(previous.y - point.y) < epsilon &&
+      Math.abs(point.y - next.y) < epsilon
+
+    return !vertical && !horizontal
+  })
+}
+
+function getMonthOutline(cells: HeatmapSvgCell[]) {
+  const occupied = new Set(
+    cells.map((cell) => `${cell.rowIndex}:${cell.columnIndex}`),
+  )
+
+  const edges: Array<{ start: Point; end: Point }> = []
+
+  function addEdge(x1: number, y1: number, x2: number, y2: number) {
+    edges.push({
+      start: { x: x1, y: y1 },
+      end: { x: x2, y: y2 },
+    })
+  }
+
+  for (const cell of cells) {
+    const row = cell.rowIndex
+    const column = cell.columnIndex
+    const x1 = cell.x
+    const y1 = cell.y
+    const x2 = cell.x + cell.width
+    const y2 = cell.y + cell.height
+
+    if (!occupied.has(`${row - 1}:${column}`)) {
+      addEdge(x1, y1, x2, y1)
+    }
+
+    if (!occupied.has(`${row}:${column + 1}`)) {
+      addEdge(x2, y1, x2, y2)
+    }
+
+    if (!occupied.has(`${row + 1}:${column}`)) {
+      addEdge(x2, y2, x1, y2)
+    }
+
+    if (!occupied.has(`${row}:${column - 1}`)) {
+      addEdge(x1, y2, x1, y1)
+    }
+  }
+
+  const outgoing = new Map<string, number[]>()
+
+  edges.forEach((edge, index) => {
+    const key = getPointKey(edge.start)
+    const indices = outgoing.get(key) ?? []
+    indices.push(index)
+    outgoing.set(key, indices)
+  })
+
+  const used = new Set<number>()
+  const contours: Point[][] = []
+
+  for (let index = 0; index < edges.length; index += 1) {
+    if (used.has(index)) {
+      continue
+    }
+
+    const startEdge = edges[index]!
+    const startKey = getPointKey(startEdge.start)
+    const points: Point[] = [startEdge.start]
+    let currentIndex: number | undefined = index
+
+    while (currentIndex !== undefined) {
+      const edge = edges[currentIndex]!
+      used.add(currentIndex)
+      points.push(edge.end)
+      const endKey = getPointKey(edge.end)
+
+      if (endKey === startKey) {
+        break
+      }
+
+      currentIndex = outgoing
+        .get(endKey)
+        ?.find((candidateIndex) => !used.has(candidateIndex))
+    }
+
+    if (getPointKey(points[points.length - 1]!) === startKey) {
+      contours.push(simplifyContour(points))
+    }
+  }
+
+  // Spare the DOM from unnecessary decimals in path coords
+  const formatCoordinate = (value: number) => Number(value.toFixed(1))
+
+  return contours
+    .map((points) => {
+      if (!points.length) {
+        return ''
+      }
+
+      const [first, ...rest] = points
+      const commands = rest
+        .map(
+          (point) =>
+            `L ${formatCoordinate(point.x)} ${formatCoordinate(point.y)}`,
+        )
+        .join(' ')
+
+      return [
+        `M ${formatCoordinate(first!.x)} ${formatCoordinate(first!.y)}`,
+        commands,
+        'Z',
+      ]
+        .filter(Boolean)
+        .join(' ')
+    })
+    .join(' ')
+}
+
+function getMonthPaths(cells: HeatmapSvgCell[]) {
+  const months = new Map<
+    string,
+    {
+      key: string
+      date: dayjs.Dayjs
+      cells: HeatmapSvgCell[]
+    }
+  >()
+
+  for (const cell of cells ?? []) {
+    const date = getCellDate(cell)
+
+    if (!date) {
+      continue
+    }
+
+    const key = getMonthKey(date)
+    const month = months.get(key) ?? {
+      key,
+      date,
+      cells: [],
+    }
+
+    month.cells.push(cell)
+    months.set(key, month)
+  }
+
+  return Array.from(months.values())
+    .sort((a, b) => a.date.valueOf() - b.date.valueOf())
+    .map((month) => ({
+      key: month.key,
+      d: getMonthOutline(month.cells),
+    }))
+}
+
+function getMonthLabelPositions(cells: HeatmapSvgCell[]) {
+  const firstRowCells = cells
+    .filter((cell) => cell.rowIndex === 0)
+    .sort((a, b) => a.columnIndex - b.columnIndex)
+
+  if (!firstRowCells.length) {
+    return []
+  }
+
+  const y = Math.min(...firstRowCells.map((cell) => cell.y)) - 10
+
+  return firstRowCells.flatMap((cell) => {
+    const label = monthLabels.value[cell.columnIndex]
+
+    if (!label) {
+      return []
+    }
+
+    return [
+      {
+        key: `${cell.columnIndex}-${label}`,
+        label,
+        x: cell.x + cell.width / 2,
+        y,
+      },
+    ]
+  })
+}
 </script>
 
 <template>
@@ -236,6 +542,19 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
     }"
   >
     <h2 class="text-center">Daily Ecosystem Activity heatmap</h2>
+  </div>
+  <p class="text-sm text-ui-muted text-center">
+    The higher the value the stronger the color.<br />
+    {{
+      selectedScale === 'relative'
+        ? 'Each heatmap computes color strength based on its individual max value.'
+        : `All heatmaps color strengths are related to the absolute max value (${Math.round(maxValue)}${selectedUnit === 'percentage' ? '%' : ''}).`
+    }}
+  </p>
+
+  <div class="flex justify-center mt-6 mb-8 gap-6">
+    <UnitToggle v-model="selectedUnit" />
+    <Toggle v-model="selectedScale" :options="scaleOptions" />
   </div>
   <div
     class="flex w-full flex-col items-center gap-6 px-12 md:flex-row md:px-0 transition-opacity"
@@ -248,8 +567,36 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
         v-for="heatmap in heatmaps"
         :key="heatmap.name"
         :dataset="heatmap.dataset"
-        :config="heatmap.config"
+        :config="mergeHeatmapConfig(heatmap.config)"
       >
+        <template #svg="{ svg }">
+          <path
+            v-for="month in getMonthPaths(svg.cells)"
+            :key="month.key"
+            :d="month.d"
+            fill="none"
+            :stroke="colors.bg"
+            stroke-width="2"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+            pointer-events="none"
+            opacity="0.5"
+          />
+
+          <text
+            v-for="monthLabel in getMonthLabelPositions(svg.cells)"
+            :key="monthLabel.key"
+            :x="monthLabel.x"
+            :y="monthLabel.y"
+            :fill="colors.textMuted"
+            font-size="18"
+            text-anchor="middle"
+            pointer-events="none"
+          >
+            {{ monthLabel.label }}
+          </text>
+        </template>
+
         <template #tooltip="{ datapoint }">
           <div class="mb-1" :style="{ color: colors.textMuted }">
             {{ getDateFromHeatmapCell(datapoint) }}
@@ -265,7 +612,10 @@ function getDateFromHeatmapCell(datapoint: VueUiHeatmapDatapoint): string {
             <span>{{ heatmap.name }}</span>
 
             <span :style="{ color: colors.textMuted }">
-              {{ round(datapoint.value ?? 0, 1) + '%' }}
+              {{
+                round(datapoint.value ?? 0, 1) +
+                (selectedUnit === 'percentage' ? '%' : '')
+              }}
             </span>
           </div>
         </template>

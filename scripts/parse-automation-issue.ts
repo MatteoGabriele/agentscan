@@ -12,6 +12,7 @@ import fs from 'fs'
 import path from 'path'
 import { parseIssue } from '@github/issue-parser'
 import { Octokit } from 'octokit'
+import { readGithubToken } from './lib/github-token'
 
 interface AutomationEntry {
   username: string
@@ -240,7 +241,7 @@ async function fetchIssueFromGitHub(issueNumber: number): Promise<{
 }> {
   // Authenticated when running in CI, so the review workflow does not burn
   // through the 60/hour unauthenticated budget.
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
+  const octokit = new Octokit({ auth: readGithubToken() })
 
   try {
     const { data: issue } = await octokit.rest.issues.get({

@@ -23,6 +23,9 @@ useHead({
       content: 'Automation pattern detection for open source maintainers',
     },
     { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://agentscan.tools/agentscan.png' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
     { name: 'color-scheme', content: colorScheme },
   ],
   link: [
@@ -50,13 +53,9 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
 
   <div class="flex flex-col">
     <div class="min-h-svh flex flex-col relative @container">
-      <MainHeader class="mx-auto w-full max-w-screen-xl" />
-
-      <!--
-        Only the home page is centered in the viewport. Elsewhere the content
-        grows as data arrives, and centering it would drag the whole page
-        upwards on every update instead of just appending below.
-      -->
+      <div class="sticky-header">
+        <MainHeader class="mx-auto w-full max-w-screen-xl" />
+      </div>
       <div
         class="flex flex-1 justify-center"
         :class="isHomePage ? 'items-center' : 'items-start'"

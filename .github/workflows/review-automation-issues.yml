@@ -21,121 +21,57 @@ on:
         default: false
         type: boolean
 
-# The hourly scan pushes to main too, so the two take turns instead of racing.
+# Two runs would comment on and close the same reports twice, so they queue.
 concurrency:
-  group: scan-results
+  group: ${{ github.workflow }}
   cancel-in-progress: false
-
-env:
-  # The Rosen Association
-  REVIEWERS: |
-    MatteoGabriele
-    huang-julien
-    danielroe
-    gameroman
-    sheremet-va
-    ematipico
-    graphieros
-    TheAlexLichter
-    orbisk
-    bluwy
-    trueberryless
-    bnb
-
-  MIN_APPROVALS: '4'
-  MIN_REJECTIONS: '2'
-
-  DECISIONS_FILE: ${{ github.workspace }}/automation-decisions.json
 
 jobs:
   review:
     if: github.repository == 'MatteoGabriele/agentscan'
     runs-on: ubuntu-latest
+    # Issues are the only thing this writes. Rejected reports are closed here;
+    # approved ones are relabelled automation:approved and left open, because
+    # their list entries are appended by `pnpm publish:automations`, run by a
+    # maintainer — the commit that carries them is what closes the reports. So
+    # nothing here needs write access to the repository.
     permissions:
-      contents: write
+      contents: read
       issues: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          # Approvals are finalized against main, so a workflow_dispatch from
-          # another ref cannot land entries anywhere else.
+          # Approvals are counted against the roster in lib/reviewers, so a
+          # workflow_dispatch from another ref cannot vote itself a new one.
           ref: main
+          # Nothing pushes, so the checkout keeps no token at all.
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 
       - name: Enable corepack
         run: corepack enable
 
+      # Installed without lifecycle scripts, so nothing from the dependency tree
+      # runs next to the token.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Count reactions and stage approvals
+      # Counts the reactions, then comments on and relabels whatever has
+      # settled, closing everything but the approvals still waiting on a list
+      # update. The outcomes go to automation-decisions.json for the next step,
+      # which both scripts default to; it stays on the runner.
+      - name: Review the open reports
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_INPUT: ${{ inputs.issue }}
-        run: |
-          args=()
-
-          if [ -n "$ISSUE_INPUT" ]; then
-            case "$ISSUE_INPUT" in
-              *[!0-9]*)
-                echo "::error::issue input must be an issue number, got: $ISSUE_INPUT"
-                exit 1
-                ;;
-            esac
-            args+=("--issue=$ISSUE_INPUT")
-          fi
-
-          pnpm exec tsx scripts/review-automation-issues.ts \
-            --mode=decide \
-            --decisions="$DECISIONS_FILE" \
-            "${args[@]}"
-
-      - name: Commit and push approvals
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          git add data/verified-automations-list.json
-
-          if git diff --cached --quiet; then
-            echo "No new automations to commit"
-            exit 0
-          fi
-
-          count="$(git diff --cached --numstat -- data/verified-automations-list.json | awk '{print $1}')"
-          git commit -m "chore: add approved automation reports"
-
-          # Main moves on its own (hourly scan, merged PRs), so rebase onto
-          # whatever landed while this run was working.
-          git fetch origin main
-
-          for attempt in 1 2 3; do
-            if git rebase origin/main && git push origin HEAD:main; then
-              echo "Pushed on attempt $attempt ($count line(s) added)"
-              exit 0
-            fi
-            git rebase --abort || true
-            sleep $((attempt * 5))
-            git fetch origin main
-          done
-
-          echo "::error::Could not push the approved automation entries to main; issues were left open and will be retried next run."
-          exit 1
-
-      # Only now that the entries are on main: comment, relabel and close.
-      - name: Close reviewed issues
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          pnpm exec tsx scripts/review-automation-issues.ts
-          --mode=finalize
-          --decisions="$DECISIONS_FILE"
+          # Read by the script, never interpolated into a command.
+          ISSUE: ${{ inputs.issue }}
+        run: pnpm review:automations
 
       # Settled reports only: a pending one never reaches the decisions file, so
       # the channel hears about a report twice at most — once when it opens, and
@@ -144,10 +80,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_REPORT: ${{ secrets.OSS_GUILD_REPORTS_DISCORD_WEBHOOK }}
-        run: >
-          pnpm exec tsx scripts/notify-report-discord.ts
-          --event=decided
-          --decisions="$DECISIONS_FILE"
+        run: pnpm exec tsx scripts/notify-report-discord.ts --event=decided
 
   # A daily digest
   digest:
@@ -163,10 +96,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 

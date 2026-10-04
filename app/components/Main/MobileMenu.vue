@@ -114,6 +114,10 @@ onBeforeUnmount(() => {
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
+        <LazyMainMenuItem class="text-xl" to="/bookmarks" label="Bookmarks" />
+
+        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
+
         <LazyMainMenuItem
           class="text-xl"
           to="/app"

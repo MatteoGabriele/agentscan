@@ -1,32 +1,25 @@
 /// <reference types="node" />
-/**
- * Review community-reported automation issues by counting reviewer reactions.
- *
- * It runs in two modes, so an issue is never closed before its entry is safely
- * on main:
- *   --mode=decide    count reactions, run `add:automation` for approved issues
- *                    and write the outcomes to --decisions=<file>
- *   --mode=finalize  replay that file: comment, relabel and close the issues
- * The workflow commits and pushes in between. If that push fails, finalize
- * never runs, the issues stay open, and the next run redoes the work from
- * scratch.
- *
- * Configuration comes from the environment (see the workflow):
- *   REVIEWERS       newline- or comma-separated GitHub handles that may vote
- *   MIN_APPROVALS   👍 from reviewers needed to flag the account
- *   MIN_REJECTIONS  👎 from reviewers needed to reject outright
- */
 
 import fs from 'fs'
-import { execFileSync } from 'child_process'
 import { Octokit } from 'octokit'
+import {
+  generateEntry,
+  parseIssueBody,
+  validateEntry,
+  type AutomationEntry,
+} from './parse-automation-issue'
+import { readList, split } from './lib/automations-list'
+import { MIN_APPROVALS, MIN_REJECTIONS, REVIEWERS } from './lib/reviewers'
+import { readGithubToken } from './lib/github-token'
 
 const OWNER = 'MatteoGabriele'
 const REPO = 'agentscan'
 
 const PENDING_LABEL = 'automation:pending'
-const CONFIRMED_LABEL = 'automation:confirmed'
+const APPROVED_LABEL = 'automation:approved'
 const REJECTED_LABEL = 'automation:rejected'
+/** Approved reports that were closed before the approvals were left open. */
+const CONFIRMED_LABEL = 'automation:confirmed'
 
 export type Outcome = 'approved' | 'rejected' | 'pending'
 
@@ -40,7 +33,7 @@ export interface Tally {
 export interface Decision extends Tally {
   issue: number
   outcome: Outcome
-  /** Set when the account was already in the list, so nothing was added. */
+  /** Set when the account is already on the list, so no entry will be added. */
   alreadyListed?: boolean
 }
 
@@ -52,33 +45,6 @@ export interface Thresholds {
 
 export interface Config extends Thresholds {
   reviewers: string[]
-}
-
-/**
- * The thresholds on their own, for the jobs that only render them — the Discord
- * messages, the explainer comment — and have no roster to count reactions
- * against. Defaults match readConfig, so a message built without the workflow's
- * environment still shows the real bar.
- */
-export function readThresholds(): Thresholds {
-  const minApprovals = parseInt(process.env.MIN_APPROVALS || '5', 10)
-  const minRejections = parseInt(process.env.MIN_REJECTIONS || '3', 10)
-
-  return {
-    minApprovals: Number.isInteger(minApprovals) ? minApprovals : 5,
-    minRejections: Number.isInteger(minRejections) ? minRejections : 3,
-  }
-}
-
-export function parseReviewers(raw: string | undefined): string[] {
-  return [
-    ...new Set(
-      (raw || '')
-        .split(/[\s,]+/)
-        .map((name) => name.trim().replace(/^@/, '').toLowerCase())
-        .filter(Boolean),
-    ),
-  ]
 }
 
 /**
@@ -103,50 +69,58 @@ export function decide(tally: Tally, config: Config): Outcome {
   return 'pending'
 }
 
+export function readThresholds(): Thresholds {
+  return {
+    minApprovals: MIN_APPROVALS,
+    minRejections: MIN_REJECTIONS,
+  }
+}
+
 export function readConfig(): Config {
-  const reviewers = parseReviewers(process.env.REVIEWERS)
-
-  if (reviewers.length === 0) {
-    console.error('✗ REVIEWERS is empty — nothing to count reactions against')
-    process.exit(1)
+  return {
+    reviewers: REVIEWERS.map((name) => name.toLowerCase()),
+    ...readThresholds(),
   }
-
-  const minApprovals = parseInt(process.env.MIN_APPROVALS || '5', 10)
-  const minRejections = parseInt(process.env.MIN_REJECTIONS || '3', 10)
-
-  if (!Number.isInteger(minApprovals) || minApprovals < 1) {
-    console.error('✗ MIN_APPROVALS must be a positive integer')
-    process.exit(1)
-  }
-  if (!Number.isInteger(minRejections) || minRejections < 1) {
-    console.error('✗ MIN_REJECTIONS must be a positive integer')
-    process.exit(1)
-  }
-  if (minApprovals > reviewers.length) {
-    console.error(
-      `✗ MIN_APPROVALS (${minApprovals}) is higher than the reviewer count (${reviewers.length}) — no report could ever pass`,
-    )
-    process.exit(1)
-  }
-
-  return { reviewers, minApprovals, minRejections }
 }
 
 function client(): Octokit {
-  const auth = process.env.GITHUB_TOKEN
+  return new Octokit({ auth: readGithubToken() })
+}
 
-  if (!auth) {
-    console.error('✗ GITHUB_TOKEN is not set')
-    process.exit(1)
+/** An open report, with everything needed to build its list entry. */
+export interface Report {
+  number: number
+  labels: string[]
+  body: string
+  issueUrl: string
+  reportedBy: string
+  createdAt: string
+}
+
+export function toReport(issue: {
+  number: number
+  labels: (string | { name?: string | null })[]
+  body?: string | null
+  html_url: string
+  user?: { login: string } | null
+  created_at: string
+}): Report {
+  return {
+    number: issue.number,
+    labels: issue.labels.map((label) =>
+      typeof label === 'string' ? label : label.name || '',
+    ),
+    body: issue.body || '',
+    issueUrl: issue.html_url,
+    reportedBy: issue.user?.login || '',
+    createdAt: issue.created_at.split('T')[0],
   }
-
-  return new Octokit({ auth })
 }
 
 export async function openReports(
   octokit: Octokit,
   only?: number,
-): Promise<{ number: number; labels: string[] }[]> {
+): Promise<Report[]> {
   const issues = only
     ? [
         (
@@ -165,25 +139,17 @@ export async function openReports(
         per_page: 100,
       })
 
-  return (
-    issues
-      .filter((issue) => issue.state === 'open')
-      // listForRepo returns pull requests too.
-      .filter((issue) => !issue.pull_request)
-      .map((issue) => ({
-        number: issue.number,
-        labels: issue.labels.map((label) =>
-          typeof label === 'string' ? label : label.name || '',
-        ),
-      }))
-      .filter((issue) => issue.labels.includes('automation'))
-      // Already ruled on by hand; leave it alone.
-      .filter(
-        (issue) =>
-          !issue.labels.includes(CONFIRMED_LABEL) &&
-          !issue.labels.includes(REJECTED_LABEL),
-      )
-  )
+  // A settled report is skipped by its label: an approved one stays open until
+  // `pnpm publish:automations` lands its entry, and without this every run
+  // would comment on it again.
+  const settled = [APPROVED_LABEL, CONFIRMED_LABEL, REJECTED_LABEL]
+
+  return issues
+    .filter((issue) => issue.state === 'open')
+    .filter((issue) => !issue.pull_request)
+    .map(toReport)
+    .filter((issue) => issue.labels.includes('automation'))
+    .filter((issue) => !issue.labels.some((label) => settled.includes(label)))
 }
 
 export async function tally(
@@ -222,38 +188,36 @@ export async function tally(
   }
 }
 
-/** Returns true when the entry is already in the list, so nothing was added. */
-function addAutomation(issue: number, approvedBy: string[]): boolean {
-  try {
-    const output = execFileSync(
-      'pnpm',
-      [
-        'add:automation',
-        String(issue),
-        // The 👍 that carried it, recorded on the entry itself.
-        `--approved-by=${approvedBy.join(',')}`,
-      ],
-      {
-        encoding: 'utf-8',
-        stdio: 'pipe',
-        env: process.env,
-      },
-    )
-    console.log(output.trim())
-    return false
-  } catch (error) {
-    const failure = error as { stdout?: string; stderr?: string }
-    const output = `${failure.stdout || ''}${failure.stderr || ''}`
+function entryFor(report: Report, approvedBy: string[]): AutomationEntry {
+  const entry = generateEntry(
+    parseIssueBody(report.body),
+    report.issueUrl,
+    report.reportedBy,
+    report.createdAt,
+    approvedBy,
+  )
 
-    if (output.includes('already exists in the list')) {
-      console.log(`ℹ️ Issue #${issue} is already in the list`)
-      return true
-    }
+  if (!validateEntry(entry)) {
+    throw new Error(`Issue #${report.number} does not parse into a list entry`)
+  }
 
-    console.error(output.trim())
-    throw new Error(`add:automation failed for issue #${issue}`, {
-      cause: error,
-    })
+  return entry
+}
+
+function markAlreadyListed(
+  approved: { decision: Decision; entry: AutomationEntry }[],
+): void {
+  if (approved.length === 0) {
+    return
+  }
+
+  const { added } = split(
+    readList(),
+    approved.map(({ entry }) => entry),
+  )
+
+  for (const { decision, entry } of approved) {
+    decision.alreadyListed = !added.includes(entry)
   }
 }
 
@@ -269,8 +233,8 @@ function scoreboard(decision: Decision, config: Config): string {
 
 function approvalComment(decision: Decision, config: Config): string {
   const added = decision.alreadyListed
-    ? 'This account was already on the list, so no new entry was added.'
-    : 'The account has been added to the [automations list](https://agentscan.tools/automations).'
+    ? 'This account is already on the list, so no new entry will be added.'
+    : 'The account will be added to the [automations list](https://agentscan.tools/automations) with the next list update. This report stays open until that lands.'
 
   return [
     `## Approved`,
@@ -304,12 +268,22 @@ function rejectionComment(decision: Decision, config: Config): string {
   ].join('\n')
 }
 
-async function closeIssue(
+/**
+ * Comments on a settled report and swaps its label over.
+ *
+ * Rejected reports are done here, so they are closed right away. An approved
+ * one still needs its entry appended by `pnpm publish:automations`, which a
+ * maintainer runs locally — it stays open under automation:approved as the
+ * reminder to do that, and the commit carrying the entry closes it. Nothing is
+ * left to run for an account that is already listed, so that one is closed too.
+ */
+async function settleIssue(
   octokit: Octokit,
   decision: Decision,
   config: Config,
 ): Promise<void> {
   const approved = decision.outcome === 'approved'
+  const staysOpen = approved && !decision.alreadyListed
 
   await octokit.rest.issues.createComment({
     owner: OWNER,
@@ -320,19 +294,11 @@ async function closeIssue(
       : rejectionComment(decision, config),
   })
 
-  await octokit.rest.issues.update({
-    owner: OWNER,
-    repo: REPO,
-    issue_number: decision.issue,
-    state: 'closed',
-    state_reason: approved ? 'completed' : 'not_planned',
-  })
-
   await octokit.rest.issues.addLabels({
     owner: OWNER,
     repo: REPO,
     issue_number: decision.issue,
-    labels: [approved ? CONFIRMED_LABEL : REJECTED_LABEL],
+    labels: [approved ? APPROVED_LABEL : REJECTED_LABEL],
   })
 
   try {
@@ -346,6 +312,21 @@ async function closeIssue(
     // The label may have been removed by hand already.
   }
 
+  if (staysOpen) {
+    console.log(
+      `✅ Issue #${decision.issue} approved — left open for the next list update`,
+    )
+    return
+  }
+
+  await octokit.rest.issues.update({
+    owner: OWNER,
+    repo: REPO,
+    issue_number: decision.issue,
+    state: 'closed',
+    state_reason: approved ? 'completed' : 'not_planned',
+  })
+
   console.log(
     `${approved ? '✅' : '❌'} Issue #${decision.issue} closed as ${approved ? 'approved' : 'rejected'}`,
   )
@@ -358,19 +339,39 @@ function flag(name: string): string | undefined {
   return match?.split('=').slice(1).join('=')
 }
 
-async function decidePhase(
+/**
+ * The single issue to review, from `--issue=` or the ISSUE environment variable
+ * the workflow passes its input through. Validated here rather than in yaml, so
+ * the workflow never has to interpolate the input into a shell command.
+ */
+function onlyIssue(): number | undefined {
+  const raw = (flag('issue') ?? process.env.ISSUE ?? '').trim()
+
+  if (!raw) {
+    return undefined
+  }
+
+  if (!/^\d+$/.test(raw)) {
+    console.error(`✗ issue must be an issue number, got: ${raw}`)
+    process.exit(1)
+  }
+
+  return parseInt(raw, 10)
+}
+
+async function review(
   octokit: Octokit,
   config: Config,
   decisionsPath: string,
 ): Promise<void> {
-  const only = flag('issue') ? parseInt(flag('issue')!, 10) : undefined
-  const reports = await openReports(octokit, only)
+  const reports = await openReports(octokit, onlyIssue())
 
   console.log(
     `🔍 Reviewing ${reports.length} open automation report(s) against ${config.reviewers.length} reviewer(s)\n`,
   )
 
   const decisions: Decision[] = []
+  const approved: { decision: Decision; entry: AutomationEntry }[] = []
 
   for (const report of reports) {
     const counted = await tally(octokit, report.number, config.reviewers)
@@ -387,52 +388,28 @@ async function decidePhase(
     const decision: Decision = { issue: report.number, outcome, ...counted }
 
     if (outcome === 'approved') {
-      decision.alreadyListed = addAutomation(report.number, counted.approvedBy)
+      // Built before anything is closed, so a report that does not parse into
+      // an entry fails the run while it is still open to be fixed.
+      approved.push({ decision, entry: entryFor(report, counted.approvedBy) })
     }
 
     decisions.push(decision)
+  }
+
+  markAlreadyListed(approved)
+
+  for (const decision of decisions) {
+    await settleIssue(octokit, decision, config)
   }
 
   fs.writeFileSync(decisionsPath, JSON.stringify(decisions, null, 2) + '\n')
   console.log(`\nWrote ${decisions.length} decision(s) to ${decisionsPath}`)
 }
 
-async function finalizePhase(
-  octokit: Octokit,
-  config: Config,
-  decisionsPath: string,
-): Promise<void> {
-  if (!fs.existsSync(decisionsPath)) {
-    console.log('No decisions file — nothing to finalize')
-    return
-  }
-
-  const decisions = JSON.parse(
-    fs.readFileSync(decisionsPath, 'utf-8'),
-  ) as Decision[]
-
-  for (const decision of decisions) {
-    await closeIssue(octokit, decision, config)
-  }
-}
-
 async function main() {
-  const mode = flag('mode') || 'decide'
   const decisionsPath = flag('decisions') || 'automation-decisions.json'
 
-  if (mode !== 'decide' && mode !== 'finalize') {
-    console.error(`✗ Unknown mode "${mode}" — expected decide or finalize`)
-    process.exit(1)
-  }
-
-  const config = readConfig()
-  const octokit = client()
-
-  if (mode === 'decide') {
-    await decidePhase(octokit, config, decisionsPath)
-  } else {
-    await finalizePhase(octokit, config, decisionsPath)
-  }
+  await review(client(), readConfig(), decisionsPath)
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

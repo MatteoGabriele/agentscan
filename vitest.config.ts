@@ -1,11 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
 
+const rootSrc = resolve(import.meta.dirname)
+
 export default defineConfig({
   resolve: {
     alias: {
-      '~~': resolve(__dirname),
-      '~': resolve(__dirname),
+      '~~': rootSrc,
+      '~': rootSrc,
     },
   },
   test: {

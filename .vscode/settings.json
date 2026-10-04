@@ -8,5 +8,7 @@
   "yaml.schemas": {
     "./schemas/agentscan.json": ".github/agentscan.yml"
   },
-  "editor.rulers": [80]
+  "editor.rulers": [80],
+  "unocss.autocomplete.matchType": "fuzzy",
+  "editor.quickSuggestions": { "strings": "on" }
 }

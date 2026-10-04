@@ -54,8 +54,7 @@ function extractExamplePrUrls(flags: IdentifyFlag[], limit: number): string[] {
       }
 
       const pr = event.payload?.pull_request as
-        | { html_url?: string; number?: number }
-        | undefined
+        { html_url?: string; number?: number } | undefined
       const url =
         pr?.html_url ??
         (event.repo?.name && pr?.number !== undefined
