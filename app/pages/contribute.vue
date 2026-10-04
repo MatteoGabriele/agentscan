@@ -11,7 +11,7 @@ type Contribution = {
   links: ContributionLink[]
 }
 
-const contributions: Contribution[] = [
+const contributionList: Contribution[] = [
   {
     title: 'Report an automated account',
     description:
@@ -218,26 +218,26 @@ useHead({
 
   <ul class="mt-12 flex flex-col gap-4">
     <li
-      v-for="contribution in contributions"
-      :key="contribution.title"
+      v-for="item in contributionList"
+      :key="item.title"
       class="border border-ui-border/50 rounded-lg bg-white/1 p-6 hover:border-ui-border transition-colors"
     >
       <div class="flex items-start gap-3">
         <span
           class="mt-1 shrink-0 text-ui-muted"
-          :class="contribution.icon"
+          :class="item.icon"
           aria-hidden="true"
         ></span>
 
         <div class="flex-1">
-          <h2 class="text-base font-semibold">{{ contribution.title }}</h2>
+          <h2 class="text-base font-semibold">{{ item.title }}</h2>
 
           <p class="mt-2 text-sm leading-relaxed text-ui-muted">
-            {{ contribution.description }}
+            {{ item.description }}
           </p>
 
           <ul class="mt-4 flex flex-wrap gap-x-4 gap-y-2">
-            <li v-for="link in contribution.links" :key="link.url">
+            <li v-for="link in item.links" :key="link.url">
               <NuxtLink
                 :to="link.url"
                 :external="link.url.startsWith('http')"
