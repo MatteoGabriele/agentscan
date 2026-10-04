@@ -780,5 +780,33 @@
       "ematipico",
       "ghostdevv"
     ]
+  },
+  {
+    "username": "lukaszszafranski",
+    "id": 45639458,
+    "reason": "It just left an unprompted review",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/481",
+    "reportedBy": "ematipico",
+    "createdAt": "2026-09-28",
+    "approvedBy": [
+      "MatteoGabriele",
+      "ematipico",
+      "graphieros",
+      "trueberryless"
+    ]
+  },
+  {
+    "username": "astra-intelligence",
+    "id": 216119346,
+    "reason": "An automated account primarily selling og:images and banners. It also appears to participate in bounty programs.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/478",
+    "reportedBy": "MatteoGabriele",
+    "createdAt": "2026-09-27",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico",
+      "sheremet-va"
+    ]
   }
 ]
