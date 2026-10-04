@@ -23,6 +23,7 @@ export default defineNuxtConfig({
         'vue-data-ui/vue-ui-icon',
         'vue-data-ui/vue-ui-horizontal-bar',
         'vue-data-ui/vue-ui-waffle',
+        'vue-data-ui/vue-ui-scatter',
       ],
     },
   },

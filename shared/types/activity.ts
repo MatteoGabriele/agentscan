@@ -23,6 +23,11 @@ export type ActivityItem = {
   is_bounty: boolean
   additions: number
   deletions: number
+  text_verdict?: 'ai' | 'human'
+  text_confidence?: number
+  text_probability?: number
+  text_template_found?: boolean
+  pr?: number
 }
 
 export type ActivityCategoryCounts = {
