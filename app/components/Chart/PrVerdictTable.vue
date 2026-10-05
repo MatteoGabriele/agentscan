@@ -25,8 +25,36 @@ type SortState = {
 
 const sortStates = ref<Record<string, SortState>>({})
 
+const uniqueEntries = computed(() => {
+  const results = hourlyWindow.value?.results ?? []
+  const entries = new Map<string, (typeof results)[number]>()
+
+  for (const item of results) {
+    if (!item.repo_name || item.pr == null) {
+      continue
+    }
+
+    const key = `${item.repo_name}#${item.pr}`
+    const existing = entries.get(key)
+
+    if (!existing) {
+      entries.set(key, item)
+      continue
+    }
+
+    const existingCreatedAt = new Date(existing.created_at ?? 0).getTime()
+    const itemCreatedAt = new Date(item.created_at ?? 0).getTime()
+
+    if (itemCreatedAt > existingCreatedAt) {
+      entries.set(key, item)
+    }
+  }
+
+  return [...entries.values()]
+})
+
 const source = computed(() =>
-  hourlyWindow.value?.results.filter(
+  uniqueEntries.value.filter(
     (result) =>
       'text_probability' in result &&
       'text_confidence' in result &&
