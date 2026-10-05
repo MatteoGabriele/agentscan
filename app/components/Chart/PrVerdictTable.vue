@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { identityConfig } from '@unveil/identity'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 import type { ActivityCategory } from '~~/shared/types/activity'
@@ -61,11 +62,11 @@ const source = computed(() =>
 )
 
 function getScoreClassification(score: number): ActivityCategory {
-  if (score < 50) {
+  if (score < identityConfig.THRESHOLD_SUSPICIOUS) {
     return 'automation'
   }
 
-  if (score < 70) {
+  if (score < identityConfig.THRESHOLD_HUMAN) {
     return 'mixed'
   }
 
