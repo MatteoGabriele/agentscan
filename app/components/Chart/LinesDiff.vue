@@ -181,7 +181,9 @@ const config = computed<VueUiXyConfig>(() => ({
 function getZeroY(svg: VueUiXySvgSlotProps['svg']) {
   const { height, top } = svg.drawingArea
   const max = minMax.value.max + Math.abs(minMax.value.min)
-  return top + height * (minMax.value.max / max)
+  return Number.isFinite(max) && max > 0
+    ? top + height * (minMax.value.max / max)
+    : top + height / 2
 }
 </script>
 
