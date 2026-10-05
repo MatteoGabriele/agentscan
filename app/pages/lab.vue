@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import PrVerdictTable from '~/components/Chart/PrVerdictTable.vue'
+</script>
 
 <template>
   <section class="flex flex-col gap-6 h-full">
@@ -35,7 +37,7 @@
         <LazyChartHourlyLinesChanged />
       </div>
       <div class="w-full">
-        <LazyChartPrTextVerdictScatter hydrate-on-visible />
+        <LazyChartPrVerdictTable hydrate-on-visible />
       </div>
       <div class="w-full">
         <LazyChartRepoScoreHistory hydrate-on-visible />
