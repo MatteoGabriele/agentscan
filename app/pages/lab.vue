@@ -35,7 +35,7 @@
         <LazyChartHourlyLinesChanged />
       </div>
       <div class="w-full">
-        <LazyChartPrTextVerdictScatter hydrate-on-visible />
+        <LazyChartPrVerdictTable hydrate-on-visible />
       </div>
       <div class="w-full">
         <LazyChartRepoScoreHistory hydrate-on-visible />
