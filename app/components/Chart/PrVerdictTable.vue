@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 import type { ActivityCategory } from '~~/shared/types/activity'
-import { useColors } from '~/composables/useColors'
 
 const { data: hourlyWindow } = await useActivityHourlyWindow()
 

@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import PrVerdictTable from '~/components/Chart/PrVerdictTable.vue'
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <section class="flex flex-col gap-6 h-full">
