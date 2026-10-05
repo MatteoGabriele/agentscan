@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 import type { ActivityCategory } from '~~/shared/types/activity'
 
@@ -42,10 +43,7 @@ const uniqueEntries = computed(() => {
       continue
     }
 
-    const existingCreatedAt = new Date(existing.created_at ?? 0).getTime()
-    const itemCreatedAt = new Date(item.created_at ?? 0).getTime()
-
-    if (itemCreatedAt > existingCreatedAt) {
+    if (dayjs(item.created_at ?? 0).isAfter(dayjs(existing.created_at ?? 0))) {
       entries.set(key, item)
     }
   }
@@ -77,7 +75,7 @@ function getScoreClassification(score: number): ActivityCategory {
 const groupedPrs = computed(() => {
   const groups = new Map<string, NonNullable<typeof source.value>>()
 
-  for (const item of source.value ?? []) {
+  for (const item of source.value) {
     const repoName = item.repo_name ?? 'Unknown repository'
     const group = groups.get(repoName)
 
@@ -91,12 +89,11 @@ const groupedPrs = computed(() => {
   return [...groups.entries()]
     .filter(([, items]) => items.length >= MIN_PRS_PER_REPO)
     .map(([repoName, items]) => {
-      const sortedItems = items.toSorted((a, b) => {
-        const aDate = new Date(a.created_at ?? 0).getTime()
-        const bDate = new Date(b.created_at ?? 0).getTime()
-
-        return bDate - aDate
-      })
+      const sortedItems = items.toSorted(
+        (a, b) =>
+          dayjs(b.created_at ?? 0).valueOf() -
+          dayjs(a.created_at ?? 0).valueOf(),
+      )
 
       const recentItems = sortedItems.slice(0, PRS_PER_REPO)
 
