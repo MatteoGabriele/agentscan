@@ -4,6 +4,7 @@ import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
+  type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import type { ActivityCategory } from '~~/shared/types/activity'
 import {
@@ -135,7 +136,8 @@ const config = computed<VueUiXyConfig>(() => ({
     color: colors.value.textMuted,
     padding: {
       left: -20,
-      top: -12,
+      top: 12,
+      bottom: 24,
     },
     grid: {
       labels: {
@@ -149,7 +151,7 @@ const config = computed<VueUiXyConfig>(() => ({
           },
         },
         yAxis: {
-          useNiceScale: true,
+          useNiceScale: false,
           scaleMin: minMax.value.min,
           scaleMax: minMax.value.max,
         },
@@ -175,6 +177,14 @@ const config = computed<VueUiXyConfig>(() => ({
     },
   },
 }))
+
+function getZeroY(svg: VueUiXySvgSlotProps['svg']) {
+  const { height, top } = svg.drawingArea
+  const max = minMax.value.max + Math.abs(minMax.value.min)
+  return Number.isFinite(max) && max > 0
+    ? top + height * (minMax.value.max / max)
+    : top + height / 2
+}
 </script>
 
 <template>
@@ -214,7 +224,7 @@ const config = computed<VueUiXyConfig>(() => ({
               absoluteIndex === selectedXIndex
             "
             :x="x"
-            :y="y + 24"
+            :y="y + 48"
             :font-size="fontSize"
             :fill="fill"
             :text-anchor="textAnchor"
@@ -247,6 +257,18 @@ const config = computed<VueUiXyConfig>(() => ({
             <stop offset="0%" :stop-color="colors.bg" stop-opacity="0" />
             <stop offset="100%" :stop-color="series.color" stop-opacity="0.5" />
           </linearGradient>
+        </template>
+
+        <template #svg="{ svg }">
+          <!-- Zero baseline axis -->
+          <line
+            :x1="svg.drawingArea.left + 18"
+            :x2="svg.drawingArea.right - 18"
+            :y1="getZeroY(svg)"
+            :y2="getZeroY(svg)"
+            :stroke="colors.border"
+            stroke-dasharray="0.5 4"
+          />
         </template>
       </VueUiXy>
     </div>
