@@ -263,7 +263,6 @@ function formatPercentage(value?: number | null) {
               <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-1.5">
                   <span class="size-2 shrink-0 rounded-full bg-ui-organic" />
-
                   <span class="text-ui-muted"> Human </span>
                 </div>
 
@@ -275,7 +274,6 @@ function formatPercentage(value?: number | null) {
               <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-1.5">
                   <span class="size-2 shrink-0 bg-ui-automation" />
-
                   <span class="text-ui-muted"> AI </span>
                 </div>
 
@@ -308,7 +306,7 @@ function formatPercentage(value?: number | null) {
               </span>
 
               <div
-                class="flex h-2 w-[150px] overflow-hidden rounded-full border border-ui-bg"
+                class="flex h-2 w-[150px] overflow-hidden rounded-full border border-ui-bg -ml-2.5"
               >
                 <div
                   v-if="group.humanCount"
