@@ -13,6 +13,8 @@ import {
 } from '~~/shared/utils/charts'
 import { formatCompactNumber } from '~~/shared/utils/numbers'
 
+import('vue-data-ui/style.css')
+
 interface Props {
   data: {
     iso: string
