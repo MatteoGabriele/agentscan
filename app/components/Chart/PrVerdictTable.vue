@@ -22,7 +22,9 @@ const showMoreOrLessLabel = computed(
   () => `Show ${showMore.value ? 'less' : 'more'} repositories`,
 )
 
-const MIN_PRS_PER_REPO = computed(() => (showMore.value ? 20 : 50))
+const MIN_PRS_PER_REPO = computed(() =>
+  showMore.value || !isMobile.value ? 20 : 50,
+)
 const PRS_PER_REPO = computed(() => (isMobile.value ? 10 : 20))
 
 type SortKey =
