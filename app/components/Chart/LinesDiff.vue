@@ -204,86 +204,75 @@ function getZeroY(svg: VueUiXySvgSlotProps['svg']) {
         />
         {{ classification.label }}
       </dt>
-      <ClientOnly>
-        <VueUiXy
-          :selected-x-index="selectedXIndex"
-          :dataset="classification.data"
-          :config="config"
+      <VueUiXy
+        :selected-x-index="selectedXIndex"
+        :dataset="classification.data"
+        :config="config"
+      >
+        <template
+          #time-label="{
+            x,
+            y,
+            fontSize,
+            fill,
+            content,
+            textAnchor,
+            absoluteIndex,
+          }"
         >
-          <template
-            #time-label="{
-              x,
-              y,
-              fontSize,
-              fill,
-              content,
-              textAnchor,
-              absoluteIndex,
+          <text
+            v-if="
+              absoluteIndex % XAXIS_LABELS_MOD_THRESHOLD === 1 ||
+              absoluteIndex === selectedXIndex
+            "
+            :x="x"
+            :y="y + 48"
+            :font-size="fontSize"
+            :fill="fill"
+            :text-anchor="textAnchor"
+            :style="{
+              transition: 'opacity 0.2s',
+              opacity:
+                selectedXIndex === undefined || selectedXIndex === absoluteIndex
+                  ? 1
+                  : 0.3,
             }"
           >
-            <text
-              v-if="
-                absoluteIndex % XAXIS_LABELS_MOD_THRESHOLD === 1 ||
-                absoluteIndex === selectedXIndex
-              "
-              :x="x"
-              :y="y + 48"
-              :font-size="fontSize"
-              :fill="fill"
-              :text-anchor="textAnchor"
-              :style="{
-                transition: 'opacity 0.2s',
-                opacity:
-                  selectedXIndex === undefined ||
-                  selectedXIndex === absoluteIndex
-                    ? 1
-                    : 0.3,
-              }"
-            >
-              {{ content }}
-            </text>
-          </template>
-
-          <template #area-gradient="{ series, id }">
-            <linearGradient
-              v-if="series.isPositive"
-              :id
-              x1="0"
-              x2="0"
-              y1="0"
-              y2="1"
-            >
-              <stop offset="0%" :stop-color="series.color" stop-opacity="0.5" />
-              <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
-            </linearGradient>
-
-            <linearGradient v-else :id x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" :stop-color="colors.bg" stop-opacity="0" />
-              <stop
-                offset="100%"
-                :stop-color="series.color"
-                stop-opacity="0.5"
-              />
-            </linearGradient>
-          </template>
-
-          <template #svg="{ svg }">
-            <!-- Zero baseline axis -->
-            <line
-              :x1="svg.drawingArea.left + 18"
-              :x2="svg.drawingArea.right - 18"
-              :y1="getZeroY(svg)"
-              :y2="getZeroY(svg)"
-              :stroke="colors.border"
-              stroke-dasharray="0.5 4"
-            />
-          </template>
-        </VueUiXy>
-
-        <template #fallback>
-          <Skeleton height="h-36" />
+            {{ content }}
+          </text>
         </template>
-      </ClientOnly>
+
+        <template #area-gradient="{ series, id }">
+          <linearGradient
+            v-if="series.isPositive"
+            :id
+            x1="0"
+            x2="0"
+            y1="0"
+            y2="1"
+          >
+            <stop offset="0%" :stop-color="series.color" stop-opacity="0.5" />
+            <stop offset="100%" :stop-color="colors.bg" stop-opacity="0" />
+          </linearGradient>
+
+          <linearGradient v-else :id x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" :stop-color="colors.bg" stop-opacity="0" />
+            <stop offset="100%" :stop-color="series.color" stop-opacity="0.5" />
+          </linearGradient>
+        </template>
+
+        <template #svg="{ svg }">
+          <!-- Zero baseline axis -->
+          <line
+            :x1="svg.drawingArea.left + 18"
+            :x2="svg.drawingArea.right - 18"
+            :y1="getZeroY(svg)"
+            :y2="getZeroY(svg)"
+            :stroke="colors.border"
+            stroke-dasharray="0.5 4"
+          />
+        </template>
+      </VueUiXy>
     </div>
   </div>
 </template>
