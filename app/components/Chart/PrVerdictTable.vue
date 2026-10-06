@@ -723,7 +723,10 @@ function formatPercentage(value?: number | null) {
       </template>
     </div>
 
-    <div v-if="groupedPrs.length && !repoSearch" class="mt-4 text-center">
+    <div
+      v-if="groupedPrs.length && !repoSearch && isMobile"
+      class="mt-4 text-center"
+    >
       <button
         @click="showMore = !showMore"
         type="button"
