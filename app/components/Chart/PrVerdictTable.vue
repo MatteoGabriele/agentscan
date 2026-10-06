@@ -6,8 +6,24 @@ import type { ActivityCategory } from '~~/shared/types/activity'
 
 const { data: hourlyWindow } = await useActivityHourlyWindow()
 
-const MIN_PRS_PER_REPO = 20
-const PRS_PER_REPO = 20
+const isMobile = useIsMobile()
+
+const containerRef = useTemplateRef('containerRef')
+
+const showMore = ref(false)
+
+watch(showMore, () => {
+  if (!showMore.value) {
+    containerRef.value?.scrollIntoView({ block: 'start' })
+  }
+})
+
+const showMoreOrLessLabel = computed(
+  () => `Show ${showMore.value ? 'less' : 'more'} repositories`,
+)
+
+const MIN_PRS_PER_REPO = computed(() => (showMore.value ? 20 : 50))
+const PRS_PER_REPO = computed(() => (isMobile.value ? 10 : 20))
 
 type SortKey =
   | 'pr'
@@ -26,6 +42,13 @@ type SortState = {
 }
 
 const sortStates = ref<Record<string, SortState>>({})
+const repoSearch = ref('')
+
+const repoSearchQuery = computed(() =>
+  repoSearch.value.trim().toLocaleLowerCase(),
+)
+
+const isExpandedRepoSearch = computed(() => repoSearchQuery.value.length >= 2)
 
 const uniqueEntries = computed(() => {
   const results = hourlyWindow.value?.results ?? []
@@ -88,7 +111,16 @@ const groupedPrs = computed(() => {
   }
 
   return [...groups.entries()]
-    .filter(([, items]) => items.length >= MIN_PRS_PER_REPO)
+    .filter(([repoName, items]) => {
+      const matchesSearch =
+        !repoSearchQuery.value ||
+        repoName.toLocaleLowerCase().includes(repoSearchQuery.value)
+
+      const meetsMinimumPrCount =
+        isExpandedRepoSearch.value || items.length >= MIN_PRS_PER_REPO.value
+
+      return matchesSearch && meetsMinimumPrCount
+    })
     .map(([repoName, items]) => {
       const sortedItems = items.toSorted(
         (a, b) =>
@@ -96,7 +128,7 @@ const groupedPrs = computed(() => {
           dayjs(a.created_at ?? 0).valueOf(),
       )
 
-      const recentItems = sortedItems.slice(0, PRS_PER_REPO)
+      const recentItems = sortedItems.slice(0, PRS_PER_REPO.value)
 
       const aiCount = recentItems.filter(
         (item) => item.text_verdict === 'ai',
@@ -223,7 +255,7 @@ function formatPercentage(value?: number | null) {
 </script>
 
 <template>
-  <div>
+  <div ref="containerRef">
     <div class="mb-5">
       <h2 class="text-center">PR descriptions analysis</h2>
 
@@ -231,6 +263,35 @@ function formatPercentage(value?: number | null) {
         Latest 20 analyzed PRs per repository in the last 24-hour window, for
         repositories with at least 20 PRs.
       </p>
+    </div>
+
+    <div class="mb-4 h-11 overflow-hidden rounded-lg border border-ui-border">
+      <label class="relative block h-full w-full">
+        <span class="sr-only">Search repositories</span>
+
+        <span
+          class="i-lucide:search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ui-muted sm:left-4"
+          aria-hidden="true"
+        />
+
+        <input
+          v-model="repoSearch"
+          type="search"
+          autocomplete="off"
+          placeholder="Search repositories..."
+          class="h-full w-full bg-transparent pl-9 pr-10 text-sm text-inherit outline-none placeholder:text-ui-muted/70 focus:bg-current/[0.025] sm:pl-10 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+        />
+
+        <button
+          v-if="repoSearch"
+          type="button"
+          class="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-sm p-1 text-ui-muted transition-colors hover:text-ui-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:right-3"
+          aria-label="Clear repository search"
+          @click="repoSearch = ''"
+        >
+          <span class="i-lucide:x" aria-hidden="true" />
+        </button>
+      </label>
     </div>
 
     <div v-if="groupedPrs.length" class="space-y-2">
@@ -652,8 +713,24 @@ function formatPercentage(value?: number | null) {
     </div>
 
     <div v-else class="py-12 text-center text-sm text-ui-muted">
-      No repositories with at least {{ MIN_PRS_PER_REPO }} PRs in the last
-      24-hour window.
+      <template v-if="repoSearchQuery">
+        No repositories match “{{ repoSearch.trim() }}”.
+      </template>
+
+      <template v-else>
+        No repositories with at least {{ MIN_PRS_PER_REPO }} PRs in the last
+        24-hour window.
+      </template>
+    </div>
+
+    <div v-if="groupedPrs.length && !repoSearch" class="mt-4 text-center">
+      <button
+        @click="showMore = !showMore"
+        type="button"
+        class="text-sm text-ui-muted hover:bg-ui-border/15 hover:text-ui-text"
+      >
+        {{ showMoreOrLessLabel }}
+      </button>
     </div>
   </div>
 </template>
