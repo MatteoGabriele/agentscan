@@ -55,7 +55,7 @@
     "valibot": "^1.4.2",
     "vue": "^3.5.28",
     "vue-data-ui": "3.26.3",
-    "vue-router": "^4.6.4",
+    "vue-router": "^5.3.1",
     "yaml": "^2.9.0"
   },
   "lint-staged": {
