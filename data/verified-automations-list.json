@@ -808,5 +808,47 @@
       "ematipico",
       "sheremet-va"
     ]
+  },
+  {
+    "username": "matbrgz",
+    "id": 23284276,
+    "reason": "Heavy automation usage creating lots of comments on PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/479",
+    "reportedBy": "trueberryless",
+    "createdAt": "2026-09-27",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "bluwy",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "keeltrace",
+    "id": 218190424,
+    "reason": "User notes \"keeltrace is a my pr bot\"",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/477",
+    "reportedBy": "luc122c",
+    "createdAt": "2026-09-26",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "bluwy",
+      "trueberryless"
+    ]
+  },
+  {
+    "username": "dhyabi2",
+    "id": 32069256,
+    "reason": "Mass AI spam, including the Jupyter repository, with over 400 contributions in two days, 172 PRs open across 125 repos this month, and typical issues with technical prose.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/474",
+    "reportedBy": "Yann-P",
+    "createdAt": "2026-09-25",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "trueberryless",
+      "bluwy"
+    ]
   }
 ]
