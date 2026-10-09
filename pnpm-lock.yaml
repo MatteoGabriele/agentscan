@@ -18,8 +18,8 @@ importers:
         specifier: ^16.1.4
         version: 16.1.4
       '@octokit/request-error':
-        specifier: ^7.1.0
-        version: 7.1.0
+        specifier: ^7.1.2
+        version: 7.1.2
       '@octokit/webhooks':
         specifier: ^14.2.0
         version: 14.2.0
@@ -1199,10 +1199,6 @@ packages:
     engines: {node: '>= 20'}
     peerDependencies:
       '@octokit/core': ^7.0.0
-
-  '@octokit/request-error@7.1.0':
-    resolution: {integrity: sha512-KMQIfq5sOPpkQYajXHwnhjCC0slzCNScLHs9JafXc4RAJI+9f+jNDlBNaIMTvazOPLgb4BnlhGJOTbnN0wIjPw==}
-    engines: {node: '>= 20'}
 
   '@octokit/request-error@7.1.2':
     resolution: {integrity: sha512-XZRuT3xZ84D3gYErI1DZvhJ33dCWVV6uzBtWkaBB4TvA/L6eOeTZodxLFVB44bBEEo3vEx7y00UfX1tBLrtLRg==}
@@ -7851,7 +7847,7 @@ snapshots:
 
   '@octokit/auth-unauthenticated@7.0.3':
     dependencies:
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/types': 16.0.0
 
   '@octokit/auth-unauthenticated@7.0.5':
@@ -7864,7 +7860,7 @@ snapshots:
       '@octokit/auth-token': 6.0.0
       '@octokit/graphql': 9.0.3
       '@octokit/request': 10.0.7
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/types': 16.0.0
       before-after-hook: 4.0.0
       universal-user-agent: 7.0.3
@@ -7929,7 +7925,7 @@ snapshots:
     dependencies:
       '@octokit/oauth-authorization-url': 8.0.0
       '@octokit/request': 10.0.7
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/types': 16.0.0
 
   '@octokit/oauth-methods@6.0.5':
@@ -7969,7 +7965,7 @@ snapshots:
   '@octokit/plugin-retry@8.1.0(@octokit/core@7.0.6)':
     dependencies:
       '@octokit/core': 7.0.6
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/types': 16.0.0
       bottleneck: 2.19.5
 
@@ -7978,10 +7974,6 @@ snapshots:
       '@octokit/core': 7.0.6
       '@octokit/types': 16.0.0
       bottleneck: 2.19.5
-
-  '@octokit/request-error@7.1.0':
-    dependencies:
-      '@octokit/types': 16.0.0
 
   '@octokit/request-error@7.1.2':
     dependencies:
@@ -7999,7 +7991,7 @@ snapshots:
   '@octokit/request@10.0.7':
     dependencies:
       '@octokit/endpoint': 11.0.3
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/types': 16.0.0
       fast-content-type-parse: 3.0.0
       universal-user-agent: 7.0.3
@@ -8021,7 +8013,7 @@ snapshots:
   '@octokit/webhooks@14.2.0':
     dependencies:
       '@octokit/openapi-webhooks-types': 12.1.0
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/webhooks-methods': 6.0.0
 
   '@oxc-parser/binding-android-arm-eabi@0.115.0':
@@ -11901,7 +11893,7 @@ snapshots:
       '@octokit/plugin-rest-endpoint-methods': 17.0.0(@octokit/core@7.0.6)
       '@octokit/plugin-retry': 8.1.0(@octokit/core@7.0.6)
       '@octokit/plugin-throttling': 11.0.3(@octokit/core@7.0.6)
-      '@octokit/request-error': 7.1.0
+      '@octokit/request-error': 7.1.2
       '@octokit/types': 16.0.0
       '@octokit/webhooks': 14.2.0
 
