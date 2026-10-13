@@ -36,6 +36,12 @@ const groups = computed<AdopterGroup[]>(() => {
   return groupAdoptersByOwner(filteredRepositories.value)
 })
 
+const repositoryCount = computed<string>(() => {
+  return Intl.NumberFormat('en-GB', {
+    compactDisplay: 'short',
+  }).format(repositories.value.length)
+})
+
 useHead({
   title: 'Used by | AgentScan',
   meta: [
@@ -62,7 +68,7 @@ useHead({
         class="h-2.5 bg-ui-border rounded w-32 inline-block animate-pulse"
       />
       <span v-else class="tabular-nums">
-        {{ repositories.length }} repositories from
+        {{ repositoryCount }} repositories from
         {{ allGroups.length }}
         {{ allGroups.length === 1 ? 'account' : 'accounts' }}
       </span>

@@ -24,8 +24,19 @@ const visibleItems = computed<AvatarStackItem[]>(() => {
   return props.items.slice(0, props.max)
 })
 
-const restItemsCount = computed<number>(() => {
-  return props.items.length - visibleItems.value.length
+const restItemsCount = computed<string>(() => {
+  const count = props.items.length - visibleItems.value.length
+
+  return formatCompactNumber(count, {
+    compactDisplay: 'short',
+    maximumSignificantDigits: 2,
+  })
+})
+
+const allItemsCount = computed<string>(() => {
+  return Intl.NumberFormat('en-GB', {
+    compactDisplay: 'short',
+  }).format(props.items.length)
 })
 
 function showRest() {
@@ -69,10 +80,10 @@ function showRest() {
         </li>
 
         <li v-if="restItemsCount" class="md:-mx-1 hover:z-10">
-          <Tooltip v-if="moreUrl" :label="`See all ${items.length}`">
+          <Tooltip v-if="moreUrl" :label="`See all ${allItemsCount}`">
             <NuxtLink
               :to="moreUrl"
-              :aria-label="`See all ${items.length}`"
+              :aria-label="`See all ${allItemsCount}`"
               class="flex items-center justify-center size-7.5 rounded-full ring-2 ring-ui-bg bg-ui-bg border border-ui-border/40 text-[0.65rem] font-medium tabular-nums text-ui-muted hover:text-ui-text hover:scale-115 transition-all"
             >
               +{{ restItemsCount }}
