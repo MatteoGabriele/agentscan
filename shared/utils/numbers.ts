@@ -3,10 +3,14 @@ export function round(n: number, rounding = 2) {
   return Math.round(n * factor) / factor
 }
 
-export function formatCompactNumber(n: number) {
+export function formatCompactNumber(
+  n: number,
+  options: Intl.NumberFormatOptions = {},
+): string {
   return new Intl.NumberFormat('en-US', {
     notation: 'compact',
     maximumFractionDigits: 1,
+    ...options,
   }).format(n)
 }
 

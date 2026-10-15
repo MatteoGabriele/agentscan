@@ -850,5 +850,75 @@
       "trueberryless",
       "bluwy"
     ]
+  },
+  {
+    "username": "devtechedge",
+    "id": 294291171,
+    "reason": "Heavy automated forking and contributions, while maintaining a ledger in a personal repository to track all community interactions and look for ways to circumvent automation detection.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/510",
+    "reportedBy": "linhr",
+    "createdAt": "2026-10-12",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico",
+      "sheremet-va"
+    ]
+  },
+  {
+    "username": "feritcemkahraman",
+    "id": 92086876,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/509",
+    "reportedBy": "OrbisK",
+    "createdAt": "2026-10-12",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico",
+      "sheremet-va"
+    ]
+  },
+  {
+    "username": "huhumeng2",
+    "id": 67313891,
+    "reason": "High PR volume in robotics-related repos.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/503",
+    "reportedBy": "MichaelGrupp",
+    "createdAt": "2026-10-09",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico",
+      "sheremet-va"
+    ]
+  },
+  {
+    "username": "webzuweb",
+    "id": 1818753,
+    "reason": "High automated PR volume in random repos to extend \"portfolio\" on his GH profile.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/502",
+    "reportedBy": "MichaelGrupp",
+    "createdAt": "2026-10-09",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico",
+      "sheremet-va"
+    ]
+  },
+  {
+    "username": "dddd-jh",
+    "id": 186017830,
+    "reason": "Several random PRs in robotics-related repositories in a very short timeframe.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/501",
+    "reportedBy": "MichaelGrupp",
+    "createdAt": "2026-10-09",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico",
+      "sheremet-va"
+    ]
   }
 ]

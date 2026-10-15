@@ -66,4 +66,25 @@ export const landmarks: Landmark[] = [
     icon: 'i-lucide:newspaper',
     iconSvg: SVG_ICON.newspaper,
   },
+  {
+    date: '2026-10-10',
+    name: 'SWE-2 release',
+    description: "Cognition's new frontier model.",
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+  },
+  {
+    date: '2026-10-12',
+    name: 'Muse Wonder release',
+    description: "Meta's new frontier model.",
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+  },
+  {
+    date: '2026-10-13',
+    name: 'Gemini Argon release',
+    description: "Google's new frontier model.",
+    icon: 'i-lucide:newspaper',
+    iconSvg: SVG_ICON.newspaper,
+  },
 ]
