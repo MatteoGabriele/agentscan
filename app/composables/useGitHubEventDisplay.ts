@@ -141,6 +141,60 @@ export function useGitHubEventDisplay() {
     }
   }
 
+  // AgentScan Text only reads PR/issue bodies and issue comments, and only
+  // text the account wrote is worth analyzing: a review links to someone
+  // else's PR, and a closed/merged PR may not be theirs either.
+  function getTextAnalysis(
+    event: GitHubEvent,
+  ): { url: string; label: string } | undefined {
+    const repo = event.repo?.name
+    const payload = event.payload as Record<string, unknown> | undefined
+    if (!repo) {
+      return undefined
+    }
+
+    let target: string | undefined
+    let label = ''
+    switch (event.type) {
+      case 'PullRequestEvent': {
+        const pr = payload?.pull_request as { number?: number } | undefined
+        if (payload?.action === 'opened' && pr?.number) {
+          target = `${repo}/pull/${pr.number}`
+          label = 'Analyze PR description'
+        }
+        break
+      }
+      case 'IssuesEvent': {
+        const issue = payload?.issue as { number?: number } | undefined
+        if (payload?.action === 'opened' && issue?.number) {
+          target = `${repo}/issues/${issue.number}`
+          label = 'Analyze issue description'
+        }
+        break
+      }
+      case 'IssueCommentEvent': {
+        const issue = payload?.issue as { number?: number } | undefined
+        const comment = payload?.comment as { id?: number } | undefined
+        if (issue?.number && comment?.id) {
+          target = `${repo}/issues/${issue.number}#issuecomment-${comment.id}`
+          label = 'Analyze comment'
+        }
+        break
+      }
+    }
+
+    if (!target) {
+      return undefined
+    }
+
+    // Same shape the Text site builds itself: protocol stripped, slashes kept.
+    const url = encodeURIComponent(`github.com/${target}`).replaceAll(
+      '%2F',
+      '/',
+    )
+    return { url: `https://text.agentscan.tools/analyze?url=${url}`, label }
+  }
+
   function formatEventTime(date: string | null | undefined): string {
     if (!date) {
       return ''
@@ -210,6 +264,7 @@ export function useGitHubEventDisplay() {
     getEventIcon,
     getEventDescription,
     getEventUrl,
+    getTextAnalysis,
     formatEventTime,
     groupEvents,
     getDeltaSeconds,

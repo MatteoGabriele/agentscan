@@ -66,6 +66,13 @@ onBeforeUnmount(() => {
               />
             </li>
             <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="https://text.agentscan.tools"
+                label="Text scan"
+              />
+            </li>
+            <li>
               <LazyMainMenuItem class="text-xl" to="/lab" label="The Lab" />
             </li>
           </ul>

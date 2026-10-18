@@ -12,6 +12,6 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: MatteoGabriele/interlinked@v0.3
+      - uses: MatteoGabriele/agentscan-text-action@v0.4
         with:
           mode: 'full'

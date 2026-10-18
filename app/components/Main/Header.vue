@@ -21,6 +21,12 @@ const scanItems: MenuDropdownItem[] = [
     icon: 'i-lucide:book-search',
   },
   {
+    to: 'https://text.agentscan.tools',
+    label: 'Text',
+    description: 'Find signs of AI-written text in open source contributions',
+    icon: 'i-agentscan:text',
+  },
+  {
     to: '/lab',
     label: 'The Lab',
     description: 'Experimental account scan mapping',

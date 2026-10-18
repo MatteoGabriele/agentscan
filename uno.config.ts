@@ -16,6 +16,12 @@ export default defineConfig({
       },
       warn: true,
       scale: 1.2,
+      collections: {
+        // Logo of AgentScan Text (text.agentscan.tools).
+        agentscan: {
+          text: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="10" height="10" rx="2"/><rect x="8" y="5" width="10" height="10" rx="2"/></svg>',
+        },
+      },
     }),
   ],
   transformers: [transformerDirectives(), transformerVariantGroup()],

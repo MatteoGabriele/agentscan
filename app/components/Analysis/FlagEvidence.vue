@@ -6,8 +6,6 @@ const props = defineProps<{
 }>()
 
 const {
-  getEventDescription,
-  getEventUrl,
   getEventIcon,
   formatEventTime,
   groupEvents,
@@ -134,25 +132,13 @@ const hiddenCount = computed(() => {
               <div class="w-px flex-1 bg-ui-automation/30 my-1" />
             </div>
             <div class="min-w-0 pb-1">
-              <a
-                v-if="getEventUrl(fastestConnection.conn.from)"
-                :href="getEventUrl(fastestConnection.conn.from)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(fastestConnection.conn.from) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <p v-else class="text-sm text-ui-text">
-                {{ getEventDescription(fastestConnection.conn.from) }}
-              </p>
+              <AnalysisFlagEvidenceLink :event="fastestConnection.conn.from" />
               <p class="text-xs text-ui-muted">
                 {{ formatEventTime(fastestConnection.conn.from.created_at) }}
               </p>
+              <AnalysisFlagEvidenceTextLink
+                :event="fastestConnection.conn.from"
+              />
             </div>
           </div>
           <div class="flex gap-3">
@@ -161,25 +147,13 @@ const hiddenCount = computed(() => {
               class="text-xs text-ui-muted shrink-0"
             />
             <div class="min-w-0">
-              <a
-                v-if="getEventUrl(fastestConnection.conn.to)"
-                :href="getEventUrl(fastestConnection.conn.to)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(fastestConnection.conn.to) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <p v-else class="text-sm text-ui-text">
-                {{ getEventDescription(fastestConnection.conn.to) }}
-              </p>
+              <AnalysisFlagEvidenceLink :event="fastestConnection.conn.to" />
               <p class="text-xs text-ui-muted">
                 {{ formatEventTime(fastestConnection.conn.to.created_at) }}
               </p>
+              <AnalysisFlagEvidenceTextLink
+                :event="fastestConnection.conn.to"
+              />
             </div>
           </div>
         </div>
@@ -198,26 +172,12 @@ const hiddenCount = computed(() => {
               <div class="w-px flex-1 bg-ui-border-subtle/40 my-1" />
             </div>
             <div class="min-w-0 pb-2">
-              <a
-                v-if="getEventUrl(conn.from)"
-                :href="getEventUrl(conn.from)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(conn.from) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <p v-else class="text-sm text-ui-text">
-                {{ getEventDescription(conn.from) }}
-              </p>
+              <AnalysisFlagEvidenceLink :event="conn.from" />
               <p class="text-xs text-ui-muted">
                 {{ formatEventTime(conn.from.created_at) }} ·
                 {{ conn.from.repo?.name?.split('/')[1] }}
               </p>
+              <AnalysisFlagEvidenceTextLink :event="conn.from" />
             </div>
           </div>
 
@@ -227,26 +187,12 @@ const hiddenCount = computed(() => {
               class="text-xs text-ui-muted shrink-0"
             />
             <div class="min-w-0">
-              <a
-                v-if="getEventUrl(conn.to)"
-                :href="getEventUrl(conn.to)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(conn.to) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60 shrink-0"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <p v-else class="text-sm text-ui-text">
-                {{ getEventDescription(conn.to) }}
-              </p>
+              <AnalysisFlagEvidenceLink :event="conn.to" />
               <p class="text-xs text-ui-muted">
                 {{ formatEventTime(conn.to.created_at) }} ·
                 {{ conn.to.repo?.name?.split('/')[1] }}
               </p>
+              <AnalysisFlagEvidenceTextLink :event="conn.to" />
             </div>
           </div>
         </div>
@@ -277,26 +223,12 @@ const hiddenCount = computed(() => {
               class="text-xs text-ui-muted shrink-0 mt-0.5"
             />
             <div class="min-w-0">
-              <a
-                v-if="getEventUrl(ev)"
-                :href="getEventUrl(ev)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(ev) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <p v-else class="text-sm text-ui-text">
-                {{ getEventDescription(ev) }}
-              </p>
+              <AnalysisFlagEvidenceLink :event="ev" />
               <p class="text-xs text-ui-muted">
                 {{ formatEventTime(ev.created_at) }} ·
                 {{ ev.repo?.name?.split('/')[1] }}
               </p>
+              <AnalysisFlagEvidenceTextLink :event="ev" />
             </div>
           </div>
         </div>
@@ -314,26 +246,12 @@ const hiddenCount = computed(() => {
               class="text-xs text-ui-muted shrink-0 mt-0.5"
             />
             <div class="min-w-0 flex-1">
-              <a
-                v-if="getEventUrl(ev)"
-                :href="getEventUrl(ev)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-ui-text hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(ev) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <p v-else class="text-sm text-ui-text">
-                {{ getEventDescription(ev) }}
-              </p>
+              <AnalysisFlagEvidenceLink :event="ev" />
               <p class="text-xs text-ui-muted">
                 {{ formatEventTime(ev.created_at) }} ·
                 {{ ev.repo?.name?.split('/')[1] }}
               </p>
+              <AnalysisFlagEvidenceTextLink :event="ev" />
             </div>
           </div>
         </div>
@@ -365,26 +283,12 @@ const hiddenCount = computed(() => {
               class="text-xs text-ui-muted shrink-0 mt-0.5"
             />
             <div class="flex-1 flex flex-col gap-0.5">
-              <a
-                v-if="getEventUrl(ev)"
-                :href="getEventUrl(ev)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-ui-text text-sm hover:underline inline-flex items-center gap-1"
-              >
-                {{ getEventDescription(ev) }}
-                <span
-                  class="i-lucide:external-link text-ui-muted opacity-60"
-                  style="font-size: 0.6rem"
-                />
-              </a>
-              <span v-else class="text-ui-text text-sm">{{
-                getEventDescription(ev)
-              }}</span>
+              <AnalysisFlagEvidenceLink :event="ev" />
               <div class="flex gap-2 text-ui-muted text-xs">
                 <span>{{ formatEventTime(ev.created_at) }}</span>
                 <span>{{ ev.repo?.name }}</span>
               </div>
+              <AnalysisFlagEvidenceTextLink :event="ev" />
             </div>
           </div>
         </div>
@@ -405,26 +309,12 @@ const hiddenCount = computed(() => {
             :key="j"
             class="flex flex-col gap-0.5"
           >
-            <a
-              v-if="getEventUrl(ev)"
-              :href="getEventUrl(ev)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-ui-text text-sm hover:underline inline-flex items-center gap-1"
-            >
-              {{ getEventDescription(ev) }}
-              <span
-                class="i-lucide:external-link text-ui-muted opacity-60"
-                style="font-size: 0.6rem"
-              />
-            </a>
-            <span v-else class="text-ui-text text-sm">
-              {{ getEventDescription(ev) }}
-            </span>
+            <AnalysisFlagEvidenceLink :event="ev" />
             <div class="flex gap-2 text-ui-muted text-xs">
               <span>{{ formatEventTime(ev.created_at) }}</span>
               <span>{{ ev.repo?.name }}</span>
             </div>
+            <AnalysisFlagEvidenceTextLink :event="ev" />
           </div>
         </div>
       </div>
