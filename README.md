@@ -7,7 +7,7 @@
 
 # AgentScan
 
-**Automation pattern detection for open source maintainers.**
+**Automation pattern detection for open sourckkkmkme maintainers.**
 
 [![Website](https://img.shields.io/badge/agentscan.tools-238636?style=flat-square&logo=googlechrome&logoColor=white)](https://agentscan.tools)
 [![GitHub App](https://img.shields.io/badge/GitHub%20App-install-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/apps/agentscanapp)
