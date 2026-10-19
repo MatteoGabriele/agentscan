@@ -920,5 +920,116 @@
       "ematipico",
       "sheremet-va"
     ]
+  },
+  {
+    "username": "dannyward630",
+    "id": 71604164,
+    "reason": "High volume of automation, talks about himself in third person...",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/528",
+    "reportedBy": "peterbud",
+    "createdAt": "2026-10-16",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros"
+    ]
+  },
+  {
+    "username": "HawkForge",
+    "id": 75696486,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/527",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-16",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele"
+    ]
+  },
+  {
+    "username": "HarshRajSinghania",
+    "id": 40535627,
+    "reason": "User failed to respond to review feedback.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/520",
+    "reportedBy": "stevepiercy",
+    "createdAt": "2026-10-15",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele"
+    ]
+  },
+  {
+    "username": "61465",
+    "id": 62155637,
+    "reason": "The replies have strong hints of an agent writing them. Lots of \"I've run pnpm test\", etc. and similar verifying statements only LLMs write",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/519",
+    "reportedBy": "teemingc",
+    "createdAt": "2026-10-14",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele"
+    ]
+  },
+  {
+    "username": "jayhemnani9910",
+    "id": 193022578,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/517",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-13",
+    "approvedBy": [
+      "ematipico",
+      "graphieros",
+      "MatteoGabriele"
+    ]
+  },
+  {
+    "username": "lx3133584",
+    "id": 24490353,
+    "reason": "Keeps creating new PRs even though his previous ones are automatically closed. Leaves no comments",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/516",
+    "reportedBy": "sheremet-va",
+    "createdAt": "2026-10-13",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "OrbisK"
+    ]
+  },
+  {
+    "username": "noy-solvin",
+    "id": 261724296,
+    "reason": "Authoring PRs without ever reviewing code or its quality and still saying \"this fix was generated using Solvin, an AI coding agent my team is building. Reviewed and tested manually before submitting.\"",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/515",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-13",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros"
+    ]
+  },
+  {
+    "username": "SwastikTripathi",
+    "id": 88632085,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/512",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-12",
+    "approvedBy": [
+      "ematipico",
+      "graphieros",
+      "OrbisK"
+    ]
+  },
+  {
+    "username": "IslamElsayed",
+    "id": 7096088,
+    "reason": "Self-disclosed as an AI agent Account publicly describes itself as an AI agent",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/511",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-12",
+    "approvedBy": [
+      "ematipico",
+      "graphieros"
+    ]
   }
 ]
