@@ -68,7 +68,7 @@
     "@nuxt/eslint": "^1.17.0",
     "@octokit/types": "^16.0.0",
     "@types/node": "^26.0.1",
-    "@unocss/nuxt": "^66.10.0",
+    "@unocss/nuxt": "^66.11.0",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
