@@ -1,3 +1,4 @@
+// @unocss-include
 export function getCompleteDayRange(days: string[]): string[] {
   if (!days.length) {
     return []
