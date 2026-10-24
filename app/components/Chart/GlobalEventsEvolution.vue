@@ -116,21 +116,6 @@ const tooltipPosition = useTooltipPosition(chartRef)
 
 const progressionLabelOffsetX = 6
 
-const viewBoxPadding = computed(() => {
-  const maxSeries = dates.value?.length ?? 0
-
-  if (maxSeries <= 1 || width.value <= 0) {
-    return { left: 0, right: 0 }
-  }
-
-  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1))
-
-  return {
-    left: -halfVueUiXyDatapointStep,
-    right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
-  }
-})
-
 const tooltipTimeFormat = 'dddd • MMM dd • HH:mm'
 
 const hoveredIndex = ref<number | null>(null)
@@ -167,11 +152,11 @@ const config = computed<VueUiXyConfig>(() => ({
     width: Math.round(width.value),
     height: Math.round(height.value),
     padding: {
-      left: viewBoxPadding.value.left,
-      right: viewBoxPadding.value.right,
+      left: 0,
+      right: -progressionLabelOffsetX,
     },
     grid: {
-      position: 'middle',
+      position: 'start',
       stroke: 'transparent',
       labels: {
         show: false,

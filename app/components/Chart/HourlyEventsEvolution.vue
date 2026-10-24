@@ -151,8 +151,9 @@ const config = computed<VueUiXyConfig>(() => ({
     width: Math.round(width.value),
     height: Math.round(height.value),
     padding: {
-      left: viewBoxPadding.value.left,
-      right: viewBoxPadding.value.right,
+      left: 0,
+      // VueUiXy reserves 6px on the right even without progression labels.
+      right: -6,
       /**
        * Extra padding bottom is added on desktop to compensate the illusion of height difference between the daily and hourly charts, and avoid a CLS impression when switching between them; but not on mobile, where we need all the real estate we can use.
        */
@@ -174,12 +175,14 @@ const config = computed<VueUiXyConfig>(() => ({
       offsetY: -64,
     },
     grid: {
+      position: 'start',
       stroke: 'transparent',
       labels: {
         show: false,
         fontSize: 12,
         color: colors.value.textMuted,
         yAxis: {
+          crosshairSize: 0,
           useIndividualScale: false,
           scaleMin: 0,
           scaleMax: scaleMax.value,
@@ -229,23 +232,6 @@ function formatScanTime(index: number) {
 
   return dayjs(scanTime).format('ddd, MMM D • HH:mm')
 }
-
-const progressionLabelOffsetX = 0
-
-const viewBoxPadding = computed(() => {
-  const maxSeries = isLoading.value ? 25 : (scanTimes.value?.length ?? 0)
-
-  if (maxSeries <= 1 || width.value <= 0) {
-    return { left: 0, right: 0 }
-  }
-
-  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1))
-
-  return {
-    left: -halfVueUiXyDatapointStep,
-    right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
-  }
-})
 
 const isChartHovered = shallowRef(false)
 
@@ -370,15 +356,7 @@ function handleChartMouseleave() {
             </template>
 
             <template
-              #time-label="{
-                x,
-                y,
-                content,
-                fontSize,
-                fill,
-                textAnchor,
-                absoluteIndex,
-              }"
+              #time-label="{ x, y, content, fontSize, fill, absoluteIndex }"
             >
               <text
                 v-if="
@@ -391,7 +369,7 @@ function handleChartMouseleave() {
                 :y="y + fontSize * 2"
                 :font-size="fontSize"
                 :fill
-                :text-anchor="textAnchor"
+                text-anchor="start"
                 :opacity="isChartHovered || isMobile ? 1 : 0"
                 class="time-label"
               >
