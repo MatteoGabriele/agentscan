@@ -175,7 +175,7 @@ const config = computed<VueUiXyConfig>(() => ({
       offsetY: -64,
     },
     grid: {
-      position: 'start',
+      position: scanTimes.value?.length === 1 ? 'middle' : 'start',
       stroke: 'transparent',
       labels: {
         show: false,

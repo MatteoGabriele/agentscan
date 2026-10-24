@@ -156,7 +156,7 @@ const config = computed<VueUiXyConfig>(() => ({
       right: -progressionLabelOffsetX,
     },
     grid: {
-      position: 'start',
+      position: dates.value?.length === 1 ? 'middle' : 'start',
       stroke: 'transparent',
       labels: {
         show: false,
