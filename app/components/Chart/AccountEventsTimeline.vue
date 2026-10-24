@@ -9,11 +9,8 @@ import { getCompleteDayRange } from '~~/shared/utils/charts'
 import type { GitHubEventType } from '~~/shared/types/identity'
 import { githubEventTypes } from '~~/shared/types/identity'
 import { useColors } from '~/composables/useColors'
-import {
-  identityConfig,
-  type IdentityClassification,
-  type GitHubEvent,
-} from '@unveil/identity'
+import { identityConfig, type IdentityClassification } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import type { VueUiXyDatasetLineItem } from 'vue-data-ui/vue-ui-xy'
 import { useTimeoutFn } from '@vueuse/core'
 

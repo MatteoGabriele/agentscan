@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import type {
-  GitHubUser,
-  IdentityClassification,
-  IdentifyResult,
-} from '@unveil/identity'
+import type { IdentityClassification, IdentifyResult } from '@unveil/identity'
+import type { GitHubUser } from '@unveil/identity/providers/github'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
 
 const props = defineProps<{

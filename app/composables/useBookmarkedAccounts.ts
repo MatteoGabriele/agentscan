@@ -1,4 +1,4 @@
-import type { GitHubUser } from '@unveil/identity'
+import type { GitHubUser } from '@unveil/identity/providers/github'
 
 export interface BookmarkedAccount {
   login: string

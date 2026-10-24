@@ -1,5 +1,5 @@
 // @unocss-include
-import type { GitHubEvent } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import dayjs from 'dayjs'
 
 const ZERO_SHA = '0000000000000000000000000000000000000000'

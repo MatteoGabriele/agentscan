@@ -1,31 +1,23 @@
-import type { GitHubEvent, IdentifyFlag } from '@unveil/identity'
+import type { IdentifyEvent, IdentifyFlag } from '@unveil/identity'
 import { describe, expect, it } from 'vitest'
 import { buildEvidenceLines, buildReportIssueUrl } from './report-issue'
 
 const makeFlag = (overrides: Partial<IdentifyFlag> = {}): IdentifyFlag => ({
   label: 'Test Flag',
   points: 10,
+  group: 'pr-volume',
   detail: 'Test detail',
   data: [],
   events: [],
   ...overrides,
 })
 
-const makePrEvent = (
-  repoName: string,
-  number: number,
-  htmlUrl?: string,
-): GitHubEvent =>
-  ({
-    type: 'PullRequestEvent',
-    repo: { name: repoName },
-    payload: {
-      pull_request: {
-        number,
-        ...(htmlUrl ? { html_url: htmlUrl } : {}),
-      },
-    },
-  }) as unknown as GitHubEvent
+const makePrEvent = (repo: string, number: number): IdentifyEvent => ({
+  type: 'pull-request',
+  at: '2026-01-01T00:00:00Z',
+  repo,
+  pullRequest: { number },
+})
 
 describe('buildReportIssueUrl', () => {
   it('points at the report-automated-account issue template on the real agentscan repo', () => {
@@ -156,12 +148,7 @@ describe('buildReportIssueUrl', () => {
         flags: [
           makeFlag({
             events: [
-              makePrEvent(
-                'owner/repo1',
-                10,
-                'https://github.com/owner/repo1/pull/10',
-              ),
-              // No html_url on the raw event: falls back to repo + number.
+              makePrEvent('owner/repo1', 10),
               makePrEvent('owner/repo2', 20),
             ],
           }),

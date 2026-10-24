@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { GitHubEvent, IdentityClassification } from '@unveil/identity'
+import type { IdentityClassification } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import {
   VueUiHorizontalBar,
   type VueUiHorizontalBarDatasetItem,

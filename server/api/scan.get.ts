@@ -1,4 +1,8 @@
-import { identify, isGitHubAppAccount } from '@unveil/identity'
+import { identify } from '@unveil/identity'
+import {
+  fromGitHub,
+  isGitHubAppAccount,
+} from '@unveil/identity/providers/github'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_COUNT } from '~~/shared/scan'
 import type { Endpoints } from '@octokit/types'
@@ -110,10 +114,7 @@ export default defineEventHandler(async (event) => {
         const user = profileRes.data
         const events = eventResponses.flatMap((r) => r.data)
 
-        const analysis = identify({
-          user,
-          events,
-        })
+        const analysis = identify(fromGitHub({ user, events }))
 
         return {
           user,

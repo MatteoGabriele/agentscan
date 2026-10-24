@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { GitHubUser, IdentifyResult } from '@unveil/identity'
+import type { IdentifyResult } from '@unveil/identity'
+import type { GitHubUser } from '@unveil/identity/providers/github'
 
 const props = defineProps<{
   user: GitHubUser

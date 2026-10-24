@@ -2,9 +2,9 @@ import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
 import {
   getClassificationDetails,
-  isGitHubAppAccount,
   type IdentityClassification,
 } from '@unveil/identity'
+import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import {
   DEFAULT_CONFIG,
   parseRepoConfig,
