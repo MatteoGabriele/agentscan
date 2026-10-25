@@ -1,25 +1,33 @@
 <script setup lang="ts">
 import type { IdentityClassification } from '@unveil/identity'
+import type { ActivityUnit } from '~~/shared/types/activity'
+import { formatCompactNumber } from '~~/shared/utils/numbers'
+import { SWATCH } from '~~/shared/utils/charts'
 
 const props = defineProps<{
   label: string
   percentage: string | undefined
+  count?: number
+  unit?: ActivityUnit
   classification?: IdentityClassification
   trend?: number
 }>()
 
-// @todo: should be globally available to avoid repetition and inconsistencies
-const color = computed(() => {
-  if (props.classification === 'organic') {
-    return 'bg-ui-organic'
-  } else if (props.classification === 'automation') {
-    return 'bg-ui-automation'
-  } else if (props.classification === 'mixed') {
-    return 'bg-ui-mixed'
-  } else {
-    return 'bg-ui-muted'
-  }
-})
+const displayValue = computed(() =>
+  props.unit === 'quantity'
+    ? props.count == null
+      ? undefined
+      : formatCompactNumber(props.count)
+    : props.percentage == null
+      ? undefined
+      : `${props.percentage}%`,
+)
+
+const color = computed(() =>
+  props.classification && props.classification !== 'insufficient-data'
+    ? SWATCH[props.classification]
+    : 'bg-ui-muted',
+)
 
 const trendColor = computed(() => {
   return getTrendColor({
@@ -39,10 +47,10 @@ const trendLabel = computed(() => formatTrend(props.trend))
     <p class="text-sm">
       {{ label }}
 
-      <template v-if="percentage">
-        <span class="text-ui-muted ml-1"> {{ percentage }}% </span>
+      <template v-if="displayValue !== undefined">
+        <span class="text-ui-muted ml-1"> {{ displayValue }} </span>
 
-        <span v-if="classification" :class="trendColor">
+        <span v-if="classification" class="ml-1" :class="trendColor">
           <span :class="trendIcon" class="shrink-0 align-middle" />
           {{ trendLabel }}
         </span>
