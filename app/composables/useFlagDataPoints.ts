@@ -1,5 +1,5 @@
 // @unocss-include
-import type { FlagDataPoint } from '@unveil/identity'
+import type { FlagDataPoint } from '@unveil/identity/explain'
 
 const ICON_RULES: [string[], string][] = [
   [['branch'], 'i-lucide:git-branch'],

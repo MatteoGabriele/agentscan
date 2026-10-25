@@ -1,4 +1,4 @@
-import { getClassificationDetails } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/explain'
 import type { IdentityClassification } from '@unveil/identity'
 type ClassificationDetails = ReturnType<typeof getClassificationDetails>
 

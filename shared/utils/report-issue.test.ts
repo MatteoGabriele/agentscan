@@ -1,8 +1,15 @@
-import type { IdentifyEvent, IdentifyFlag } from '@unveil/identity'
+import type { IdentifyEvent } from '@unveil/identity'
+import type { ExplainedFlag } from '@unveil/identity/explain'
 import { describe, expect, it } from 'vitest'
 import { buildEvidenceLines, buildReportIssueUrl } from './report-issue'
 
-const makeFlag = (overrides: Partial<IdentifyFlag> = {}): IdentifyFlag => ({
+const makeFlag = (
+  overrides: Partial<
+    Pick<ExplainedFlag, 'label' | 'detail' | 'points' | 'events'>
+  > = {},
+): ExplainedFlag => ({
+  id: 'pr-volume-day',
+  facts: { prs: 10 },
   label: 'Test Flag',
   points: 10,
   group: 'pr-volume',

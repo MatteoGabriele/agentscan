@@ -1,3 +1,4 @@
+import { explain } from '@unveil/identity/explain'
 import { analyze } from '@unveil/vk'
 import * as v from 'valibot'
 
@@ -36,10 +37,15 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return analyze(formatUsername(username), {
+    const result = await analyze(formatUsername(username), {
       token: config.githubToken,
       showEvents: parsedQuery.output.show_events,
     })
+
+    return {
+      ...result,
+      analysis: explain(result.analysis),
+    }
   } catch (err: unknown) {
     const error = err as { status?: number; statusCode?: number }
     const status = error.status ?? error.statusCode

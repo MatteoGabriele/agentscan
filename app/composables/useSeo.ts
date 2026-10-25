@@ -1,4 +1,5 @@
-import { getClassificationDetails, type IdentifyResult } from '@unveil/identity'
+import type { IdentifyResult } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/explain'
 import type { GitHubUser } from '@unveil/identity/providers/github'
 
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {

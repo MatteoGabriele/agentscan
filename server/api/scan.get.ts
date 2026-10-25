@@ -1,4 +1,5 @@
 import { identify } from '@unveil/identity'
+import { explain } from '@unveil/identity/explain'
 import {
   fromGitHub,
   isGitHubAppAccount,
@@ -114,7 +115,8 @@ export default defineEventHandler(async (event) => {
         const user = profileRes.data
         const events = eventResponses.flatMap((r) => r.data)
 
-        const analysis = identify(fromGitHub({ user, events }))
+        const results = identify(fromGitHub({ user, events }))
+        const analysis = explain(results)
 
         return {
           user,

@@ -1,4 +1,5 @@
 import type { IdentifyFlag } from '@unveil/identity'
+import type { ExplainedFlag } from '@unveil/identity/explain'
 
 const REPORT_ISSUE_URL =
   'https://github.com/matteogabriele/agentscan/issues/new'
@@ -7,13 +8,13 @@ const MAX_EXAMPLE_PRS = 5
 
 type ReportIssueParams = {
   username: string
-  userId: number | undefined
-  flags: IdentifyFlag[]
+  userId: number | string | undefined
+  flags: ExplainedFlag[]
   sourceUrl: string
 }
 
 type EvidenceParams = {
-  flags: IdentifyFlag[]
+  flags: ExplainedFlag[]
   sourceUrl?: string
 }
 

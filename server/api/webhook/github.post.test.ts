@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest'
 import type { IdentifyResult } from '@unveil/identity'
-import { getClassificationDetails } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/explain'
 import type { AnalyzeReturn } from '@unveil/vk'
 import { analyze } from '@unveil/vk'
 import { parse as parseYaml } from 'yaml'
@@ -101,7 +101,12 @@ vi.mock('@octokit/webhooks', () => ({
     return mockWebhooks
   }),
 }))
-vi.mock('@unveil/identity')
+// Only the classification copy is stubbed: `explain` stays real so the flag
+// text in the comment comes from the same code that runs in production.
+vi.mock('@unveil/identity/explain', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@unveil/identity/explain')>()),
+  getClassificationDetails: vi.fn(),
+}))
 vi.mock('@unveil/vk', () => ({ analyze: vi.fn() }))
 vi.mock('yaml', () => ({ parse: vi.fn() }))
 
@@ -142,10 +147,9 @@ const MOCK_ANALYSIS: IdentifyResult = {
   },
   flags: [
     {
-      label: 'Test Flag',
+      id: 'new-account',
+      facts: { ageDays: 5 },
       points: 10,
-      detail: 'Test detail',
-      data: [],
       events: [],
       group: 'account-age',
     },
@@ -1548,7 +1552,9 @@ describe('GitHub Webhook Handler', () => {
         mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
       expect(commentCall.body).toContain('<details>')
       expect(commentCall.body).toContain('<summary>Evidence</summary>')
-      expect(commentCall.body).toContain('Test Flag: Test detail')
+      expect(commentCall.body).toContain(
+        'Recently created: Account is 5 days old',
+      )
     })
 
     it('omits the evidence section when there are no flags', async () => {

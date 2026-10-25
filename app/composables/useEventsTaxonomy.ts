@@ -18,6 +18,7 @@ export function useEventsTaxonomy(
         organic: colors.value.eventOrganicBranch,
         mixed: colors.value.eventMixedBranch,
         automation: colors.value.eventAutomationBranch,
+        'insufficient-data': undefined,
       }[classification],
     },
     DeleteEvent: {
@@ -35,6 +36,7 @@ export function useEventsTaxonomy(
         organic: colors.value.eventOrganicFork,
         mixed: colors.value.eventMixedFork,
         automation: colors.value.eventAutomationFork,
+        'insufficient-data': undefined,
       }[classification],
     },
     GollumEvent: {
@@ -64,6 +66,7 @@ export function useEventsTaxonomy(
         organic: colors.value.eventOrganicPr,
         mixed: colors.value.eventMixedPr,
         automation: colors.value.eventAutomationPr,
+        'insufficient-data': undefined,
       }[classification],
     },
     PullRequestReviewEvent: {
