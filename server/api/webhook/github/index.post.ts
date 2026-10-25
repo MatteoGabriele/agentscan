@@ -1,7 +1,7 @@
 import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
 import type { IdentityClassification } from '@unveil/identity'
-import { explain, getClassificationDetails } from '@unveil/identity/explain'
+import { getClassificationDetails } from '@unveil/identity/report'
 import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import {
   DEFAULT_CONFIG,
@@ -432,8 +432,8 @@ export default defineEventHandler(async (event) => {
       token: installation?.token,
       showEvents: true,
     })
-    const analysis = explain(result.analysis)
-    const { userId } = result
+    const analysis = result.report
+    const userId = result.user.id
 
     // A GitHub App account (`type: "Bot"`) is CI, not a contributor to judge:
     // being automated is the whole point of it. The analysis stands, it just

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { IdentifyEvent, IdentifyFlag } from '@unveil/identity'
+import type { IdentifyEvent } from '@unveil/identity'
+import type { IdentifyFlag } from '@unveil/identity/report'
 import type { GitHubEvent } from '@unveil/identity/providers/github'
 
 const props = defineProps<{

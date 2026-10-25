@@ -1,4 +1,4 @@
-import { getClassificationDetails } from '@unveil/identity/explain'
+import { getClassificationDetails } from '@unveil/identity/report'
 
 /**
  * Used instead of the classification details when the account appears on the

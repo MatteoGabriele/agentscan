@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ExplainedFlag } from '@unveil/identity/explain'
+import type { ReportFlag } from '@unveil/identity/report'
 import type { IntegrationItem } from '~~/shared/types/integrations'
 
 defineProps<{
-  flags: ExplainedFlag[]
+  flags: ReportFlag[]
   activityReport: IntegrationItem | undefined
 }>()
 </script>

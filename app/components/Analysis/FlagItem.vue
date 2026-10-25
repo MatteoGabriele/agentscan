@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ExplainedFlag } from '@unveil/identity/explain'
+import type { ReportFlag } from '@unveil/identity/report'
 
 const props = defineProps<{
-  flag: ExplainedFlag
+  flag: ReportFlag
 }>()
 
 const { parseDataPoint, groupDataPoints } = useFlagDataPoints()

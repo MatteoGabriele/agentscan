@@ -1,9 +1,5 @@
-import { identify } from '@unveil/identity'
-import { explain } from '@unveil/identity/explain'
-import {
-  fromGitHub,
-  isGitHubAppAccount,
-} from '@unveil/identity/providers/github'
+import { isGitHubAppAccount } from '@unveil/identity/providers/github'
+import { analyze } from '@unveil/vk'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_COUNT } from '~~/shared/scan'
 import type { Endpoints } from '@octokit/types'
@@ -13,7 +9,6 @@ export type AuthorAssociation =
 
 const PER_PAGE = 50
 const MAX_PAGES = 5
-const EVENT_PAGES = 3
 
 const TRUSTED_ASSOCIATIONS: AuthorAssociation[] = [
   'OWNER',
@@ -99,31 +94,16 @@ export default defineEventHandler(async (event) => {
 
     const results = await Promise.all(
       pullRequests.map(async (entry) => {
-        const [profileRes, eventResponses] = await Promise.all([
-          octokit.rest.users.getByUsername({ username: entry.login }),
-          Promise.all(
-            Array.from({ length: EVENT_PAGES }, (_, i) =>
-              octokit.rest.activity.listPublicEventsForUser({
-                username: entry.login,
-                per_page: 100,
-                page: i + 1,
-              }),
-            ),
-          ),
-        ])
-
-        const user = profileRes.data
-        const events = eventResponses.flatMap((r) => r.data)
-
-        const results = identify(fromGitHub({ user, events }))
-        const analysis = explain(results)
+        const { user, report, eventsCount } = await analyze(entry.login, {
+          token: config.githubToken,
+        })
 
         return {
           user,
-          analysis,
+          analysis: report,
           prUrl: entry.prUrl,
           prState: entry.state,
-          eventsCount: events.length,
+          eventsCount,
         }
       }),
     )
