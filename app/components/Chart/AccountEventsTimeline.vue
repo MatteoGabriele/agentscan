@@ -9,11 +9,8 @@ import { getCompleteDayRange } from '~~/shared/utils/charts'
 import type { GitHubEventType } from '~~/shared/types/identity'
 import { githubEventTypes } from '~~/shared/types/identity'
 import { useColors } from '~/composables/useColors'
-import {
-  identityConfig,
-  type IdentityClassification,
-  type GitHubEvent,
-} from '@unveil/identity'
+import { identityConfig, type ClassificationLabel } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import type { VueUiXyDatasetLineItem } from 'vue-data-ui/vue-ui-xy'
 import { useTimeoutFn } from '@vueuse/core'
 
@@ -21,7 +18,7 @@ import('vue-data-ui/style.css')
 
 const props = defineProps<{
   events: GitHubEvent[]
-  classification?: IdentityClassification
+  classification?: ClassificationLabel
 }>()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
@@ -45,7 +42,7 @@ function selectLegend(items: Array<{ color: string; name: string }>) {
 
 const eventConfig = computed(() => {
   const classification = (props.classification || 'mixed') as Exclude<
-    IdentityClassification,
+    ClassificationLabel,
     'insufficient-data'
   >
   const palette = {

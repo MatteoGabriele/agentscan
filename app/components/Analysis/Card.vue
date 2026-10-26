@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type {
-  GitHubUser,
-  IdentityClassification,
-  IdentifyResult,
-} from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
+import type { Report } from '@unveil/identity/report'
+import type { GitHubUser } from '@unveil/identity/providers/github'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
 
 const props = defineProps<{
@@ -55,8 +53,8 @@ const approvedBy = computed<string[]>(() => {
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
-const classification = computed<IdentityClassification | undefined>(() => {
-  return data.value?.analysis.classification
+const classification = computed<ClassificationLabel | undefined>(() => {
+  return data.value?.report.classification
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
@@ -74,27 +72,27 @@ const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
     username: username.value || '',
     userId: props.user.id,
-    flags: data.value?.analysis.flags ?? [],
+    flags: data.value?.report.flags ?? [],
     sourceUrl: `https://agentscan.tools/user/${username.value}`,
   })
 })
 
-const identifyAnalysis = computed<IdentifyResult | undefined>(() => {
-  return data.value?.analysis
+const identifyAnalysis = computed<Report | undefined>(() => {
+  return data.value?.report
 })
 
 const score = computed<number | undefined>(() => {
-  return data.value?.analysis.score
+  return data.value?.report.score
 })
 
 const isBountyHunter = computed<boolean>(() => {
-  return !!data.value?.analysis.isBountyHunter
+  return !!data.value?.report.isBountyHunter
 })
 
 const { nearestClassification } = useNearestClassification(score)
 
 const confidence = computed<number | undefined>(() => {
-  return data.value?.analysis.confidence
+  return data.value?.report.confidence
 })
 
 const { coverageLevel } = useDataCoverage(confidence)
@@ -273,8 +271,8 @@ useSeoAnalysis(identifyAnalysis, {
   <div class="@lg:mx-6">
     <AnalysisFlagsSkeleton v-if="status === 'pending'" />
     <LazyAnalysisFlags
-      v-else-if="data && (data.analysis.flags.length > 0 || hasActivityReport)"
-      :flags="data.analysis.flags"
+      v-else-if="data && (data.report.flags.length > 0 || hasActivityReport)"
+      :flags="data.report.flags"
       :activity-report="activityReport"
       hydrate-on-interaction
     />

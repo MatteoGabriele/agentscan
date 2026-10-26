@@ -1,5 +1,5 @@
 // @unocss-include
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import { SVG_ICON } from '~~/shared/utils/charts'
 
 export type Landmark = {
@@ -8,7 +8,7 @@ export type Landmark = {
   description: string
   icon: string
   iconSvg: string
-  series?: IdentityClassification
+  series?: ClassificationLabel
   offsetY?: number
 }
 

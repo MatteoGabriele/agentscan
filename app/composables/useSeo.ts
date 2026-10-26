@@ -1,8 +1,5 @@
-import {
-  getClassificationDetails,
-  type GitHubUser,
-  type IdentifyResult,
-} from '@unveil/identity'
+import { getClassificationDetails, type Report } from '@unveil/identity/report'
+import type { GitHubUser } from '@unveil/identity/providers/github'
 
 export function useSeoUser(user: MaybeRefOrGetter<GitHubUser | undefined>) {
   const ogTitle = computed<string | undefined>(() => {
@@ -50,7 +47,7 @@ export type UseSeoAnalysisOptions = {
 }
 
 export function useSeoAnalysis(
-  analysis: MaybeRefOrGetter<IdentifyResult | undefined>,
+  analysis: MaybeRefOrGetter<Report | undefined>,
   options?: UseSeoAnalysisOptions,
 ) {
   const ogDescription = computed(() => {

@@ -1,7 +1,11 @@
 import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest'
-import type { IdentifyResult } from '@unveil/identity'
-import { getClassificationDetails } from '@unveil/identity'
-import type { AnalyzeReturn } from '@unveil/vk'
+import {
+  describeFlag,
+  getClassificationDetails,
+  type Flag,
+  type Report,
+} from '@unveil/identity/report'
+import type { AnalyzeReturn, GitHubUser } from '@unveil/vk'
 import { analyze } from '@unveil/vk'
 import { parse as parseYaml } from 'yaml'
 import handler from './github/index.post.ts'
@@ -101,7 +105,12 @@ vi.mock('@octokit/webhooks', () => ({
     return mockWebhooks
   }),
 }))
-vi.mock('@unveil/identity')
+// Only the classification copy is stubbed: `describeFlag` stays real so the
+// flag text in the comment comes from the same code that runs in production.
+vi.mock('@unveil/identity/report', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@unveil/identity/report')>()),
+  getClassificationDetails: vi.fn(),
+}))
 vi.mock('@unveil/vk', () => ({ analyze: vi.fn() }))
 vi.mock('yaml', () => ({ parse: vi.fn() }))
 
@@ -124,7 +133,15 @@ const BASE_PAYLOAD = {
   repository: { owner: { login: 'test-owner' }, name: 'test-repo' },
 }
 
-const MOCK_ANALYSIS: IdentifyResult = {
+const MOCK_FLAG: Flag = {
+  id: 'new-account',
+  facts: { ageDays: 5 },
+  points: 10,
+  events: [],
+  group: 'account-age',
+}
+
+const MOCK_ANALYSIS: Report = {
   classification: 'organic',
   score: 20,
   confidence: 0.1,
@@ -140,22 +157,18 @@ const MOCK_ANALYSIS: IdentifyResult = {
     lastEventAt: null,
     saturated: false,
   },
-  flags: [
-    {
-      label: 'Test Flag',
-      points: 10,
-      detail: 'Test detail',
-      data: [],
-      events: [],
-      group: 'account-age',
-    },
-  ],
+  flags: [{ ...MOCK_FLAG, ...describeFlag(MOCK_FLAG) }],
   isBountyHunter: false,
   isGitHubApp: false,
   profile: { age: 365, repos: 0 },
 }
 
-const MOCK_USER_ID = 4242
+const MOCK_USER: GitHubUser = {
+  id: 4242,
+  login: 'test-user',
+  created_at: '2024-01-01T00:00:00Z',
+  public_repos: 0,
+}
 
 const MOCK_EVENT = {} satisfies H3Event<EventHandlerRequest>
 
@@ -174,12 +187,12 @@ function setupEvent(
   })
 }
 
-function mockAnalysis(analysis: IdentifyResult) {
+function mockAnalysis(report: Report) {
   vi.mocked(analyze).mockResolvedValue({
-    analysis,
+    report,
     events: [],
     eventsCount: 0,
-    userId: MOCK_USER_ID,
+    user: MOCK_USER,
   })
 }
 
@@ -1548,7 +1561,9 @@ describe('GitHub Webhook Handler', () => {
         mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
       expect(commentCall.body).toContain('<details>')
       expect(commentCall.body).toContain('<summary>Evidence</summary>')
-      expect(commentCall.body).toContain('Test Flag: Test detail')
+      expect(commentCall.body).toContain(
+        'Recently created: Account is 5 days old',
+      )
     })
 
     it('omits the evidence section when there are no flags', async () => {
@@ -1837,10 +1852,10 @@ describe('GitHub Webhook Handler', () => {
       // Let the handler run its cleanup before handing the clock back, so no
       // in-flight work leaks into the next test.
       resolveAnalysis({
-        analysis: MOCK_ANALYSIS,
+        report: MOCK_ANALYSIS,
         events: [],
         eventsCount: 0,
-        userId: MOCK_USER_ID,
+        user: MOCK_USER,
       })
       await pending
 

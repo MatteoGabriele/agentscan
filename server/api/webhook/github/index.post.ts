@@ -1,10 +1,8 @@
 import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
-import {
-  getClassificationDetails,
-  isGitHubAppAccount,
-  type IdentityClassification,
-} from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/report'
+import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import {
   DEFAULT_CONFIG,
   parseRepoConfig,
@@ -47,7 +45,7 @@ type AutomationListItem = {
 }
 
 type LabelMap = Record<
-  Exclude<IdentityClassification, 'organic' | 'insufficient-data'>,
+  Exclude<ClassificationLabel, 'organic' | 'insufficient-data'>,
   string
 >
 
@@ -430,10 +428,12 @@ export default defineEventHandler(async (event) => {
       type: 'installation',
     })) as OctokitAuthInstall
 
-    const { analysis, userId } = await analyze(username, {
+    const result = await analyze(username, {
       token: installation?.token,
       showEvents: true,
     })
+    const analysis = result.report
+    const userId = result.user.id
 
     // A GitHub App account (`type: "Bot"`) is CI, not a contributor to judge:
     // being automated is the whole point of it. The analysis stands, it just

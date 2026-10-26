@@ -1,4 +1,4 @@
-import type { IdentifyFlag } from '@unveil/identity'
+import type { Flag, ReportFlag } from '@unveil/identity/report'
 
 const REPORT_ISSUE_URL =
   'https://github.com/matteogabriele/agentscan/issues/new'
@@ -7,13 +7,13 @@ const MAX_EXAMPLE_PRS = 5
 
 type ReportIssueParams = {
   username: string
-  userId: number | undefined
-  flags: IdentifyFlag[]
+  userId: number | string | undefined
+  flags: ReportFlag[]
   sourceUrl: string
 }
 
 type EvidenceParams = {
-  flags: IdentifyFlag[]
+  flags: ReportFlag[]
   sourceUrl?: string
 }
 
@@ -37,11 +37,11 @@ function withoutBacklink(url: string): string {
 }
 
 /**
- * Flags carry the raw GitHub events that triggered them. Pull a handful of the
- * actual PRs behind a "PR volume"/"fork→PR pattern" style flag so a reviewer has
- * concrete examples to look at, instead of just the aggregate detail string.
+ * Flags carry the events that triggered them. Pull a handful of the actual PRs
+ * behind a "PR volume"/"fork→PR pattern" style flag so a reviewer has concrete
+ * examples to look at, instead of just the aggregate detail string.
  */
-function extractExamplePrUrls(flags: IdentifyFlag[], limit: number): string[] {
+function extractExamplePrUrls(flags: Flag[], limit: number): string[] {
   const urls = new Set<string>()
 
   for (const flag of flags) {
@@ -49,21 +49,17 @@ function extractExamplePrUrls(flags: IdentifyFlag[], limit: number): string[] {
       if (urls.size >= limit) {
         break
       }
-      if (event.type !== 'PullRequestEvent') {
+
+      const number = event.pullRequest?.number
+      if (
+        event.type !== 'pull-request' ||
+        !event.repo ||
+        number === undefined
+      ) {
         continue
       }
 
-      const pr = event.payload?.pull_request as
-        { html_url?: string; number?: number } | undefined
-      const url =
-        pr?.html_url ??
-        (event.repo?.name && pr?.number !== undefined
-          ? `https://github.com/${event.repo.name}/pull/${pr.number}`
-          : undefined)
-
-      if (url) {
-        urls.add(url)
-      }
+      urls.add(`https://github.com/${event.repo}/pull/${number}`)
     }
   }
 

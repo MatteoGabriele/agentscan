@@ -36,10 +36,12 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return analyze(formatUsername(username), {
+    const analysis = await analyze(formatUsername(username), {
       token: config.githubToken,
       showEvents: parsedQuery.output.show_events,
     })
+
+    return analysis
   } catch (err: unknown) {
     const error = err as { status?: number; statusCode?: number }
     const status = error.status ?? error.statusCode

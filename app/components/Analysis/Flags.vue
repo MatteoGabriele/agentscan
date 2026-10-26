@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { IdentifyFlag } from '@unveil/identity'
+import type { ReportFlag } from '@unveil/identity/report'
 import type { IntegrationItem } from '~~/shared/types/integrations'
 
 defineProps<{
-  flags: IdentifyFlag[]
+  flags: ReportFlag[]
   activityReport: IntegrationItem | undefined
 }>()
 </script>
@@ -18,7 +18,7 @@ defineProps<{
     </header>
 
     <ul v-if="flags.length" class="mt-1">
-      <AnalysisFlagItem v-for="flag in flags" :key="flag.label" :flag="flag" />
+      <AnalysisFlagItem v-for="flag in flags" :key="flag.id" :flag="flag" />
     </ul>
 
     <LazyExternalAnlysisCard

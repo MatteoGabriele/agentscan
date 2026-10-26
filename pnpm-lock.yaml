@@ -45,14 +45,14 @@ importers:
         specifier: ^66.10.0
         version: 66.10.0
       '@unveil/identity':
-        specifier: 2.1.1
-        version: 2.1.1
+        specifier: 3.0.0
+        version: 3.0.0
       '@unveil/interlinked':
         specifier: ^0.0.11
         version: 0.0.11
       '@unveil/vk':
-        specifier: ^0.6.0
-        version: 0.6.0(@unveil/identity@2.1.1)
+        specifier: 1.0.0
+        version: 1.0.0(@unveil/identity@3.0.0)
       '@vueuse/core':
         specifier: ^14.4.0
         version: 14.4.0(vue@3.5.35(typescript@6.0.3))
@@ -2707,16 +2707,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@unveil/identity@2.1.1':
-    resolution: {integrity: sha512-1HRYDDuNOu9LWRHQARC9idNumvSga5xBtTkolYGuFTX9+Ie3JAJNDeY4OidjzieVVoGdEem1NINgSDZH1ZkN5g==}
+  '@unveil/identity@3.0.0':
+    resolution: {integrity: sha512-K12WL5AS7s9FXiY46TCZIMS/Y9RCU0DISs9K2G4ZkOCN3K9E4axG1XrNGYw6G6SrmRtWnZT3kPO+hFnYE055Dw==}
 
   '@unveil/interlinked@0.0.11':
     resolution: {integrity: sha512-FkvSiCCFmRXpce8ACvnarYnbWKTi2CxXaasui1jB1GCuRXLdluWOLs8OLeDZQHWTZ4nOx3hHrMvyiRQv2cHd9A==}
 
-  '@unveil/vk@0.6.0':
-    resolution: {integrity: sha512-G/uX3QdnPCGsBPxTrBZJ86JaBy3qeGKtijk2SPKx5Gro7NbYu2+PyNMZ+Or5JJQIxR389CpH0gf0tN+S1Sdhmg==}
+  '@unveil/vk@1.0.0':
+    resolution: {integrity: sha512-/vVWcDJg8ZCun46eZseK8nHUit6Yd1tbgD2ydRXNNEqasGh9cAS00l9QkFdNIL2gy0HF3akbrCTIsftXTNw2Zw==}
     peerDependencies:
-      '@unveil/identity': ^2.0.4
+      '@unveil/identity': ^3.0.0
 
   '@valibot/to-json-schema@1.7.1':
     resolution: {integrity: sha512-3qkmU6KXWh8GIThEAW3kuRHPQBMjWkKy+Ppz3WkUucx53DTpOa6siMn4xDGSOhlVyMrDaJTCTMLYPZVAIk1P0A==}
@@ -9445,13 +9445,13 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@unveil/identity@2.1.1': {}
+  '@unveil/identity@3.0.0': {}
 
   '@unveil/interlinked@0.0.11': {}
 
-  '@unveil/vk@0.6.0(@unveil/identity@2.1.1)':
+  '@unveil/vk@1.0.0(@unveil/identity@3.0.0)':
     dependencies:
-      '@unveil/identity': 2.1.1
+      '@unveil/identity': 3.0.0
 
   '@valibot/to-json-schema@1.7.1(valibot@1.4.2(typescript@6.0.3))':
     dependencies:

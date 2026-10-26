@@ -1,5 +1,5 @@
 // @unocss-include
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 
 type ScoreStyle = {
   text: string
@@ -41,7 +41,7 @@ const insufficient = {
 }
 
 export function useScoreStyle(
-  classification: MaybeRefOrGetter<IdentityClassification | undefined>,
+  classification: MaybeRefOrGetter<ClassificationLabel | undefined>,
   options?: MaybeRefOrGetter<UseScoreStyleOptions>,
 ): UseScoreStyle {
   const scoreStyle = computed<ScoreStyle>(() => {
