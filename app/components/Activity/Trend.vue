@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import type { ActivityUnit } from '~~/shared/types/activity'
 import { formatCompactNumber } from '~~/shared/utils/numbers'
 import { SWATCH } from '~~/shared/utils/charts'
@@ -9,7 +9,7 @@ const props = defineProps<{
   percentage: string | undefined
   count?: number
   unit?: ActivityUnit
-  classification?: IdentityClassification
+  classification?: ClassificationLabel
   trend?: number
 }>()
 

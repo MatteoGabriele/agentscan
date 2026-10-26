@@ -1,4 +1,4 @@
-import type { IdentifyFlag, ReportFlag } from '@unveil/identity/report'
+import type { Flag, ReportFlag } from '@unveil/identity/report'
 
 const REPORT_ISSUE_URL =
   'https://github.com/matteogabriele/agentscan/issues/new'
@@ -41,7 +41,7 @@ function withoutBacklink(url: string): string {
  * behind a "PR volume"/"fork→PR pattern" style flag so a reviewer has concrete
  * examples to look at, instead of just the aggregate detail string.
  */
-function extractExamplePrUrls(flags: IdentifyFlag[], limit: number): string[] {
+function extractExamplePrUrls(flags: Flag[], limit: number): string[] {
   const urls = new Set<string>()
 
   for (const flag of flags) {

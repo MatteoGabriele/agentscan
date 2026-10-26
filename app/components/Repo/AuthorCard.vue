@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { IdentifyResult } from '@unveil/identity'
+import type { Report } from '@unveil/identity/report'
 import type { GitHubUser } from '@unveil/identity/providers/github'
 
 const props = defineProps<{
   user: GitHubUser
   prUrl: string
   prState: string
-  analysis: IdentifyResult
+  analysis: Report
 }>()
 
 const prLabel = computed<string>(() => {

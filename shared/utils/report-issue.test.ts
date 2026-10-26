@@ -1,4 +1,4 @@
-import type { IdentifyEvent } from '@unveil/identity'
+import type { ActivityEvent } from '@unveil/identity'
 import type { ReportFlag } from '@unveil/identity/report'
 import { describe, expect, it } from 'vitest'
 import { buildEvidenceLines, buildReportIssueUrl } from './report-issue'
@@ -19,7 +19,7 @@ const makeFlag = (
   ...overrides,
 })
 
-const makePrEvent = (repo: string, number: number): IdentifyEvent => ({
+const makePrEvent = (repo: string, number: number): ActivityEvent => ({
   type: 'pull-request',
   at: '2026-01-01T00:00:00Z',
   repo,

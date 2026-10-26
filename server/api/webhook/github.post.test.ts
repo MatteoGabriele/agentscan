@@ -2,8 +2,8 @@ import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest'
 import {
   describeFlag,
   getClassificationDetails,
-  type IdentifyFlag,
-  type IdentityReport,
+  type Flag,
+  type Report,
 } from '@unveil/identity/report'
 import type { AnalyzeReturn, GitHubUser } from '@unveil/vk'
 import { analyze } from '@unveil/vk'
@@ -133,7 +133,7 @@ const BASE_PAYLOAD = {
   repository: { owner: { login: 'test-owner' }, name: 'test-repo' },
 }
 
-const MOCK_FLAG: IdentifyFlag = {
+const MOCK_FLAG: Flag = {
   id: 'new-account',
   facts: { ageDays: 5 },
   points: 10,
@@ -141,7 +141,7 @@ const MOCK_FLAG: IdentifyFlag = {
   group: 'account-age',
 }
 
-const MOCK_ANALYSIS: IdentityReport = {
+const MOCK_ANALYSIS: Report = {
   classification: 'organic',
   score: 20,
   confidence: 0.1,
@@ -187,7 +187,7 @@ function setupEvent(
   })
 }
 
-function mockAnalysis(report: IdentityReport) {
+function mockAnalysis(report: Report) {
   vi.mocked(analyze).mockResolvedValue({
     report,
     events: [],

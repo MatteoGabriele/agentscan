@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { IdentifyEvent } from '@unveil/identity'
-import type { IdentifyFlag } from '@unveil/identity/report'
+import type { ActivityEvent } from '@unveil/identity'
+import type { Flag } from '@unveil/identity/report'
 import type { GitHubEvent } from '@unveil/identity/providers/github'
 
 const props = defineProps<{
-  flag: IdentifyFlag
+  flag: Flag
 }>()
 
 // Flag events are provider-neutral; the raw GitHub event they came from is
 // kept on `source`, which is what the links and descriptions below read.
-function toGitHubEvent(event: IdentifyEvent): GitHubEvent | undefined {
+function toGitHubEvent(event: ActivityEvent): GitHubEvent | undefined {
   return event.source as GitHubEvent | undefined
 }
 

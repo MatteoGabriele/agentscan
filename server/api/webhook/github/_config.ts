@@ -1,4 +1,4 @@
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
 
 export type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
@@ -18,7 +18,7 @@ export type RepoConfig = {
   'allowed-users': string[]
   'trusted-author-associations': AuthorAssociation[]
   'auto-close': boolean
-  'auto-close-classifications': IdentityClassification[]
+  'auto-close-classifications': ClassificationLabel[]
   honeypot: boolean
   mode: ScanMode
   'comment-on-organic': boolean

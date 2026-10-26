@@ -730,9 +730,9 @@ function formatPercentage(value?: number | null) {
       class="mt-4 text-center"
     >
       <button
-        @click="showMore = !showMore"
         type="button"
         class="text-sm text-ui-muted hover:bg-ui-border/15 hover:text-ui-text"
+        @click="showMore = !showMore"
       >
         {{ showMoreOrLessLabel }}
       </button>

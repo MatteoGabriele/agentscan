@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import type { GitHubEvent } from '@unveil/identity/providers/github'
 import {
   VueUiHorizontalBar,
@@ -12,7 +12,7 @@ import('vue-data-ui/style.css')
 
 const props = defineProps<{
   events: GitHubEvent[]
-  classification?: IdentityClassification
+  classification?: ClassificationLabel
 }>()
 
 const rootEl = shallowRef<HTMLElement | null>(null)

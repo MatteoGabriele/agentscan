@@ -1,6 +1,6 @@
 import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import { getClassificationDetails } from '@unveil/identity/report'
 import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import {
@@ -45,7 +45,7 @@ type AutomationListItem = {
 }
 
 type LabelMap = Record<
-  Exclude<IdentityClassification, 'organic' | 'insufficient-data'>,
+  Exclude<ClassificationLabel, 'organic' | 'insufficient-data'>,
   string
 >
 

@@ -1,8 +1,8 @@
 // @unocss-include
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 
 export function useClassificationIcons(
-  classification: MaybeRefOrGetter<IdentityClassification | undefined>,
+  classification: MaybeRefOrGetter<ClassificationLabel | undefined>,
 ) {
   const classificationIcon = computed<string>(() => {
     const classificationValue = toValue(classification)

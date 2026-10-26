@@ -45,14 +45,14 @@ importers:
         specifier: ^66.10.0
         version: 66.10.0
       '@unveil/identity':
-        specifier: 3.0.0-beta.4
-        version: 3.0.0-beta.4
+        specifier: 3.0.0-beta.5
+        version: 3.0.0-beta.5
       '@unveil/interlinked':
         specifier: ^0.0.11
         version: 0.0.11
       '@unveil/vk':
-        specifier: 1.0.0-beta.5
-        version: 1.0.0-beta.5(@unveil/identity@3.0.0-beta.4)
+        specifier: 1.0.0-beta.6
+        version: 1.0.0-beta.6(@unveil/identity@3.0.0-beta.5)
       '@vueuse/core':
         specifier: ^14.4.0
         version: 14.4.0(vue@3.5.35(typescript@6.0.3))
@@ -2707,16 +2707,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@unveil/identity@3.0.0-beta.4':
-    resolution: {integrity: sha512-gwXh7A+9PGE23Zll4iNOzvnmyr4ZrgSORPuHFXRAK+ekBKL0lBMo+xpPiqzalp6Wnmf5bRxBi5mqjcAvc17djw==}
+  '@unveil/identity@3.0.0-beta.5':
+    resolution: {integrity: sha512-i3wwDvM33LxTXyphlTbd11NL9HObFYw6SIfbBqWSUCMIxvd7swzamlHuNdSmUCfJzoMGm0n7Rdpe2SkMsKRmIw==}
 
   '@unveil/interlinked@0.0.11':
     resolution: {integrity: sha512-FkvSiCCFmRXpce8ACvnarYnbWKTi2CxXaasui1jB1GCuRXLdluWOLs8OLeDZQHWTZ4nOx3hHrMvyiRQv2cHd9A==}
 
-  '@unveil/vk@1.0.0-beta.5':
-    resolution: {integrity: sha512-rDhN+SCBRhOrGS8wbbkvApJVtQraiQvDKzuYtcmpAZ1lY1GRahc0vL7ZUFV3utGncjaXiStKG4u75XKwrv85ig==}
+  '@unveil/vk@1.0.0-beta.6':
+    resolution: {integrity: sha512-+QDZoIN/+ugIePI65RD9m5oBgkset55EmGcE1lYHLtC9H/9lznYIDi13eWuBYT5Su93WcW/BYdu+YhaBm6xmGg==}
     peerDependencies:
-      '@unveil/identity': ^3.0.0-beta.4
+      '@unveil/identity': ^3.0.0-beta.5
 
   '@valibot/to-json-schema@1.7.1':
     resolution: {integrity: sha512-3qkmU6KXWh8GIThEAW3kuRHPQBMjWkKy+Ppz3WkUucx53DTpOa6siMn4xDGSOhlVyMrDaJTCTMLYPZVAIk1P0A==}
@@ -9445,13 +9445,13 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@unveil/identity@3.0.0-beta.4': {}
+  '@unveil/identity@3.0.0-beta.5': {}
 
   '@unveil/interlinked@0.0.11': {}
 
-  '@unveil/vk@1.0.0-beta.5(@unveil/identity@3.0.0-beta.4)':
+  '@unveil/vk@1.0.0-beta.6(@unveil/identity@3.0.0-beta.5)':
     dependencies:
-      '@unveil/identity': 3.0.0-beta.4
+      '@unveil/identity': 3.0.0-beta.5
 
   '@valibot/to-json-schema@1.7.1(valibot@1.4.2(typescript@6.0.3))':
     dependencies:

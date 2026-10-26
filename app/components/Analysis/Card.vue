@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { IdentityClassification } from '@unveil/identity'
-import type { IdentityReport } from '@unveil/identity/report'
+import type { ClassificationLabel } from '@unveil/identity'
+import type { Report } from '@unveil/identity/report'
 import type { GitHubUser } from '@unveil/identity/providers/github'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
 
@@ -53,7 +53,7 @@ const approvedBy = computed<string[]>(() => {
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
-const classification = computed<IdentityClassification | undefined>(() => {
+const classification = computed<ClassificationLabel | undefined>(() => {
   return data.value?.report.classification
 })
 
@@ -77,7 +77,7 @@ const flagAccountUrl = computed<string>(() => {
   })
 })
 
-const identifyAnalysis = computed<IdentityReport | undefined>(() => {
+const identifyAnalysis = computed<Report | undefined>(() => {
   return data.value?.report
 })
 
