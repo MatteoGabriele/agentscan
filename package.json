@@ -49,7 +49,7 @@
     "@unveil/vk": "1.0.0",
     "@vueuse/core": "^14.4.0",
     "dayjs": "^1.11.19",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.2",
     "octokit": "^5.0.5",
     "simple-analytics-vue": "^3.1.0",
     "tiptap-markdown": "^0.9.0",
