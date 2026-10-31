@@ -125,12 +125,45 @@ onBeforeUnmount(() => {
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
-        <LazyMainMenuItem
-          class="text-xl"
-          to="/app"
-          label="Install AgentScan"
-          @click="trackEvent('get_agentscan_clicked')"
-        />
+        <div class="flex flex-col items-center gap-3">
+          <p
+            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+          >
+            Install AgentScan
+          </p>
+          <ul class="flex flex-col items-center gap-3">
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/app"
+                label="GitHub App"
+                @click="
+                  trackEvent('get_agentscan_clicked', { item: 'GitHub App' })
+                "
+              />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="https://github.com/marketplace/actions/agentscan"
+                label="GitHub Action"
+                @click="
+                  trackEvent('get_agentscan_clicked', { item: 'GitHub Action' })
+                "
+              />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/app#configure"
+                label="Configure"
+                @click="
+                  trackEvent('get_agentscan_clicked', { item: 'Configure' })
+                "
+              />
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -54,6 +54,27 @@ const communityItems: MenuDropdownItem[] = [
     icon: 'i-lucide:heart-handshake',
   },
 ]
+
+const installItems: MenuDropdownItem[] = [
+  {
+    to: '/app',
+    label: 'GitHub App',
+    description: 'Install on your repositories, no setup needed',
+    icon: 'i-lucide:github',
+  },
+  {
+    to: 'https://github.com/marketplace/actions/agentscan',
+    label: 'GitHub Action',
+    description: 'Run it in your own workflow',
+    icon: 'i-lucide:workflow',
+  },
+  {
+    to: '/app#configure',
+    label: 'Configure',
+    description: 'Labels, comments, auto-close and trusted users',
+    icon: 'i-lucide:settings-2',
+  },
+]
 </script>
 
 <template>
@@ -78,10 +99,13 @@ const communityItems: MenuDropdownItem[] = [
         </li>
         <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
         <li>
-          <LazyMainMenuItem
-            to="/app"
+          <LazyMainMenuDropdown
             label="Install AgentScan"
-            @click="trackEvent('get_agentscan_clicked')"
+            :items="installItems"
+            @select="
+              (item) =>
+                trackEvent('get_agentscan_clicked', { item: item.label })
+            "
           />
         </li>
       </ul>

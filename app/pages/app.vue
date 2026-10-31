@@ -98,8 +98,9 @@ const { trackEvent } = useSaEvent()
     </template>
 
     <section
+      id="configure"
       ref="configGenerator"
-      class="flex items-center py-12 border-t border-ui-border-subtle/60 w-full"
+      class="flex items-center py-12 border-t border-ui-border-subtle/60 w-full scroll-mt-15"
     >
       <div class="w-full max-w-5xl text-left mx-auto px-4 sm:px-6">
         <header class="mb-8 max-w-2xl">
