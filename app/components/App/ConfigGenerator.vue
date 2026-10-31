@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { stringify } from 'yaml'
 import { useClipboard } from '@vueuse/core'
+import type { ActionReleasesResponse } from '~~/shared/types/action-release'
 import {
   buildDefaultFirstTimeHoneypotGreeting,
   buildDefaultHoneypotGreeting,
   getDefaultMessages,
 } from '~~/shared/utils/agentscan-messages'
+import {
+  AUTO_CLOSE_OPTIONS,
+  buildActionWorkflow,
+  buildAppConfig,
+  CUSTOMIZABLE_MESSAGES,
+  DEFAULT_AUTO_CLOSE_CLASSIFICATIONS,
+  DEFAULT_LABELS,
+  type AuthorAssociation,
+  type Classification,
+  type ConfigSettings,
+  type LabelledClassification,
+  type Platform,
+  type ScanMode,
+} from '~~/shared/utils/agentscan-config'
 
-type ScanMode = 'full' | 'comment' | 'labels' | 'silent'
-type AuthorAssociation =
-  | 'collaborator'
-  | 'contributor'
-  | 'first_timer'
-  | 'first_time_contributor'
-  | 'member'
-  | 'owner'
-// A community flag is a state of the account rather than an analysis result,
-// but it replaces the result's title, comment and label, so the form treats it
-// as one.
-type Classification =
-  'organic' | 'mixed' | 'automation' | 'community-flagged' | 'insufficient-data'
-type LabelledClassification = 'mixed' | 'automation' | 'community-flagged'
+const platforms: { value: Platform; label: string; icon: string }[] = [
+  { value: 'app', label: 'GitHub App', icon: 'i-lucide:github' },
+  { value: 'action', label: 'GitHub Action', icon: 'i-lucide:workflow' },
+]
 
 const modes: { value: ScanMode; label: string; hint: string }[] = [
   {
@@ -78,25 +82,22 @@ const defaultMessages = getDefaultMessages()
 
 const classificationInfo: Record<
   Classification,
-  { label: string; when: string; dot: string; defaultLabel?: string }
+  { label: string; when: string; dot: string }
 > = {
   automation: {
     label: 'Automation',
     when: 'The account’s activity looks automated.',
     dot: 'bg-ui-automation',
-    defaultLabel: 'agentscan:automation-signals',
   },
   mixed: {
     label: 'Mixed',
     when: 'Some activity looks automated, some looks human.',
     dot: 'bg-ui-mixed',
-    defaultLabel: 'agentscan:mixed-signals',
   },
   'community-flagged': {
     label: 'Community-flagged',
     when: 'The account is on the community list of verified automated accounts. This replaces the analysis result.',
     dot: 'bg-ui-destructive',
-    defaultLabel: 'agentscan:community-flagged',
   },
   organic: {
     label: 'Organic',
@@ -123,21 +124,13 @@ const classifications = tabOrder.map((value) => ({
   ...classificationInfo[value],
 }))
 
-// What `auto-close-classifications` accepts. Community-flagged accounts are not
-// in it: the app closes them whenever auto-close is on.
-const autoCloseOptions = classifications.filter(
-  (item) =>
-    item.value === 'organic' ||
-    item.value === 'mixed' ||
-    item.value === 'automation',
-)
-
-const defaultAutoCloseClassifications: Classification[] = ['automation']
-
-function sameMembers<T>(a: T[], b: T[]): boolean {
-  return a.length === b.length && a.every((item) => b.includes(item))
+function isLabelled(
+  classification: Classification,
+): classification is LabelledClassification {
+  return classification in DEFAULT_LABELS.app
 }
 
+const platform = ref<Platform>('app')
 const mode = ref<ScanMode>('full')
 const scanPullRequests = ref(true)
 const scanIssues = ref(false)
@@ -147,15 +140,36 @@ const trustedAuthorAssociations = ref<AuthorAssociation[]>([])
 const commentOnOrganic = ref(false)
 const autoClose = ref(false)
 const autoCloseClassifications = ref<Classification[]>([
-  ...defaultAutoCloseClassifications,
+  ...DEFAULT_AUTO_CLOSE_CLASSIFICATIONS,
 ])
 const honeypot = ref(false)
+const cache = ref(false)
 
-const labels = reactive<Record<LabelledClassification, string>>({
-  mixed: 'agentscan:mixed-signals',
-  automation: 'agentscan:automation-signals',
-  'community-flagged': 'agentscan:community-flagged',
+const labels = reactive({ ...DEFAULT_LABELS.app })
+
+// The platforms disagree on some default labels. A label still on the old
+// default follows the switch, so it doesn't turn into a customization.
+watch(platform, (current, previous) => {
+  for (const key of Object.keys(labels) as LabelledClassification[]) {
+    if (labels[key] === DEFAULT_LABELS[previous][key]) {
+      labels[key] = DEFAULT_LABELS[current][key]
+    }
+  }
 })
+
+// Community-flagged accounts are not in `auto-close-classifications`: both
+// platforms close them whenever auto-close is on.
+const autoCloseOptions = computed(() =>
+  classifications.filter((item) =>
+    AUTO_CLOSE_OPTIONS[platform.value].includes(item.value),
+  ),
+)
+
+const pickedAutoCloseOptions = computed(() =>
+  autoCloseOptions.value.filter((item) =>
+    autoCloseClassifications.value.includes(item.value),
+  ),
+)
 
 const messages = reactive<Record<Classification, string>>({
   organic: '',
@@ -177,13 +191,23 @@ const addsLabels = computed(
 
 const activeTab = ref<Classification>('automation')
 const activeClassification = computed(() => classificationInfo[activeTab.value])
+const activeLabel = computed(() =>
+  isLabelled(activeTab.value) ? activeTab.value : null,
+)
+const isActiveMessageCustomizable = computed(() =>
+  CUSTOMIZABLE_MESSAGES[platform.value].includes(activeTab.value),
+)
 const tabsId = useId()
 
-function isCustomized(item: (typeof classifications)[number]) {
-  const label = labels[item.value as LabelledClassification]
+function isCustomized(classification: Classification) {
+  const hasCustomMessage =
+    messages[classification] !== '' &&
+    CUSTOMIZABLE_MESSAGES[platform.value].includes(classification)
+
   return (
-    messages[item.value] !== '' ||
-    (item.defaultLabel !== undefined && label !== item.defaultLabel)
+    hasCustomMessage ||
+    (isLabelled(classification) &&
+      labels[classification] !== DEFAULT_LABELS[platform.value][classification])
   )
 }
 
@@ -232,84 +256,58 @@ function removeLastAllowedUser() {
   }
 }
 
-const yaml = computed(() => {
-  const config: Record<string, unknown> = { version: 1 }
+const settings = computed<ConfigSettings>(() => ({
+  mode: mode.value,
+  scanPullRequests: scanPullRequests.value,
+  scanIssues: scanIssues.value,
+  allowedUsers: allowedUsersList.value,
+  trustedAuthorAssociations: trustedAuthorAssociations.value,
+  commentOnOrganic: commentOnOrganic.value,
+  autoClose: autoClose.value,
+  autoCloseClassifications: autoCloseClassifications.value,
+  honeypot: honeypot.value,
+  cache: cache.value,
+  labels,
+  messages,
+  messageHoneypot: messageHoneypot.value,
+  messageHoneypotFirstTime: messageHoneypotFirstTime.value,
+}))
 
-  const scan: Record<string, boolean> = {}
-  if (!scanPullRequests.value) {
-    scan['pull-requests'] = false
-  }
-  if (scanIssues.value) {
-    scan.issues = true
-  }
-  if (Object.keys(scan).length > 0) {
-    config.scan = scan
-  }
-
-  if (allowedUsersList.value.length > 0) {
-    config['allowed-users'] = allowedUsersList.value
-  }
-
-  if (trustedAuthorAssociations.value.length > 0) {
-    config['trusted-author-associations'] = trustedAuthorAssociations.value
-  }
-
-  if (commentOnOrganic.value) {
-    config['comment-on-organic'] = true
-  }
-
-  if (autoClose.value) {
-    config['auto-close'] = true
-
-    if (
-      !sameMembers(
-        autoCloseClassifications.value,
-        defaultAutoCloseClassifications,
-      )
-    ) {
-      config['auto-close-classifications'] = autoCloseClassifications.value
-    }
-  }
-
-  if (honeypot.value) {
-    config.honeypot = true
-  }
-
-  if (mode.value !== 'full') {
-    config.mode = mode.value
-  }
-
-  const customLabels: Record<string, string> = {}
-  for (const item of classifications) {
-    const label = labels[item.value as LabelledClassification]
-    if (item.defaultLabel !== undefined && label !== item.defaultLabel) {
-      customLabels[item.value] = label
-    }
-  }
-  if (Object.keys(customLabels).length > 0) {
-    config.labels = customLabels
-  }
-
-  const customMessages: Record<string, string> = {}
-  for (const item of classifications) {
-    if (messages[item.value]) {
-      customMessages[item.value] = messages[item.value]
-    }
-  }
-  if (honeypot.value && messageHoneypot.value) {
-    customMessages.honeypot = messageHoneypot.value
-  }
-  if (honeypot.value && messageHoneypotFirstTime.value) {
-    customMessages['honeypot-first-time'] = messageHoneypotFirstTime.value
-  }
-  if (Object.keys(customMessages).length > 0) {
-    config.messages = customMessages
-  }
-
-  return stringify(config, { lineWidth: 0 })
+// Only needed once someone asks for a workflow: it pins the latest releases.
+const {
+  data: releases,
+  status: releasesStatus,
+  execute: fetchReleases,
+} = useLazyFetch<ActionReleasesResponse>('/api/action-releases', {
+  immediate: false,
+  server: false,
 })
 
-const isDefaultConfig = computed(() => yaml.value.trim() === 'version: 1')
+watch(platform, (current) => {
+  if (current === 'action' && releasesStatus.value === 'idle') {
+    fetchReleases()
+  }
+})
+
+const output = computed(() => {
+  if (platform.value === 'app') {
+    return buildAppConfig(settings.value)
+  }
+
+  return releases.value
+    ? buildActionWorkflow(settings.value, releases.value)
+    : ''
+})
+
+const outputPath = computed(() =>
+  platform.value === 'app'
+    ? '.github/agentscan.yml'
+    : '.github/workflows/agentscan.yml',
+)
+
+const isDefaultConfig = computed(
+  () => platform.value === 'app' && output.value.trim() === 'version: 1',
+)
 
 const defaultHoneypotGreeting = computed(() =>
   buildDefaultHoneypotGreeting({
@@ -335,12 +333,50 @@ const defaultHoneypotFirstTimeGreeting = computed(
       .trim(),
 )
 
-const { copy, copied } = useClipboard({ source: yaml })
+const { copy, copied } = useClipboard({ source: output })
 </script>
 
 <template>
   <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
     <form class="flex flex-col gap-6 min-w-0" @submit.prevent>
+      <fieldset class="flex flex-col gap-2">
+        <legend class="sr-only">Generate the configuration for</legend>
+        <div
+          class="grid grid-cols-2 gap-1 p-1 rounded-2 bg-ui-muted/10 sm:max-w-sm"
+        >
+          <label
+            v-for="item in platforms"
+            :key="item.value"
+            class="flex items-center justify-center gap-2 px-3 py-2 rounded text-sm cursor-pointer transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ui-accent/40"
+            :class="
+              platform === item.value
+                ? 'bg-ui-bg text-ui-text font-medium shadow-sm'
+                : 'text-ui-muted hover:text-ui-text'
+            "
+          >
+            <input
+              v-model="platform"
+              type="radio"
+              name="platform"
+              :value="item.value"
+              class="sr-only"
+            />
+            <span :class="item.icon" aria-hidden="true" />
+            {{ item.label }}
+          </label>
+        </div>
+        <p class="text-sm text-ui-muted text-pretty">
+          <template v-if="platform === 'app'">
+            A config file for the installed GitHub App. Without one, the app
+            runs on its defaults.
+          </template>
+          <template v-else>
+            A workflow that runs the GitHub Action, pinned to its latest
+            release.
+          </template>
+        </p>
+      </fieldset>
+
       <AppConfigSection
         title="What to scan"
         icon="i-lucide:scan-search"
@@ -357,6 +393,28 @@ const { copy, copied } = useClipboard({ source: yaml })
             label="Issues"
             hint="Off by default."
           />
+          <AppConfigCheckbox
+            v-if="platform === 'action'"
+            v-model="cache"
+            label="Cache results between runs"
+            hint="Reuses an author’s analysis for 2 days, so repeat contributors cost fewer API calls. Adds an actions/cache step to the workflow."
+          />
+          <p
+            v-if="platform === 'action' && cache"
+            class="flex items-start gap-1.5 pl-6.5 text-xs text-ui-text/80 text-pretty"
+          >
+            <span
+              class="i-lucide:triangle-alert shrink-0 mt-0.5 text-ui-mixed"
+              aria-hidden="true"
+            />
+            <span>
+              A cached result doesn’t change until it expires. A new account
+              that has only just started behaving like automation may not show
+              enough signals yet, so it can be cached as organic and keep that
+              result for up to 2 days, even as the evidence piles up. The same
+              goes for an account the community flags after it was cached.
+            </span>
+          </p>
         </div>
       </AppConfigSection>
 
@@ -369,8 +427,11 @@ const { copy, copied } = useClipboard({ source: yaml })
           <template #hint>
             Bots such as
             <span class="font-mono">dependabot[bot]</span>
-            are recognized automatically. Usernames must match exactly,
-            including capitalization.
+            are recognized automatically.
+            <template v-if="platform === 'app'">
+              Usernames must match exactly, including capitalization.
+            </template>
+            <template v-else>Capitalization doesn’t matter.</template>
           </template>
 
           <div
@@ -506,7 +567,7 @@ const { copy, copied } = useClipboard({ source: yaml })
             </div>
             <p class="mt-2 text-xs text-ui-muted text-pretty">
               Community-flagged accounts are always closed while this is on.
-              <template v-if="autoCloseClassifications.length === 0">
+              <template v-if="pickedAutoCloseOptions.length === 0">
                 With nothing else picked, they are the only ones closed.
               </template>
             </p>
@@ -549,7 +610,7 @@ const { copy, copied } = useClipboard({ source: yaml })
                 aria-hidden="true"
               />
               {{ item.label }}
-              <template v-if="isCustomized(item)">
+              <template v-if="isCustomized(item.value)">
                 <span
                   class="i-lucide:pencil text-xs text-ui-muted"
                   aria-hidden="true"
@@ -592,10 +653,7 @@ const { copy, copied } = useClipboard({ source: yaml })
               </p>
             </div>
 
-            <p
-              v-if="!activeClassification.defaultLabel"
-              class="text-sm text-ui-muted"
-            >
+            <p v-if="!activeLabel" class="text-sm text-ui-muted">
               No label is added for this result.
             </p>
 
@@ -610,10 +668,10 @@ const { copy, copied } = useClipboard({ source: yaml })
               "
             >
               <input
-                v-model="labels[activeTab as LabelledClassification]"
+                v-model="labels[activeLabel]"
                 type="text"
                 aria-label="Label name"
-                :placeholder="activeClassification.defaultLabel"
+                :placeholder="DEFAULT_LABELS[platform][activeLabel]"
                 class="w-full px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
               />
             </AppConfigField>
@@ -628,9 +686,21 @@ const { copy, copied } = useClipboard({ source: yaml })
               "
             >
               <AppConfigMessage
+                v-if="isActiveMessageCustomizable"
                 v-model="messages[activeTab]"
                 :default-message="defaultMessages[activeTab]"
               />
+              <div
+                v-else
+                class="rounded border border-dashed border-ui-border/60 px-3 py-2.5"
+              >
+                <p class="text-xs font-medium text-ui-muted">
+                  Always sent. The GitHub Action can’t change this one.
+                </p>
+                <p class="mt-1.5 text-sm font-mono text-ui-text/90">
+                  {{ defaultMessages[activeTab] }}
+                </p>
+              </div>
             </AppConfigField>
           </div>
         </div>
@@ -661,6 +731,13 @@ const { copy, copied } = useClipboard({ source: yaml })
               Turn on “Close automatically” to also close the pull request or
               issue.
             </template>
+          </p>
+          <p
+            v-if="honeypot && platform === 'action'"
+            class="flex items-start gap-1.5 mt-1.5 pl-6.5 text-xs text-ui-muted"
+          >
+            <span class="i-lucide:info shrink-0 mt-0.5" aria-hidden="true" />
+            The workflow also runs on new comments, so it can see the reply.
           </p>
         </div>
 
@@ -695,10 +772,11 @@ const { copy, copied } = useClipboard({ source: yaml })
       aria-label="Generated configuration"
     >
       <div class="flex items-center justify-between gap-2">
-        <p class="text-sm font-mono text-ui-muted">.github/agentscan.yml</p>
+        <p class="text-sm font-mono text-ui-muted truncate">{{ outputPath }}</p>
         <button
           type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-ui-border/60 hover:bg-ui-muted/20 transition-colors"
+          class="flex shrink-0 items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-ui-border/60 hover:bg-ui-muted/20 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+          :disabled="!output"
           @click="copy()"
         >
           <span
@@ -710,11 +788,46 @@ const { copy, copied } = useClipboard({ source: yaml })
       </div>
 
       <pre
+        v-if="output"
         class="px-4 py-3 bg-ui-card border border-ui-border/60 rounded text-sm text-ui-text font-mono overflow-auto max-h-[70vh] whitespace-pre"
-      ><code>{{ yaml }}</code></pre>
+      ><code>{{ output }}</code></pre>
+      <p
+        v-else-if="releasesStatus === 'error'"
+        class="px-4 py-3 border border-ui-border/60 rounded text-sm text-ui-destructive"
+        role="alert"
+      >
+        Couldn’t look up the latest release of the GitHub Action.
+        <button
+          type="button"
+          class="underline hover:text-ui-text"
+          @click="fetchReleases()"
+        >
+          Try again
+        </button>
+      </p>
+      <p
+        v-else
+        class="px-4 py-3 border border-ui-border/60 rounded text-sm text-ui-muted"
+        aria-live="polite"
+      >
+        Looking up the latest release…
+      </p>
 
       <p class="text-xs text-ui-muted text-pretty">
-        <template v-if="isDefaultConfig">
+        <template v-if="platform === 'action'">
+          <template v-if="releases">
+            Pinned to the commit of
+            <NuxtLink
+              :to="releases.agentscan.url"
+              external
+              target="_blank"
+              class="underline hover:text-ui-text"
+            >
+              {{ releases.agentscan.tag }}</NuxtLink
+            >, the latest release. Only the inputs you changed are included.
+          </template>
+        </template>
+        <template v-else-if="isDefaultConfig">
           These are the defaults, so you don’t need a config file. Change any
           setting to customize it.
         </template>
