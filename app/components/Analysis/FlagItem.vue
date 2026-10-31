@@ -21,8 +21,8 @@ function toggleExpanded() {
 <template>
   <li class="not-last:border-b border-ui-border-subtle/15">
     <button
-      class="group w-full flex items-start gap-3 text-left py-3.5"
-      :class="isExpandable ? 'cursor-pointer' : 'cursor-default'"
+      class="group w-[calc(100%+1rem)] -mx-2 px-2 flex items-start gap-3 text-left py-3.5 rounded-md transition-colors"
+      :class="isExpandable && 'hover:bg-ui-muted/6'"
       :aria-expanded="isExpandable ? isExpanded : undefined"
       @click="toggleExpanded"
     >
@@ -39,7 +39,7 @@ function toggleExpanded() {
       </div>
       <span
         v-if="isExpandable"
-        class="i-lucide:chevron-down text-sm text-ui-muted/50 group-hover:text-ui-muted transition-all mt-0.5 shrink-0"
+        class="i-lucide:chevron-down text-sm text-ui-muted/50 group-hover:text-ui-text transition-all mt-0.5 shrink-0"
         :class="isExpanded && 'rotate-180'"
       />
     </button>

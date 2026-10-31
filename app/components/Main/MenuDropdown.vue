@@ -41,7 +41,7 @@ watch(
   <div ref="root" class="relative" @keydown.esc="isOpen = false">
     <button
       type="button"
-      class="inline-flex items-center gap-1 text-sm hover:text-ui-text transition-colors cursor-pointer"
+      class="inline-flex items-center gap-1 text-sm hover:text-ui-text transition-colors"
       :class="isSectionActive || isOpen ? 'text-ui-text' : 'text-ui-muted'"
       :aria-expanded="isOpen"
       aria-haspopup="true"

@@ -61,7 +61,7 @@ const hiddenRepositoriesCount = computed<number>(() => {
 
       <button
         v-if="otherRepositories.length"
-        class="shrink-0 inline-flex items-center gap-1 rounded-full border border-ui-border-subtle/60 px-2 py-0.5 text-xs text-ui-muted tabular-nums hover:text-ui-text hover:border-ui-border/80 transition-colors cursor-pointer"
+        class="shrink-0 inline-flex items-center gap-1 rounded-full border border-ui-border-subtle/60 px-2 py-0.5 text-xs text-ui-muted tabular-nums hover:text-ui-text hover:border-ui-border/80 transition-colors"
         :aria-expanded="isExpanded"
         :aria-label="`Show the other ${otherRepositories.length} repositories of ${group.owner}`"
         @click="isOpen = !isOpen"
@@ -111,7 +111,7 @@ const hiddenRepositoriesCount = computed<number>(() => {
 
       <button
         v-if="hiddenRepositoriesCount > 0"
-        class="ml-5 mt-1.5 text-sm text-ui-muted/70 hover:text-ui-text cursor-pointer"
+        class="ml-5 mt-1.5 text-sm text-ui-muted/70 hover:text-ui-text"
         @click="showAllRepositories = true"
       >
         Show {{ hiddenRepositoriesCount }} more

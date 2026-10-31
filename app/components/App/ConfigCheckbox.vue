@@ -10,7 +10,7 @@ const model = defineModel<boolean | string[]>()
 </script>
 
 <template>
-  <label class="group flex items-start gap-2.5 cursor-pointer">
+  <label class="group flex items-start gap-2.5">
     <input
       v-model="model"
       type="checkbox"

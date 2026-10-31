@@ -347,7 +347,7 @@ const { copy, copied } = useClipboard({ source: output })
           <label
             v-for="item in platforms"
             :key="item.value"
-            class="flex items-center justify-center gap-2 px-3 py-2 rounded text-sm cursor-pointer transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ui-accent/40"
+            class="flex items-center justify-center gap-2 px-3 py-2 rounded text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ui-accent/40"
             :class="
               platform === item.value
                 ? 'bg-ui-bg text-ui-text font-medium shadow-sm'
@@ -492,7 +492,7 @@ const { copy, copied } = useClipboard({ source: output })
             <label
               v-for="item in modes"
               :key="item.value"
-              class="flex items-start gap-2.5 p-3 rounded border cursor-pointer transition-colors"
+              class="flex items-start gap-2.5 p-3 rounded border transition-colors"
               :class="
                 mode === item.value
                   ? 'border-ui-accent bg-ui-accent/5'
@@ -538,7 +538,7 @@ const { copy, copied } = useClipboard({ source: output })
               <label
                 v-for="item in autoCloseOptions"
                 :key="item.value"
-                class="flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors"
+                class="flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-full border text-sm transition-colors"
                 :class="
                   autoCloseClassifications.includes(item.value)
                     ? 'border-ui-accent bg-ui-accent/5 text-ui-text'

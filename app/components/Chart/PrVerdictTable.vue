@@ -304,7 +304,7 @@ function formatPercentage(value?: number | null) {
         class="group overflow-hidden rounded-lg border border-ui-border"
       >
         <summary
-          class="flex cursor-pointer list-none items-center gap-3 px-3 py-3 select-none hover:bg-ui-bg-muted sm:gap-4 sm:px-4"
+          class="flex list-none items-center gap-3 px-3 py-3 select-none hover:bg-ui-bg-muted sm:gap-4 sm:px-4"
         >
           <span
             class="i-lucide:chevron-right size-4 shrink-0 text-ui-muted transition-transform group-open:rotate-90"

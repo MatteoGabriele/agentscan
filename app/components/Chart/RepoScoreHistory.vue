@@ -469,7 +469,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
     <div class="flex flex-row flex-nowrap items-end gap-4">
       <Tooltip :label="selectedRepo === '' ? '' : 'Toggle table view'">
         <button
-          class="shrink-0 inline-flex items-center rounded-sm border border-ui-border-subtle/60 p-3 text-xs text-ui-muted tabular-nums transition-colors cursor-pointer"
+          class="shrink-0 inline-flex items-center rounded-sm border border-ui-border-subtle/60 p-3 text-xs text-ui-muted tabular-nums transition-colors"
           :class="{
             'cursor-not-allowed opacity-50': !selectedRepo,
             'hover:text-ui-text hover:border-ui-border/80': !!selectedRepo,
@@ -721,7 +721,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full cursor-pointer items-center justify-center gap-1 rounded-sm transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:justify-start sm:gap-2"
+                  class="flex w-full items-center justify-center gap-1 rounded-sm transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:justify-start sm:gap-2"
                   @click="sortBy('progression')"
                 >
                   <span class="hidden sm:inline">Trend</span>
@@ -745,7 +745,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full min-w-0 cursor-pointer items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
+                  class="flex w-full min-w-0 items-center gap-1 rounded-sm text-left transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('repo')"
                 >
                   <span class="min-w-0 truncate">Repository</span>
@@ -767,7 +767,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full cursor-pointer items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
+                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('averageScore')"
                 >
                   <span class="hidden sm:inline">Average score</span>
@@ -792,7 +792,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
               >
                 <button
                   type="button"
-                  class="flex w-full cursor-pointer items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
+                  class="flex w-full items-center justify-end gap-1 rounded-sm text-right transition-colors hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current/20 sm:gap-2"
                   @click="sortBy('count')"
                 >
                   <span class="hidden sm:inline">Scanned PRs</span>
@@ -926,7 +926,7 @@ function getSparklineConfig(item: RepoRow): VueUiSparklineConfig {
                   >
                     <button
                       type="button"
-                      class="w-full cursor-pointer"
+                      class="w-full"
                       :aria-label="`View chart for ${sparkline.repo}`"
                       @click="viewRepoChart(sparkline)"
                     >
