@@ -708,7 +708,7 @@ const { copy, copied } = useClipboard({ source: output })
 
       <AppConfigSection
         title="Honeypot"
-        icon="i-lucide:bot"
+        icon="i-lucide:fishing-hook"
         hint="A trap that gets AI agents to identify themselves."
       >
         <div>
