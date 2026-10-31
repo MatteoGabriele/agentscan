@@ -86,6 +86,12 @@ function toggleOrderedList() {
   editor.value?.chain().focus().toggleOrderedList().run()
 }
 
+function insert(text: string) {
+  editor.value?.chain().focus().insertContent(text).run()
+}
+
+defineExpose({ insert })
+
 function setLink() {
   if (!editor.value) {
     return

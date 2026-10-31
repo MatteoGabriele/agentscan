@@ -101,7 +101,15 @@ const { trackEvent } = useSaEvent()
       ref="configGenerator"
       class="flex items-center py-12 border-t border-ui-border-subtle/60 w-full"
     >
-      <div class="w-full max-w-2xl text-left mx-auto px-6">
+      <div class="w-full max-w-5xl text-left mx-auto px-4 sm:px-6">
+        <header class="mb-8 max-w-2xl">
+          <h2 class="text-xl font-semibold">Customize configuration</h2>
+          <p class="mt-1 text-ui-muted text-pretty">
+            Everything is optional. Change what you need, then copy the
+            generated file into your repository.
+          </p>
+        </header>
+
         <AppConfigGenerator />
       </div>
     </section>

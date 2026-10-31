@@ -15,42 +15,124 @@ type AuthorAssociation =
   | 'first_time_contributor'
   | 'member'
   | 'owner'
-type Classification = 'organic' | 'mixed' | 'automation'
+// A community flag is a state of the account rather than an analysis result,
+// but it replaces the result's title, comment and label, so the form treats it
+// as one.
+type Classification =
+  'organic' | 'mixed' | 'automation' | 'community-flagged' | 'insufficient-data'
+type LabelledClassification = 'mixed' | 'automation' | 'community-flagged'
 
-const modes: { value: ScanMode; label: string }[] = [
-  { value: 'full', label: 'Full — comment and apply labels' },
-  { value: 'comment', label: 'Comment only' },
-  { value: 'labels', label: 'Labels only' },
-  { value: 'silent', label: 'Silent — analysis only, no comment or labels' },
-]
-
-const authorAssociations: { value: AuthorAssociation; label: string }[] = [
-  { value: 'owner', label: 'Owner' },
-  { value: 'member', label: 'Member' },
-  { value: 'collaborator', label: 'Collaborator' },
-  { value: 'contributor', label: 'Contributor' },
-  { value: 'first_timer', label: 'First timer (new to GitHub)' },
+const modes: { value: ScanMode; label: string; hint: string }[] = [
   {
-    value: 'first_time_contributor',
-    label: 'First-time contributor (new to this repo)',
+    value: 'full',
+    label: 'Comment and label',
+    hint: 'Posts the result as a comment and adds a label.',
+  },
+  {
+    value: 'comment',
+    label: 'Comment only',
+    hint: 'Posts the result as a comment. No label.',
+  },
+  {
+    value: 'labels',
+    label: 'Label only',
+    hint: 'Adds a label. No comment.',
+  },
+  {
+    value: 'silent',
+    label: 'Silent',
+    hint: 'Posts nothing. Auto-close and the honeypot still work.',
   },
 ]
 
-const classifications: { value: Classification; label: string }[] = [
-  { value: 'organic', label: 'Organic' },
-  { value: 'mixed', label: 'Mixed' },
-  { value: 'automation', label: 'Automation' },
+const authorAssociations: {
+  value: AuthorAssociation
+  label: string
+  hint: string
+}[] = [
+  { value: 'owner', label: 'Owner', hint: 'Owns the repository' },
+  { value: 'member', label: 'Member', hint: 'Belongs to the organization' },
+  {
+    value: 'collaborator',
+    label: 'Collaborator',
+    hint: 'Invited to the repository',
+  },
+  {
+    value: 'contributor',
+    label: 'Contributor',
+    hint: 'Has committed to the repository before',
+  },
+  {
+    value: 'first_time_contributor',
+    label: 'First-time contributor',
+    hint: 'First contribution to this repository',
+  },
+  {
+    value: 'first_timer',
+    label: 'First timer',
+    hint: 'First contribution anywhere on GitHub',
+  },
 ]
 
-const defaultLabels = {
-  'community-flagged': 'agentscan:community-flagged',
-  mixed: 'agentscan:mixed-signals',
-  automation: 'agentscan:automation-signals',
+const defaultMessages = getDefaultMessages()
+
+const classificationInfo: Record<
+  Classification,
+  { label: string; when: string; dot: string; defaultLabel?: string }
+> = {
+  automation: {
+    label: 'Automation',
+    when: 'The account’s activity looks automated.',
+    dot: 'bg-ui-automation',
+    defaultLabel: 'agentscan:automation-signals',
+  },
+  mixed: {
+    label: 'Mixed',
+    when: 'Some activity looks automated, some looks human.',
+    dot: 'bg-ui-mixed',
+    defaultLabel: 'agentscan:mixed-signals',
+  },
+  'community-flagged': {
+    label: 'Community-flagged',
+    when: 'The account is on the community list of verified automated accounts. This replaces the analysis result.',
+    dot: 'bg-ui-destructive',
+    defaultLabel: 'agentscan:community-flagged',
+  },
+  organic: {
+    label: 'Organic',
+    when: 'No signs of automation were found.',
+    dot: 'bg-ui-organic',
+  },
+  'insufficient-data': {
+    label: 'Not enough data',
+    when: 'The account has too little public activity to judge.',
+    dot: 'bg-ui-muted',
+  },
 }
 
-const defaultAutoCloseClassifications: Classification[] = ['automation']
+const tabOrder: Classification[] = [
+  'automation',
+  'mixed',
+  'community-flagged',
+  'organic',
+  'insufficient-data',
+]
 
-const defaultMessages = getDefaultMessages()
+const classifications = tabOrder.map((value) => ({
+  value,
+  ...classificationInfo[value],
+}))
+
+// What `auto-close-classifications` accepts. Community-flagged accounts are not
+// in it: the app closes them whenever auto-close is on.
+const autoCloseOptions = classifications.filter(
+  (item) =>
+    item.value === 'organic' ||
+    item.value === 'mixed' ||
+    item.value === 'automation',
+)
+
+const defaultAutoCloseClassifications: Classification[] = ['automation']
 
 function sameMembers<T>(a: T[], b: T[]): boolean {
   return a.length === b.length && a.every((item) => b.includes(item))
@@ -64,24 +146,71 @@ const newAllowedUser = ref('')
 const trustedAuthorAssociations = ref<AuthorAssociation[]>([])
 const commentOnOrganic = ref(false)
 const autoClose = ref(false)
-const autoCloseClassifications = ref<Classification[]>(['automation'])
+const autoCloseClassifications = ref<Classification[]>([
+  ...defaultAutoCloseClassifications,
+])
 const honeypot = ref(false)
 
-const labelCommunityFlagged = ref(defaultLabels['community-flagged'])
-const labelMixed = ref(defaultLabels.mixed)
-const labelAutomation = ref(defaultLabels.automation)
+const labels = reactive<Record<LabelledClassification, string>>({
+  mixed: 'agentscan:mixed-signals',
+  automation: 'agentscan:automation-signals',
+  'community-flagged': 'agentscan:community-flagged',
+})
 
-const messageOrganic = ref('')
-const messageMixed = ref('')
-const messageAutomation = ref('')
-const messageCommunityFlagged = ref('')
+const messages = reactive<Record<Classification, string>>({
+  organic: '',
+  mixed: '',
+  automation: '',
+  'community-flagged': '',
+  'insufficient-data': '',
+})
+
 const messageHoneypot = ref('')
 const messageHoneypotFirstTime = ref('')
+
+const postsComments = computed(
+  () => mode.value === 'full' || mode.value === 'comment',
+)
+const addsLabels = computed(
+  () => mode.value === 'full' || mode.value === 'labels',
+)
+
+const activeTab = ref<Classification>('automation')
+const activeClassification = computed(() => classificationInfo[activeTab.value])
+const tabsId = useId()
+
+function isCustomized(item: (typeof classifications)[number]) {
+  const label = labels[item.value as LabelledClassification]
+  return (
+    messages[item.value] !== '' ||
+    (item.defaultLabel !== undefined && label !== item.defaultLabel)
+  )
+}
+
+function selectTab(index: number) {
+  const item = classifications.at(index % classifications.length)
+  if (!item) {
+    return
+  }
+
+  activeTab.value = item.value
+  document.getElementById(`${tabsId}-${item.value}`)?.focus()
+}
+
+function onTabKeydown(event: KeyboardEvent, index: number) {
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    selectTab(index + 1)
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    selectTab(index - 1)
+  }
+}
 
 function addAllowedUser() {
   const users = newAllowedUser.value
     .split(/[\n,]/)
-    .map((user) => user.trim())
+    .map((user) => user.trim().replace(/^@/, ''))
     .filter(Boolean)
 
   for (const user of users) {
@@ -150,44 +279,37 @@ const yaml = computed(() => {
     config.mode = mode.value
   }
 
-  if (
-    labelCommunityFlagged.value !== defaultLabels['community-flagged'] ||
-    labelMixed.value !== defaultLabels.mixed ||
-    labelAutomation.value !== defaultLabels.automation
-  ) {
-    config.labels = {
-      'community-flagged': labelCommunityFlagged.value,
-      mixed: labelMixed.value,
-      automation: labelAutomation.value,
+  const customLabels: Record<string, string> = {}
+  for (const item of classifications) {
+    const label = labels[item.value as LabelledClassification]
+    if (item.defaultLabel !== undefined && label !== item.defaultLabel) {
+      customLabels[item.value] = label
     }
   }
+  if (Object.keys(customLabels).length > 0) {
+    config.labels = customLabels
+  }
 
-  const messages: Record<string, string> = {}
-  if (messageOrganic.value) {
-    messages.organic = messageOrganic.value
-  }
-  if (messageMixed.value) {
-    messages.mixed = messageMixed.value
-  }
-  if (messageAutomation.value) {
-    messages.automation = messageAutomation.value
-  }
-  if (messageCommunityFlagged.value) {
-    messages['community-flagged'] = messageCommunityFlagged.value
+  const customMessages: Record<string, string> = {}
+  for (const item of classifications) {
+    if (messages[item.value]) {
+      customMessages[item.value] = messages[item.value]
+    }
   }
   if (honeypot.value && messageHoneypot.value) {
-    messages.honeypot = messageHoneypot.value
+    customMessages.honeypot = messageHoneypot.value
   }
   if (honeypot.value && messageHoneypotFirstTime.value) {
-    messages['honeypot-first-time'] = messageHoneypotFirstTime.value
+    customMessages['honeypot-first-time'] = messageHoneypotFirstTime.value
   }
-
-  if (Object.keys(messages).length > 0) {
-    config.messages = messages
+  if (Object.keys(customMessages).length > 0) {
+    config.messages = customMessages
   }
 
   return stringify(config, { lineWidth: 0 })
 })
+
+const isDefaultConfig = computed(() => yaml.value.trim() === 'version: 1')
 
 const defaultHoneypotGreeting = computed(() =>
   buildDefaultHoneypotGreeting({
@@ -199,91 +321,58 @@ const defaultHoneypotGreeting = computed(() =>
     .trim(),
 )
 
-const defaultHoneypotFirstTimeGreeting = computed(() =>
-  buildDefaultFirstTimeHoneypotGreeting({
-    username: '{username}',
-    subject: '{type}',
-    isPR: scanPullRequests.value,
-  })
-    .join('\n')
-    .trim(),
+// A blank first-time greeting falls back to the regular custom greeting first,
+// and only then to the built-in first-time one. Show whichever will be sent.
+const defaultHoneypotFirstTimeGreeting = computed(
+  () =>
+    messageHoneypot.value.trim() ||
+    buildDefaultFirstTimeHoneypotGreeting({
+      username: '{username}',
+      subject: '{type}',
+      isPR: scanPullRequests.value,
+    })
+      .join('\n')
+      .trim(),
 )
 
 const { copy, copied } = useClipboard({ source: yaml })
 </script>
 
 <template>
-  <div class="flex flex-col gap-10">
-    <form class="flex flex-col" @submit.prevent>
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+    <form class="flex flex-col gap-6 min-w-0" @submit.prevent>
+      <AppConfigSection
+        title="What to scan"
+        icon="i-lucide:scan-search"
+        hint="AgentScan checks the author when one of these is opened."
       >
-        <legend class="sr-only">Mode</legend>
-        <div>
-          <p class="text-sm font-medium text-ui-text">Mode</p>
-          <p class="text-xs text-ui-muted mt-1">
-            Controls what actions AgentScan takes on each PR/issue.
-          </p>
-        </div>
-        <div class="relative self-start">
-          <select
-            v-model="mode"
-            class="w-full appearance-none px-3 py-2 pr-9 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
-          >
-            <option v-for="item in modes" :key="item.value" :value="item.value">
-              {{ item.label }}
-            </option>
-          </select>
-          <span
-            class="i-lucide:chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-ui-muted pointer-events-none"
-            aria-hidden="true"
+        <div class="flex flex-col gap-3">
+          <AppConfigCheckbox
+            v-model="scanPullRequests"
+            label="Pull requests"
+            hint="On by default."
+          />
+          <AppConfigCheckbox
+            v-model="scanIssues"
+            label="Issues"
+            hint="Off by default."
           />
         </div>
-      </fieldset>
+      </AppConfigSection>
 
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
+      <AppConfigSection
+        title="Who to skip"
+        icon="i-lucide:user-check"
+        hint="Authors matching any of these are never scanned."
       >
-        <legend class="sr-only">Scan triggers</legend>
-        <div>
-          <p class="text-sm font-medium text-ui-text">Scan triggers</p>
-        </div>
-        <div class="flex flex-col gap-2 self-start">
-          <label
-            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
-          >
-            <input
-              v-model="scanPullRequests"
-              type="checkbox"
-              class="accent-ui-accent"
-            />
-            Pull requests
-          </label>
-          <label
-            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
-          >
-            <input
-              v-model="scanIssues"
-              type="checkbox"
-              class="accent-ui-accent"
-            />
-            Issues
-          </label>
-        </div>
-      </fieldset>
+        <AppConfigField label="Usernames">
+          <template #hint>
+            Bots such as
+            <span class="font-mono">dependabot[bot]</span>
+            are recognized automatically. Usernames must match exactly,
+            including capitalization.
+          </template>
 
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
-      >
-        <legend class="sr-only">Allowed users</legend>
-        <div>
-          <p class="text-sm font-medium text-ui-text">Allowed users</p>
-          <p class="text-xs text-ui-muted mt-1">
-            GitHub usernames to exclude from scanning. GitHub Apps (e.g.
-            dependabot[bot]) are detected automatically and never flagged.
-          </p>
-        </div>
-        <div class="self-start">
           <div
             class="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-ui-bg border border-ui-border/60 rounded focus-within:border-ui-accent focus-within:ring-1 focus-within:ring-ui-accent/30"
           >
@@ -305,265 +394,308 @@ const { copy, copied } = useClipboard({ source: yaml })
             <input
               v-model="newAllowedUser"
               type="text"
-              placeholder="Add username"
-              class="flex-1 min-w-32 px-1 py-1 bg-transparent text-sm text-ui-text font-mono placeholder:text-ui-muted/60 focus:outline-none"
+              aria-label="Add a username"
+              placeholder="Type a username, then Enter"
+              class="flex-1 min-w-40 px-1 py-1 bg-transparent text-sm text-ui-text font-mono placeholder:text-ui-muted/60 focus:outline-none"
               @keydown.enter.prevent="addAllowedUser"
               @keydown.,.prevent="addAllowedUser"
               @keydown.backspace="removeLastAllowedUser"
               @blur="addAllowedUser"
             />
           </div>
-          <p class="text-xs text-ui-muted mt-1">Press Enter or comma to add.</p>
-        </div>
-      </fieldset>
+        </AppConfigField>
 
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
-      >
-        <legend class="sr-only">Trusted author associations</legend>
-        <div>
-          <p class="text-sm font-medium text-ui-text">
-            Trusted author associations
-          </p>
-          <p class="text-xs text-ui-muted mt-1">
-            Author associations to exclude from scanning.
-          </p>
-        </div>
-        <div class="flex flex-col gap-2 self-start">
-          <label
-            v-for="item in authorAssociations"
-            :key="item.value"
-            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
-          >
-            <input
-              v-model="trustedAuthorAssociations"
-              type="checkbox"
-              :value="item.value"
-              class="accent-ui-accent"
-            />
-            {{ item.label }}
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
-      >
-        <legend class="sr-only">Comments</legend>
-        <div>
-          <p class="text-sm font-medium text-ui-text">Comments</p>
-        </div>
-        <div class="self-start">
-          <label
-            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
-          >
-            <input
-              v-model="commentOnOrganic"
-              type="checkbox"
-              class="accent-ui-accent"
-            />
-            Comment even when the result is organic
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
-      >
-        <legend class="sr-only">Auto-close</legend>
-        <div>
-          <p class="text-sm font-medium text-ui-text">Auto-close</p>
-        </div>
-        <div class="self-start">
-          <label
-            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
-          >
-            <input
-              v-model="autoClose"
-              type="checkbox"
-              class="accent-ui-accent"
-            />
-            Automatically close PRs/issues opened by flagged accounts
-          </label>
-
-          <div v-if="autoClose" class="flex flex-col gap-2 mt-3 pl-6">
-            <label
-              v-for="item in classifications"
+        <AppConfigField
+          label="Roles"
+          hint="Based on the author’s relationship to the repository, as GitHub reports it."
+        >
+          <div class="grid gap-3 sm:grid-cols-2">
+            <AppConfigCheckbox
+              v-for="item in authorAssociations"
               :key="item.value"
-              class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
+              v-model="trustedAuthorAssociations"
+              :value="item.value"
+              :label="item.label"
+              :hint="item.hint"
+            />
+          </div>
+        </AppConfigField>
+      </AppConfigSection>
+
+      <AppConfigSection title="What happens after a scan" icon="i-lucide:zap">
+        <AppConfigField
+          label="Mode"
+          hint="How AgentScan reports the result on the pull request or issue."
+        >
+          <div class="grid gap-2 sm:grid-cols-2">
+            <label
+              v-for="item in modes"
+              :key="item.value"
+              class="flex items-start gap-2.5 p-3 rounded border cursor-pointer transition-colors"
+              :class="
+                mode === item.value
+                  ? 'border-ui-accent bg-ui-accent/5'
+                  : 'border-ui-border/60 hover:border-ui-border'
+              "
             >
               <input
-                v-model="autoCloseClassifications"
-                type="checkbox"
+                v-model="mode"
+                type="radio"
+                name="mode"
                 :value="item.value"
-                class="accent-ui-accent"
+                class="mt-1 shrink-0 accent-ui-accent"
               />
-              {{ item.label }}
+              <span class="flex flex-col">
+                <span class="text-sm font-medium text-ui-text">
+                  {{ item.label }}
+                </span>
+                <span class="text-xs text-ui-muted">{{ item.hint }}</span>
+              </span>
             </label>
           </div>
-        </div>
-      </fieldset>
+        </AppConfigField>
 
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
-      >
-        <legend class="sr-only">Honeypot</legend>
+        <AppConfigCheckbox
+          v-model="commentOnOrganic"
+          label="Comment on organic results too"
+          hint="By default AgentScan stays quiet when it finds no sign of automation."
+        />
+
         <div>
-          <p class="text-sm font-medium text-ui-text">Honeypot</p>
-          <p class="text-xs text-ui-muted mt-1">
-            Posts an ordinary thank-you comment with a one-off verification code
-            hidden in its raw Markdown, addressed only at AI agents. An agent
-            that reads the page source and replies with the code identifies
-            itself.
-          </p>
-        </div>
-        <div class="self-start">
-          <label
-            class="flex items-center gap-2 text-sm hover:text-ui-text text-ui-text/90"
-          >
-            <input
-              v-model="honeypot"
-              type="checkbox"
-              class="accent-ui-accent"
-            />
-            Post a honeypot comment on new PRs/issues
-          </label>
+          <AppConfigCheckbox
+            v-model="autoClose"
+            label="Close automatically"
+            hint="Closes the pull request or issue as “not planned” when the result is one you pick below."
+          />
 
-          <p v-if="honeypot" class="text-xs text-ui-muted mt-3 pl-6">
-            <template v-if="autoClose"
-              >When the code comes back, the PR/issue is closed.</template
-            ><template v-else
-              >Enable auto-close above to close the PR/issue when the code comes
-              back.</template
+          <div v-if="autoClose" class="mt-3 pl-6.5">
+            <div
+              class="flex flex-wrap gap-2"
+              role="group"
+              aria-label="Results that close the pull request or issue"
             >
-          </p>
-
-          <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-4 pl-6">
-            <div class="text-xs text-ui-muted mb-2">
-              Default greeting
-              <pre
-                class="mt-2 px-3 py-2 bg-ui-bg border border-ui-border/60 rounded font-mono text-ui-text/90 whitespace-pre-wrap"
-                >{{ defaultHoneypotGreeting }}</pre>
+              <label
+                v-for="item in autoCloseOptions"
+                :key="item.value"
+                class="flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors"
+                :class="
+                  autoCloseClassifications.includes(item.value)
+                    ? 'border-ui-accent bg-ui-accent/5 text-ui-text'
+                    : 'border-ui-border/60 text-ui-text/80 hover:border-ui-border'
+                "
+              >
+                <input
+                  v-model="autoCloseClassifications"
+                  type="checkbox"
+                  :value="item.value"
+                  class="accent-ui-accent"
+                />
+                {{ item.label }}
+              </label>
+              <label
+                class="flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-full border border-ui-accent/50 bg-ui-accent/5 text-sm text-ui-text/80 cursor-not-allowed"
+              >
+                <input
+                  type="checkbox"
+                  checked
+                  disabled
+                  class="accent-ui-accent"
+                />
+                Community-flagged
+              </label>
             </div>
-
-            <CommonMarkdownEditor
-              v-model="messageHoneypot"
-              placeholder="Custom greeting"
-            />
-            <p class="text-xs text-ui-muted">
-              Replaces the visible thank-you message. The hidden verification
-              code is always added underneath. Use
-              <span class="font-mono">{username}</span> and
-              <span class="font-mono">{type}</span> (pull request or issue) as
-              placeholders.
-            </p>
-          </div>
-
-          <div v-if="honeypot" class="min-w-0 flex flex-col gap-1.5 mt-6 pl-6">
-            <p class="text-sm font-medium text-ui-text">
-              First-time contributors
-            </p>
-            <div class="text-xs text-ui-muted mb-2 mt-1">
-              Default greeting for an author opening their first PR/issue on the
-              repository
-              <pre
-                class="mt-2 px-3 py-2 bg-ui-bg border border-ui-border/60 rounded font-mono text-ui-text/90 whitespace-pre-wrap"
-                >{{ defaultHoneypotFirstTimeGreeting }}</pre>
-            </div>
-
-            <CommonMarkdownEditor
-              v-model="messageHoneypotFirstTime"
-              placeholder="Custom greeting for first-time contributors"
-            />
-            <p class="text-xs text-ui-muted">
-              Used instead of the greeting above when GitHub reports the author
-              as a first timer or first-time contributor. Left blank, first-time
-              contributors get your regular custom greeting.
+            <p class="mt-2 text-xs text-ui-muted text-pretty">
+              Community-flagged accounts are always closed while this is on.
+              <template v-if="autoCloseClassifications.length === 0">
+                With nothing else picked, they are the only ones closed.
+              </template>
             </p>
           </div>
         </div>
-      </fieldset>
+      </AppConfigSection>
 
-      <fieldset
-        class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6 not-last:border-b border-ui-border-subtle/20 first:pt-0"
+      <AppConfigSection
+        title="Results"
+        icon="i-lucide:tags"
+        hint="Change the label and the comment for each result. Comments support Markdown. Anything you leave untouched keeps its default."
       >
-        <legend class="sr-only">Labels</legend>
         <div>
-          <p class="text-sm font-medium text-ui-text">Labels</p>
-        </div>
-        <div class="flex flex-col gap-3 self-start">
-          <label class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Community-flagged</span>
-            <input
-              v-model="labelCommunityFlagged"
-              type="text"
-              class="px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
-            />
-          </label>
-          <label class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Mixed signals</span>
-            <input
-              v-model="labelMixed"
-              type="text"
-              class="px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
-            />
-          </label>
-          <label class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Automated account</span>
-            <input
-              v-model="labelAutomation"
-              type="text"
-              class="px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
-            />
-          </label>
-        </div>
-      </fieldset>
+          <div
+            role="tablist"
+            aria-label="Results"
+            class="flex flex-wrap gap-1 p-1 rounded-2 bg-ui-muted/10"
+          >
+            <button
+              v-for="(item, index) in classifications"
+              :id="`${tabsId}-${item.value}`"
+              :key="item.value"
+              type="button"
+              role="tab"
+              :aria-selected="activeTab === item.value"
+              :aria-controls="`${tabsId}-panel`"
+              :tabindex="activeTab === item.value ? 0 : -1"
+              class="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors"
+              :class="
+                activeTab === item.value
+                  ? 'bg-ui-bg text-ui-text shadow-sm'
+                  : 'text-ui-muted hover:text-ui-text'
+              "
+              @click="activeTab = item.value"
+              @keydown="onTabKeydown($event, index)"
+            >
+              <span
+                class="size-2 rounded-full shrink-0"
+                :class="item.dot"
+                aria-hidden="true"
+              />
+              {{ item.label }}
+              <template v-if="isCustomized(item)">
+                <span
+                  class="i-lucide:pencil text-xs text-ui-muted"
+                  aria-hidden="true"
+                />
+                <span class="sr-only">(customized)</span>
+              </template>
+            </button>
+          </div>
 
-      <fieldset class="grid gap-x-8 gap-y-2 sm:grid-cols-[200px_1fr] py-6">
-        <legend class="sr-only">Messages</legend>
+          <div
+            :id="`${tabsId}-panel`"
+            role="tabpanel"
+            :aria-labelledby="`${tabsId}-${activeTab}`"
+            class="flex flex-col gap-6 pt-5"
+          >
+            <div class="flex flex-col gap-1.5">
+              <p class="text-sm text-ui-text/90">
+                <span class="font-medium">When:</span>
+                {{ activeClassification.when }}
+              </p>
+              <p
+                v-if="mode === 'silent'"
+                class="flex items-start gap-1.5 text-xs text-ui-muted"
+              >
+                <span
+                  class="i-lucide:info shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
+                Silent mode posts no label or comment.
+              </p>
+              <p
+                v-else-if="activeTab === 'organic' && !commentOnOrganic"
+                class="flex items-start gap-1.5 text-xs text-ui-muted"
+              >
+                <span
+                  class="i-lucide:info shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
+                Only posted when “Comment on organic results too” is on.
+              </p>
+            </div>
+
+            <p
+              v-if="!activeClassification.defaultLabel"
+              class="text-sm text-ui-muted"
+            >
+              No label is added for this result.
+            </p>
+
+            <AppConfigField
+              v-else
+              :key="`label-${activeTab}`"
+              label="Label"
+              :hint="
+                addsLabels
+                  ? 'Added to the pull request or issue.'
+                  : 'Not added in the current mode.'
+              "
+            >
+              <input
+                v-model="labels[activeTab as LabelledClassification]"
+                type="text"
+                aria-label="Label name"
+                :placeholder="activeClassification.defaultLabel"
+                class="w-full px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono focus:outline-none focus:border-ui-accent focus:ring-1 focus:ring-ui-accent/30"
+              />
+            </AppConfigField>
+
+            <AppConfigField
+              :key="`message-${activeTab}`"
+              label="Comment"
+              :hint="
+                postsComments
+                  ? 'Shown under the result title, followed by a link to the full analysis.'
+                  : 'Not posted in the current mode.'
+              "
+            >
+              <AppConfigMessage
+                v-model="messages[activeTab]"
+                :default-message="defaultMessages[activeTab]"
+              />
+            </AppConfigField>
+          </div>
+        </div>
+      </AppConfigSection>
+
+      <AppConfigSection
+        title="Honeypot"
+        icon="i-lucide:bot"
+        hint="A trap that gets AI agents to identify themselves."
+      >
         <div>
-          <p class="text-sm font-medium text-ui-text">Messages</p>
-          <p class="text-xs text-ui-muted mt-1">
-            Custom comment messages per classification. Supports Markdown. Leave
-            a field blank to post the default message shown in it.
+          <AppConfigCheckbox
+            v-model="honeypot"
+            label="Post a honeypot comment"
+            hint="Posts a friendly thank-you comment on each scanned pull request or issue that stays open. Hidden in it is a short code with instructions only an AI agent would read. If the author replies with that code, AgentScan reports them as automated."
+          />
+
+          <p
+            v-if="honeypot"
+            class="flex items-start gap-1.5 mt-3 pl-6.5 text-xs text-ui-muted"
+          >
+            <span class="i-lucide:info shrink-0 mt-0.5" aria-hidden="true" />
+            <template v-if="autoClose">
+              The pull request or issue is also closed, because auto-close is
+              on.
+            </template>
+            <template v-else>
+              Turn on “Close automatically” to also close the pull request or
+              issue.
+            </template>
           </p>
         </div>
-        <div class="min-w-0 flex flex-col gap-4 self-start">
-          <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Organic</span>
-            <CommonMarkdownEditor
-              v-model="messageOrganic"
-              :placeholder="defaultMessages.organic"
+
+        <template v-if="honeypot">
+          <AppConfigField
+            label="Greeting"
+            hint="The visible part of the comment. The hidden code is always added below it."
+          >
+            <AppConfigMessage
+              v-model="messageHoneypot"
+              :default-message="defaultHoneypotGreeting"
+              :placeholders="['username', 'type']"
             />
-          </div>
-          <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Mixed</span>
-            <CommonMarkdownEditor
-              v-model="messageMixed"
-              :placeholder="defaultMessages.mixed"
+          </AppConfigField>
+
+          <AppConfigField
+            label="Greeting for first-time contributors"
+            hint="Used instead when the author is opening their first pull request or issue on this repository."
+          >
+            <AppConfigMessage
+              v-model="messageHoneypotFirstTime"
+              :default-message="defaultHoneypotFirstTimeGreeting"
+              :placeholders="['username', 'type']"
             />
-          </div>
-          <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Automation</span>
-            <CommonMarkdownEditor
-              v-model="messageAutomation"
-              :placeholder="defaultMessages.automation"
-            />
-          </div>
-          <div class="flex flex-col gap-1.5 text-sm">
-            <span class="text-xs text-ui-muted">Community-flagged</span>
-            <CommonMarkdownEditor
-              v-model="messageCommunityFlagged"
-              :placeholder="defaultMessages['community-flagged']"
-            />
-          </div>
-        </div>
-      </fieldset>
+          </AppConfigField>
+        </template>
+      </AppConfigSection>
     </form>
 
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <p class="text-sm text-ui-muted">.github/agentscan.yml</p>
+    <aside
+      class="flex flex-col gap-3 min-w-0 lg:sticky lg:top-20"
+      aria-label="Generated configuration"
+    >
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-sm font-mono text-ui-muted">.github/agentscan.yml</p>
         <button
           type="button"
           class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-ui-border/60 hover:bg-ui-muted/20 transition-colors"
@@ -577,13 +709,20 @@ const { copy, copied } = useClipboard({ source: yaml })
         </button>
       </div>
 
-      <textarea
-        :value="yaml"
-        readonly
-        rows="16"
-        spellcheck="false"
-        class="px-4 py-3 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text font-mono resize-y focus:outline-none"
-      />
-    </div>
+      <pre
+        class="px-4 py-3 bg-ui-card border border-ui-border/60 rounded text-sm text-ui-text font-mono overflow-auto max-h-[70vh] whitespace-pre"
+      ><code>{{ yaml }}</code></pre>
+
+      <p class="text-xs text-ui-muted text-pretty">
+        <template v-if="isDefaultConfig">
+          These are the defaults, so you don’t need a config file. Change any
+          setting to customize it.
+        </template>
+        <template v-else>
+          Commit this file to your default branch. Only the settings you changed
+          are included.
+        </template>
+      </p>
+    </aside>
   </div>
 </template>

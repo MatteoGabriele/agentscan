@@ -20,8 +20,21 @@ export function getDefaultMessages() {
     mixed: getClassificationDetails('mixed').description,
     automation: getClassificationDetails('automation').description,
     'community-flagged': COMMUNITY_FLAGGED_DETAILS.description,
+    'insufficient-data':
+      getClassificationDetails('insufficient-data').description,
   }
 }
+
+/**
+ * Placeholders the app fills in. Only the honeypot greetings support them:
+ * classification messages are posted as written.
+ */
+export const MESSAGE_PLACEHOLDERS = {
+  username: 'author',
+  type: 'pull request or issue',
+} as const
+
+export type MessagePlaceholder = keyof typeof MESSAGE_PLACEHOLDERS
 
 export function buildDefaultHoneypotGreeting({
   username,

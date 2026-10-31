@@ -21,6 +21,14 @@ const report: ReportSummary = {
 
 const thresholds: Thresholds = { minApprovals: 4, minRejections: 2 }
 
+function firstMessage(messages: string[]): string {
+  const [message] = messages
+  if (message === undefined) {
+    throw new Error('Expected at least one digest message')
+  }
+  return message
+}
+
 const decision = (overrides: Partial<Decision> = {}): Decision => ({
   issue: 42,
   outcome: 'approved',
@@ -203,9 +211,11 @@ describe('digestMessages', () => {
   })
 
   it('lists who has voted under each report', () => {
-    const [message] = digestMessages(
-      [pending({ approvedBy: ['alice', 'bob'], rejectedBy: ['carol'] })],
-      thresholds,
+    const message = firstMessage(
+      digestMessages(
+        [pending({ approvedBy: ['alice', 'bob'], rejectedBy: ['carol'] })],
+        thresholds,
+      ),
     )
 
     const lines = message.split('\n')
@@ -251,12 +261,14 @@ describe('digestMessages', () => {
   // The old flat list ran every report together, which was unreadable in the
   // channel: each entry now stands as its own block.
   it('separates the reports with a blank line', () => {
-    const [message] = digestMessages(
-      [
-        pending({ issue: 1, username: 'first' }),
-        pending({ issue: 2, username: 'second' }),
-      ],
-      thresholds,
+    const message = firstMessage(
+      digestMessages(
+        [
+          pending({ issue: 1, username: 'first' }),
+          pending({ issue: 2, username: 'second' }),
+        ],
+        thresholds,
+      ),
     )
 
     const lines = message.split('\n')
@@ -266,12 +278,14 @@ describe('digestMessages', () => {
   })
 
   it('keeps the reports in the order it was given', () => {
-    const [message] = digestMessages(
-      [
-        pending({ issue: 7, username: 'older' }),
-        pending({ issue: 9, username: 'newer' }),
-      ],
-      thresholds,
+    const message = firstMessage(
+      digestMessages(
+        [
+          pending({ issue: 7, username: 'older' }),
+          pending({ issue: 9, username: 'newer' }),
+        ],
+        thresholds,
+      ),
     )
 
     expect(message.indexOf('older')).toBeLessThan(message.indexOf('newer'))

@@ -54,8 +54,7 @@ describe('mergeAdopters', () => {
     )
 
     expect(merged).toHaveLength(1)
-    expect(merged[0].avatar).toBe('app-avatar')
-    expect(merged[0].platform).toBe('app')
+    expect(merged[0]).toMatchObject({ avatar: 'app-avatar', platform: 'app' })
   })
 
   it('returns an empty list when nothing was collected', () => {
