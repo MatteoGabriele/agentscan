@@ -1042,5 +1042,56 @@
     "approvedBy": [
       "MatteoGabriele"
     ]
+  },
+  {
+    "username": "DoctorGuidance",
+    "id": 12963915,
+    "reason": "Spamming AI comments on GitHub issues",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/543",
+    "reportedBy": "gameroman",
+    "createdAt": "2026-10-31",
+    "approvedBy": [
+      "ematipico",
+      "MatteoGabriele"
+    ]
+  },
+  {
+    "username": "akasakariko",
+    "id": 148060537,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/541",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-27",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "HuzaifaChaudary",
+    "id": 98877942,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/536",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-23",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico"
+    ]
+  },
+  {
+    "username": "cpruijsen",
+    "id": 3891941,
+    "reason": "Heavy automation usage creating spam PRs within short timeframe",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/535",
+    "reportedBy": "mostafaNazari702",
+    "createdAt": "2026-10-22",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico"
+    ]
   }
 ]
