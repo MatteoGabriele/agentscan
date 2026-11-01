@@ -31,12 +31,6 @@
     <div
       class="flex flex-col gap-20 items-center justify-center max-w-4xl mx-auto py-12 w-full"
     >
-      <div class="w-full min-h-screen-md">
-        <LazyChartHourlyLinesChanged />
-      </div>
-      <div class="w-full">
-        <LazyChartPrVerdictTable hydrate-on-visible />
-      </div>
       <div class="w-full">
         <LazyChartRepoScoreHistory hydrate-on-visible />
       </div>

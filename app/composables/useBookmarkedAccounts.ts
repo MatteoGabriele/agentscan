@@ -131,13 +131,10 @@ export function useBookmarkedAccounts() {
     }
   }
 
-  const { trackEvent } = useSaEvent()
   async function toggleBookmark(user: GitHubUser): Promise<void> {
     if (isBookmarked(user.login)) {
-      trackEvent('bookmark_toggle_remove_clicked')
       await removeBookmark(user.login)
     } else {
-      trackEvent('bookmark_toggle_add_clicked')
       await addBookmark(user)
     }
   }

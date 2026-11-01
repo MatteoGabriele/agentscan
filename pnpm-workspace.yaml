@@ -6,4 +6,3 @@ minimumReleaseAgeExclude:
   - '@unveil/identity'
   - 'vue-data-ui'
   - '@unveil/vk'
-  - '@unveil/interlinked'

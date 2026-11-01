@@ -23,8 +23,6 @@ function scrollToConfig() {
     behavior: 'smooth',
   })
 }
-
-const { trackEvent } = useSaEvent()
 </script>
 
 <template>
@@ -51,7 +49,6 @@ const { trackEvent } = useSaEvent()
             external
             to="https://github.com/apps/agentscanapp/installations/new"
             class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-ui-accent hover:bg-ui-accent-hover transition-colors"
-            @click="trackEvent('github_app_install_button_clicked')"
           >
             <span class="i-lucide-github text-lg" aria-hidden="true" />
             Install the GitHub App

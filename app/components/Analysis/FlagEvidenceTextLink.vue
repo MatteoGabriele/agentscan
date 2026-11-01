@@ -6,7 +6,6 @@ const props = defineProps<{
 }>()
 
 const { getTextAnalysis } = useGitHubEventDisplay()
-const { trackEvent } = useSaEvent()
 
 const analysis = computed(() => getTextAnalysis(props.event))
 </script>
@@ -18,7 +17,6 @@ const analysis = computed(() => getTextAnalysis(props.event))
     target="_blank"
     title="Open in AgentScan Text"
     class="mt-1 w-fit inline-flex items-center gap-1.5 text-xs text-ui-muted hover:text-ui-text transition-colors"
-    @click="trackEvent('evidence_text_analysis_clicked')"
   >
     <span class="i-agentscan:text shrink-0" />
     {{ analysis.label }}

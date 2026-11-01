@@ -47,9 +47,6 @@ importers:
       '@unveil/identity':
         specifier: 3.0.0
         version: 3.0.0
-      '@unveil/interlinked':
-        specifier: ^0.0.11
-        version: 0.0.11
       '@unveil/vk':
         specifier: 1.0.0
         version: 1.0.0(@unveil/identity@3.0.0)
@@ -65,9 +62,6 @@ importers:
       octokit:
         specifier: ^5.0.5
         version: 5.0.5
-      simple-analytics-vue:
-        specifier: ^3.1.0
-        version: 3.1.0(vue@3.5.35(typescript@6.0.3))
       tiptap-markdown:
         specifier: ^0.9.0
         version: 0.9.0(@tiptap/core@3.30.5(@tiptap/pm@3.31.3))
@@ -2709,9 +2703,6 @@ packages:
 
   '@unveil/identity@3.0.0':
     resolution: {integrity: sha512-K12WL5AS7s9FXiY46TCZIMS/Y9RCU0DISs9K2G4ZkOCN3K9E4axG1XrNGYw6G6SrmRtWnZT3kPO+hFnYE055Dw==}
-
-  '@unveil/interlinked@0.0.11':
-    resolution: {integrity: sha512-FkvSiCCFmRXpce8ACvnarYnbWKTi2CxXaasui1jB1GCuRXLdluWOLs8OLeDZQHWTZ4nOx3hHrMvyiRQv2cHd9A==}
 
   '@unveil/vk@1.0.0':
     resolution: {integrity: sha512-/vVWcDJg8ZCun46eZseK8nHUit6Yd1tbgD2ydRXNNEqasGh9cAS00l9QkFdNIL2gy0HF3akbrCTIsftXTNw2Zw==}
@@ -5469,11 +5460,6 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
-
-  simple-analytics-vue@3.1.0:
-    resolution: {integrity: sha512-8Pwjbh3e0UDKwhLgDOokGOWe3Ot7bZsTbNHMaQylqFebTxoWe80gH+h1jcNbWPCBQ+/nEWHdqbRLpc/4vg2gow==}
-    peerDependencies:
-      vue: ^3.0.0
 
   simple-git@3.36.0:
     resolution: {integrity: sha512-cGQjLjK8bxJw4QuYT7gxHw3/IouVESbhahSsHrX97MzCL1gu2u7oy38W6L2ZIGECEfIBG4BabsWDPjBxJENv9Q==}
@@ -9447,8 +9433,6 @@ snapshots:
 
   '@unveil/identity@3.0.0': {}
 
-  '@unveil/interlinked@0.0.11': {}
-
   '@unveil/vk@1.0.0(@unveil/identity@3.0.0)':
     dependencies:
       '@unveil/identity': 3.0.0
@@ -12684,10 +12668,6 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
-
-  simple-analytics-vue@3.1.0(vue@3.5.35(typescript@6.0.3)):
-    dependencies:
-      vue: 3.5.35(typescript@6.0.3)
 
   simple-git@3.36.0(supports-color@10.2.2):
     dependencies:

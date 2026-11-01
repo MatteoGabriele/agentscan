@@ -10,8 +10,6 @@ const props = defineProps<{
   forceExpanded?: boolean
 }>()
 
-const { trackEvent } = useSaEvent()
-
 const isOpen = ref(false)
 const showAllRepositories = ref(false)
 
@@ -43,7 +41,6 @@ const hiddenRepositoriesCount = computed<number>(() => {
         rel="noopener"
         :to="topRepository.url"
         class="group flex items-center gap-3 min-w-0"
-        @click="trackEvent('adopter_repository_link_clicked')"
       >
         <img
           :src="group.avatar"
@@ -91,7 +88,6 @@ const hiddenRepositoriesCount = computed<number>(() => {
             rel="noopener"
             :to="repository.url"
             class="group flex items-center gap-3 py-1.5"
-            @click="trackEvent('adopter_repository_link_clicked')"
           >
             <span
               class="font-mono text-sm text-ui-muted truncate group-hover:text-ui-text transition-colors"
