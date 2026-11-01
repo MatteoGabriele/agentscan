@@ -10,8 +10,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
   ],
 
-  plugins: ['~/plugins/analytics.client'],
-
   vite: {
     optimizeDeps: {
       include: [

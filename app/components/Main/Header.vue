@@ -5,8 +5,6 @@ defineProps<{
   onlyLogo?: boolean
 }>()
 
-const { trackEvent } = useSaEvent()
-
 const scanItems: MenuDropdownItem[] = [
   {
     to: '/',
@@ -102,10 +100,6 @@ const installItems: MenuDropdownItem[] = [
           <LazyMainMenuDropdown
             label="Install AgentScan"
             :items="installItems"
-            @select="
-              (item) =>
-                trackEvent('get_agentscan_clicked', { item: item.label })
-            "
           />
         </li>
       </ul>

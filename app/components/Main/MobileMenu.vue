@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute()
-const { trackEvent } = useSaEvent()
 
 const isMenuOpen = ref<boolean>(false)
 function toggleMenu() {
@@ -133,23 +132,13 @@ onBeforeUnmount(() => {
           </p>
           <ul class="flex flex-col items-center gap-3">
             <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/app"
-                label="GitHub App"
-                @click="
-                  trackEvent('get_agentscan_clicked', { item: 'GitHub App' })
-                "
-              />
+              <LazyMainMenuItem class="text-xl" to="/app" label="GitHub App" />
             </li>
             <li>
               <LazyMainMenuItem
                 class="text-xl"
                 to="https://github.com/marketplace/actions/agentscan"
                 label="GitHub Action"
-                @click="
-                  trackEvent('get_agentscan_clicked', { item: 'GitHub Action' })
-                "
               />
             </li>
             <li>
@@ -157,9 +146,6 @@ onBeforeUnmount(() => {
                 class="text-xl"
                 to="/app#configure"
                 label="Configure"
-                @click="
-                  trackEvent('get_agentscan_clicked', { item: 'Configure' })
-                "
               />
             </li>
           </ul>
