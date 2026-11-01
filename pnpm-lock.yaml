@@ -47,9 +47,6 @@ importers:
       '@unveil/identity':
         specifier: 3.0.0
         version: 3.0.0
-      '@unveil/interlinked':
-        specifier: ^0.0.11
-        version: 0.0.11
       '@unveil/vk':
         specifier: 1.0.0
         version: 1.0.0(@unveil/identity@3.0.0)
@@ -2706,9 +2703,6 @@ packages:
 
   '@unveil/identity@3.0.0':
     resolution: {integrity: sha512-K12WL5AS7s9FXiY46TCZIMS/Y9RCU0DISs9K2G4ZkOCN3K9E4axG1XrNGYw6G6SrmRtWnZT3kPO+hFnYE055Dw==}
-
-  '@unveil/interlinked@0.0.11':
-    resolution: {integrity: sha512-FkvSiCCFmRXpce8ACvnarYnbWKTi2CxXaasui1jB1GCuRXLdluWOLs8OLeDZQHWTZ4nOx3hHrMvyiRQv2cHd9A==}
 
   '@unveil/vk@1.0.0':
     resolution: {integrity: sha512-/vVWcDJg8ZCun46eZseK8nHUit6Yd1tbgD2ydRXNNEqasGh9cAS00l9QkFdNIL2gy0HF3akbrCTIsftXTNw2Zw==}
@@ -9438,8 +9432,6 @@ snapshots:
     optional: true
 
   '@unveil/identity@3.0.0': {}
-
-  '@unveil/interlinked@0.0.11': {}
 
   '@unveil/vk@1.0.0(@unveil/identity@3.0.0)':
     dependencies:
