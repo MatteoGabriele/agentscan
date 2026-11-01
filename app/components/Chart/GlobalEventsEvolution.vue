@@ -268,11 +268,7 @@ const landmarkGroups = computed(() =>
   }),
 )
 
-/**
- * Landmarks close to the first or last date would render their centered label
- * outside of the chart, where it gets cut off. Keeping the label anchored in
- * the middle
- */
+/** Clamps a landmark label horizontally so it stays inside the chart. */
 function placeLandmarkLabelX({
   svg,
   name,

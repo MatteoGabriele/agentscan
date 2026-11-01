@@ -2,9 +2,9 @@ import { Document, isMap, isScalar, stringify } from 'yaml'
 import type { ActionReleasesResponse } from '../types/action-release'
 
 /**
- * Turns the config generator's settings into either the GitHub App's
- * `.github/agentscan.yml` or a GitHub Action workflow. Both only spell out what
- * differs from that platform's defaults, which are not quite the same.
+ * Turns the config generator's settings into the GitHub App's
+ * `.github/agentscan.yml` or a GitHub Action workflow, listing only what
+ * differs from each platform's defaults.
  */
 
 export type Platform = 'app' | 'action'
@@ -19,9 +19,8 @@ export type AuthorAssociation =
   | 'member'
   | 'owner'
 
-// A community flag is a state of the account rather than an analysis result,
-// but it replaces the result's title, comment and label, so the generator
-// treats it as one.
+// Includes community-flagged: not an analysis result, but it has its own
+// title, comment and label.
 export type Classification =
   'organic' | 'mixed' | 'automation' | 'community-flagged' | 'insufficient-data'
 
@@ -63,8 +62,8 @@ export const DEFAULT_LABELS: Record<
 }
 
 /**
- * Accepted by `auto-close-classifications`. Community-flagged accounts are
- * closed whenever auto-close is on, so neither platform lists them.
+ * Options for `auto-close-classifications`. Community-flagged accounts are
+ * always closed when auto-close is on.
  */
 export const AUTO_CLOSE_OPTIONS: Record<Platform, Classification[]> = {
   app: ['organic', 'mixed', 'automation'],
@@ -251,9 +250,8 @@ function getActionInputs(settings: ConfigSettings) {
 }
 
 /**
- * The workflow from the action's README. Steps are pinned to the commit SHA of
- * their latest release, with the tag alongside so Dependabot and Renovate can
- * keep it current.
+ * The workflow from the action's README, with each step pinned to its latest
+ * release SHA and the tag alongside for Dependabot and Renovate.
  */
 export function buildActionWorkflow(
   settings: ConfigSettings,

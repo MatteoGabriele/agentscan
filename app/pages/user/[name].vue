@@ -14,6 +14,22 @@ const username = computed(() => {
   return route.params.name[0] ?? ''
 })
 
+// Started before the account fetch so both requests run in parallel.
+const analysisKey = computed<string>(() => `analysis:${username.value}`)
+const {
+  data: analysis,
+  status: analysisStatus,
+  error: analysisError,
+  refresh: refreshAnalysis,
+} = useFetch(() => `/api/identify-replicant/${username.value}`, {
+  query: {
+    show_events: true,
+  },
+  key: analysisKey,
+  watch: [username],
+  lazy: true,
+})
+
 const accountKey = computed<string>(() => `account:${username.value}`)
 const {
   data: user,
@@ -41,7 +57,14 @@ useSeoUser(user)
   />
 
   <div class="flex flex-col gap-6 @container">
-    <LazyAnalysisCard v-if="user" :user />
+    <LazyAnalysisCard
+      v-if="user"
+      :user
+      :analysis
+      :status="analysisStatus"
+      :error="analysisError"
+      :retry="refreshAnalysis"
+    />
 
     <LazyUserCardError v-else-if="error" :error :username :retry="refresh" />
   </div>

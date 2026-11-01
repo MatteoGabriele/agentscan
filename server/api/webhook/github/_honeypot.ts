@@ -15,8 +15,7 @@ function tokenMarker(token: string) {
 
 const TOKEN_MARKER = new RegExp(`<!-- ${MARKER_NAME}:(${TOKEN_PATTERN}) -->`)
 
-// Kept as anonymous as the bait marker: a thread can be scanned again later,
-// and a marker naming the mechanism would carry it over to the next reader.
+// Neutral name, like the bait marker, so the thread doesn't reveal the mechanism.
 export const HONEYPOT_RESULT_MARKER = `<!-- ${MARKER_NAME}-check -->`
 
 export function createHoneypotToken(): string {
@@ -24,11 +23,8 @@ export function createHoneypotToken(): string {
 }
 
 /**
- * True when a comment was posted by this GitHub App.
- *
- * Anyone can write the marker into a comment, so the marker alone says nothing
- * about who issued the code inside it. Only a comment GitHub attributes to our
- * app is a token we handed out.
+ * True when the comment was posted by this GitHub App. Anyone can write the
+ * marker, so only the app's own comments hold trusted codes.
  */
 export function isOwnComment(
   comment: { performed_via_github_app?: { id?: number } | null },

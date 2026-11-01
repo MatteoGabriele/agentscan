@@ -175,8 +175,7 @@ export function getActivityStatsByBuckets(
   }
 }
 
-// Entries written by the same scan run share a `created_at`, so a run is
-// already its own bucket — the hourly scan gives one bucket per hour.
+// Groups by `created_at`, which entries from the same scan run share.
 export function getClassificationStatsByScanTime(
   data: ActivityItem[] = [],
 ): GetClassificationStatsByDateResults {
@@ -218,8 +217,7 @@ export function applyCumulativeTrends(
 
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
 
-// The clock hour a timestamp belongs to, so a scan time and the placeholder
-// standing in for it can never end up under two different keys.
+// Truncates a timestamp to its clock hour.
 function getHourTime(time: number): number {
   return Math.floor(time / MILLISECONDS_PER_HOUR) * MILLISECONDS_PER_HOUR
 }
@@ -276,9 +274,7 @@ export function fillEmptyHourlyBuckets({
         )
       : firstHourTime
 
-  // Scan times that don't sit exactly on the hourly grid still belong to the
-  // window, so they collapse onto their clock hour rather than being dropped
-  // next to the placeholder for that same hour.
+  // Scan times off the hourly grid are bucketed under their clock hour.
   const recorded: GetClassificationStatsByDateResults = {}
 
   hours.forEach((hour) => {

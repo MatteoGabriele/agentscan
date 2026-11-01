@@ -3,8 +3,7 @@ import type {
   PinnedRelease,
 } from '~~/shared/types/action-release'
 
-// The config generator pins workflow steps to a commit SHA rather than a tag:
-// a tag can be moved to point at different code, a SHA cannot.
+// Steps are pinned to a commit SHA, since a tag can be moved.
 async function getLatestRelease(
   octokit: ReturnType<typeof createOctokit>,
   owner: string,

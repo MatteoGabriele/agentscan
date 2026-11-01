@@ -11,8 +11,8 @@ export const COMMUNITY_FLAGGED_DETAILS = {
 }
 
 /**
- * What the bot comments when `messages.*` is left blank in agentscan.yml.
- * Shared so the config generator can show the real text rather than describe it.
+ * Default bot comments when `messages.*` is blank in agentscan.yml. Also shown
+ * by the config generator.
  */
 export function getDefaultMessages() {
   return {
@@ -25,10 +25,7 @@ export function getDefaultMessages() {
   }
 }
 
-/**
- * Placeholders the app fills in. Only the honeypot greetings support them:
- * classification messages are posted as written.
- */
+/** Placeholders the app fills in. Only honeypot greetings support them. */
 export const MESSAGE_PLACEHOLDERS = {
   username: 'author',
   type: 'pull request or issue',

@@ -61,7 +61,7 @@ const unit = computed<ActivityUnit>(() => {
 // Rendered outside the Toggle so it sits below both toggles
 const rangeCaption = computed(() =>
   urlParams.view === 'hourly'
-    ? // In mobile we actually show 13 datapoints, but saying 12 looks better on the UI
+    ? // Mobile shows 13 datapoints; the caption rounds to 12.
       `Last ${isMobile.value ? 12 : WINDOW_MAX_HOURS} hours, updated every hour`
     : `Daily totals from the last ${isMobile.value ? 2 : DEFAULT_HISTORY_MONTHS} ${isMobile.value ? 'weeks' : 'months'}`,
 )

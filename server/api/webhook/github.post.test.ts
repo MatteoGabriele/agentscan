@@ -24,8 +24,7 @@ const {
   const mockWebhooks = { verify: vi.fn() }
 
   const mockInstallationOctokit = {
-    // Mirrors octokit's paginate: calls the endpoint and unwraps `data`, so the
-    // per-test `listComments.mockResolvedValue({ data })` setups still apply.
+    // Mirrors octokit's paginate: calls the endpoint and unwraps `data`.
     paginate: vi.fn(
       async (
         endpoint: (params: unknown) => Promise<{ data: unknown[] }>,
@@ -35,8 +34,7 @@ const {
         return data
       },
     ),
-    // The handler authenticates as the installation and hands the token to
-    // `analyze`, which does the GitHub reads itself.
+    // The installation token is passed to `analyze`, which does the GitHub reads.
     auth: vi.fn(),
     rest: {
       repos: { getContent: vi.fn() },
@@ -105,8 +103,7 @@ vi.mock('@octokit/webhooks', () => ({
     return mockWebhooks
   }),
 }))
-// Only the classification copy is stubbed: `describeFlag` stays real so the
-// flag text in the comment comes from the same code that runs in production.
+// Only the classification copy is stubbed; `describeFlag` stays real.
 vi.mock('@unveil/identity/report', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@unveil/identity/report')>()),
   getClassificationDetails: vi.fn(),
@@ -432,8 +429,7 @@ describe('GitHub Webhook Handler', () => {
 
       await handler(MOCK_EVENT)
 
-      // Raw brackets make `details_url` an invalid URL, GitHub rejects the
-      // update, and the check run stays stuck in progress.
+      // Raw brackets make `details_url` invalid and GitHub rejects the update.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           details_url: 'https://agentscan.tools/user/dependabot%5Bbot%5D',
@@ -1207,8 +1203,7 @@ describe('GitHub Webhook Handler', () => {
         })
       })
 
-      // The bait is the whole mechanism, so mode does not gate it — otherwise
-      // honeypot: true would silently do nothing.
+      // The bait applies regardless of mode.
       it.each(['silent', 'labels'])(
         'still posts the honeypot comment in %s mode',
         async (mode) => {
@@ -1782,9 +1777,8 @@ describe('GitHub Webhook Handler', () => {
       onTestFinished(() => consoleError.mockRestore())
 
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
-      // Each conclusion is attempted twice — full payload, then stripped — and
-      // the run must not be left at `in_progress`: once the real conclusion is
-      // exhausted the guard concludes it as neutral instead.
+      // Each conclusion is tried with the full payload, then stripped; if both fail,
+      // the run is concluded as neutral.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
         4,
       )
@@ -1811,8 +1805,7 @@ describe('GitHub Webhook Handler', () => {
 
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
 
-      // The stripped retry lands the real conclusion, so the safety net in
-      // `finally` sees a settled run and does not overwrite it with neutral.
+      // The stripped retry succeeds, so `finally` leaves the conclusion alone.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
         2,
       )
@@ -1831,8 +1824,7 @@ describe('GitHub Webhook Handler', () => {
     it('concludes the check run as neutral when the analysis outruns the deadline', async () => {
       vi.useFakeTimers()
 
-      // Stays pending past the deadline: stands in for a scan slow enough to be
-      // killed by the function timeout before it can conclude the run itself.
+      // Never resolves, simulating a scan that outlives the function timeout.
       let resolveAnalysis: (value: AnalyzeReturn) => void = () => {}
       vi.mocked(analyze).mockReturnValue(
         new Promise((resolve) => {
@@ -1854,8 +1846,7 @@ describe('GitHub Webhook Handler', () => {
         }),
       )
 
-      // Let the handler run its cleanup before handing the clock back, so no
-      // in-flight work leaks into the next test.
+      // Lets the handler clean up before restoring real timers.
       resolveAnalysis({
         report: MOCK_ANALYSIS,
         events: [],

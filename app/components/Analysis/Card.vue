@@ -1,49 +1,39 @@
 <script setup lang="ts">
+import type { AsyncDataRequestStatus } from '#app'
 import type { ClassificationLabel } from '@unveil/identity'
 import type { Report } from '@unveil/identity/report'
 import type { GitHubUser } from '@unveil/identity/providers/github'
+import type { AnalyzeReturn } from '@unveil/vk'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
 
 const props = defineProps<{
   user: GitHubUser
+  analysis?: AnalyzeReturn | null
+  status: AsyncDataRequestStatus
+  error?: unknown
+  retry: () => unknown
 }>()
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const analysisKey = computed<string>(() => `analysis:${username.value}`)
-const { data, status, error, refresh } = useFetch(
-  () => `/api/identify-replicant/${username.value}`,
+const { data: accountReports } = await useFetch(
+  () => `/api/account-reports/${username.value}`,
   {
-    query: {
-      show_events: true,
-    },
-    key: analysisKey,
-    watch: [username],
-    lazy: true,
+    key: computed(() => `account-reports:${username.value}`),
+    query: computed(() => ({ id: props.user.id })),
   },
 )
 
-const { data: verifiedAutomations } = await useVerifiedAutomations()
-
 const verifiedAutomation = computed(() => {
-  return verifiedAutomations.value?.find((account) => {
-    return (
-      account.username.toLowerCase() === username.value?.toLowerCase() ||
-      account.id === props.user.id
-    )
-  })
+  return accountReports.value?.verifiedAutomation ?? undefined
 })
 
-const { data: automationTally } = await useAutomationTally()
 const matchedTally = computed(() => {
-  return automationTally.value?.find((tally) => tally.id === props.user.id)
+  return accountReports.value?.automationTally ?? undefined
 })
 
-const { data: integrations } = await useIntegrations()
 const activityReport = computed<IntegrationItem | undefined>(() => {
-  return integrations.value?.find((item) => {
-    return item.username.toLowerCase() === username.value?.toLowerCase()
-  })
+  return accountReports.value?.integration ?? undefined
 })
 
 const approvedBy = computed<string[]>(() => {
@@ -54,7 +44,7 @@ const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
 const classification = computed<ClassificationLabel | undefined>(() => {
-  return data.value?.report.classification
+  return props.analysis?.report.classification
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
@@ -72,27 +62,27 @@ const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
     username: username.value || '',
     userId: props.user.id,
-    flags: data.value?.report.flags ?? [],
+    flags: props.analysis?.report.flags ?? [],
     sourceUrl: `https://agentscan.tools/user/${username.value}`,
   })
 })
 
 const identifyAnalysis = computed<Report | undefined>(() => {
-  return data.value?.report
+  return props.analysis?.report
 })
 
 const score = computed<number | undefined>(() => {
-  return data.value?.report.score
+  return props.analysis?.report.score
 })
 
 const isBountyHunter = computed<boolean>(() => {
-  return !!data.value?.report.isBountyHunter
+  return !!props.analysis?.report.isBountyHunter
 })
 
 const { nearestClassification } = useNearestClassification(score)
 
 const confidence = computed<number | undefined>(() => {
-  return data.value?.report.confidence
+  return props.analysis?.report.confidence
 })
 
 const { coverageLevel } = useDataCoverage(confidence)
@@ -148,8 +138,8 @@ useSeoAnalysis(identifyAnalysis, {
 
     <div class="px-6">
       <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
-      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
-      <template v-else-if="data">
+      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => retry()" />
+      <template v-else-if="analysis">
         <section v-if="verifiedAutomation">
           <header class="mb-2 flex gap-2 items-center text-ui-automation">
             <span class="i-lucide:circle-alert text-base" aria-hidden="true" />
@@ -220,8 +210,8 @@ useSeoAnalysis(identifyAnalysis, {
           <div
             class="text-sm text-ui-muted flex flex-wrap items-center gap-x-3 gap-y-2"
           >
-            <p v-if="data.eventsCount > 0">
-              Analyzed from the last {{ data.eventsCount }} public GitHub
+            <p v-if="analysis.eventsCount > 0">
+              Analyzed from the last {{ analysis.eventsCount }} public GitHub
               <NuxtLink
                 external
                 target="_blank"
@@ -271,23 +261,25 @@ useSeoAnalysis(identifyAnalysis, {
   <div class="@lg:mx-6">
     <AnalysisFlagsSkeleton v-if="status === 'pending'" />
     <LazyAnalysisFlags
-      v-else-if="data && (data.report.flags.length > 0 || hasActivityReport)"
-      :flags="data.report.flags"
+      v-else-if="
+        analysis && (analysis.report.flags.length > 0 || hasActivityReport)
+      "
+      :flags="analysis.report.flags"
       :activity-report="activityReport"
       hydrate-on-interaction
     />
   </div>
 
-  <template v-if="classification !== 'insufficient-data' && data">
+  <template v-if="classification !== 'insufficient-data' && analysis">
     <LazyChartAccountEventsTimeline
       :classification="classification"
-      :events="data.events"
+      :events="analysis.events"
       hydrate-on-visible
     />
 
     <LazyChartAccountEventsBreakdown
       :classification="classification"
-      :events="data.events"
+      :events="analysis.events"
       hydrate-on-interaction
     />
   </template>

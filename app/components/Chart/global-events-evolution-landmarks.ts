@@ -13,9 +13,8 @@ export type Landmark = {
 }
 
 /**
- * Temporary landmark for sample updates
- * We can remove it later if we don't notice any before/after trend shifts
- * The landmark is visible only when it is a day older than the last date of the dataset.
+ * Temporary landmark for the sample update; remove if no trend shift shows up.
+ * Shown once it is a day older than the last date of the dataset.
  */
 export const landmarks: Landmark[] = [
   {

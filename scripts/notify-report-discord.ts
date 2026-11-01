@@ -36,13 +36,13 @@ const REPO = 'agentscan'
 
 const REPORT_LABEL = 'automation'
 
-/** Discord caps a message at 2000 characters */
+/** Longest report reason quoted in a message. */
 const MAX_REASON_LENGTH = 300
 
-/** The same cap, applied to the digest by splitting it across messages. */
+/** Discord's per-message limit; the digest is split to fit. */
 const MAX_MESSAGE_LENGTH = 2_000
 
-/** Discord rate limits webhooks, and a run can settle several reports at once. */
+/** Delay between webhook posts, to stay under Discord's rate limit. */
 const POST_INTERVAL_MS = 1_000
 
 const SUPPRESS_EMBEDS = 4
@@ -55,14 +55,14 @@ export interface ReportSummary {
   reason: string
 }
 
-/** One entry of the daily digest: an open report nobody has settled yet. */
+/** An open report in the daily digest that has no verdict yet. */
 export interface PendingReport {
   issue: number
   url: string
   username: string
   approvals: number
   rejections: number
-  /** Reviewer logins, so everyone can spot the report they have not voted on. */
+  /** Reviewer logins, listed so reviewers can spot reports they have not voted on. */
   approvedBy: string[]
   rejectedBy: string[]
 }
@@ -108,11 +108,10 @@ export function decidedMessage(
     '',
     outcome,
     '',
-    // Counts only. Who voted which way stays on the issue, where the scoreboard
-    // comment already spells it out.
+    // Counts only; voter names stay on the issue.
     `👍 ${decision.approvals}/${thresholds.minApprovals}  ·  👎 ${decision.rejections}/${thresholds.minRejections}`,
     '',
-    // Wrapped in <> so the link brings no preview card with it.
+    // <> suppresses Discord's link preview.
     `<${report.url}>`,
   ].join('\n')
 }
@@ -143,7 +142,7 @@ export function reportBlock(
     `**#${report.issue}**  ·  \`@${report.username}\``,
     `> 👍 ${report.approvals}/${thresholds.minApprovals}  ·  👎 ${report.rejections}/${thresholds.minRejections}`,
     votersLine(report),
-    // Wrapped in <> so no entry drags a preview card along behind it.
+    // <> suppresses Discord's link preview.
     `> <${report.url}>`,
   ]
 }
@@ -192,10 +191,7 @@ function client(): Octokit {
   return new Octokit({ auth: readGithubToken() })
 }
 
-/**
- * Returns null when the issue is not an automation report, so a mistargeted
- * dispatch posts nothing rather than posting nonsense.
- */
+/** Returns null when the issue is not an automation report. */
 async function fetchReport(
   octokit: Octokit,
   issue: number,
@@ -326,9 +322,8 @@ async function decidedEvent(dryRun: boolean): Promise<void> {
 }
 
 /**
- * Lists every open report that is still pending, cheapest signal first: the
- * same reviewer roster and the same thresholds the review workflow decides on,
- * so the counts here match the ones that will settle the report.
+ * Posts the digest of open reports still pending, using the same roster and
+ * thresholds as the review workflow.
  */
 async function digestEvent(dryRun: boolean): Promise<void> {
   const octokit = client()
@@ -337,12 +332,11 @@ async function digestEvent(dryRun: boolean): Promise<void> {
   const open = await openReports(octokit)
   const pending: PendingReport[] = []
 
-  // Ascending issue number, so the reports that have waited longest lead.
+  // Oldest reports first.
   for (const issue of open.sort((a, b) => a.number - b.number)) {
     const counted = await tally(octokit, issue.number, config.reviewers)
 
-    // A settled report is left out: the review job running just before this one
-    // has already announced and closed it.
+    // Skips reports the review job has already settled.
     if (decide(counted, config) !== 'pending') {
       continue
     }

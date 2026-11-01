@@ -7,8 +7,7 @@ const props = defineProps<{
   flag: Flag
 }>()
 
-// Flag events are provider-neutral; the raw GitHub event they came from is
-// kept on `source`, which is what the links and descriptions below read.
+// Returns the raw GitHub event a flag event was built from.
 function toGitHubEvent(event: ActivityEvent): GitHubEvent | undefined {
   return event.source as GitHubEvent | undefined
 }
@@ -284,7 +283,7 @@ const hiddenCount = computed(() => {
       </button>
     </template>
 
-    <!-- ── ORIGINAL icon+sticky list (single event type) ── -->
+    <!-- Single event type: icon list -->
     <template v-else>
       <LazyAnalysisFlagEvidenceFast
         v-if="fastestEventPair"
