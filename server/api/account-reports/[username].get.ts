@@ -1,3 +1,7 @@
+import type { VerifiedAutomation } from '~~/shared/types/automation'
+import type { IntegrationItem } from '~~/shared/types/integrations'
+import type { AutomationTallyResponse } from '~~/shared/types/logs-api'
+
 // Returns the community report, scan tally and integration entries for one account.
 export default defineEventHandler(async (event) => {
   const username = getRouterParam(event, 'username')?.toLowerCase()
@@ -18,26 +22,29 @@ export default defineEventHandler(async (event) => {
     $fetch('/api/integration/unsafe-labs'),
   ])
 
-  const verifiedAutomation =
-    verified.status === 'fulfilled'
-      ? verified.value.find((account) => {
-          return (
-            account.username.toLowerCase() === username || account.id === id
-          )
-        })
-      : undefined
+  let verifiedAutomation: VerifiedAutomation | undefined
 
-  const automationTally =
-    tally.status === 'fulfilled' && id !== undefined
-      ? tally.value.find((entry) => entry.id === id)
-      : undefined
+  if (verified.status === 'fulfilled') {
+    verifiedAutomation = verified.value.find((account) => {
+      return id === undefined
+        ? account.username.toLowerCase() === username
+        : account.id === id
+    })
+  }
 
-  const integration =
-    integrations.status === 'fulfilled'
-      ? integrations.value.find((item) => {
-          return item.username.toLowerCase() === username
-        })
-      : undefined
+  let automationTally: AutomationTallyResponse[number] | undefined
+
+  if (tally.status === 'fulfilled' && id !== undefined) {
+    automationTally = tally.value.find((entry) => entry.id === id)
+  }
+
+  let integration: IntegrationItem | undefined
+
+  if (integrations.status === 'fulfilled') {
+    integration = integrations.value.find((item) => {
+      return item.username.toLowerCase() === username
+    })
+  }
 
   return {
     verifiedAutomation: verifiedAutomation ?? null,

@@ -16,11 +16,12 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const { data: accountReports } = await useFetch(
+const { data: accountReports } = useFetch(
   () => `/api/account-reports/${username.value}`,
   {
     key: computed(() => `account-reports:${username.value}`),
     query: computed(() => ({ id: props.user.id })),
+    lazy: true,
   },
 )
 
