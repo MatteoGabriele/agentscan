@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const { data: accountReports } = useFetch(
+const { data: accountReports, status: accountReportsStatus } = useFetch(
   () => `/api/account-reports/${username.value}`,
   {
     key: computed(() => `account-reports:${username.value}`),
@@ -24,6 +24,12 @@ const { data: accountReports } = useFetch(
     lazy: true,
   },
 )
+
+// Held until community reports settle too, so a reported account never
+// flashes its regular classification before switching.
+const isPending = computed<boolean>(() => {
+  return props.status === 'pending' || accountReportsStatus.value === 'pending'
+})
 
 const verifiedAutomation = computed(() => {
   return accountReports.value?.verifiedAutomation ?? undefined
@@ -45,7 +51,7 @@ const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
 const classification = computed<ClassificationLabel | undefined>(() => {
-  return props.analysis?.report.classification
+  return isPending.value ? undefined : props.analysis?.report.classification
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
@@ -138,7 +144,7 @@ useSeoAnalysis(identifyAnalysis, {
     />
 
     <div class="px-6">
-      <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
+      <LazyAnalysisCardSkeleton v-if="isPending" />
       <LazyErrorCardGeneric v-else-if="error" :error :retry="() => retry()" />
       <template v-else-if="analysis">
         <section v-if="verifiedAutomation">
@@ -260,7 +266,7 @@ useSeoAnalysis(identifyAnalysis, {
   </div>
 
   <div class="@lg:mx-6">
-    <AnalysisFlagsSkeleton v-if="status === 'pending'" />
+    <AnalysisFlagsSkeleton v-if="isPending" />
     <LazyAnalysisFlags
       v-else-if="
         analysis && (analysis.report.flags.length > 0 || hasActivityReport)
