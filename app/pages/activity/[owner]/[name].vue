@@ -65,6 +65,31 @@ function roundScore(value: number | null | undefined) {
 
 const score = computed(() => roundScore(report.value?.current.score))
 
+if (report.value) {
+  const ogTitle = `${report.value.repo} activity | AgentScan`
+
+  useHead({
+    meta: [
+      { property: 'og:title', content: ogTitle },
+      {
+        property: 'og:description',
+        content:
+          summary.value?.text ??
+          `No pull requests scored in the last ${REPO_REPORT_PERIOD_DAYS} days.`,
+      },
+    ],
+  })
+
+  defineOgImage('RepoReport', {
+    repo: report.value.repo,
+    score: score.value ?? undefined,
+    classification: classification.value,
+    label: summary.value?.label,
+    count: report.value.current.count,
+    days: REPO_REPORT_PERIOD_DAYS,
+  })
+}
+
 const scoreChange = computed(() => {
   const current = report.value?.current.score
   const previous = report.value?.previous?.score

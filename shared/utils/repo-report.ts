@@ -27,16 +27,19 @@ function isSameRepo(a: string, b: string): boolean {
 
 /**
  * Finds the repo's canonical spelling, since the URL may not match GitHub's
- * casing. Returns null when neither data source has seen the repo.
+ * casing. Returns null when no data source knows the repo.
  */
 export function findRepoName({
   repo,
   days,
   results,
+  libraries = [],
 }: {
   repo: string
   days: ActivityRepoScoreDay[]
   results: ActivityItem[]
+  // Tracked repos with no scored pull requests yet.
+  libraries?: string[]
 }): string | null {
   for (const day of days) {
     const match = day.repos.find((item) => isSameRepo(item.name, repo))
@@ -48,7 +51,11 @@ export function findRepoName({
 
   const repoEntry = results.find((item) => isSameRepo(item.repo_name, repo))
 
-  return repoEntry?.repo_name ?? null
+  if (repoEntry) {
+    return repoEntry.repo_name
+  }
+
+  return libraries.find((item) => isSameRepo(item, repo)) ?? null
 }
 
 function sumTotals(

@@ -59,6 +59,17 @@ describe('findRepoName', () => {
     )
   })
 
+  it('falls back to the tracked repositories', () => {
+    expect(
+      findRepoName({
+        repo: 'Nuxt/UI',
+        days: [],
+        results: [],
+        libraries: ['nuxt/ui'],
+      }),
+    ).toBe('nuxt/ui')
+  })
+
   it('returns null for untracked repos', () => {
     expect(findRepoName({ repo: 'a/b', days: [], results: [] })).toBeNull()
   })

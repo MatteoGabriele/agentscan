@@ -1,4 +1,7 @@
-import type { ActivityHourlyWindowResponse } from '~~/shared/types/logs-api'
+import type {
+  ActivityHourlyWindowResponse,
+  LibrariesResponse,
+} from '~~/shared/types/logs-api'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { findRepoName, getRepoReport } from '~~/shared/utils/repo-report'
 
@@ -21,16 +24,18 @@ export default defineCachedEventHandler(
       })
     }
 
-    const [days, window] = await Promise.all([
+    const [days, window, libraries] = await Promise.all([
       getRepoScoreHistory(),
-      // Internal call, so it reuses the hourly window route's cache.
+      // Internal calls, so they reuse each route's cache.
       $fetch<ActivityHourlyWindowResponse>('/api/activity/hourly-window'),
+      $fetch<LibrariesResponse>('/api/libraries'),
     ])
 
     const name = findRepoName({
       repo,
       days,
       results: window.results,
+      libraries: libraries.repos,
     })
 
     if (!name) {
