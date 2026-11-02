@@ -31,6 +31,16 @@ const { data, status, error } = useAsyncData(
   { lazy: true, server: false },
 )
 
+const { data: libraries } = useLibraries()
+
+const isTracked = computed(() => {
+  const name = data.value?.repo.toLowerCase()
+
+  return Boolean(
+    name && libraries.value.repos.some((item) => item.toLowerCase() === name),
+  )
+})
+
 const repoInput = ref(repo.value)
 
 async function handleSubmit(value: string) {
@@ -77,6 +87,13 @@ async function handleSubmit(value: string) {
         >
           {{ data.repo }}
         </NuxtLink>
+      </p>
+      <p v-if="isTracked" class="mt-1">
+        <NuxtLink
+          :to="`/activity/${data.repo}`"
+          class="underline hover:text-ui-text"
+          >See its activity report</NuxtLink
+        >
       </p>
       <p class="text-xs text-ui-muted/80 mt-1">
         Members, collaborators, and owners are excluded from the scan, as

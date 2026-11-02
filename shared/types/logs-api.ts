@@ -52,9 +52,17 @@ export type AutomationTallyResponse = {
   counter: number
 }[]
 
+export type LibraryCategory = {
+  name: string
+  // Broad area the category belongs to, used as a filter.
+  group: string
+  repos: string[]
+}
+
 export type LibrariesResponse = {
   total: number
   repos: string[]
+  categories: LibraryCategory[]
 }
 
 export type ActivityRepoScore = {
@@ -72,20 +80,9 @@ export type ActivityRepoScoresDatesResponse = {
   dates: string[]
 }
 
-export type ActivityRepoScoresDateResponse = {
-  date: string
-  dates: string[]
-  repos: ActivityRepoScore[]
-}
-
 export type ActivityRepoScoresRangeResponse = {
   from: string
   to: string
   dates: string[]
   days: ActivityRepoScoreDay[]
 }
-
-export type ActivityRepoScoresResponse =
-  | ActivityRepoScoresDatesResponse
-  | ActivityRepoScoresDateResponse
-  | ActivityRepoScoresRangeResponse

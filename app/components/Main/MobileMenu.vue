@@ -79,11 +79,30 @@ onBeforeUnmount(() => {
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
-        <LazyMainMenuItem
-          class="text-xl"
-          to="/activity"
-          label="Ecosystem Activity"
-        />
+        <div class="flex flex-col items-center gap-3">
+          <p
+            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+          >
+            Ecosystem Activity
+          </p>
+          <ul class="flex flex-col items-center gap-3">
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/activity"
+                label="Overview"
+                exact
+              />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/activity/repositories"
+                label="Repositories"
+              />
+            </li>
+          </ul>
+        </div>
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 

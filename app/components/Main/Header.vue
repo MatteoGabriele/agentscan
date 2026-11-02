@@ -32,6 +32,22 @@ const scanItems: MenuDropdownItem[] = [
   },
 ]
 
+const activityItems: MenuDropdownItem[] = [
+  {
+    to: '/activity',
+    label: 'Overview',
+    description: 'Contribution patterns across the tracked repositories',
+    icon: 'i-lucide:activity',
+    exact: true,
+  },
+  {
+    to: '/activity/repositories',
+    label: 'Repositories',
+    description: 'Browse the tracked repositories by category',
+    icon: 'i-lucide:library',
+  },
+]
+
 const communityItems: MenuDropdownItem[] = [
   {
     to: '/contribute',
@@ -91,7 +107,12 @@ const installItems: MenuDropdownItem[] = [
         <li>
           <LazyMainMenuDropdown label="Scan" :items="scanItems" />
         </li>
-        <li><LazyMainMenuItem to="/activity" label="Ecosystem Activity" /></li>
+        <li>
+          <LazyMainMenuDropdown
+            label="Ecosystem Activity"
+            :items="activityItems"
+          />
+        </li>
         <li>
           <LazyMainMenuDropdown label="Community" :items="communityItems" />
         </li>

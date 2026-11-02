@@ -2,11 +2,14 @@
 const props = defineProps<{
   label: string
   to: string
+  exact?: boolean
 }>()
 
 const route = useRoute()
 const isPathActive = computed(() => {
-  return props.to === '/' ? route.path === '/' : route.path.startsWith(props.to)
+  return props.to === '/' || props.exact
+    ? route.path === props.to
+    : route.path.startsWith(props.to)
 })
 </script>
 

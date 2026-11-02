@@ -204,7 +204,11 @@ const rangeCaption = computed(() =>
           projects.
         </p>
 
-        <ScannedRepositoryList />
+        <p>
+          <NuxtLink to="/activity/repositories" class="underline"
+            >Browse all tracked repositories</NuxtLink
+          >, grouped by category, and open any of them for its own report.
+        </p>
       </div>
     </section>
   </NuxtLayout>
