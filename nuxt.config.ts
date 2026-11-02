@@ -8,7 +8,18 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/fonts',
+    'nuxt-og-image',
   ],
+
+  site: {
+    url: 'https://agentscan.tools',
+    name: 'AgentScan',
+  },
+
+  ogImage: {
+    // Matches the static og:image size declared in the layouts.
+    defaults: { height: 630 },
+  },
 
   vite: {
     optimizeDeps: {

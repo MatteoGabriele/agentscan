@@ -17,8 +17,10 @@ const isSectionActive = computed<boolean>(() => {
   })
 })
 
-function isItemActive(to: string) {
-  return to === '/' ? route.path === '/' : route.path.startsWith(to)
+function isItemActive({ to, exact }: MenuDropdownItem) {
+  const isExact = exact || to === '/'
+
+  return isExact ? route.path === to : route.path.startsWith(to)
 }
 
 onClickOutside(root, () => {
@@ -70,13 +72,13 @@ watch(
             class="mt-1 shrink-0 group-hover:text-ui-text transition-colors"
             :class="[
               item.icon,
-              isItemActive(item.to) ? 'text-ui-text' : 'text-ui-muted',
+              isItemActive(item) ? 'text-ui-text' : 'text-ui-muted',
             ]"
           ></span>
           <span class="flex flex-col gap-0.5">
             <span
               class="text-sm group-hover:text-ui-text transition-colors"
-              :class="isItemActive(item.to) ? 'text-ui-text' : 'text-ui-muted'"
+              :class="isItemActive(item) ? 'text-ui-text' : 'text-ui-muted'"
             >
               {{ item.label }}
             </span>

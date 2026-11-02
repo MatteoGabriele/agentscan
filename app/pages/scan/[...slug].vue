@@ -31,6 +31,22 @@ const { data, status, error } = useAsyncData(
   { lazy: true, server: false },
 )
 
+const { data: libraries } = useLibraries()
+
+const isTracked = computed(() => {
+  const name = data.value?.repo.toLowerCase()
+
+  if (!name) {
+    return false
+  }
+
+  return libraries.value.repos.some((item) => item.toLowerCase() === name)
+})
+
+// Built here rather than in the template: Volar rewrites `//` in component
+// props as a comment, which breaks type checking for the rest of the template.
+const repoUrl = computed(() => `https://github.com/${data.value?.repo}`)
+
 const repoInput = ref(repo.value)
 
 async function handleSubmit(value: string) {
@@ -70,13 +86,20 @@ async function handleSubmit(value: string) {
       <p>
         Last {{ data.pullRequests.length }} PRs in
         <NuxtLink
-          :to="`https://github.com/${data.repo}`"
+          :to="repoUrl"
           external
           target="_blank"
           class="underline hover:text-ui-text"
         >
           {{ data.repo }}
         </NuxtLink>
+      </p>
+      <p v-if="isTracked" class="mt-1">
+        <NuxtLink
+          :to="`/activity/${data.repo}`"
+          class="underline hover:text-ui-text"
+          >See its activity report</NuxtLink
+        >
       </p>
       <p class="text-xs text-ui-muted/80 mt-1">
         Members, collaborators, and owners are excluded from the scan, as
