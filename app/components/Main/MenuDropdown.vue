@@ -18,7 +18,9 @@ const isSectionActive = computed<boolean>(() => {
 })
 
 function isItemActive({ to, exact }: MenuDropdownItem) {
-  return to === '/' || exact ? route.path === to : route.path.startsWith(to)
+  const isExact = exact || to === '/'
+
+  return isExact ? route.path === to : route.path.startsWith(to)
 }
 
 onClickOutside(root, () => {

@@ -7,9 +7,9 @@ const props = defineProps<{
 
 const route = useRoute()
 const isPathActive = computed(() => {
-  return props.to === '/' || props.exact
-    ? route.path === props.to
-    : route.path.startsWith(props.to)
+  const isExact = props.exact || props.to === '/'
+
+  return isExact ? route.path === props.to : route.path.startsWith(props.to)
 })
 </script>
 

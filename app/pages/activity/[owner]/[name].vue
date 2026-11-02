@@ -39,6 +39,7 @@ const { classificationIcon } = useClassificationIcons(classification)
 
 // The classification describes who opens pull requests, never the project:
 // popular repos attract automation through no fault of their own.
+// Sometimes. Hopefully.
 const SUMMARY: Record<ActivityCategory, { label: string; text: string }> = {
   organic: {
     label: 'Organic contributions',
@@ -58,11 +59,11 @@ const summary = computed(() =>
   classification.value ? SUMMARY[classification.value] : null,
 )
 
-const score = computed(() => {
-  const value = report.value?.current.score
-
+function roundScore(value: number | null | undefined) {
   return value == null ? null : Math.round(value)
-})
+}
+
+const score = computed(() => roundScore(report.value?.current.score))
 
 const scoreChange = computed(() => {
   const current = report.value?.current.score
@@ -71,11 +72,11 @@ const scoreChange = computed(() => {
   return current == null || previous == null ? null : current - previous
 })
 
-const ecosystemScore = computed(() => {
-  const value = report.value?.ecosystemScore
+const ecosystemScore = computed(() => roundScore(report.value?.ecosystemScore))
 
-  return value == null ? null : Math.round(value)
-})
+// Built here rather than in the template: Volar rewrites `//` in component
+// props as a comment, which breaks type checking for the rest of the template.
+const repoUrl = computed(() => `https://github.com/${report.value?.repo}`)
 
 const trackedSince = computed(
   () => report.value?.days.find((day) => day.count > 0)?.date,
@@ -100,10 +101,16 @@ const windowShares = computed(() => {
 
 const showAllPullRequests = ref(false)
 
-const pullRequests = computed(() => {
-  const items = report.value?.window.pullRequests ?? []
+const allPullRequests = computed(() => report.value?.window.pullRequests ?? [])
 
-  return showAllPullRequests.value ? items : items.slice(0, MAX_PULL_REQUESTS)
+const pullRequests = computed(() => {
+  return showAllPullRequests.value
+    ? allPullRequests.value
+    : allPullRequests.value.slice(0, MAX_PULL_REQUESTS)
+})
+
+const hasHiddenPullRequests = computed(() => {
+  return pullRequests.value.length < allPullRequests.value.length
 })
 
 const classificationNames = Object.fromEntries(
@@ -141,7 +148,7 @@ function formatDate(date: string) {
   </div>
 
   <div v-else-if="error" class="text-center py-12 text-ui-muted">
-    <p v-if="error.statusCode === 404" class="text-sm text-pretty">
+    <p v-if="error.status === 404" class="text-sm text-pretty">
       <span class="text-ui-text font-medium">{{ repo }}</span> is not one of the
       <NuxtLink to="/activity/repositories" class="underline"
         >repositories we track</NuxtLink
@@ -163,7 +170,7 @@ function formatDate(date: string) {
         class="px-6 flex flex-col gap-1 md:flex-row md:items-center md:justify-between md:gap-2"
       >
         <NuxtLink
-          :to="`https://github.com/${report.repo}`"
+          :to="repoUrl"
           external
           target="_blank"
           class="flex items-center gap-2 text-lg font-semibold hover:underline"
@@ -225,21 +232,18 @@ function formatDate(date: string) {
           <dt class="text-ui-muted">
             vs previous {{ REPO_REPORT_PERIOD_DAYS }} days
           </dt>
+          <dd v-if="scoreChange === null">–</dd>
           <dd
+            v-else
             class="tabular-nums"
-            :class="
-              scoreChange === null ? '' : getTrendColor({ value: scoreChange })
-            "
+            :class="getTrendColor({ value: scoreChange })"
           >
-            <template v-if="scoreChange !== null">
-              <span
-                :class="getTrendArrow(scoreChange)"
-                class="align-middle"
-                aria-hidden="true"
-              />
-              {{ formatProgressionPoints(scoreChange) }}
-            </template>
-            <template v-else>–</template>
+            <span
+              :class="getTrendArrow(scoreChange)"
+              class="align-middle"
+              aria-hidden="true"
+            />
+            {{ formatProgressionPoints(scoreChange) }}
           </dd>
         </div>
         <div class="flex flex-col justify-between">
@@ -319,15 +323,16 @@ function formatDate(date: string) {
               />
               <NuxtLink
                 v-if="pullRequest.pr"
-                :to="`https://github.com/${report.repo}/pull/${pullRequest.pr}`"
+                :to="`${repoUrl}/pull/${pullRequest.pr}`"
                 external
                 target="_blank"
                 class="underline tabular-nums"
-                >#{{ pullRequest.pr }}</NuxtLink
               >
-              <span class="text-ui-muted">{{
-                classificationNames[pullRequest.classification]
-              }}</span>
+                #{{ pullRequest.pr }}
+              </NuxtLink>
+              <span class="text-ui-muted">
+                {{ classificationNames[pullRequest.classification] }}
+              </span>
             </div>
             <NuxtTime
               :datetime="pullRequest.createdAt"
@@ -338,10 +343,7 @@ function formatDate(date: string) {
         </ul>
 
         <button
-          v-if="
-            !showAllPullRequests &&
-            report.window.pullRequests.length > MAX_PULL_REQUESTS
-          "
+          v-if="hasHiddenPullRequests"
           class="self-start text-sm text-ui-muted/70 hover:text-ui-text"
           @click="showAllPullRequests = true"
         >

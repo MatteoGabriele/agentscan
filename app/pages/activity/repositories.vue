@@ -23,11 +23,10 @@ const query = computed<string>(() => search.value.trim().toLowerCase())
 const groups = computed<RepoGroup[]>(() => {
   const counts = new Map<string, number>()
 
-  for (const category of data.value.categories) {
-    counts.set(
-      category.group,
-      (counts.get(category.group) ?? 0) + category.repos.length,
-    )
+  for (const { group, repos } of data.value.categories) {
+    const count = counts.get(group) ?? 0
+
+    counts.set(group, count + repos.length)
   }
 
   return [...counts].map(([name, count]) => ({ name, count }))
@@ -42,29 +41,37 @@ const groupOptions = computed<RepoGroup[]>(() => [
 const selectedGroup = computed<string | undefined>({
   get: () => {
     const value = route.query.group
+    const exists = groups.value.some((group) => group.name === value)
 
-    return groups.value.some((group) => group.name === value)
-      ? String(value)
-      : undefined
+    return exists ? String(value) : undefined
   },
   set: (value) => {
     router.replace({ query: { ...route.query, group: value } })
   },
 })
 
+function isInSelectedGroup(category: LibraryCategory) {
+  return !selectedGroup.value || category.group === selectedGroup.value
+}
+
+function matchesQuery(repo: string) {
+  return repo.toLowerCase().includes(query.value)
+}
+
 const categories = computed<LibraryCategory[]>(() => {
   return data.value.categories
-    .filter(
-      (category) =>
-        !selectedGroup.value || category.group === selectedGroup.value,
-    )
+    .filter(isInSelectedGroup)
     .map((category) => ({
       ...category,
-      repos: category.repos.filter((repo) =>
-        repo.toLowerCase().includes(query.value),
-      ),
+      repos: category.repos.filter(matchesQuery),
     }))
     .filter((category) => category.repos.length > 0)
+})
+
+const emptyMessage = computed(() => {
+  const area = selectedGroup.value ? ` in ${selectedGroup.value}` : ''
+
+  return `No tracked repository matches "${search.value}"${area}.`
 })
 
 // Untracked repos can still be scanned on demand.
@@ -163,21 +170,18 @@ useHead({
 
   <div v-else class="mt-12">
     <p v-if="categories.length === 0" class="text-ui-muted">
-      No tracked repository matches "{{ search }}"<template
+      {{ emptyMessage }}
+      <button
         v-if="selectedGroup"
+        type="button"
+        class="underline hover:text-ui-text"
+        @click="selectedGroup = undefined"
       >
-        in {{ selectedGroup }}.
-        <button
-          type="button"
-          class="underline hover:text-ui-text"
-          @click="selectedGroup = undefined"
-        >
-          Search all areas
-        </button></template
-      ><template v-else>.</template>
-      <NuxtLink v-if="scanSlug" :to="`/scan/${scanSlug}`" class="underline"
-        >Scan it instead</NuxtLink
-      >
+        Search all areas
+      </button>
+      <NuxtLink v-if="scanSlug" :to="`/scan/${scanSlug}`" class="underline">
+        Scan it instead
+      </NuxtLink>
     </p>
 
     <div v-else class="columns-1 @xl:columns-2 @2xl:columns-3 gap-10">

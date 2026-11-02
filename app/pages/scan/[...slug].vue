@@ -36,10 +36,16 @@ const { data: libraries } = useLibraries()
 const isTracked = computed(() => {
   const name = data.value?.repo.toLowerCase()
 
-  return Boolean(
-    name && libraries.value.repos.some((item) => item.toLowerCase() === name),
-  )
+  if (!name) {
+    return false
+  }
+
+  return libraries.value.repos.some((item) => item.toLowerCase() === name)
 })
+
+// Built here rather than in the template: Volar rewrites `//` in component
+// props as a comment, which breaks type checking for the rest of the template.
+const repoUrl = computed(() => `https://github.com/${data.value?.repo}`)
 
 const repoInput = ref(repo.value)
 
@@ -80,7 +86,7 @@ async function handleSubmit(value: string) {
       <p>
         Last {{ data.pullRequests.length }} PRs in
         <NuxtLink
-          :to="`https://github.com/${data.repo}`"
+          :to="repoUrl"
           external
           target="_blank"
           class="underline hover:text-ui-text"

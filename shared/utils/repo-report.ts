@@ -17,6 +17,10 @@ function getMean({ count, scoreSum }: Totals): number | null {
   return count ? scoreSum / count : null
 }
 
+function addTotals(a: Totals, b: Totals): Totals {
+  return { count: a.count + b.count, scoreSum: a.scoreSum + b.scoreSum }
+}
+
 function isSameRepo(a: string, b: string): boolean {
   return a.toLowerCase() === b.toLowerCase()
 }
@@ -34,7 +38,6 @@ export function findRepoName({
   days: ActivityRepoScoreDay[]
   results: ActivityItem[]
 }): string | null {
-  console.log(days)
   for (const day of days) {
     const match = day.repos.find((item) => isSameRepo(item.name, repo))
 
@@ -59,12 +62,10 @@ function sumTotals(
       continue
     }
 
-    for (const { name, count, scoreSum } of day.repos) {
-      const entry = totals.get(name) ?? { count: 0, scoreSum: 0 }
+    for (const entry of day.repos) {
+      const total = totals.get(entry.name) ?? { count: 0, scoreSum: 0 }
 
-      entry.count += count
-      entry.scoreSum += scoreSum
-      totals.set(name, entry)
+      totals.set(entry.name, addTotals(total, entry))
     }
   }
 
@@ -90,29 +91,25 @@ function getWindow(
   results: ActivityItem[],
   repo: string,
 ): RepoReport['window'] {
+  const pullRequests: RepoReportPullRequest[] = results
+    .filter((item) => item.repo_name === repo)
+    .filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
+    .map((item) => ({
+      pr: item.pr ?? null,
+      createdAt: item.created_at,
+      classification: classifyByScore(item.score) as ActivityCategory,
+    }))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+
   const counts: Record<ActivityCategory, number> = {
     organic: 0,
     mixed: 0,
     automation: 0,
   }
 
-  const pullRequests: RepoReportPullRequest[] = results
-    .filter(
-      (item) =>
-        item.repo_name === repo && item.score !== INSUFFICIENT_DATA_SCORE,
-    )
-    .map((item) => {
-      const classification = classifyByScore(item.score) as ActivityCategory
-
-      counts[classification]++
-
-      return {
-        pr: item.pr ?? null,
-        createdAt: item.created_at,
-        classification,
-      }
-    })
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  for (const { classification } of pullRequests) {
+    counts[classification]++
+  }
 
   return { counts, total: pullRequests.length, pullRequests }
 }
@@ -136,13 +133,10 @@ export function getRepoReport({
   const currentTotals = sumTotals(days, new Set(currentDates))
   const previousTotals = sumTotals(days, new Set(previousDates))
 
-  const ecosystem = [...currentTotals.values()].reduce(
-    (sum, entry) => ({
-      count: sum.count + entry.count,
-      scoreSum: sum.scoreSum + entry.scoreSum,
-    }),
-    { count: 0, scoreSum: 0 },
-  )
+  const ecosystem = [...currentTotals.values()].reduce(addTotals, {
+    count: 0,
+    scoreSum: 0,
+  })
 
   const repoDays = new Map(
     days.map((day) => [day.date, day.repos.find((item) => item.name === repo)]),
