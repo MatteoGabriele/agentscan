@@ -16,6 +16,7 @@ import { REPO_REPORT_PERIOD_DAYS } from '~~/shared/utils/repo-report'
 const MAX_PULL_REQUESTS = 10
 
 const route = useRoute()
+const isMobile = useIsMobile()
 
 const repo = computed(() => `${route.params.owner}/${route.params.name}`)
 
@@ -153,12 +154,14 @@ function formatDate(date: string) {
     <p v-else class="text-sm">{{ error.message }}</p>
   </div>
 
-  <div v-else-if="report" class="flex flex-col gap-12 @container">
+  <div v-else-if="report" class="flex flex-col gap-12">
     <div
-      class="flex flex-col gap-6 bg-ui-card py-4 @md:py-6 rounded-2 border-2 border-solid"
+      class="flex flex-col gap-6 bg-ui-card py-4 md:py-6 rounded-2 border-2 border-solid"
       :class="scoreStyle.border"
     >
-      <header class="px-6 flex flex-wrap items-baseline justify-between gap-2">
+      <header
+        class="px-6 flex flex-col gap-1 md:flex-row md:items-center md:justify-between md:gap-2"
+      >
         <NuxtLink
           :to="`https://github.com/${report.repo}`"
           external
@@ -179,7 +182,9 @@ function formatDate(date: string) {
         aria-hidden="true"
       />
 
-      <section class="px-6 flex flex-wrap items-end justify-between gap-6">
+      <section
+        class="px-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+      >
         <div v-if="summary" class="flex flex-col gap-1 max-w-sm">
           <div class="flex gap-2 items-center" :class="scoreStyle.text">
             <span :class="classificationIcon" class="text-base" />
@@ -196,7 +201,7 @@ function formatDate(date: string) {
           {{ REPO_REPORT_PERIOD_DAYS }} days.
         </p>
 
-        <div v-if="score !== null" class="text-right">
+        <div v-if="score !== null" class="shrink-0 md:text-right">
           <p class="font-mono tabular-nums">
             <span class="text-5xl" :class="scoreStyle.text">{{ score }}</span>
             <span class="text-ui-muted">/100</span>
@@ -208,15 +213,15 @@ function formatDate(date: string) {
       </section>
 
       <dl
-        class="mx-6 pt-4 border-t border-ui-border-subtle grid grid-cols-2 @md:grid-cols-3 gap-4 text-sm"
+        class="mx-6 pt-4 border-t border-ui-border-subtle grid grid-cols-3 gap-4 text-sm"
       >
-        <div>
+        <div class="flex flex-col justify-between">
           <dt class="text-ui-muted">PRs scored</dt>
           <dd class="tabular-nums">
             {{ report.current.count.toLocaleString('en') }}
           </dd>
         </div>
-        <div>
+        <div class="flex flex-col justify-between">
           <dt class="text-ui-muted">
             vs previous {{ REPO_REPORT_PERIOD_DAYS }} days
           </dt>
@@ -237,26 +242,27 @@ function formatDate(date: string) {
             <template v-else>–</template>
           </dd>
         </div>
-        <div>
+        <div class="flex flex-col justify-between">
           <dt class="text-ui-muted">Ecosystem average</dt>
           <dd class="tabular-nums">{{ ecosystemScore ?? '–' }}</dd>
         </div>
       </dl>
     </div>
 
-    <section class="flex flex-col gap-4">
+    <!-- Too dense to read at phone width, so it's left out entirely. -->
+    <section v-if="!isMobile" class="hidden md:flex flex-col gap-4">
       <header>
         <h2 class="font-semibold">Daily score</h2>
         <p class="text-sm text-ui-muted text-pretty">
           Average score of each day's pull requests. The dotted line is daily
-          volume, the dashed lines mark the organic and automation thresholds.
+          volume.
         </p>
       </header>
       <LazyChartRepoDailyScore :days="report.days" />
     </section>
 
     <section class="flex flex-col gap-4">
-      <header class="flex flex-wrap items-baseline justify-between gap-2">
+      <header class="flex items-baseline justify-between gap-2">
         <div>
           <h2 class="font-semibold">Last 30 hours</h2>
           <p class="text-sm text-ui-muted">

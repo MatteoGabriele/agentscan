@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { identityConfig } from '@unveil/identity'
 import { useTooltipPosition } from 'vue-data-ui/composables'
 import {
   VueUiXy,
   type VueUiXyConfig,
   type VueUiXyDatasetItem,
-  type VueUiXySvgSlotProps,
 } from 'vue-data-ui/vue-ui-xy'
 import type { RepoReportDay } from '~~/shared/types/repo-report'
 
@@ -47,21 +45,6 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
     scaleMax: 100,
   },
 ])
-
-const thresholds = computed(() => [
-  { value: identityConfig.THRESHOLD_HUMAN, color: colors.value.organic },
-  {
-    value: identityConfig.THRESHOLD_SUSPICIOUS,
-    color: colors.value.automation,
-  },
-])
-
-// The y scale is pinned to 0-100, so a score maps straight onto the drawing area.
-function getThresholdY(svg: VueUiXySvgSlotProps['svg'], value: number) {
-  const { bottom, height } = svg.drawingArea
-
-  return bottom - (value / 100) * height
-}
 
 const XAXIS_LABELS_MOD_THRESHOLD = 8
 const TIME_LABEL_FORMAT = 'MMM dd'
@@ -165,19 +148,6 @@ function formatDay(index: number) {
     <ClientOnly>
       <VueUiXy :dataset :config>
         <template #svg="{ svg }">
-          <line
-            v-for="threshold in thresholds"
-            :key="threshold.value"
-            :x1="svg.drawingArea.left"
-            :x2="svg.drawingArea.right"
-            :y1="getThresholdY(svg, threshold.value)"
-            :y2="getThresholdY(svg, threshold.value)"
-            :stroke="threshold.color"
-            stroke-width="1"
-            stroke-dasharray="4 4"
-            opacity="0.5"
-          />
-
           <ChartPrVolumeLine
             :svg
             :counts
