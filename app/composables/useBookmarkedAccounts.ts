@@ -36,8 +36,7 @@ function openDb(): Promise<IDBDatabase> {
   return dbPromise
 }
 
-// Shared across every instance so all bookmark buttons and the bookmarks
-// page agree on state without each re-reading IndexedDB.
+// Module-level state shared by every bookmark button and the bookmarks page.
 const bookmarkedAccounts = ref<BookmarkedAccount[]>([])
 const isLoaded = ref(false)
 let loadPromise: Promise<void> | null = null

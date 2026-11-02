@@ -7,8 +7,7 @@ import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown, type MarkdownStorage } from 'tiptap-markdown'
 
-// Typed text is treated as markdown source (e.g. a
-// pasted image URL like `![](...)` shouldn't come out as `!\[\]\(...\)`).
+// Keeps typed text as raw markdown, so a pasted `![](...)` isn't escaped.
 const RawText = Text.extend({
   addStorage() {
     return {

@@ -1,7 +1,5 @@
-// The responses agentscan-logs serves. The scan, the data files and the
-// aggregation all live in that repo; the routes under server/api/activity and
-// server/api/automation-tally here only pass them through, so these types are
-// the contract between the two.
+// Response types of agentscan-logs, proxied by server/api/activity and
+// server/api/automation-tally.
 
 import type { ActivityCategoryProgression, ActivityItem } from './activity'
 import type { GetClassificationStatsByDateResults } from '../utils/count-classification-by-date'

@@ -19,7 +19,7 @@ const rangeOptions = computed<ChartRangeOption[]>(() => [
   {
     value: 'hourly',
     label: 'Hourly',
-    // In mobile we actually show 13 datapoints, but saying 12 looks better on the UI
+    // Mobile shows 13 datapoints; the caption rounds to 12.
     caption: `Last ${isMobile.value ? 12 : WINDOW_MAX_HOURS} hours, updated every hour`,
   },
 ])

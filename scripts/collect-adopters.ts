@@ -1,19 +1,15 @@
 /// <reference types="node" />
 /**
- * Collect the repositories using AgentScan into data/adopters.json.
+ * Collects the repositories using AgentScan into data/adopters.json.
+ * Run with `pnpm collect:adopters` and commit the file.
  *
- * This used to run per request in server/api/adopters.get.ts, but code search
- * is rate limited to 10 requests a minute and listing the app installations
- * costs a token per install. Run it by hand every now and then with
- * `pnpm collect:adopters` and commit the file; the site serves that.
- *
- * Credentials come from .env, the same ones the server uses:
- *   NUXT_GITHUB_TOKEN            a token that may search code across public repos
- *   NUXT_GITHUB_APP_ID           the AgentScan app, to list its installations
+ * Credentials from .env:
+ *   NUXT_GITHUB_TOKEN            code search across public repos
+ *   NUXT_GITHUB_APP_ID           lists the app installations
  *   NUXT_GITHUB_APP_PRIVATE_KEY  base64-encoded PEM
  *
- * Without the app credentials only the action adopters are collected, which
- * would drop every app-only repository from the file, so the run fails instead.
+ * Fails without the app credentials, since the result would miss app-only
+ * adopters.
  */
 
 import fs from 'fs'
@@ -101,8 +97,7 @@ async function fetchRepositories(octokit: Octokit, ids: string[]) {
     .filter((node) => node !== null)
 }
 
-// The action leaves a workflow file behind, so adopters are found by searching
-// for it.
+// Finds action adopters by searching for the workflow file.
 export async function collectActionRepositories(
   token: string,
 ): Promise<AdopterRepository[]> {
@@ -124,8 +119,7 @@ export async function collectActionRepositories(
   }))
 }
 
-// The app leaves nothing in the repository, so we ask GitHub, as the app, which
-// installations exist.
+// Lists app adopters from the app's installations.
 export async function collectAppRepositories(
   appId: string,
   encodedPrivateKey: string,
@@ -143,8 +137,7 @@ export async function collectAppRepositories(
       continue
     }
 
-    // Skipping a failed installation would return a short list that still looks
-    // healthy and overwrite the committed file, so the whole run fails instead.
+    // A failed installation fails the run, so a partial list never overwrites the file.
     let installed
     try {
       installed = await octokit.paginate(
@@ -177,9 +170,8 @@ export async function collectAppRepositories(
 }
 
 /**
- * A repository running both the action and the app is one adopter, and the
- * list passed last wins, so it is recorded with that platform. Ties are
- * broken by name so a week without star changes produces no diff at all.
+ * Merges adopter lists into one entry per repository; later lists win.
+ * Sorted by stars, then name, for stable diffs.
  */
 export function mergeAdopters(
   ...lists: AdopterRepository[][]
@@ -224,8 +216,7 @@ async function main() {
     `📋 ${adopters.length} adopter(s): ${actionRepositories.length} from the action, ${appRepositories.length} from the app`,
   )
 
-  // An empty result means the search or the app listing broke, not that every
-  // adopter left, so keep whatever is already committed.
+  // An empty result means a lookup failed; keep the committed file.
   if (adopters.length === 0) {
     console.error('✗ No adopters found — leaving the existing file untouched')
     process.exit(1)

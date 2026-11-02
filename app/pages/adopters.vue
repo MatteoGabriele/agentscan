@@ -12,8 +12,7 @@ const repositories = computed<AdopterRepository[]>(() => data.value ?? [])
 
 const query = computed<string>(() => search.value.trim().toLowerCase())
 
-// The repository name carries its owner, so searching for one keeps every
-// repository underneath it.
+// Matches owners too, since the repository name includes them.
 const filteredRepositories = computed<AdopterRepository[]>(() => {
   if (!query.value) {
     return repositories.value

@@ -92,15 +92,23 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // One analysis per author, shared across their PRs.
+    const analyses = new Map<string, ReturnType<typeof analyze>>()
+
     const results = await Promise.all(
       pullRequests.map(async (entry) => {
-        const { user, report, eventsCount } = await analyze(entry.login, {
-          token: config.githubToken,
-        })
+        let analysis = analyses.get(entry.login)
+
+        if (!analysis) {
+          analysis = analyze(entry.login, { token: config.githubToken })
+          analyses.set(entry.login, analysis)
+        }
+
+        const { user, report, eventsCount } = await analysis
 
         return {
           user,
-          analysis: report,
+          analysis: withoutEvidence(report),
           prUrl: entry.prUrl,
           prState: entry.state,
           eventsCount,

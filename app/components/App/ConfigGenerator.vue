@@ -147,8 +147,7 @@ const cache = ref(false)
 
 const labels = reactive({ ...DEFAULT_LABELS.app })
 
-// The platforms disagree on some default labels. A label still on the old
-// default follows the switch, so it doesn't turn into a customization.
+// Labels still on the previous platform's default switch to the new one's default.
 watch(platform, (current, previous) => {
   for (const key of Object.keys(labels) as LabelledClassification[]) {
     if (labels[key] === DEFAULT_LABELS[previous][key]) {
@@ -157,8 +156,7 @@ watch(platform, (current, previous) => {
   }
 })
 
-// Community-flagged accounts are not in `auto-close-classifications`: both
-// platforms close them whenever auto-close is on.
+// Community-flagged accounts are always closed when auto-close is on, so they are not an option.
 const autoCloseOptions = computed(() =>
   classifications.filter((item) =>
     AUTO_CLOSE_OPTIONS[platform.value].includes(item.value),
@@ -273,7 +271,7 @@ const settings = computed<ConfigSettings>(() => ({
   messageHoneypotFirstTime: messageHoneypotFirstTime.value,
 }))
 
-// Only needed once someone asks for a workflow: it pins the latest releases.
+// Latest action releases, fetched once the action platform is selected.
 const {
   data: releases,
   status: releasesStatus,
@@ -319,8 +317,7 @@ const defaultHoneypotGreeting = computed(() =>
     .trim(),
 )
 
-// A blank first-time greeting falls back to the regular custom greeting first,
-// and only then to the built-in first-time one. Show whichever will be sent.
+// Blank first-time greeting falls back to the custom regular greeting, then the built-in one.
 const defaultHoneypotFirstTimeGreeting = computed(
   () =>
     messageHoneypot.value.trim() ||

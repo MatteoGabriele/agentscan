@@ -1,16 +1,11 @@
 /// <reference types="node" />
 /**
- * Explain the review process on a freshly opened automation report.
- *
- * The issue template spells the voting out, but a reporter who skims it — or
- * who files the report from AgentScan without reading the form — is left
- * wondering why nothing is happening and who gets to decide. So the rules are
- * repeated once, as a comment on their own issue, where they cannot be missed.
+ * Comments the review process on a newly opened automation report.
  *
  *   --issue=<n>   the report to comment on
  *   --dry-run     print the comment instead of posting it
  *
- * Configuration comes from the environment (see the workflow):
+ * Environment:
  *   NUXT_GITHUB_TOKEN / GITHUB_TOKEN  reads the issue and posts the comment
  *   MIN_APPROVALS   👍 from reviewers needed to flag the account
  *   MIN_REJECTIONS  👎 from reviewers needed to reject outright
@@ -26,17 +21,13 @@ const REPO = 'agentscan'
 
 const REPORT_LABEL = 'automation'
 
-/**
- * Lets a re-run of the workflow — or a second dispatch — recognise its own
- * comment instead of posting the same explanation twice.
- */
+/** Identifies this script's comment so it is posted only once. */
 export const MARKER = '<!-- agentscan:review-process -->'
 
 export function reviewProcessComment(thresholds: Thresholds): string {
   const { minApprovals, minRejections } = thresholds
 
-  // One paragraph per entry: GitHub turns single newlines into line breaks, so
-  // wrapping the prose here would wrap it in the rendered comment too.
+  // One line per paragraph: GitHub renders single newlines as line breaks.
   return [
     MARKER,
     `### How this report gets decided`,

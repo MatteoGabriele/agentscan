@@ -41,7 +41,11 @@ export default defineEventHandler(async (event) => {
       showEvents: parsedQuery.output.show_events,
     })
 
-    return analysis
+    return {
+      ...analysis,
+      report: slimReport(analysis.report),
+      events: analysis.events.map(slimGitHubEvent),
+    }
   } catch (err: unknown) {
     const error = err as { status?: number; statusCode?: number }
     const status = error.status ?? error.statusCode
