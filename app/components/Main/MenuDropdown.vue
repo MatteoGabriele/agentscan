@@ -75,12 +75,17 @@ watch(
               isItemActive(item) ? 'text-ui-text' : 'text-ui-muted',
             ]"
           ></span>
-          <span class="flex flex-col gap-0.5">
+          <span class="flex flex-1 flex-col gap-0.5">
             <span
-              class="text-sm group-hover:text-ui-text transition-colors"
+              class="flex items-center justify-between gap-1 text-sm group-hover:text-ui-text transition-colors"
               :class="isItemActive(item) ? 'text-ui-text' : 'text-ui-muted'"
             >
               {{ item.label }}
+              <span
+                v-if="item.to.startsWith('http')"
+                class="i-lucide:external-link text-[0.7em] opacity-60 shrink-0"
+                aria-hidden="true"
+              ></span>
             </span>
             <span class="text-xs text-ui-muted/70 leading-snug">
               {{ item.description }}
