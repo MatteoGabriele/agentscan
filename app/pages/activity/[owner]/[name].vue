@@ -11,7 +11,10 @@ import {
   CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
   SWATCH,
 } from '~~/shared/utils/charts'
-import { REPO_REPORT_PERIOD_DAYS } from '~~/shared/utils/repo-report'
+import {
+  REPO_REPORT_PERIOD_DAYS,
+  REPO_REPORT_WINDOW_HOURS,
+} from '~~/shared/utils/repo-report'
 
 const MAX_PULL_REQUESTS = 10
 
@@ -293,7 +296,9 @@ function formatDate(date: string) {
     <section class="flex flex-col gap-4">
       <header class="flex items-baseline justify-between gap-2">
         <div>
-          <h2 class="font-semibold">Last 30 hours</h2>
+          <h2 class="font-semibold">
+            Last {{ REPO_REPORT_WINDOW_HOURS }} hours
+          </h2>
           <p class="text-sm text-ui-muted">
             {{ report.window.total }} pull requests scored
           </p>
@@ -376,7 +381,8 @@ function formatDate(date: string) {
         </button>
       </template>
       <p v-else class="text-sm text-ui-muted">
-        No pull requests scored in the last 30 hours.
+        No pull requests scored in the last
+        {{ REPO_REPORT_WINDOW_HOURS }} hours.
       </p>
     </section>
   </div>

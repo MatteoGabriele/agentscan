@@ -11,6 +11,10 @@ import { getCompleteDayRange } from './charts'
 
 export const REPO_REPORT_PERIOD_DAYS = 30
 
+export const REPO_REPORT_WINDOW_HOURS = 24
+
+const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
+
 type Totals = { count: number; scoreSum: number }
 
 function getMean({ count, scoreSum }: Totals): number | null {
@@ -27,7 +31,9 @@ function isSameRepo(a: string, b: string): boolean {
 
 /**
  * Finds the repo's canonical spelling, since the URL may not match GitHub's
- * casing. Returns null when no data source knows the repo.
+ * casing. Newest sources win: older days may hold a stale spelling (e.g.
+ * tanstack/query before TanStack/query). Returns null when no data source
+ * knows the repo.
  */
 export function findRepoName({
   repo,
@@ -41,7 +47,15 @@ export function findRepoName({
   // Tracked repos with no scored pull requests yet.
   libraries?: string[]
 }): string | null {
-  for (const day of days) {
+  const repoEntry = results.find((item) => isSameRepo(item.repo_name, repo))
+
+  if (repoEntry) {
+    return repoEntry.repo_name
+  }
+
+  const newestDays = [...days].sort((a, b) => b.date.localeCompare(a.date))
+
+  for (const day of newestDays) {
     const match = day.repos.find((item) => isSameRepo(item.name, repo))
 
     if (match) {
@@ -49,13 +63,20 @@ export function findRepoName({
     }
   }
 
-  const repoEntry = results.find((item) => isSameRepo(item.repo_name, repo))
-
-  if (repoEntry) {
-    return repoEntry.repo_name
-  }
-
   return libraries.find((item) => isSameRepo(item, repo)) ?? null
+}
+
+// Days can hold the same repo under more than one casing, so it's matched
+// case-insensitively and its entries summed.
+function getRepoTotals(
+  day: ActivityRepoScoreDay,
+  repo: string,
+): Totals | undefined {
+  const entries = day.repos.filter((item) => isSameRepo(item.name, repo))
+
+  return entries.length
+    ? entries.reduce(addTotals, { count: 0, scoreSum: 0 })
+    : undefined
 }
 
 function sumTotals(
@@ -70,9 +91,10 @@ function sumTotals(
     }
 
     for (const entry of day.repos) {
-      const total = totals.get(entry.name) ?? { count: 0, scoreSum: 0 }
+      const key = entry.name.toLowerCase()
+      const total = totals.get(key) ?? { count: 0, scoreSum: 0 }
 
-      totals.set(entry.name, addTotals(total, entry))
+      totals.set(key, addTotals(total, entry))
     }
   }
 
@@ -84,7 +106,7 @@ function getPeriod(
   repo: string,
   dates: string[],
 ): RepoReportPeriod {
-  const entry = totals.get(repo) ?? { count: 0, scoreSum: 0 }
+  const entry = totals.get(repo.toLowerCase()) ?? { count: 0, scoreSum: 0 }
 
   return {
     from: dates[0] ?? '',
@@ -94,12 +116,29 @@ function getPeriod(
   }
 }
 
+/**
+ * Start of the last REPO_REPORT_WINDOW_HOURS scanned clock hours. Anchored to
+ * the newest PR across every repo, so a quiet repo doesn't shift its own
+ * window back in time.
+ */
+function getWindowStart(results: ActivityItem[]): number {
+  const latest = Math.max(
+    ...results.map((item) => new Date(item.created_at).getTime()),
+  )
+  const latestHour =
+    Math.floor(latest / MILLISECONDS_PER_HOUR) * MILLISECONDS_PER_HOUR
+
+  return latestHour - (REPO_REPORT_WINDOW_HOURS - 1) * MILLISECONDS_PER_HOUR
+}
+
 function getWindow(
   results: ActivityItem[],
   repo: string,
 ): RepoReport['window'] {
+  const windowStart = getWindowStart(results)
   const pullRequests: RepoReportPullRequest[] = results
-    .filter((item) => item.repo_name === repo)
+    .filter((item) => isSameRepo(item.repo_name, repo))
+    .filter((item) => new Date(item.created_at).getTime() >= windowStart)
     .filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
     .map((item) => ({
       pr: item.pr ?? null,
@@ -146,7 +185,7 @@ export function getRepoReport({
   })
 
   const repoDays = new Map(
-    days.map((day) => [day.date, day.repos.find((item) => item.name === repo)]),
+    days.map((day) => [day.date, getRepoTotals(day, repo)]),
   )
 
   const reportDays: RepoReportDay[] = dates.map((date) => {

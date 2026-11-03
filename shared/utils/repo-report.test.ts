@@ -51,12 +51,31 @@ describe('findRepoName', () => {
     ).toBe('All-Hands-AI/OpenHands')
   })
 
-  it('falls back to the hourly window', () => {
+  it('reads the hourly window', () => {
     const results = [createItem({ repo_name: 'vuejs/core' })]
 
     expect(findRepoName({ repo: 'VueJS/Core', days: [], results })).toBe(
       'vuejs/core',
     )
+  })
+
+  it('prefers the newest spelling over a stale one', () => {
+    const [oldDay, newDay] = createDays(2, [])
+
+    if (!oldDay || !newDay) {
+      throw new Error('Expected two days')
+    }
+
+    oldDay.repos = [{ name: 'tanstack/query', count: 1, scoreSum: 90 }]
+    newDay.repos = [{ name: 'TanStack/query', count: 1, scoreSum: 90 }]
+
+    expect(
+      findRepoName({
+        repo: 'tanstack/query',
+        days: [oldDay, newDay],
+        results: [],
+      }),
+    ).toBe('TanStack/query')
   })
 
   it('falls back to the tracked repositories', () => {
@@ -164,5 +183,38 @@ describe('getRepoReport', () => {
     expect(window.total).toBe(2)
     expect(window.counts).toEqual({ organic: 1, mixed: 0, automation: 1 })
     expect(window.pullRequests.map((item) => item.pr)).toEqual([2, 1])
+  })
+  it('keeps only the last 24 scanned hours of the window', () => {
+    const results = [
+      createItem({ pr: 1, created_at: '2026-01-01T10:59:00.000Z' }),
+      createItem({ pr: 2, created_at: '2026-01-01T11:00:00.000Z' }),
+      // The newest PR anchors the window, whichever repo it belongs to.
+      createItem({
+        pr: 3,
+        repo_name: 'vuejs/core',
+        created_at: '2026-01-02T10:30:00.000Z',
+      }),
+    ]
+
+    const { window } = getRepoReport({
+      repo: 'nuxt/nuxt',
+      days: [],
+      results,
+    })
+
+    expect(window.pullRequests.map((item) => item.pr)).toEqual([2])
+  })
+  it('merges a repo stored under more than one casing', () => {
+    const days = createDays(2, [
+      { name: 'tanstack/query', count: 1, scoreSum: 100 },
+      { name: 'TanStack/query', count: 3, scoreSum: 0 },
+    ])
+    const results = [createItem({ repo_name: 'TanStack/query' })]
+
+    const report = getRepoReport({ repo: 'tanstack/query', days, results })
+
+    expect(report.current.count).toBe(8)
+    expect(report.days.map((day) => day.count)).toEqual([4, 4])
+    expect(report.window.total).toBe(1)
   })
 })
