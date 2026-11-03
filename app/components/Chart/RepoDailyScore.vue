@@ -64,7 +64,7 @@ const counts = computed(() => props.days.map((day) => day.count))
 const scoreColors = computed(() =>
   props.days.map((day) => {
     const classification =
-      day.score === null ? null : classifyByScore(day.score)
+      day.score === null ? null : classifyByScore(Math.round(day.score))
 
     return classification === null || classification === 'insufficient-data'
       ? colors.value.textMuted
