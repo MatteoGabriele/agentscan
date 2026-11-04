@@ -48,22 +48,11 @@ const rows = computed(() =>
   })),
 )
 
-// Rising organic share is good news, rising anything else is not.
-function getChangeColor(category: ActivityCategory, change: number) {
-  if (change === 0) {
-    return COLORS.muted
-  }
-
-  const good = category === 'organic' ? change > 0 : change < 0
-
-  return good ? CLASSIFICATION_COLORS.organic : CLASSIFICATION_COLORS.automation
-}
-
-// The arrow carries the direction, so the value is unsigned
 function formatChange(change: number) {
   const value = Math.abs(change)
+  const sign = change > 0 ? '+' : change < 0 ? '−' : ''
 
-  return `${value} ${value === 1 ? 'pt' : 'pts'}`
+  return `${sign}${value} ${value === 1 ? 'pt' : 'pts'}`
 }
 
 function formatDay(date: string) {
@@ -280,22 +269,6 @@ const lines = computed(() =>
             class="flex items-center gap-2"
             :style="{ color: COLORS.muted, fontSize: '30px' }"
           >
-            <svg
-              v-if="row.change !== 0"
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="18"
-              viewBox="0 0 20 18"
-            >
-              <path
-                :d="
-                  row.change > 0
-                    ? 'M10 0 L20 18 L0 18 Z'
-                    : 'M0 0 L20 0 L10 18 Z'
-                "
-                :fill="getChangeColor(row.category, row.change)"
-              />
-            </svg>
             <span :style="{ color: COLORS.text }">{{
               formatChange(row.change)
             }}</span>
