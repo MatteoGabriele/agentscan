@@ -14,7 +14,6 @@ const { week } = defineProps<{
 // tokens in app/assets/main.css.
 const COLORS = {
   bg: '#0b0b0b',
-  border: '#575757',
   text: '#f0f0f0',
   muted: '#808080',
 }
@@ -81,15 +80,6 @@ const period = computed(() => {
 
   return first && last ? `${formatDay(first)} – ${formatDay(last)}` : ''
 })
-
-const step = computed(() =>
-  week.dates.length > 1 ? WIDTH / (week.dates.length - 1) : WIDTH,
-)
-
-// One faint line per day inside the frame
-const dayLines = computed(() =>
-  week.dates.slice(1, -1).map((_, index) => (index + 1) * step.value),
-)
 
 const yMax = computed(
   () =>
@@ -215,25 +205,7 @@ const lines = computed(() =>
           <stop offset="0%" :stop-color="series.color" stop-opacity="0.35" />
           <stop offset="100%" :stop-color="series.color" stop-opacity="0" />
         </linearGradient>
-        <!-- Keeps the text readable if a line ever climbs behind it -->
-        <linearGradient id="scrim" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" :stop-color="COLORS.bg" stop-opacity="1" />
-          <stop offset="45%" :stop-color="COLORS.bg" stop-opacity="0.85" />
-          <stop offset="65%" :stop-color="COLORS.bg" stop-opacity="0" />
-        </linearGradient>
       </defs>
-      <line
-        v-for="x in dayLines"
-        :key="x"
-        :x1="x"
-        :x2="x"
-        :y1="CHART_TOP"
-        :y2="HEIGHT"
-        :stroke="COLORS.border"
-        stroke-opacity="0.35"
-        stroke-width="2"
-        stroke-dasharray="2 8"
-      />
       <path
         v-for="series in lines"
         :key="`area-${series.category}`"
@@ -250,7 +222,6 @@ const lines = computed(() =>
         stroke-linecap="round"
         stroke-linejoin="round"
       />
-      <rect x="0" y="0" :width="WIDTH" :height="HEIGHT" fill="url(#scrim)" />
     </svg>
 
     <!-- Sized for a link card in a social feed, shown at a third to a half
@@ -301,12 +272,7 @@ const lines = computed(() =>
             />
             <span>{{ row.name }}</span>
           </div>
-          <span
-            class="font-bold leading-none"
-            :style="{
-              fontSize: '96px',
-              color: CLASSIFICATION_COLORS[row.category],
-            }"
+          <span class="font-bold leading-none" :style="{ fontSize: '96px' }"
             >{{ row.share }}%</span
           >
           <div
@@ -330,10 +296,9 @@ const lines = computed(() =>
                 :fill="getChangeColor(row.category, row.change)"
               />
             </svg>
-            <span
-              :style="{ color: getChangeColor(row.category, row.change) }"
-              >{{ formatChange(row.change) }}</span
-            >
+            <span :style="{ color: COLORS.text }">{{
+              formatChange(row.change)
+            }}</span>
             <span>vs last week</span>
           </div>
         </div>
