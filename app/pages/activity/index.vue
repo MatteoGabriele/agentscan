@@ -5,29 +5,42 @@ import {
 } from '~~/shared/utils/activity-history-window'
 import { useUrlSearchParams } from '@vueuse/core'
 import type { ActivityUnit } from '~~/shared/types/activity'
+import { getActivityWeekSnapshot } from '~~/shared/utils/activity-week'
 
 definePageMeta({
   layout: false,
 })
 
-useHead({
-  title: 'Ecosystem Activity | AgentScan',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'A snapshot of community contribution patterns across the ecosystem.',
-    },
-    { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
-    { property: 'og:image', content: '/activity.png' },
-    {
-      property: 'og:description',
-      content:
-        'A snapshot of community contribution patterns across the ecosystem.',
-    },
-    { property: 'og:type', content: 'website' },
-  ],
-})
+const DESCRIPTION =
+  'A snapshot of community contribution patterns across the ecosystem.'
+
+// Shares the cached request with the trend list and the daily chart.
+const { data: activity } = await useActivity()
+const week = activity.value ? getActivityWeekSnapshot(activity.value) : null
+
+useHead(
+  {
+    title: 'Ecosystem Activity | AgentScan',
+    meta: [
+      { name: 'description', content: DESCRIPTION },
+      { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
+      {
+        property: 'og:description',
+        content: week
+          ? `${week.total.toLocaleString('en')} pull requests scored in the past week. ${DESCRIPTION}`
+          : DESCRIPTION,
+      },
+      { property: 'og:type', content: 'website' },
+    ],
+  },
+  // The full layout is rendered inside this page, so its generic tags would
+  // otherwise be registered last and win.
+  { tagPriority: 'high' },
+)
+
+if (week) {
+  defineOgImage('ActivityWeek', { week })
+}
 
 type ChartRange = 'daily' | 'hourly'
 type ChartRangeOption = {
