@@ -16,12 +16,11 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const { data: accountReports, status: accountReportsStatus } = useFetch(
+const { data: accountReports, status: accountReportsStatus } = useLazyFetch(
   () => `/api/account-reports/${username.value}`,
   {
-    key: computed(() => `account-reports:${username.value}`),
-    query: computed(() => ({ id: props.user.id })),
-    lazy: true,
+    key: () => `account-reports:${username.value}`,
+    query: () => ({ id: props.user.id }),
   },
 )
 
@@ -47,7 +46,13 @@ const approvedBy = computed<string[]>(() => {
   return verifiedAutomation.value?.approvedBy ?? []
 })
 
-const reportIssues = computed(() => accountReports.value?.reportIssues ?? [])
+const { data: reportIssues, pending: isLoadingReports } = useLazyFetch(
+  () => `/api/report-issues/${username.value}`,
+  {
+    key: () => `report-issues:${username.value}`,
+    default: () => [],
+  },
+)
 
 const openReport = computed(() => {
   return reportIssues.value.find((report) => report.state === 'open')
@@ -259,7 +264,16 @@ useSeoAnalysis(identifyAnalysis, {
           v-if="!verifiedAutomation"
           class="mt-4 pt-4 border-t border-ui-border-subtle"
         >
-          <template v-if="openReport">
+          <template v-if="isLoadingReports">
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <span
+              class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
+              aria-hidden="true"
+            />
+          </template>
+          <template v-else-if="openReport">
             <p class="text-ui-muted text-sm">
               This account already has an open report under review. Add what you
               know there.

@@ -1,7 +1,6 @@
 import type { VerifiedAutomation } from '~~/shared/types/automation'
 import type { IntegrationItem } from '~~/shared/types/integrations'
 import type { AutomationTallyResponse } from '~~/shared/types/logs-api'
-import type { ReportIssue } from '~~/shared/utils/report-issues'
 
 // Returns the community report, scan tally and integration entries for one account.
 export default defineEventHandler(async (event) => {
@@ -17,11 +16,10 @@ export default defineEventHandler(async (event) => {
   const id = Number(getQuery(event).id) || undefined
 
   // Settled independently so one failing source doesn't hide the others.
-  const [verified, tally, integrations, issues] = await Promise.allSettled([
+  const [verified, tally, integrations] = await Promise.allSettled([
     $fetch('/api/verified-automations'),
     $fetch('/api/automation-tally'),
     $fetch('/api/integration/unsafe-labs'),
-    id === undefined ? Promise.resolve([]) : getReportIssues(id),
   ])
 
   let verifiedAutomation: VerifiedAutomation | undefined
@@ -48,16 +46,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  let reportIssues: ReportIssue[] = []
-
-  if (issues.status === 'fulfilled') {
-    reportIssues = issues.value
-  }
-
   return {
     verifiedAutomation: verifiedAutomation ?? null,
     automationTally: automationTally ?? null,
     integration: integration ?? null,
-    reportIssues,
   }
 })
