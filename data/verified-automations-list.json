@@ -1147,5 +1147,19 @@
       "danielroe",
       "OrbisK"
     ]
+  },
+  {
+    "username": "mvanhorn",
+    "id": 455140,
+    "reason": "Opening AI-generated PRs in multiple repos",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/544",
+    "reportedBy": "gameroman",
+    "createdAt": "2026-10-31",
+    "approvedBy": [
+      "MatteoGabriele",
+      "ematipico",
+      "graphieros",
+      "huang-julien"
+    ]
   }
 ]
