@@ -284,7 +284,9 @@ useSeoAnalysis(identifyAnalysis, {
     <LazyAnalysisActivityEvents :events="analysis.events" />
   </div>
 
-  <template v-if="classification !== 'insufficient-data' && analysis">
+  <template
+    v-if="classification && classification !== 'insufficient-data' && analysis"
+  >
     <LazyChartAccountEventsTimeline
       :classification="classification"
       :events="analysis.events"
