@@ -2,7 +2,7 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { ClassificationLabel } from '@unveil/identity'
 import type { Report } from '@unveil/identity/report'
-import type { GitHubUser } from '@unveil/identity/providers/github'
+import type { GitHubEvent, GitHubUser } from '@unveil/identity/providers/github'
 import type { AnalyzeReturn } from '@unveil/vk'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
 
@@ -52,6 +52,14 @@ const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
 const classification = computed<ClassificationLabel | undefined>(() => {
   return isPending.value ? undefined : props.analysis?.report.classification
+})
+
+// Insufficient-data accounts already list every analyzed event.
+const repoEvents = computed<GitHubEvent[]>(() => {
+  if (!classification.value || classification.value === 'insufficient-data') {
+    return []
+  }
+  return props.analysis?.events ?? []
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
@@ -275,6 +283,10 @@ useSeoAnalysis(identifyAnalysis, {
       :activity-report="activityReport"
       hydrate-on-interaction
     />
+  </div>
+
+  <div v-if="repoEvents.length" class="@lg:mx-6">
+    <LazyAnalysisRepoActivity :events="repoEvents" hydrate-on-interaction />
   </div>
 
   <div
