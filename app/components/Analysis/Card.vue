@@ -47,6 +47,16 @@ const approvedBy = computed<string[]>(() => {
   return verifiedAutomation.value?.approvedBy ?? []
 })
 
+const reportIssues = computed(() => accountReports.value?.reportIssues ?? [])
+
+const openReport = computed(() => {
+  return reportIssues.value.find((report) => report.state === 'open')
+})
+
+const closedReports = computed(() => {
+  return reportIssues.value.filter((report) => report.state === 'closed')
+})
+
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
@@ -249,17 +259,57 @@ useSeoAnalysis(identifyAnalysis, {
           v-if="!verifiedAutomation"
           class="mt-4 pt-4 border-t border-ui-border-subtle"
         >
-          <p class="text-ui-muted text-sm">
-            Know something about this account? Help the community.
-          </p>
-          <NuxtLink
-            :to="flagAccountUrl"
-            target="_blank"
-            external
-            class="underline inline text-xs"
-          >
-            Add report
-          </NuxtLink>
+          <template v-if="openReport">
+            <p class="text-ui-muted text-sm">
+              This account already has an open report under review. Add what you
+              know there.
+            </p>
+            <NuxtLink
+              :to="openReport.url"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              View open report #{{ openReport.number }}
+            </NuxtLink>
+          </template>
+          <template v-else>
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <NuxtLink
+              :to="flagAccountUrl"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              Add report
+            </NuxtLink>
+          </template>
+
+          <div v-if="closedReports.length" class="mt-3 text-xs text-ui-muted">
+            <p>
+              Previously reported
+              {{
+                closedReports.length === 1
+                  ? 'once'
+                  : `${closedReports.length} times`
+              }}:
+            </p>
+            <ul class="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+              <li v-for="report in closedReports" :key="report.number">
+                <NuxtLink
+                  :to="report.url"
+                  target="_blank"
+                  external
+                  class="underline hover:text-ui-text"
+                >
+                  #{{ report.number }}</NuxtLink
+                >
+                ({{ report.outcome }})
+              </li>
+            </ul>
+          </div>
         </section>
       </template>
     </div>
