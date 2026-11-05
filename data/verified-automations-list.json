@@ -1133,5 +1133,19 @@
       "ematipico",
       "danielroe"
     ]
+  },
+  {
+    "username": "dexhunter",
+    "id": 6930518,
+    "reason": "PR spam with mostly useless micro perf-optimizations. Profile discloses as doing \"AI-generated optimization PRs\" as part of their startup's research.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/552",
+    "reportedBy": "MichaelGrupp",
+    "createdAt": "2026-11-03",
+    "approvedBy": [
+      "graphieros",
+      "ematipico",
+      "danielroe",
+      "OrbisK"
+    ]
   }
 ]
