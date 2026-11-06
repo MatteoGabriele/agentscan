@@ -3,6 +3,8 @@ import type { RepoActivity } from '~/utils/repo-activity'
 
 const props = defineProps<{
   activity: RepoActivity
+  /** Set when AgentScan tracks this repository. */
+  activityPath?: string
 }>()
 
 const isExpanded = ref(false)
@@ -19,32 +21,48 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
 </script>
 
 <template>
-  <li class="not-last:border-b border-ui-border-subtle/15">
-    <button
-      class="group w-[calc(100%+1rem)] -mx-2 px-2 flex items-start gap-3 text-left py-3.5 rounded-md transition-colors hover:bg-ui-muted/6"
-      :aria-expanded="isExpanded"
-      @click="isExpanded = !isExpanded"
-    >
-      <div class="min-w-0 flex-1">
+  <li class="not-last:border-b border-ui-border/25">
+    <div class="flex items-start gap-3">
+      <button
+        class="group flex-1 min-w-0 py-4 flex items-start gap-2 text-left"
+        :aria-expanded="isExpanded"
+        @click="isExpanded = !isExpanded"
+      >
         <span
-          class="block truncate font-mono text-sm text-ui-text/90 transition-colors group-hover:text-ui-text"
-        >
-          {{ activity.repo }}
-        </span>
-        <p class="text-ui-muted text-sm text-pretty mt-0.5">{{ summary }}</p>
-      </div>
-      <span
-        class="i-lucide:chevron-down text-sm text-ui-muted/50 group-hover:text-ui-text transition-all mt-0.5 shrink-0"
-        :class="isExpanded && 'rotate-180'"
-      />
-    </button>
+          class="i-lucide:chevron-right text-sm text-ui-muted/50 transition-all mt-0.5 shrink-0 group-hover:text-ui-text"
+          :class="isExpanded ? 'rotate-90' : 'group-hover:translate-x-0.5'"
+        />
+        <div class="min-w-0 flex-1">
+          <span
+            class="block truncate font-mono text-sm text-ui-text/90 underline decoration-transparent underline-offset-4 transition-colors group-hover:text-ui-text group-hover:decoration-ui-border-subtle"
+          >
+            {{ activity.repo }}
+          </span>
+          <p
+            class="text-ui-muted text-sm text-pretty mt-1 transition-colors group-hover:text-ui-text/75"
+          >
+            {{ summary }}
+          </p>
+        </div>
+      </button>
+
+      <NuxtLink
+        v-if="activityPath"
+        :to="activityPath"
+        :aria-label="`${activity.repo} is tracked by AgentScan. View repository activity`"
+        class="mt-4 shrink-0 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-1 border-solid border-ui-border/50 px-2 py-0.5 text-xs text-ui-muted/80 transition-colors hover:border-ui-border hover:text-ui-text"
+      >
+        <span class="i-lucide:chart-line shrink-0" aria-hidden="true" />
+        Tracked
+      </NuxtLink>
+    </div>
 
     <div
       v-if="isExpanded"
-      class="pl-4 pb-4 border-l border-ui-border-subtle/20 space-y-3"
+      class="ml-1.5 pl-4 mb-5 border-l border-ui-border/30 space-y-3"
     >
       <ul
-        class="rounded-lg border border-ui-border-subtle/30 divide-y divide-ui-border-subtle/15"
+        class="rounded-lg border border-ui-border/45 divide-y divide-ui-border/25"
       >
         <AnalysisEventItem
           v-for="(event, i) in visibleItems"

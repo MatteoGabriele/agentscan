@@ -30,19 +30,37 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
   repos,
   5,
 )
+
+// Tracked repositories have their own activity page. The libraries list is
+// lowercase, so the match ignores case.
+const { data: libraries } = useLibraries()
+const trackedRepos = computed<Map<string, string>>(() => {
+  return new Map(
+    libraries.value.repos.map((repo) => [repo.toLowerCase(), repo]),
+  )
+})
+
+function getActivityPath(repo: string): string | undefined {
+  const tracked = trackedRepos.value.get(repo.toLowerCase())
+  return tracked ? `/activity/${tracked}` : undefined
+}
 </script>
 
 <template>
-  <section v-if="repoCount" class="rounded-2 border border-ui-border-subtle/40">
+  <section
+    v-if="repoCount"
+    class="rounded-2 border border-ui-border/40 overflow-hidden"
+  >
     <h3>
       <button
-        class="group w-full flex items-center gap-2 px-6 py-3.5 text-left"
+        class="group w-full flex items-center gap-2 px-6 py-3.5 text-left bg-ui-card"
+        :class="isExpanded && 'border-b border-ui-border/30'"
         :aria-expanded="isExpanded"
         aria-controls="repo-activity-panel"
         @click="isExpanded = !isExpanded"
       >
         <span
-          class="i-lucide:folder-git-2 text-sm text-ui-muted shrink-0"
+          class="i-lucide:list-tree text-sm text-ui-muted shrink-0"
           aria-hidden="true"
         />
         <span
@@ -60,7 +78,7 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
       </button>
     </h3>
 
-    <div v-if="isExpanded" id="repo-activity-panel" class="px-6 pb-5">
+    <div v-if="isExpanded" id="repo-activity-panel" class="px-6 pt-3 pb-5">
       <Toggle
         v-if="categoryOptions.length"
         v-model="category"
@@ -73,6 +91,7 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
           v-for="activity in visibleItems"
           :key="activity.repo"
           :activity
+          :activity-path="getActivityPath(activity.repo)"
         />
       </ul>
 
