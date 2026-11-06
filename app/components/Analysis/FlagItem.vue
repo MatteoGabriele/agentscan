@@ -44,7 +44,7 @@ function toggleExpanded() {
       </div>
       <span
         v-if="isExpandable"
-        class="i-lucide:chevron-down text-sm text-ui-muted/50 group-hover:text-ui-text transition-all mt-0.5 shrink-0"
+        class="i-lucide:chevron-down text-sm text-ui-muted group-hover:text-ui-text transition-all mt-0.5 shrink-0"
         :class="isExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'"
       />
     </button>

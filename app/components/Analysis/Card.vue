@@ -64,6 +64,22 @@ const repoEvents = computed<RepoEvent[]>(() => {
   return fromGitHub({ user: props.user, events }).events
 })
 
+// Opened from the "events" toggle in the card.
+const isEventBreakdownOpen = ref(false)
+
+const rawEventsUrl = computed<string>(() => {
+  return `https://api.github.com/users/${username.value}/events?per_page=100`
+})
+const hasEventBreakdown = computed<boolean>(() => {
+  return groupEventsByRepo(repoEvents.value).length > 0
+})
+
+const hasSignals = computed<boolean>(() => {
+  return (
+    (props.analysis?.report.flags.length ?? 0) > 0 || hasActivityReport.value
+  )
+})
+
 const { classificationDetails } = useClassificationDetails(classification)
 const { scoreStyle } = useScoreStyle(
   classification,
@@ -179,14 +195,29 @@ useSeoAnalysis(identifyAnalysis, {
               />
             </div>
 
-            <NuxtLink
-              :to="verifiedAutomation.issueUrl"
-              target="_blank"
-              external
-              class="text-ui-muted underline inline text-xs hover:text-ui-text"
-            >
-              View issue
-            </NuxtLink>
+            <div class="flex items-center gap-3 text-xs">
+              <button
+                class="inline-flex items-center gap-0.5 text-ui-muted hover:text-ui-text underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                :aria-expanded="isEventBreakdownOpen"
+                aria-controls="event-breakdown"
+                @click="isEventBreakdownOpen = !isEventBreakdownOpen"
+              >
+                Event breakdown
+                <span
+                  class="i-lucide:chevron-down text-xs transition-transform"
+                  :class="isEventBreakdownOpen && 'rotate-180'"
+                  aria-hidden="true"
+                />
+              </button>
+              <NuxtLink
+                :to="verifiedAutomation.issueUrl"
+                target="_blank"
+                external
+                class="text-ui-muted underline inline hover:text-ui-text"
+              >
+                View issue
+              </NuxtLink>
+            </div>
           </footer>
         </section>
         <template v-else>
@@ -229,11 +260,27 @@ useSeoAnalysis(identifyAnalysis, {
           >
             <p v-if="analysis.eventsCount > 0">
               Analyzed from the last {{ analysis.eventsCount }} public GitHub
+              <!-- The raw API link moves into the breakdown panel. -->
+              <button
+                v-if="hasEventBreakdown"
+                class="inline-flex items-center gap-0.5 text-ui-text underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                :aria-expanded="isEventBreakdownOpen"
+                aria-controls="event-breakdown"
+                @click="isEventBreakdownOpen = !isEventBreakdownOpen"
+              >
+                events
+                <span
+                  class="i-lucide:chevron-down text-xs transition-transform"
+                  :class="isEventBreakdownOpen && 'rotate-180'"
+                  aria-hidden="true"
+                />
+              </button>
               <NuxtLink
+                v-else
                 external
                 target="_blank"
                 class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
+                :to="rawEventsUrl"
               >
                 events
               </NuxtLink>
@@ -244,7 +291,7 @@ useSeoAnalysis(identifyAnalysis, {
                 external
                 target="_blank"
                 class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
+                :to="rawEventsUrl"
               >
                 events</NuxtLink
               >
@@ -254,6 +301,14 @@ useSeoAnalysis(identifyAnalysis, {
             <DetectionVersion class="hidden md:inline-flex" />
           </div>
         </template>
+
+        <AnalysisRepoActivityPanel
+          v-if="isEventBreakdownOpen && hasEventBreakdown"
+          id="event-breakdown"
+          :events="repoEvents"
+          :raw-events-url
+          class="mt-4 pt-3 border-t border-ui-border-subtle/40"
+        />
 
         <section
           v-if="!verifiedAutomation"
@@ -275,20 +330,14 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
   </div>
 
-  <div class="@lg:mx-6">
+  <div v-if="isPending || (analysis && hasSignals)" class="@lg:mx-6">
     <AnalysisFlagsSkeleton v-if="isPending" />
     <LazyAnalysisFlags
-      v-else-if="
-        analysis && (analysis.report.flags.length > 0 || hasActivityReport)
-      "
+      v-else-if="analysis"
       :flags="analysis.report.flags"
       :activity-report="activityReport"
       hydrate-on-interaction
     />
-  </div>
-
-  <div v-if="repoEvents.length" class="@lg:mx-6">
-    <LazyAnalysisRepoActivity :events="repoEvents" hydrate-on-interaction />
   </div>
 
   <div
