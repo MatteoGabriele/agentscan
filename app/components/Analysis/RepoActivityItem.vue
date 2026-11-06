@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import type { RepoActivity } from '~/utils/repo-activity'
 
 const props = defineProps<{
@@ -14,8 +15,13 @@ const repoUrl = computed<string>(
   () => `https://github.com/${props.activity.repo}`,
 )
 
+// Event rows render the raw GitHub event each one was normalized from.
+const sourceEvents = computed<GitHubEvent[]>(() => {
+  return props.activity.events.flatMap((event) => event.source ?? [])
+})
+
 const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
-  () => props.activity.events,
+  sourceEvents,
   5,
 )
 </script>

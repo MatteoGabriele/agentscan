@@ -37,5 +37,10 @@ export function usePreviewList<T>(items: MaybeRefOrGetter<T[]>, limit: number) {
     },
   )
 
-  return { visibleItems, canToggle, toggleLabel, toggle }
+  return {
+    visibleItems,
+    canToggle,
+    toggleLabel,
+    toggle,
+  }
 }

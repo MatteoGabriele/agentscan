@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { GitHubEvent } from '@unveil/identity/providers/github'
-import type { EventCategory } from '~/utils/repo-activity'
+import type { EventCategory, RepoEvent } from '~/utils/repo-activity'
 
 const props = defineProps<{
-  events: GitHubEvent[]
+  events: RepoEvent[]
 }>()
 
 const isExpanded = ref(false)
@@ -14,7 +13,13 @@ const categoryOptions = computed(() => {
   if (!categories.length) {
     return []
   }
-  return [{ value: 'all' as const, label: 'All' }, ...categories]
+  return [
+    {
+      value: 'all' as const,
+      label: 'All',
+    },
+    ...categories,
+  ]
 })
 
 const repoCount = computed<number>(() => {
@@ -60,13 +65,13 @@ function getActivityPath(repo: string): string | undefined {
         @click="isExpanded = !isExpanded"
       >
         <span
-          class="i-lucide:list-tree text-sm text-ui-muted shrink-0"
+          class="i-lucide:text-search text-sm text-ui-muted shrink-0"
           aria-hidden="true"
         />
         <span
           class="font-mono text-sm text-ui-text/90 transition-colors group-hover:text-ui-text"
         >
-          All activity by repository
+          Analyzed events
         </span>
         <span class="text-ui-muted text-sm">
           {{ repoCount }} {{ repoCount === 1 ? 'repo' : 'repos' }}

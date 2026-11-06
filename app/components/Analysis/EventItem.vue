@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import type { GitHubEvent } from '@unveil/identity/providers/github'
 
-withDefaults(
-  defineProps<{
-    event: GitHubEvent
-    showRepo?: boolean
-  }>(),
-  { showRepo: true },
-)
+const { showRepo = true } = defineProps<{
+  event: GitHubEvent
+  showRepo?: boolean
+}>()
 
 const { getEventIcon, formatEventTime } = useGitHubEventDisplay()
 </script>

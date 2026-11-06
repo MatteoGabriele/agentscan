@@ -2,9 +2,10 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { ClassificationLabel } from '@unveil/identity'
 import type { Report } from '@unveil/identity/report'
-import type { GitHubEvent, GitHubUser } from '@unveil/identity/providers/github'
+import { fromGitHub, type GitHubUser } from '@unveil/identity/providers/github'
 import type { AnalyzeReturn } from '@unveil/vk'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
+import type { RepoEvent } from '~/utils/repo-activity'
 
 const props = defineProps<{
   user: GitHubUser
@@ -55,11 +56,12 @@ const classification = computed<ClassificationLabel | undefined>(() => {
 })
 
 // Insufficient-data accounts already list every analyzed event.
-const repoEvents = computed<GitHubEvent[]>(() => {
+const repoEvents = computed<RepoEvent[]>(() => {
   if (!classification.value || classification.value === 'insufficient-data') {
     return []
   }
-  return props.analysis?.events ?? []
+  const events = props.analysis?.events ?? []
+  return fromGitHub({ user: props.user, events }).events
 })
 
 const { classificationDetails } = useClassificationDetails(classification)

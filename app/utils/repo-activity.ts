@@ -1,10 +1,14 @@
+import type { ActivityEvent, ActivityEventType } from '@unveil/identity'
 import type { GitHubEvent } from '@unveil/identity/providers/github'
+
+/** A GitHub event normalized by `fromGitHub`, keeping the raw event as `source`. */
+export type RepoEvent = ActivityEvent<GitHubEvent>
 
 export type RepoActivity = {
   /** Full name, e.g. "owner/repo". */
   repo: string
   /** Newest first. */
-  events: GitHubEvent[]
+  events: RepoEvent[]
 }
 
 export type EventCategory = 'pull-requests' | 'issues' | 'code'
@@ -17,69 +21,64 @@ export type EventCategoryOption = {
 /** Broad groups of event types, used to filter the list. */
 const EVENT_CATEGORIES: Record<
   EventCategory,
-  { label: string; types: string[] }
+  { label: string; types: ActivityEventType[] }
 > = {
   'pull-requests': {
     label: 'Pull requests',
-    types: [
-      'PullRequestEvent',
-      'PullRequestReviewEvent',
-      'PullRequestReviewCommentEvent',
-    ],
+    types: ['pull-request', 'review', 'review-comment', 'review-thread'],
   },
   issues: {
     label: 'Issues',
-    types: ['IssuesEvent', 'IssueCommentEvent'],
+    types: ['issue', 'issue-comment'],
   },
   code: {
     label: 'Code',
-    types: [
-      'PushEvent',
-      'CreateEvent',
-      'DeleteEvent',
-      'ReleaseEvent',
-      'CommitCommentEvent',
-    ],
+    types: ['push', 'create', 'delete', 'release', 'commit-comment'],
   },
 }
 
 /** Plural, lowercase names used in summaries ("3 events · pull requests"). */
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  PullRequestEvent: 'pull requests',
-  PullRequestReviewEvent: 'reviews',
-  PullRequestReviewCommentEvent: 'review comments',
-  IssuesEvent: 'issues',
-  IssueCommentEvent: 'comments',
-  PushEvent: 'pushes',
-  CreateEvent: 'branches',
-  DeleteEvent: 'deletions',
-  ForkEvent: 'forks',
-  WatchEvent: 'stars',
-  ReleaseEvent: 'releases',
-  CommitCommentEvent: 'commit comments',
-  MemberEvent: 'members',
-  GollumEvent: 'wiki edits',
-  DiscussionEvent: 'discussions',
+const EVENT_TYPE_LABELS: Record<ActivityEventType, string> = {
+  'pull-request': 'pull requests',
+  review: 'reviews',
+  'review-comment': 'review comments',
+  'review-thread': 'review threads',
+  issue: 'issues',
+  'issue-comment': 'comments',
+  push: 'pushes',
+  create: 'branches',
+  delete: 'deletions',
+  fork: 'forks',
+  star: 'stars',
+  release: 'releases',
+  'commit-comment': 'commit comments',
+  member: 'members',
+  public: 'made public',
+  wiki: 'wiki edits',
+  discussion: 'discussions',
+  sponsorship: 'sponsorships',
 }
 
 /** How many event types a summary names before trailing off. */
 const SUMMARY_TYPE_LIMIT = 3
 
-export function getEventTypeLabel(type: string): string {
+/**
+ * Types the provider doesn't know are passed through raw ("FooEvent"), so the
+ * fallback strips the GitHub suffix.
+ */
+export function getEventTypeLabel(type: ActivityEventType): string {
   return EVENT_TYPE_LABELS[type] ?? type.replace(/Event$/, '').toLowerCase()
 }
 
-function isInCategory(event: GitHubEvent, category: EventCategory): boolean {
-  return EVENT_CATEGORIES[category].types.includes(event.type ?? '')
+function isInCategory(event: RepoEvent, category: EventCategory): boolean {
+  return EVENT_CATEGORIES[category].types.includes(event.type)
 }
 
 /**
  * The categories worth offering as filters: those that keep some of the
  * events but not all of them (otherwise picking one would change nothing).
  */
-export function getEventCategories(
-  events: GitHubEvent[],
-): EventCategoryOption[] {
+export function getEventCategories(events: RepoEvent[]): EventCategoryOption[] {
   const categories = Object.keys(EVENT_CATEGORIES) as EventCategory[]
 
   return categories
@@ -97,28 +96,28 @@ export function getEventCategories(
 
 /** Keeps the events in `category`; with no category, keeps them all. */
 export function filterByCategory(
-  events: GitHubEvent[],
+  events: RepoEvent[],
   category?: EventCategory,
-): GitHubEvent[] {
+): RepoEvent[] {
   if (!category) {
     return events
   }
   return events.filter((event) => isInCategory(event, category))
 }
 
-function timestamp(event: GitHubEvent): number {
-  return Date.parse(event.created_at ?? '') || 0
+function timestamp(event: RepoEvent): number {
+  return Date.parse(event.at) || 0
 }
 
 /**
  * Groups events by repository. Events without a repository are skipped.
  * Busiest repositories come first; ties go to the most recently active.
  */
-export function groupEventsByRepo(events: GitHubEvent[]): RepoActivity[] {
-  const eventsByRepo = new Map<string, GitHubEvent[]>()
+export function groupEventsByRepo(events: RepoEvent[]): RepoActivity[] {
+  const eventsByRepo = new Map<string, RepoEvent[]>()
 
   for (const event of events) {
-    const repo = event.repo?.name
+    const repo = event.repo
     if (!repo) {
       continue
     }
@@ -142,11 +141,10 @@ export function groupEventsByRepo(events: GitHubEvent[]): RepoActivity[] {
 }
 
 /** One line describing a list of events: "12 events · pull requests, comments". */
-export function summarizeEvents(events: GitHubEvent[]): string {
-  const countByType = new Map<string, number>()
+export function summarizeEvents(events: RepoEvent[]): string {
+  const countByType = new Map<ActivityEventType, number>()
   for (const event of events) {
-    const type = event.type ?? ''
-    countByType.set(type, (countByType.get(type) ?? 0) + 1)
+    countByType.set(event.type, (countByType.get(event.type) ?? 0) + 1)
   }
 
   const typesByFrequency = [...countByType]
