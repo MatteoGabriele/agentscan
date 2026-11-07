@@ -1,5 +1,5 @@
 import type { Endpoints } from '@octokit/types'
-import { isGitHubAppAccount } from '@unveil/identity'
+import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import { projectRepositories } from '~~/shared/project-repositories'
 import type {
   Contributor,

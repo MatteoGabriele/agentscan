@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { IdentifyFlag } from '@unveil/identity'
+import type { ReportFlag } from '@unveil/identity/report'
 
 const props = defineProps<{
-  flag: IdentifyFlag
+  flag: ReportFlag
 }>()
 
 const { parseDataPoint, groupDataPoints } = useFlagDataPoints()
@@ -21,32 +21,37 @@ function toggleExpanded() {
 <template>
   <li class="not-last:border-b border-ui-border-subtle/15">
     <button
-      class="group w-full flex items-start gap-3 text-left py-3.5"
-      :class="isExpandable ? 'cursor-pointer' : 'cursor-default'"
+      class="group w-full flex items-start gap-3 text-left py-4"
       :aria-expanded="isExpandable ? isExpanded : undefined"
       @click="toggleExpanded"
     >
       <div class="min-w-0 flex-1">
         <span
-          class="font-mono text-sm text-ui-text/90 transition-colors"
-          :class="isExpandable && 'group-hover:text-ui-text'"
+          class="font-mono text-sm text-ui-text/90 underline decoration-transparent underline-offset-4 transition-colors"
+          :class="
+            isExpandable &&
+            'group-hover:text-ui-text group-hover:decoration-ui-border-subtle'
+          "
         >
           {{ flag.label }}
         </span>
-        <p class="text-ui-muted text-sm text-pretty mt-0.5">
+        <p
+          class="text-ui-muted text-sm text-pretty mt-1 transition-colors"
+          :class="isExpandable && 'group-hover:text-ui-text/75'"
+        >
           {{ flag.detail }}
         </p>
       </div>
       <span
         v-if="isExpandable"
-        class="i-lucide:chevron-down text-sm text-ui-muted/50 group-hover:text-ui-muted transition-all mt-0.5 shrink-0"
-        :class="isExpanded && 'rotate-180'"
+        class="i-lucide:chevron-down text-sm text-ui-muted group-hover:text-ui-text transition-all mt-0.5 shrink-0"
+        :class="isExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'"
       />
     </button>
 
     <div
       v-if="isExpandable && isExpanded"
-      class="pl-4 pb-4 border-l border-ui-border-subtle/20 space-y-3"
+      class="pl-4 mb-5 border-l border-ui-border-subtle/20 space-y-3"
     >
       <div
         v-for="(group, i) in groupDataPoints(flag.data)"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { GitHubEvent, IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import {
   VueUiHorizontalBar,
   type VueUiHorizontalBarDatasetItem,
@@ -11,7 +12,7 @@ import('vue-data-ui/style.css')
 
 const props = defineProps<{
   events: GitHubEvent[]
-  classification?: IdentityClassification
+  classification?: ClassificationLabel
 }>()
 
 const rootEl = shallowRef<HTMLElement | null>(null)
@@ -96,15 +97,8 @@ const config = computed<VueUiHorizontalBarConfig>(() => ({
 }))
 
 const isExpanded = shallowRef(false)
-const { trackEvent } = useSaEvent()
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
-
-  if (isExpanded.value) {
-    trackEvent('account_events_breakdown_opened')
-  } else {
-    trackEvent('account_events_breakdown_closed')
-  }
 }
 </script>
 

@@ -1,7 +1,5 @@
-// The responses agentscan-logs serves. The scan, the data files and the
-// aggregation all live in that repo; the routes under server/api/activity and
-// server/api/automation-tally here only pass them through, so these types are
-// the contract between the two.
+// Response types of agentscan-logs, proxied by server/api/activity and
+// server/api/automation-tally.
 
 import type { ActivityCategoryProgression, ActivityItem } from './activity'
 import type { GetClassificationStatsByDateResults } from '../utils/count-classification-by-date'
@@ -54,9 +52,17 @@ export type AutomationTallyResponse = {
   counter: number
 }[]
 
+export type LibraryCategory = {
+  name: string
+  // Broad area the category belongs to, used as a filter.
+  group: string
+  repos: string[]
+}
+
 export type LibrariesResponse = {
   total: number
   repos: string[]
+  categories: LibraryCategory[]
 }
 
 export type ActivityRepoScore = {
@@ -74,20 +80,9 @@ export type ActivityRepoScoresDatesResponse = {
   dates: string[]
 }
 
-export type ActivityRepoScoresDateResponse = {
-  date: string
-  dates: string[]
-  repos: ActivityRepoScore[]
-}
-
 export type ActivityRepoScoresRangeResponse = {
   from: string
   to: string
   dates: string[]
   days: ActivityRepoScoreDay[]
 }
-
-export type ActivityRepoScoresResponse =
-  | ActivityRepoScoresDatesResponse
-  | ActivityRepoScoresDateResponse
-  | ActivityRepoScoresRangeResponse

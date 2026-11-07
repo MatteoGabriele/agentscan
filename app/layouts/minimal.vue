@@ -1,15 +1,5 @@
 <script setup lang="ts">
-import { usePreferredDark } from '@vueuse/core'
-
-const darkMode = usePreferredDark()
-const colorMode = useColorMode()
-const colorScheme = computed(() => {
-  return {
-    system: darkMode ? 'dark light' : 'light dark',
-    light: 'only light',
-    dark: 'only dark',
-  }[colorMode.preference]
-})
+const colorScheme = useColorScheme()
 
 useHead({
   title: 'AgentScan - GitHub Automation Detector',

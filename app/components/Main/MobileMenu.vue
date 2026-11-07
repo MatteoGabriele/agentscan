@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute()
-const { trackEvent } = useSaEvent()
 
 const isMenuOpen = ref<boolean>(false)
 function toggleMenu() {
@@ -80,11 +79,30 @@ onBeforeUnmount(() => {
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
-        <LazyMainMenuItem
-          class="text-xl"
-          to="/activity"
-          label="Ecosystem Activity"
-        />
+        <div class="flex flex-col items-center gap-3">
+          <p
+            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+          >
+            Ecosystem Activity
+          </p>
+          <ul class="flex flex-col items-center gap-3">
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/activity"
+                label="Overview"
+                exact
+              />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/activity/repositories"
+                label="Repositories"
+              />
+            </li>
+          </ul>
+        </div>
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
@@ -125,12 +143,32 @@ onBeforeUnmount(() => {
 
         <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
 
-        <LazyMainMenuItem
-          class="text-xl"
-          to="/app"
-          label="Install AgentScan"
-          @click="trackEvent('get_agentscan_clicked')"
-        />
+        <div class="flex flex-col items-center gap-3">
+          <p
+            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+          >
+            Install AgentScan
+          </p>
+          <ul class="flex flex-col items-center gap-3">
+            <li>
+              <LazyMainMenuItem class="text-xl" to="/app" label="GitHub App" />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="https://github.com/marketplace/actions/agentscan"
+                label="GitHub Action"
+              />
+            </li>
+            <li>
+              <LazyMainMenuItem
+                class="text-xl"
+                to="/app#configure"
+                label="Configure"
+              />
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

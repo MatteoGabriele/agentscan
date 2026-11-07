@@ -1,9 +1,28 @@
 <script setup lang="ts">
-import type { IdentifyFlag } from '@unveil/identity'
+import type { ActivityEvent } from '@unveil/identity'
+import type { Flag } from '@unveil/identity/report'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 
 const props = defineProps<{
-  flag: IdentifyFlag
+  flag: Flag
 }>()
+
+// Returns the raw GitHub event a flag event was built from.
+function toGitHubEvent(event: ActivityEvent): GitHubEvent | undefined {
+  return event.source as GitHubEvent | undefined
+}
+
+const events = computed<GitHubEvent[]>(() => {
+  return props.flag.events.flatMap((e) => toGitHubEvent(e) ?? [])
+})
+
+const connections = computed(() => {
+  return (props.flag.connections ?? []).flatMap((conn) => {
+    const from = toGitHubEvent(conn.from)
+    const to = toGitHubEvent(conn.to)
+    return from && to ? [{ from, to, label: conn.label }] : []
+  })
+})
 
 const {
   getEventIcon,
@@ -17,13 +36,13 @@ const {
 const showAllEvidence = ref(false)
 
 const hasConnections = computed(() => {
-  return (props.flag.connections?.length ?? 0) > 0
+  return connections.value.length > 0
 })
 const isMixedTypes = computed(() => {
-  return new Set(props.flag.events.map((e) => e.type)).size > 1
+  return new Set(events.value.map((e) => e.type)).size > 1
 })
 
-const sortedEvents = computed(() => sortByTime(props.flag.events))
+const sortedEvents = computed(() => sortByTime(events.value))
 
 const PREVIEW_COUNT = 5
 const FAST_THRESHOLD_SECONDS = 300
@@ -33,7 +52,7 @@ const fastestConnection = computed(() => {
     return null
   }
 
-  const conns = props.flag.connections ?? []
+  const conns = connections.value
 
   let best: (typeof conns)[0] | null = null
   let minDelta = Infinity
@@ -92,7 +111,7 @@ const fastestEventPair = computed(() => {
 })
 
 const visibleConnections = computed(() => {
-  const conns = props.flag.connections ?? []
+  const conns = connections.value
   return showAllEvidence.value ? conns : conns.slice(0, PREVIEW_COUNT)
 })
 
@@ -104,9 +123,7 @@ const visibleSortedEvents = computed(() => {
 
 const hiddenCount = computed(() => {
   if (hasConnections.value) {
-    return (
-      (props.flag.connections?.length ?? 0) - visibleConnections.value.length
-    )
+    return connections.value.length - visibleConnections.value.length
   }
 
   return sortedEvents.value.length - visibleSortedEvents.value.length
@@ -214,8 +231,8 @@ const hiddenCount = computed(() => {
       >
         <div class="space-y-1">
           <div
-            v-for="ev in [fastestEventPair.a, fastestEventPair.b]"
-            :key="ev.id"
+            v-for="(ev, i) in [fastestEventPair.a, fastestEventPair.b]"
+            :key="i"
             class="flex gap-2.5"
           >
             <span
@@ -266,7 +283,7 @@ const hiddenCount = computed(() => {
       </button>
     </template>
 
-    <!-- ── ORIGINAL icon+sticky list (single event type) ── -->
+    <!-- Single event type: icon list -->
     <template v-else>
       <LazyAnalysisFlagEvidenceFast
         v-if="fastestEventPair"
@@ -274,8 +291,8 @@ const hiddenCount = computed(() => {
       >
         <div class="space-y-1">
           <div
-            v-for="ev in [fastestEventPair.a, fastestEventPair.b]"
-            :key="ev.id"
+            v-for="(ev, i) in [fastestEventPair.a, fastestEventPair.b]"
+            :key="i"
             class="flex gap-2"
           >
             <span

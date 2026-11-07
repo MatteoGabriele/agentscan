@@ -14,7 +14,11 @@ import type {
   ActivityUnit,
   EventsEvolutionSeries,
 } from '~~/shared/types/activity.ts'
-import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
+import {
+  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
+  EMPTY_HOUR_NOTE,
+  SVG_ICON,
+} from '~~/shared/utils/charts.ts'
 
 dayjs.extend(utc)
 
@@ -48,6 +52,18 @@ const prCounts = computed(() =>
     (scanTime) => countsByScanTime.value?.[scanTime]?.total.count ?? 0,
   ),
 )
+
+const emptyHourIndexes = computed(() => {
+  if (isLoading.value) {
+    return new Set([])
+  }
+
+  return new Set(
+    prCounts.value.flatMap((count, index) => {
+      return count ? [] : [index]
+    }),
+  )
+})
 
 const scanTimesOffset = computed(() => {
   if (!isMobile.value) {
@@ -151,8 +167,9 @@ const config = computed<VueUiXyConfig>(() => ({
     width: Math.round(width.value),
     height: Math.round(height.value),
     padding: {
-      left: viewBoxPadding.value.left,
-      right: viewBoxPadding.value.right,
+      left: 0,
+      // VueUiXy reserves 6px on the right even without progression labels.
+      right: -6,
       /**
        * Extra padding bottom is added on desktop to compensate the illusion of height difference between the daily and hourly charts, and avoid a CLS impression when switching between them; but not on mobile, where we need all the real estate we can use.
        */
@@ -174,12 +191,14 @@ const config = computed<VueUiXyConfig>(() => ({
       offsetY: -64,
     },
     grid: {
+      position: scanTimes.value?.length === 1 ? 'middle' : 'start',
       stroke: 'transparent',
       labels: {
         show: false,
         fontSize: 12,
         color: colors.value.textMuted,
         yAxis: {
+          crosshairSize: 0,
           useIndividualScale: false,
           scaleMin: 0,
           scaleMax: scaleMax.value,
@@ -229,23 +248,6 @@ function formatScanTime(index: number) {
 
   return dayjs(scanTime).format('ddd, MMM D • HH:mm')
 }
-
-const progressionLabelOffsetX = 0
-
-const viewBoxPadding = computed(() => {
-  const maxSeries = isLoading.value ? 25 : (scanTimes.value?.length ?? 0)
-
-  if (maxSeries <= 1 || width.value <= 0) {
-    return { left: 0, right: 0 }
-  }
-
-  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1))
-
-  return {
-    left: -halfVueUiXyDatapointStep,
-    right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
-  }
-})
 
 const isChartHovered = shallowRef(false)
 
@@ -318,6 +320,33 @@ function handleChartMouseleave() {
                 :hovered-index="hoveredIndex"
               />
 
+              <!-- EMPTY HOURS -->
+              <template
+                v-for="(plot, i) in svg?.data?.[0]?.plots"
+                :key="`empty_${i}`"
+              >
+                <g
+                  v-if="emptyHourIndexes.has(i + svg.slicer.start)"
+                  :transform="`translate(${plot.x}, ${svg.drawingArea.bottom - 22})`"
+                  :color="colors.textMuted"
+                  style="cursor: default"
+                >
+                  <title>{{ EMPTY_HOUR_NOTE }}</title>
+                  <circle r="12" :fill="colors.bg" />
+                  <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
+                  <g
+                    transform="translate(-7.68, -7.68) scale(0.64)"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                    v-html="SVG_ICON.triangleAlert"
+                  />
+                  <!-- eslint-enable vue/no-v-text-v-html-on-component, vue/no-v-html -->
+                </g>
+              </template>
+
               <text
                 v-if="isLoading"
                 :x="svg.drawingArea.left + svg.drawingArea.width / 2"
@@ -366,19 +395,19 @@ function handleChartMouseleave() {
                     <th class="px-2 text-left">Trend</th>
                   </template>
                 </ChartEventsEvolutionTooltipTable>
+
+                <div
+                  v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
+                  class="mt-2 flex flex-row gap-2 max-w-[280px] text-xs text-ui-muted"
+                >
+                  <span class="w-6 shrink-0 i-lucide:triangle-alert" />
+                  <span>{{ EMPTY_HOUR_NOTE }}</span>
+                </div>
               </div>
             </template>
 
             <template
-              #time-label="{
-                x,
-                y,
-                content,
-                fontSize,
-                fill,
-                textAnchor,
-                absoluteIndex,
-              }"
+              #time-label="{ x, y, content, fontSize, fill, absoluteIndex }"
             >
               <text
                 v-if="
@@ -391,7 +420,7 @@ function handleChartMouseleave() {
                 :y="y + fontSize * 2"
                 :font-size="fontSize"
                 :fill
-                :text-anchor="textAnchor"
+                text-anchor="start"
                 :opacity="isChartHovered || isMobile ? 1 : 0"
                 class="time-label"
               >

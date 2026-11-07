@@ -1,7 +1,6 @@
 import type { AdopterRepository } from '~~/shared/types/adopter-repository'
 
-// Refreshed by hand with `pnpm collect:adopters`, which writes
-// data/adopters.json.
+// Served from data/adopters.json, updated with `pnpm collect:adopters`.
 export default defineEventHandler(async (): Promise<AdopterRepository[]> => {
   try {
     const adopters =

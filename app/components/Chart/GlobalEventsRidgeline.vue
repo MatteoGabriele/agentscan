@@ -12,7 +12,7 @@ import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.t
 
 import 'vue-data-ui/style.css'
 import ClassificationToggle from '../Activity/ClassificationToggle.vue'
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import UnitToggle from '../Activity/UnitToggle.vue'
 
 dayjs.extend(isoWeek)
@@ -32,7 +32,7 @@ const dates = computed(() => activity.value?.dates)
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 const countsByDate = computed(() => activity.value?.countsByDate)
-const selectedClassification = ref<IdentityClassification>('organic')
+const selectedClassification = ref<ClassificationLabel>('organic')
 
 const selectedUnit = ref<'percentage' | 'quantity'>('percentage')
 

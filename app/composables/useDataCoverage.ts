@@ -1,9 +1,8 @@
 import { identityConfig } from '@unveil/identity'
 
 /**
- * How much activity was available to analyze. Derived from the analysis
- * `confidence`, which counts events and the days they span, not how certain
- * the classification is.
+ * How much activity the analysis covered, from `confidence` (event count and
+ * day span). Not a measure of classification certainty.
  */
 export type DataCoverageLevel = 'full' | 'partial' | 'low'
 

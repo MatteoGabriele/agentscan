@@ -1,9 +1,9 @@
-import { getClassificationDetails } from '@unveil/identity'
-import type { IdentityClassification } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/report'
+import type { ClassificationLabel } from '@unveil/identity'
 type ClassificationDetails = ReturnType<typeof getClassificationDetails>
 
 export function useClassificationDetails(
-  classification: MaybeRefOrGetter<IdentityClassification | undefined>,
+  classification: MaybeRefOrGetter<ClassificationLabel | undefined>,
 ) {
   const classificationDetails = computed<ClassificationDetails>(() => {
     const classificationValue = toValue(classification)

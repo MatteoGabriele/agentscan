@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import { computed } from 'vue'
 
-const selected = defineModel<IdentityClassification>()
+const selected = defineModel<ClassificationLabel>()
 
 const options = computed(() => [
   {

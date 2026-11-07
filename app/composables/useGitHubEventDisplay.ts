@@ -1,5 +1,5 @@
 // @unocss-include
-import type { GitHubEvent } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 import dayjs from 'dayjs'
 
 const ZERO_SHA = '0000000000000000000000000000000000000000'
@@ -141,9 +141,7 @@ export function useGitHubEventDisplay() {
     }
   }
 
-  // AgentScan Text only reads PR/issue bodies and issue comments, and only
-  // text the account wrote is worth analyzing: a review links to someone
-  // else's PR, and a closed/merged PR may not be theirs either.
+  // AgentScan Text link for text the account wrote: opened PRs, opened issues and issue comments.
   function getTextAnalysis(
     event: GitHubEvent,
   ): { url: string; label: string } | undefined {
@@ -187,7 +185,7 @@ export function useGitHubEventDisplay() {
       return undefined
     }
 
-    // Same shape the Text site builds itself: protocol stripped, slashes kept.
+    // Same URL format the Text site builds: no protocol, unescaped slashes.
     const url = encodeURIComponent(`github.com/${target}`).replaceAll(
       '%2F',
       '/',

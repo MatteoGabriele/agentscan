@@ -1,10 +1,10 @@
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 
 // GitHub events as listed on https://docs.github.com/en/rest/using-the-rest-api/github-event-types (2026-03-10 version of the API)
 // Descriptions are taken from there
 export function useEventsTaxonomy(
   colors: Ref<Record<string, string>>,
-  classification: IdentityClassification = 'mixed',
+  classification: ClassificationLabel = 'mixed',
 ) {
   const taxonomy = computed<EventTaxonomy>(() => ({
     CommitCommentEvent: {
@@ -18,6 +18,7 @@ export function useEventsTaxonomy(
         organic: colors.value.eventOrganicBranch,
         mixed: colors.value.eventMixedBranch,
         automation: colors.value.eventAutomationBranch,
+        'insufficient-data': undefined,
       }[classification],
     },
     DeleteEvent: {
@@ -35,6 +36,7 @@ export function useEventsTaxonomy(
         organic: colors.value.eventOrganicFork,
         mixed: colors.value.eventMixedFork,
         automation: colors.value.eventAutomationFork,
+        'insufficient-data': undefined,
       }[classification],
     },
     GollumEvent: {
@@ -64,6 +66,7 @@ export function useEventsTaxonomy(
         organic: colors.value.eventOrganicPr,
         mixed: colors.value.eventMixedPr,
         automation: colors.value.eventAutomationPr,
+        'insufficient-data': undefined,
       }[classification],
     },
     PullRequestReviewEvent: {

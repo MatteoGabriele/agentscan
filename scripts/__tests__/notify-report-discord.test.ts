@@ -21,6 +21,14 @@ const report: ReportSummary = {
 
 const thresholds: Thresholds = { minApprovals: 4, minRejections: 2 }
 
+function firstMessage(messages: string[]): string {
+  const [message] = messages
+  if (message === undefined) {
+    throw new Error('Expected at least one digest message')
+  }
+  return message
+}
+
 const decision = (overrides: Partial<Decision> = {}): Decision => ({
   issue: 42,
   outcome: 'approved',
@@ -102,8 +110,6 @@ describe('decidedMessage', () => {
     expect(message).toContain('was not flagged')
   })
 
-  // The verdict is posted with SUPPRESS_EMBEDS too, but a run settling several
-  // reports would still stack preview cards if the link were left bare.
   it('wraps the issue link so Discord shows no preview card', () => {
     const message = decidedMessage(report, decision(), thresholds)
 
@@ -117,8 +123,6 @@ describe('decidedMessage', () => {
     )
   })
 
-  // The reviewers who voted are already named in the issue comment; the channel
-  // post deliberately keeps to the counts.
   it('does not name the reviewers who voted', () => {
     const message = decidedMessage(report, decision(), thresholds)
 
@@ -161,7 +165,6 @@ describe('votersLine', () => {
     expect(line).toContain('nobody has voted yet')
   })
 
-  // Names are a roster, not a summons: no @ means Discord pings no one.
   it('does not tag the reviewers it names', () => {
     const line = votersLine(
       pending({ approvedBy: ['alice'], rejectedBy: ['carol'] }),
@@ -187,9 +190,6 @@ describe('digestMessages', () => {
     )
   })
 
-  // A preview card per entry would bury the list, so every link is wrapped in
-  // <>. The digest is posted with SUPPRESS_EMBEDS too, but the formatting alone
-  // has to be enough.
   it('leaves no bare link that Discord would unfurl into a preview', () => {
     const messages = digestMessages(
       [pending({ issue: 1 }), pending({ issue: 2 }), pending({ issue: 3 })],
@@ -203,23 +203,23 @@ describe('digestMessages', () => {
   })
 
   it('lists who has voted under each report', () => {
-    const [message] = digestMessages(
-      [pending({ approvedBy: ['alice', 'bob'], rejectedBy: ['carol'] })],
-      thresholds,
+    const message = firstMessage(
+      digestMessages(
+        [pending({ approvedBy: ['alice', 'bob'], rejectedBy: ['carol'] })],
+        thresholds,
+      ),
     )
 
     const lines = message.split('\n')
     const entry = lines.findIndex((line) => line.includes('`@kaigritun`'))
 
-    // The entry runs: account, tally, roster, link.
+    // Entry order: account, tally, roster, link.
     expect(lines[entry + 1]).toContain('👍 2/4')
     expect(lines[entry + 2]).toContain('👍 `alice, bob`')
     expect(lines[entry + 2]).toContain('👎 `carol`')
     expect(lines[entry + 3]).toContain('<https://')
   })
 
-  // The split moves whole reports, so no message can open with a roster whose
-  // report was left at the end of the previous one.
   it('never separates a roster from the report it belongs to', () => {
     const many = Array.from({ length: 120 }, (_, index) =>
       pending({
@@ -248,15 +248,15 @@ describe('digestMessages', () => {
     }
   })
 
-  // The old flat list ran every report together, which was unreadable in the
-  // channel: each entry now stands as its own block.
   it('separates the reports with a blank line', () => {
-    const [message] = digestMessages(
-      [
-        pending({ issue: 1, username: 'first' }),
-        pending({ issue: 2, username: 'second' }),
-      ],
-      thresholds,
+    const message = firstMessage(
+      digestMessages(
+        [
+          pending({ issue: 1, username: 'first' }),
+          pending({ issue: 2, username: 'second' }),
+        ],
+        thresholds,
+      ),
     )
 
     const lines = message.split('\n')
@@ -266,12 +266,14 @@ describe('digestMessages', () => {
   })
 
   it('keeps the reports in the order it was given', () => {
-    const [message] = digestMessages(
-      [
-        pending({ issue: 7, username: 'older' }),
-        pending({ issue: 9, username: 'newer' }),
-      ],
-      thresholds,
+    const message = firstMessage(
+      digestMessages(
+        [
+          pending({ issue: 7, username: 'older' }),
+          pending({ issue: 9, username: 'newer' }),
+        ],
+        thresholds,
+      ),
     )
 
     expect(message.indexOf('older')).toBeLessThan(message.indexOf('newer'))
@@ -294,8 +296,6 @@ describe('digestMessages', () => {
     ).toHaveLength(1)
   })
 
-  // Discord drops anything past 2000 characters, so a long backlog has to span
-  // several messages rather than lose its tail.
   it('splits a long backlog into messages that each fit the limit', () => {
     const many = Array.from({ length: 120 }, (_, index) =>
       pending({ issue: index, username: `automation-account-${index}` }),

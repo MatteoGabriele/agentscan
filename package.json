@@ -2,7 +2,10 @@
   "name": "agentscan",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@11.22.0",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=26.13.0"
+  },
   "scripts": {
     "build": "nuxt build",
     "clean": "nuxt cleanup",
@@ -32,29 +35,30 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@nuxt/fonts": "^0.14.0",
+    "@nuxt/fonts": "^1.2.0",
     "@nuxtjs/color-mode": "^4.0.1",
     "@octokit/app": "^16.1.4",
     "@octokit/request-error": "^7.1.0",
     "@octokit/webhooks": "^14.2.0",
+    "@takumi-rs/core": "^2.19.0",
     "@tiptap/core": "^3.30.5",
     "@tiptap/extension-link": "^3.27.1",
     "@tiptap/extension-placeholder": "^3.31.3",
     "@tiptap/extension-text": "^3.31.3",
     "@tiptap/starter-kit": "^3.31.3",
     "@tiptap/vue-3": "^3.31.3",
-    "@unocss/preset-icons": "^66.10.0",
-    "@unveil/identity": "2.1.1",
-    "@unveil/vk": "^0.6.0",
+    "@unocss/preset-icons": "^66.12.0",
+    "@unveil/identity": "3.0.0",
+    "@unveil/vk": "1.0.0",
     "@vueuse/core": "^14.4.0",
     "dayjs": "^1.11.19",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.4",
+    "nuxt-og-image": "^7.0.7",
     "octokit": "^5.0.5",
-    "simple-analytics-vue": "^3.1.0",
     "tiptap-markdown": "^0.9.0",
     "valibot": "^1.4.2",
     "vue": "^3.5.28",
-    "vue-data-ui": "3.26.3",
+    "vue-data-ui": "3.28.8",
     "vue-router": "^4.6.4",
     "yaml": "^2.9.0"
   },
@@ -67,7 +71,7 @@
     "@nuxt/eslint": "^1.17.0",
     "@octokit/types": "^16.0.0",
     "@types/node": "^26.0.1",
-    "@unocss/nuxt": "^66.10.0",
+    "@unocss/nuxt": "^66.12.0",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
@@ -75,7 +79,7 @@
     "prettier": "^3.9.9",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "unocss": "^66.6.7",
+    "unocss": "^66.12.0",
     "vitest": "^5.0.0"
   }
 }

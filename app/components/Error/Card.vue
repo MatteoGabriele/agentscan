@@ -57,16 +57,11 @@ const showDetail = computed<boolean>(() => {
 })
 
 const isRetrying = ref(false)
-const { trackEvent } = useSaEvent()
 
 async function handleRetry() {
   if (!props.retry || isRetrying.value) {
     return
   }
-
-  trackEvent('error_card_retry_clicked', {
-    statusCode: props.statusCode ?? 0,
-  })
 
   isRetrying.value = true
 

@@ -1,15 +1,12 @@
 import type { VueUiXyDatasetItem } from 'vue-data-ui/vue-ui-xy'
 import type { calcLinearProgression } from '../utils/calc-linear-progression'
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 
 export type PrStatus = 'open' | 'closed' | 'merged'
 
 // Categories plotted on the activity graph. "insufficient-data" scans are stored
 // with a negative score and excluded from every aggregate.
-export type ActivityCategory = Exclude<
-  IdentityClassification,
-  'insufficient-data'
->
+export type ActivityCategory = Exclude<ClassificationLabel, 'insufficient-data'>
 
 export type ActivityItem = {
   created_at: string
@@ -21,12 +18,6 @@ export type ActivityItem = {
   events_count: number
   repo_name: string
   is_bounty: boolean
-  additions: number
-  deletions: number
-  text_verdict?: 'ai' | 'human'
-  text_confidence?: number
-  text_probability?: number
-  text_template_found?: boolean
   pr?: number
 }
 

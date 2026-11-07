@@ -1,4 +1,4 @@
-import type { IdentifyFlag } from '@unveil/identity'
+import type { Flag, ReportFlag } from '@unveil/identity/report'
 
 const REPORT_ISSUE_URL =
   'https://github.com/matteogabriele/agentscan/issues/new'
@@ -7,21 +7,19 @@ const MAX_EXAMPLE_PRS = 5
 
 type ReportIssueParams = {
   username: string
-  userId: number | undefined
-  flags: IdentifyFlag[]
+  userId: number | string | undefined
+  flags: ReportFlag[]
   sourceUrl: string
 }
 
 type EvidenceParams = {
-  flags: IdentifyFlag[]
+  flags: ReportFlag[]
   sourceUrl?: string
 }
 
 /**
- * A github.com link to a PR/issue in the evidence body would make GitHub post an
- * unwanted "mentioned this pull request" backlink on that PR once the report issue
- * is filed. redirect.github.com is GitHub's documented escape hatch: it 302s to the
- * same page but isn't recognized by the reference parser, so no backlink is created.
+ * Rewrites github.com PR/issue links to redirect.github.com, so the filed report
+ * doesn't create backlinks on them.
  * https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls
  */
 function withoutBacklink(url: string): string {
@@ -36,12 +34,8 @@ function withoutBacklink(url: string): string {
   }
 }
 
-/**
- * Flags carry the raw GitHub events that triggered them. Pull a handful of the
- * actual PRs behind a "PR volume"/"fork→PR pattern" style flag so a reviewer has
- * concrete examples to look at, instead of just the aggregate detail string.
- */
-function extractExamplePrUrls(flags: IdentifyFlag[], limit: number): string[] {
+/** Example PR URLs from the events behind the flags, for reviewers. */
+function extractExamplePrUrls(flags: Flag[], limit: number): string[] {
   const urls = new Set<string>()
 
   for (const flag of flags) {
@@ -49,31 +43,24 @@ function extractExamplePrUrls(flags: IdentifyFlag[], limit: number): string[] {
       if (urls.size >= limit) {
         break
       }
-      if (event.type !== 'PullRequestEvent') {
+
+      const number = event.pullRequest?.number
+      if (
+        event.type !== 'pull-request' ||
+        !event.repo ||
+        number === undefined
+      ) {
         continue
       }
 
-      const pr = event.payload?.pull_request as
-        { html_url?: string; number?: number } | undefined
-      const url =
-        pr?.html_url ??
-        (event.repo?.name && pr?.number !== undefined
-          ? `https://github.com/${event.repo.name}/pull/${pr.number}`
-          : undefined)
-
-      if (url) {
-        urls.add(url)
-      }
+      urls.add(`https://github.com/${event.repo}/pull/${number}`)
     }
   }
 
   return [...urls].slice(0, limit)
 }
 
-/**
- * Builds the evidence lines shared between the PR/issue comment and the pre-filled
- * report-issue link, so both surfaces always show the same facts.
- */
+/** Evidence lines shared by the PR/issue comment and the report-issue link. */
 export function buildEvidenceLines({
   flags,
   sourceUrl,
@@ -110,10 +97,8 @@ export function buildEvidenceLines({
 }
 
 /**
- * Builds a pre-filled "Report Automated Account" issue URL from an already-computed
- * analysis, so a maintainer only has to review and submit it instead of retyping
- * evidence AgentScan already has. Shared between the GitHub webhook comment and the
- * "Add report" link on the analysis page, so both point at the same rich report.
+ * Builds a pre-filled "Report Automated Account" issue URL from an analysis.
+ * Used by the webhook comment and the "Add report" link on the analysis page.
  */
 export function buildReportIssueUrl({
   username,

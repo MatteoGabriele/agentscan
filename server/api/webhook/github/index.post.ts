@@ -1,10 +1,8 @@
 import { App } from 'octokit'
 import { Webhooks } from '@octokit/webhooks'
-import {
-  getClassificationDetails,
-  isGitHubAppAccount,
-  type IdentityClassification,
-} from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/report'
+import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import {
   DEFAULT_CONFIG,
   parseRepoConfig,
@@ -27,15 +25,17 @@ import {
 } from './_honeypot'
 import { analyze } from '@unveil/vk'
 
+// Line-anchored so a mention mid-sentence doesn't trigger a scan.
+const SCAN_COMMAND = /^\s*@agentscanapp\s+scan\b/im
+
+const MAINTAINER_ASSOCIATIONS = ['OWNER', 'MEMBER', 'COLLABORATOR']
+
 type OctokitAuthInstall = { token?: string } | undefined
 
-// Netlify's synchronous function timeout is 10s. Leave room to conclude the
-// check run before the process is killed.
+// Under Netlify's 10s function timeout, leaving time to conclude the check run.
 const CHECK_RUN_DEADLINE_MS = 8_000
 
-// Bot logins carry square brackets (`dependabot[bot]`), which are not legal in
-// a URL path. Left raw, GitHub rejects `details_url` and the check run never
-// gets a result.
+// Encoded because bot logins (`dependabot[bot]`) make `details_url` invalid.
 const profileUrl = (username: string) =>
   `https://agentscan.tools/user/${encodeURIComponent(username)}`
 
@@ -47,7 +47,7 @@ type AutomationListItem = {
 }
 
 type LabelMap = Record<
-  Exclude<IdentityClassification, 'organic' | 'insufficient-data'>,
+  Exclude<ClassificationLabel, 'organic' | 'insufficient-data'>,
   string
 >
 
@@ -84,16 +84,18 @@ export default defineEventHandler(async (event) => {
 
   const payload = JSON.parse(rawBody)
 
-  // issue_comment events are only of interest to the honeypot, which needs to
-  // see the contributor's reply to the bait comment.
+  // issue_comment events are the honeypot reply or the scan command.
   const isCommentEvent =
     payload.action === 'created' && !!payload.comment && !!payload.issue
 
-  if (
-    payload.action !== 'opened' &&
-    payload.action !== 'reopened' &&
-    !isCommentEvent
-  ) {
+  // Reopening never re-scans, so a maintainer can reopen an auto-closed PR
+  // without it closing again. A maintainer re-runs the scan by command instead.
+  const isScanCommand =
+    isCommentEvent &&
+    SCAN_COMMAND.test(payload.comment.body ?? '') &&
+    MAINTAINER_ASSOCIATIONS.includes(payload.comment.author_association)
+
+  if (payload.action !== 'opened' && !isCommentEvent) {
     return { ok: true }
   }
 
@@ -121,9 +123,7 @@ export default defineEventHandler(async (event) => {
   const authorAssociation = rawAuthorAssociation?.toLowerCase() as
     AuthorAssociation | undefined
 
-  // GitHub reports both for an author with no merged contribution here:
-  // `first_timer` is new to GitHub entirely, `first_time_contributor` is new
-  // to this repository. Either way it is their first PR/issue on the repo.
+  // Both mean the author's first PR/issue on this repository.
   const isFirstTimeContributor =
     authorAssociation === 'first_timer' ||
     authorAssociation === 'first_time_contributor'
@@ -168,13 +168,12 @@ export default defineEventHandler(async (event) => {
     // no config file. use defaults
   }
 
-  if (isCommentEvent) {
+  if (isCommentEvent && !isScanCommand) {
     if (!repoConfig.honeypot) {
       return { ok: true }
     }
 
-    // Only the author of the PR/issue can spring their own trap. A maintainer
-    // or third party quoting the code is not a signal about the contributor.
+    // Only the PR/issue author can trigger their own trap.
     const commentAuthor: string | undefined = payload.comment.user?.login
 
     if (
@@ -185,8 +184,7 @@ export default defineEventHandler(async (event) => {
       return { ok: true }
     }
 
-    // Paginated: on a long thread the bait comment is not on the last page, and
-    // missing it would mean never matching the reply that sprang the trap.
+    // Paginated so the bait comment is found on long threads.
     const comments = await octokit
       .paginate(octokit.rest.issues.listComments, {
         owner,
@@ -209,10 +207,8 @@ export default defineEventHandler(async (event) => {
       return { ok: true }
     }
 
-    // Only our own comments count: the code the reply is matched against has to
-    // be one we issued, or a third party could plant a marker holding a code the
-    // author is likely to type anyway (a short commit SHA is 12 hex characters
-    // too) and have their contribution closed for them.
+    // Only the app's own comments, so nobody can plant a marker with a code the
+    // author might type anyway (e.g. a 12-character commit SHA).
     const ownComments = comments.filter((c) =>
       isOwnComment(c, config.githubAppId),
     )
@@ -291,11 +287,22 @@ export default defineEventHandler(async (event) => {
   let checkRunId: number | undefined
   if (isPR) {
     try {
+      // issue_comment payloads carry no head SHA.
+      const headSha: string =
+        payload.pull_request?.head.sha ??
+        (
+          await octokit.rest.pulls.get({
+            owner,
+            repo,
+            pull_number: targetNumber,
+          })
+        ).data.head.sha
+
       const { data: checkRun } = await octokit.rest.checks.create({
         owner,
         repo,
         name: 'AgentScan',
-        head_sha: payload.pull_request.head.sha,
+        head_sha: headSha,
         status: 'in_progress',
         started_at: new Date().toISOString(),
         output: {
@@ -311,9 +318,7 @@ export default defineEventHandler(async (event) => {
 
   type CheckConclusion = 'success' | 'action_required' | 'failure' | 'neutral'
 
-  // The check run gets a result only once. The first call below wins, and any
-  // later one does nothing, so the timeout and the finally block can safely try
-  // without overwriting a real result.
+  // The check run is concluded once; later calls (timeout, finally) are no-ops.
   let isCheckRunSettled = false
 
   const completeCheckRun = async (
@@ -325,13 +330,10 @@ export default defineEventHandler(async (event) => {
       return
     }
 
-    // Set before the request, not after, so that a call arriving while this one
-    // is still waiting for GitHub skips instead of sending a second result.
+    // Set before the request so a concurrent call skips.
     isCheckRunSettled = true
 
-    // Reporting a result is the only way out of `in_progress`: GitHub never
-    // expires a check run on its own, so whatever goes wrong here, the run has
-    // to end with a conclusion or it blocks the PR forever.
+    // GitHub never expires an in-progress check run, so it must always get a conclusion.
     const result = {
       owner,
       repo,
@@ -367,7 +369,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // In case this takes too long, we're gonna timeout the process
+  // Concludes the check run if processing outlives the deadline.
   let deadline: NodeJS.Timeout | undefined
 
   if (checkRunId) {
@@ -375,7 +377,7 @@ export default defineEventHandler(async (event) => {
       completeCheckRun(
         'neutral',
         'Analysis timed out',
-        'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
+        'AgentScan did not finish analyzing this contributor in time. Comment `@agentscanapp scan` to try again.',
       )
     }, CHECK_RUN_DEADLINE_MS)
   }
@@ -430,15 +432,14 @@ export default defineEventHandler(async (event) => {
       type: 'installation',
     })) as OctokitAuthInstall
 
-    const { analysis, userId } = await analyze(username, {
+    const result = await analyze(username, {
       token: installation?.token,
       showEvents: true,
     })
+    const analysis = result.report
+    const userId = result.user.id
 
-    // A GitHub App account (`type: "Bot"`) is CI, not a contributor to judge:
-    // being automated is the whole point of it. The analysis stands, it just
-    // has nothing to report. No comment, no label, and the check passes so the
-    // PR is not held up.
+    // GitHub App accounts (`type: "Bot"`) are CI: pass the check without commenting or labelling.
     if (analysis.isGitHubApp) {
       await completeCheckRun(
         'success',
@@ -493,8 +494,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // `mode` deliberately does not apply here. The bait is a comment: there
-    // is no honeypot without one.
+    // Applies regardless of `mode`: the honeypot needs the bait comment.
     if (repoConfig.honeypot && !shouldAutoClose) {
       try {
         const comments = await octokit.paginate(
@@ -514,8 +514,7 @@ export default defineEventHandler(async (event) => {
         )
 
         if (!alreadyBaited) {
-          // A blank first-time greeting falls back to the regular custom one,
-          // so a repo that only customised `honeypot` keeps a single voice.
+          // A blank first-time greeting falls back to the custom regular one.
           const greeting = isFirstTimeContributor
             ? repoConfig.messages['honeypot-first-time']?.trim() ||
               repoConfig.messages.honeypot
@@ -583,7 +582,7 @@ export default defineEventHandler(async (event) => {
           })
         : null
 
-    // Rendered inline so a reviewer can see the evidence without leaving this page.
+    // Evidence rendered inline in the comment.
     const evidenceLines =
       analysis.flags.length > 0
         ? buildEvidenceLines({ flags: analysis.flags })
@@ -702,8 +701,7 @@ export default defineEventHandler(async (event) => {
   } finally {
     clearTimeout(deadline)
 
-    // Safety net: if the code above returned early without giving the check run
-    // a result, close it here so it never stays stuck as "in progress".
+    // Concludes the check run as neutral if nothing above did.
     await completeCheckRun(
       'neutral',
       'Analysis incomplete',

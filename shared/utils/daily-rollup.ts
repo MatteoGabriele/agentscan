@@ -1,4 +1,4 @@
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import type { ActivityCategory, PrStatus } from '../types/activity'
 import { formatPercentage } from './activity-stats'
 import { CLASSIFICATION_CATEGORIES } from './count-classification-by-date'
@@ -13,7 +13,7 @@ export type DailyScanEntry = {
   date: string
   createdAt: string
   hours: number
-  classifications: Record<IdentityClassification, DailyClassificationCounts>
+  classifications: Record<ClassificationLabel, DailyClassificationCounts>
 }
 
 export function getDailyActivityStats(

@@ -33,11 +33,11 @@ export interface Tally {
 export interface Decision extends Tally {
   issue: number
   outcome: Outcome
-  /** Set when the account is already on the list, so no entry will be added. */
+  /** Set when the account is already listed; no entry is added. */
   alreadyListed?: boolean
 }
 
-/** The bar a report has to clear, without the roster it is counted against. */
+/** Approval and rejection thresholds. */
 export interface Thresholds {
   minApprovals: number
   minRejections: number
@@ -48,9 +48,8 @@ export interface Config extends Thresholds {
 }
 
 /**
- * A report is rejected once it can no longer pass, not only once MIN_REJECTIONS
- * is hit: with 7 reviewers and 5 approvals required, a 3rd 👎 leaves at most 4
- * possible 👍, so the outcome is already settled.
+ * Rejects a report as soon as it can no longer reach MIN_APPROVALS, not only at
+ * MIN_REJECTIONS.
  */
 export function decide(tally: Tally, config: Config): Outcome {
   if (tally.approvals >= config.minApprovals) {
@@ -139,9 +138,8 @@ export async function openReports(
         per_page: 100,
       })
 
-  // A settled report is skipped by its label: an approved one stays open until
-  // `pnpm publish:automations` lands its entry, and without this every run
-  // would comment on it again.
+  // Settled reports are skipped by label, so approved ones awaiting publish are
+  // not commented on again.
   const settled = [APPROVED_LABEL, CONFIRMED_LABEL, REJECTED_LABEL]
 
   return issues
@@ -269,13 +267,9 @@ function rejectionComment(decision: Decision, config: Config): string {
 }
 
 /**
- * Comments on a settled report and swaps its label over.
- *
- * Rejected reports are done here, so they are closed right away. An approved
- * one still needs its entry appended by `pnpm publish:automations`, which a
- * maintainer runs locally — it stays open under automation:approved as the
- * reminder to do that, and the commit carrying the entry closes it. Nothing is
- * left to run for an account that is already listed, so that one is closed too.
+ * Comments on a settled report and swaps its label. Rejected and already listed
+ * reports are closed; approved ones stay open until `pnpm publish:automations`
+ * lands their entry.
  */
 async function settleIssue(
   octokit: Octokit,
@@ -340,9 +334,8 @@ function flag(name: string): string | undefined {
 }
 
 /**
- * The single issue to review, from `--issue=` or the ISSUE environment variable
- * the workflow passes its input through. Validated here rather than in yaml, so
- * the workflow never has to interpolate the input into a shell command.
+ * The issue to review, from `--issue=` or ISSUE. Validated here so the workflow
+ * never interpolates it into a shell command.
  */
 function onlyIssue(): number | undefined {
   const raw = (flag('issue') ?? process.env.ISSUE ?? '').trim()
@@ -388,8 +381,7 @@ async function review(
     const decision: Decision = { issue: report.number, outcome, ...counted }
 
     if (outcome === 'approved') {
-      // Built before anything is closed, so a report that does not parse into
-      // an entry fails the run while it is still open to be fixed.
+      // Built before closing anything, so a report that fails to parse stays open.
       approved.push({ decision, entry: entryFor(report, counted.approvedBy) })
     }
 

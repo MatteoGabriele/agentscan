@@ -1,4 +1,4 @@
-import type { IdentityClassification } from '@unveil/identity'
+import type { ClassificationLabel } from '@unveil/identity'
 import { parse as parseYaml } from 'yaml'
 
 export type ScanMode = 'full' | 'labels' | 'comment' | 'silent'
@@ -18,7 +18,7 @@ export type RepoConfig = {
   'allowed-users': string[]
   'trusted-author-associations': AuthorAssociation[]
   'auto-close': boolean
-  'auto-close-classifications': IdentityClassification[]
+  'auto-close-classifications': ClassificationLabel[]
   honeypot: boolean
   mode: ScanMode
   'comment-on-organic': boolean
@@ -38,15 +38,13 @@ export type RepoConfig = {
     'insufficient-data': string
     'community-flagged': string
     /**
-     * Replaces the visible greeting of the honeypot comment. The hidden
-     * verification block is always appended. It is what the trap is made of.
-     * Supports `{username}` and `{type}` placeholders.
+     * Visible greeting of the honeypot comment; the hidden verification block is
+     * always appended. Supports `{username}` and `{type}` placeholders.
      */
     honeypot: string
     /**
-     * Same, but for authors GitHub reports as opening their first PR/issue on
-     * the repository. Falls back to `honeypot` when left blank, so a repo that
-     * only customises the regular greeting keeps one voice.
+     * Greeting for first-time contributors to the repository. Falls back to
+     * `honeypot` when blank.
      */
     'honeypot-first-time': string
   }

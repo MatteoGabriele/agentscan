@@ -1,4 +1,4 @@
-import { getClassificationDetails } from '@unveil/identity'
+import { getClassificationDetails } from '@unveil/identity/report'
 
 /**
  * Used instead of the classification details when the account appears on the
@@ -11,8 +11,8 @@ export const COMMUNITY_FLAGGED_DETAILS = {
 }
 
 /**
- * What the bot comments when `messages.*` is left blank in agentscan.yml.
- * Shared so the config generator can show the real text rather than describe it.
+ * Default bot comments when `messages.*` is blank in agentscan.yml. Also shown
+ * by the config generator.
  */
 export function getDefaultMessages() {
   return {
@@ -20,8 +20,18 @@ export function getDefaultMessages() {
     mixed: getClassificationDetails('mixed').description,
     automation: getClassificationDetails('automation').description,
     'community-flagged': COMMUNITY_FLAGGED_DETAILS.description,
+    'insufficient-data':
+      getClassificationDetails('insufficient-data').description,
   }
 }
+
+/** Placeholders the app fills in. Only honeypot greetings support them. */
+export const MESSAGE_PLACEHOLDERS = {
+  username: 'author',
+  type: 'pull request or issue',
+} as const
+
+export type MessagePlaceholder = keyof typeof MESSAGE_PLACEHOLDERS
 
 export function buildDefaultHoneypotGreeting({
   username,

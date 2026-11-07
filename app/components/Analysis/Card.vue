@@ -1,51 +1,47 @@
 <script setup lang="ts">
-import type {
-  GitHubUser,
-  IdentityClassification,
-  IdentifyResult,
-} from '@unveil/identity'
+import type { AsyncDataRequestStatus } from '#app'
+import type { ClassificationLabel } from '@unveil/identity'
+import type { Report } from '@unveil/identity/report'
+import { fromGitHub, type GitHubUser } from '@unveil/identity/providers/github'
+import type { AnalyzeReturn } from '@unveil/vk'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
+import type { RepoEvent } from '~/utils/repo-activity'
 
 const props = defineProps<{
   user: GitHubUser
+  analysis?: AnalyzeReturn | null
+  status: AsyncDataRequestStatus
+  error?: unknown
+  retry: () => unknown
 }>()
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const analysisKey = computed<string>(() => `analysis:${username.value}`)
-const { data, status, error, refresh } = useFetch(
-  () => `/api/identify-replicant/${username.value}`,
+const { data: accountReports, status: accountReportsStatus } = useFetch(
+  () => `/api/account-reports/${username.value}`,
   {
-    query: {
-      show_events: true,
-    },
-    key: analysisKey,
-    watch: [username],
+    key: computed(() => `account-reports:${username.value}`),
+    query: computed(() => ({ id: props.user.id })),
     lazy: true,
   },
 )
 
-const { data: verifiedAutomations } = await useVerifiedAutomations()
+// Held until community reports settle too, so a reported account never
+// flashes its regular classification before switching.
+const isPending = computed<boolean>(() => {
+  return props.status === 'pending' || accountReportsStatus.value === 'pending'
+})
 
 const verifiedAutomation = computed(() => {
-  return verifiedAutomations.value?.find((account) => {
-    return (
-      account.username.toLowerCase() === username.value?.toLowerCase() ||
-      account.id === props.user.id
-    )
-  })
+  return accountReports.value?.verifiedAutomation ?? undefined
 })
 
-const { data: automationTally } = await useAutomationTally()
 const matchedTally = computed(() => {
-  return automationTally.value?.find((tally) => tally.id === props.user.id)
+  return accountReports.value?.automationTally ?? undefined
 })
 
-const { data: integrations } = await useIntegrations()
 const activityReport = computed<IntegrationItem | undefined>(() => {
-  return integrations.value?.find((item) => {
-    return item.username.toLowerCase() === username.value?.toLowerCase()
-  })
+  return accountReports.value?.integration ?? undefined
 })
 
 const approvedBy = computed<string[]>(() => {
@@ -55,8 +51,29 @@ const approvedBy = computed<string[]>(() => {
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
-const classification = computed<IdentityClassification | undefined>(() => {
-  return data.value?.analysis.classification
+const classification = computed<ClassificationLabel | undefined>(() => {
+  return isPending.value ? undefined : props.analysis?.report.classification
+})
+
+const repoEvents = computed<RepoEvent[]>(() => {
+  if (!classification.value) {
+    return []
+  }
+  const events = props.analysis?.events ?? []
+  return fromGitHub({ user: props.user, events }).events
+})
+
+const rawEventsUrl = computed<string>(() => {
+  return `https://api.github.com/users/${username.value}/events?per_page=100`
+})
+const hasEventBreakdown = computed<boolean>(() => {
+  return groupEventsByRepo(repoEvents.value).length > 0
+})
+
+const hasSignals = computed<boolean>(() => {
+  return (
+    (props.analysis?.report.flags.length ?? 0) > 0 || hasActivityReport.value
+  )
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
@@ -74,27 +91,27 @@ const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
     username: username.value || '',
     userId: props.user.id,
-    flags: data.value?.analysis.flags ?? [],
+    flags: props.analysis?.report.flags ?? [],
     sourceUrl: `https://agentscan.tools/user/${username.value}`,
   })
 })
 
-const identifyAnalysis = computed<IdentifyResult | undefined>(() => {
-  return data.value?.analysis
+const identifyAnalysis = computed<Report | undefined>(() => {
+  return props.analysis?.report
 })
 
 const score = computed<number | undefined>(() => {
-  return data.value?.analysis.score
+  return props.analysis?.report.score
 })
 
 const isBountyHunter = computed<boolean>(() => {
-  return !!data.value?.analysis.isBountyHunter
+  return !!props.analysis?.report.isBountyHunter
 })
 
 const { nearestClassification } = useNearestClassification(score)
 
 const confidence = computed<number | undefined>(() => {
-  return data.value?.analysis.confidence
+  return props.analysis?.report.confidence
 })
 
 const { coverageLevel } = useDataCoverage(confidence)
@@ -149,9 +166,9 @@ useSeoAnalysis(identifyAnalysis, {
     />
 
     <div class="px-6">
-      <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
-      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
-      <template v-else-if="data">
+      <LazyAnalysisCardSkeleton v-if="isPending" />
+      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => retry()" />
+      <template v-else-if="analysis">
         <section v-if="verifiedAutomation">
           <header class="mb-2 flex gap-2 items-center text-ui-automation">
             <span class="i-lucide:circle-alert text-base" aria-hidden="true" />
@@ -219,35 +236,20 @@ useSeoAnalysis(identifyAnalysis, {
             </div>
           </header>
 
-          <div
-            class="text-sm text-ui-muted flex flex-wrap items-center gap-x-3 gap-y-2"
-          >
-            <p v-if="data.eventsCount > 0">
-              Analyzed from the last {{ data.eventsCount }} public GitHub
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
-              >
-                events
-              </NuxtLink>
-            </p>
-            <p v-else>
-              No recent
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
-              >
-                events</NuxtLink
-              >
-              from this account
-            </p>
+          <AnalysisRepoActivityDisclosure
+            v-if="hasEventBreakdown"
+            :events="repoEvents"
+            :raw-events-url
+            class="mt-4"
+          />
 
-            <DetectionVersion class="hidden md:inline-flex" />
-          </div>
+          <p class="mt-3 text-sm text-ui-muted">
+            <template v-if="analysis.eventsCount > 0">
+              Analyzed from the last {{ analysis.eventsCount }} public GitHub
+              events
+            </template>
+            <template v-else>No recent events from this account</template>
+          </p>
         </template>
 
         <section
@@ -270,26 +272,28 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
   </div>
 
-  <div class="@lg:mx-6">
-    <AnalysisFlagsSkeleton v-if="status === 'pending'" />
+  <div v-if="isPending || (analysis && hasSignals)" class="@lg:mx-6">
+    <AnalysisFlagsSkeleton v-if="isPending" />
     <LazyAnalysisFlags
-      v-else-if="data && (data.analysis.flags.length > 0 || hasActivityReport)"
-      :flags="data.analysis.flags"
+      v-else-if="analysis"
+      :flags="analysis.report.flags"
       :activity-report="activityReport"
       hydrate-on-interaction
     />
   </div>
 
-  <template v-if="classification !== 'insufficient-data' && data">
+  <template
+    v-if="classification && classification !== 'insufficient-data' && analysis"
+  >
     <LazyChartAccountEventsTimeline
       :classification="classification"
-      :events="data.events"
+      :events="analysis.events"
       hydrate-on-visible
     />
 
     <LazyChartAccountEventsBreakdown
       :classification="classification"
-      :events="data.events"
+      :events="analysis.events"
       hydrate-on-interaction
     />
   </template>

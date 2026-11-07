@@ -13,20 +13,3 @@ export function formatCompactNumber(
     ...options,
   }).format(n)
 }
-
-export function median(values: number[]) {
-  const sorted = [...values].sort((a, b) => a - b)
-  const middle = Math.floor(sorted.length / 2)
-  const upper = sorted[middle]
-  const lower = sorted[middle - 1]
-
-  if (upper === undefined) {
-    return null
-  }
-
-  if (sorted.length % 2 || lower === undefined) {
-    return upper
-  }
-
-  return (lower + upper) / 2
-}

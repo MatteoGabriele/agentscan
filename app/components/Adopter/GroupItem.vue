@@ -10,8 +10,6 @@ const props = defineProps<{
   forceExpanded?: boolean
 }>()
 
-const { trackEvent } = useSaEvent()
-
 const isOpen = ref(false)
 const showAllRepositories = ref(false)
 
@@ -43,7 +41,6 @@ const hiddenRepositoriesCount = computed<number>(() => {
         rel="noopener"
         :to="topRepository.url"
         class="group flex items-center gap-3 min-w-0"
-        @click="trackEvent('adopter_repository_link_clicked')"
       >
         <img
           :src="group.avatar"
@@ -61,7 +58,7 @@ const hiddenRepositoriesCount = computed<number>(() => {
 
       <button
         v-if="otherRepositories.length"
-        class="shrink-0 inline-flex items-center gap-1 rounded-full border border-ui-border-subtle/60 px-2 py-0.5 text-xs text-ui-muted tabular-nums hover:text-ui-text hover:border-ui-border/80 transition-colors cursor-pointer"
+        class="shrink-0 inline-flex items-center gap-1 rounded-full border border-ui-border-subtle/60 px-2 py-0.5 text-xs text-ui-muted tabular-nums hover:text-ui-text hover:border-ui-border/80 transition-colors"
         :aria-expanded="isExpanded"
         :aria-label="`Show the other ${otherRepositories.length} repositories of ${group.owner}`"
         @click="isOpen = !isOpen"
@@ -91,7 +88,6 @@ const hiddenRepositoriesCount = computed<number>(() => {
             rel="noopener"
             :to="repository.url"
             class="group flex items-center gap-3 py-1.5"
-            @click="trackEvent('adopter_repository_link_clicked')"
           >
             <span
               class="font-mono text-sm text-ui-muted truncate group-hover:text-ui-text transition-colors"
@@ -111,7 +107,7 @@ const hiddenRepositoriesCount = computed<number>(() => {
 
       <button
         v-if="hiddenRepositoriesCount > 0"
-        class="ml-5 mt-1.5 text-sm text-ui-muted/70 hover:text-ui-text cursor-pointer"
+        class="ml-5 mt-1.5 text-sm text-ui-muted/70 hover:text-ui-text"
         @click="showAllRepositories = true"
       >
         Show {{ hiddenRepositoriesCount }} more

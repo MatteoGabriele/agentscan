@@ -1,4 +1,4 @@
-import type { GitHubUser } from '@unveil/identity'
+import type { GitHubUser } from '@unveil/identity/providers/github'
 
 export interface BookmarkedAccount {
   login: string
@@ -36,8 +36,7 @@ function openDb(): Promise<IDBDatabase> {
   return dbPromise
 }
 
-// Shared across every instance so all bookmark buttons and the bookmarks
-// page agree on state without each re-reading IndexedDB.
+// Module-level state shared by every bookmark button and the bookmarks page.
 const bookmarkedAccounts = ref<BookmarkedAccount[]>([])
 const isLoaded = ref(false)
 let loadPromise: Promise<void> | null = null
@@ -131,13 +130,10 @@ export function useBookmarkedAccounts() {
     }
   }
 
-  const { trackEvent } = useSaEvent()
   async function toggleBookmark(user: GitHubUser): Promise<void> {
     if (isBookmarked(user.login)) {
-      trackEvent('bookmark_toggle_remove_clicked')
       await removeBookmark(user.login)
     } else {
-      trackEvent('bookmark_toggle_add_clicked')
       await addBookmark(user)
     }
   }

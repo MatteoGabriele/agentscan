@@ -116,21 +116,6 @@ const tooltipPosition = useTooltipPosition(chartRef)
 
 const progressionLabelOffsetX = 6
 
-const viewBoxPadding = computed(() => {
-  const maxSeries = dates.value?.length ?? 0
-
-  if (maxSeries <= 1 || width.value <= 0) {
-    return { left: 0, right: 0 }
-  }
-
-  const halfVueUiXyDatapointStep = width.value / (2 * (maxSeries - 1))
-
-  return {
-    left: -halfVueUiXyDatapointStep,
-    right: -halfVueUiXyDatapointStep - progressionLabelOffsetX,
-  }
-})
-
 const tooltipTimeFormat = 'dddd • MMM dd • HH:mm'
 
 const hoveredIndex = ref<number | null>(null)
@@ -167,11 +152,11 @@ const config = computed<VueUiXyConfig>(() => ({
     width: Math.round(width.value),
     height: Math.round(height.value),
     padding: {
-      left: viewBoxPadding.value.left,
-      right: viewBoxPadding.value.right,
+      left: 0,
+      right: -progressionLabelOffsetX,
     },
     grid: {
-      position: 'middle',
+      position: dates.value?.length === 1 ? 'middle' : 'start',
       stroke: 'transparent',
       labels: {
         show: false,
@@ -278,16 +263,13 @@ const landmarkGroups = computed(() =>
         iconSvg: isGrouped ? SVG_ICON.layers : first.iconSvg,
         series: isGrouped ? undefined : first.series,
         offsetY: isGrouped ? undefined : first.offsetY,
+        labelAbove: isGrouped ? false : first.labelAbove,
       },
     ]
   }),
 )
 
-/**
- * Landmarks close to the first or last date would render their centered label
- * outside of the chart, where it gets cut off. Keeping the label anchored in
- * the middle
- */
+/** Clamps a landmark label horizontally so it stays inside the chart. */
 function placeLandmarkLabelX({
   svg,
   name,
@@ -402,7 +384,9 @@ function placeLandmark({
                           x: plot.x,
                         })
                       "
-                      :y="svg.drawingArea.bottom - 4"
+                      :y="
+                        svg.drawingArea.bottom - (landmark.labelAbove ? 42 : 4)
+                      "
                       text-anchor="middle"
                       dominant-baseline="middle"
                       paint-order="stroke fill"

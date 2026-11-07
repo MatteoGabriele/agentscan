@@ -5,29 +5,42 @@ import {
 } from '~~/shared/utils/activity-history-window'
 import { useUrlSearchParams } from '@vueuse/core'
 import type { ActivityUnit } from '~~/shared/types/activity'
+import { getActivityWeekSnapshot } from '~~/shared/utils/activity-week'
 
 definePageMeta({
   layout: false,
 })
 
-useHead({
-  title: 'Ecosystem Activity | AgentScan',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'A snapshot of community contribution patterns across the ecosystem.',
-    },
-    { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
-    { property: 'og:image', content: '/activity.png' },
-    {
-      property: 'og:description',
-      content:
-        'A snapshot of community contribution patterns across the ecosystem.',
-    },
-    { property: 'og:type', content: 'website' },
-  ],
-})
+const DESCRIPTION =
+  'A snapshot of community contribution patterns across the ecosystem.'
+
+// Shares the cached request with the trend list and the daily chart.
+const { data: activity } = await useActivity()
+const week = activity.value ? getActivityWeekSnapshot(activity.value) : null
+
+useHead(
+  {
+    title: 'Ecosystem Activity | AgentScan',
+    meta: [
+      { name: 'description', content: DESCRIPTION },
+      { property: 'og:title', content: 'Ecosystem Activity | AgentScan' },
+      {
+        property: 'og:description',
+        content: week
+          ? `${week.total.toLocaleString('en')} pull requests scored in the past week. ${DESCRIPTION}`
+          : DESCRIPTION,
+      },
+      { property: 'og:type', content: 'website' },
+    ],
+  },
+  // The full layout is rendered inside this page, so its generic tags would
+  // otherwise be registered last and win.
+  { tagPriority: 'high' },
+)
+
+if (week) {
+  defineOgImage('ActivityWeek', { week })
+}
 
 type ChartRange = 'daily' | 'hourly'
 type ChartRangeOption = {
@@ -61,7 +74,7 @@ const unit = computed<ActivityUnit>(() => {
 // Rendered outside the Toggle so it sits below both toggles
 const rangeCaption = computed(() =>
   urlParams.view === 'hourly'
-    ? // In mobile we actually show 13 datapoints, but saying 12 looks better on the UI
+    ? // Mobile shows 13 datapoints; the caption rounds to 12.
       `Last ${isMobile.value ? 12 : WINDOW_MAX_HOURS} hours, updated every hour`
     : `Daily totals from the last ${isMobile.value ? 2 : DEFAULT_HISTORY_MONTHS} ${isMobile.value ? 'weeks' : 'months'}`,
 )
@@ -92,7 +105,7 @@ const rangeCaption = computed(() =>
             </header>
 
             <div class="mt-4 px-4 md:py-4 md:border-y md:border-y-ui-border/40">
-              <ActivityTrendItemList :view="urlParams.view" />
+              <ActivityTrendItemList :view="urlParams.view" :unit />
             </div>
 
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
@@ -204,7 +217,11 @@ const rangeCaption = computed(() =>
           projects.
         </p>
 
-        <ScannedRepositoryList />
+        <p>
+          <NuxtLink to="/activity/repositories" class="underline"
+            >Browse all tracked repositories</NuxtLink
+          >, grouped by category, and open any of them for its own report.
+        </p>
       </div>
     </section>
   </NuxtLayout>

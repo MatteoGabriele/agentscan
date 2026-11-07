@@ -1,15 +1,5 @@
 <script setup lang="ts">
-import { usePreferredDark } from '@vueuse/core'
-
-const darkMode = usePreferredDark()
-const colorMode = useColorMode()
-const colorScheme = computed(() => {
-  return {
-    system: darkMode ? 'dark light' : 'light dark',
-    light: 'only light',
-    dark: 'only dark',
-  }[colorMode.preference]
-})
+const colorScheme = useColorScheme()
 
 useHead({
   title: 'AgentScan - GitHub Automation Detector',
@@ -62,7 +52,7 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
       >
         <main
           class="max-w-screen-md mx-auto px-4 @container w-full"
-          :class="{ 'py-20': !isHomePage }"
+          :class="{ 'py-8 md:py-20': !isHomePage }"
         >
           <LazyMainBrand v-if="isHomePage" class="mb-4" />
           <slot />

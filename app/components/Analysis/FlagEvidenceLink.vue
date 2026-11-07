@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GitHubEvent } from '@unveil/identity'
+import type { GitHubEvent } from '@unveil/identity/providers/github'
 
 const props = defineProps<{
   event: GitHubEvent

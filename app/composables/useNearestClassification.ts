@@ -1,7 +1,7 @@
-import { identityConfig, type IdentityClassification } from '@unveil/identity'
+import { identityConfig, type ClassificationLabel } from '@unveil/identity'
 
 export type UseNearestClassificationReturn = {
-  nearestClassification: ComputedRef<IdentityClassification | undefined>
+  nearestClassification: ComputedRef<ClassificationLabel | undefined>
 }
 
 const CLASSIFICATION_PROXIMITY_THRESHOLD = 15
@@ -9,7 +9,7 @@ const CLASSIFICATION_PROXIMITY_THRESHOLD = 15
 export function useNearestClassification(
   score: MaybeRefOrGetter<number | undefined>,
 ): UseNearestClassificationReturn {
-  const nearestClassification = computed<IdentityClassification | undefined>(
+  const nearestClassification = computed<ClassificationLabel | undefined>(
     () => {
       const scoreValue = toValue(score)
 

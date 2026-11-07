@@ -8,9 +8,18 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/fonts',
+    'nuxt-og-image',
   ],
 
-  plugins: ['~/plugins/analytics.client'],
+  site: {
+    url: 'https://agentscan.tools',
+    name: 'AgentScan',
+  },
+
+  ogImage: {
+    // Matches the static og:image size declared in the layouts.
+    defaults: { height: 630 },
+  },
 
   vite: {
     optimizeDeps: {
@@ -55,8 +64,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Where the hourly scan publishes its results. Overridable with
-    // NUXT_LOGS_API_BASE; the activity and automation-tally routes proxy it.
+    // agentscan-logs base URL (NUXT_LOGS_API_BASE), proxied by the activity and
+    // automation-tally routes.
     logsApiBase: 'https://logs.agentscan.tools',
     githubToken: '',
     githubAppId: '',
@@ -83,8 +92,7 @@ export default defineNuxtConfig({
       },
     },
 
-    // the routes moved with the agentscan-logs rename; keep the old paths
-    // working for anything still pointing at them.
+    // Redirects from the paths used before the agentscan-logs rename.
     '/api/health': {
       redirect: {
         to: '/api/activity',
@@ -113,7 +121,7 @@ export default defineNuxtConfig({
       },
     },
 
-    // served from data/adopters.json, refreshed weekly by the workflow.
+    // Served from data/adopters.json, updated with `pnpm collect:adopters`.
     '/api/adopters': {
       cache: {
         maxAge: 60 * 60,
@@ -122,10 +130,10 @@ export default defineNuxtConfig({
 
     '/api/identify-replicant/**': {
       isr: {
-        expiration: 60 * 10,
+        expiration: 60 * 60,
         passQuery: true,
       },
-      cache: { maxAge: 600 },
+      cache: { maxAge: 60 * 60 },
     },
     '/api/verified-automations/**': {
       cache: {
@@ -144,10 +152,10 @@ export default defineNuxtConfig({
     },
     '/api/scan/**': {
       isr: {
-        expiration: 60 * 10,
+        expiration: 60 * 60,
         passQuery: true,
       },
-      cache: { maxAge: 600 },
+      cache: { maxAge: 60 * 60 },
     },
     '/feed.xml': {
       cache: {
