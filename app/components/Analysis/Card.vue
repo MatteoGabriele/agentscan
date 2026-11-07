@@ -17,12 +17,11 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const { data: accountReports, status: accountReportsStatus } = useFetch(
+const { data: accountReports, status: accountReportsStatus } = useLazyFetch(
   () => `/api/account-reports/${username.value}`,
   {
-    key: computed(() => `account-reports:${username.value}`),
-    query: computed(() => ({ id: props.user.id })),
-    lazy: true,
+    key: () => `account-reports:${username.value}`,
+    query: () => ({ id: props.user.id }),
   },
 )
 
@@ -46,6 +45,22 @@ const activityReport = computed<IntegrationItem | undefined>(() => {
 
 const approvedBy = computed<string[]>(() => {
   return verifiedAutomation.value?.approvedBy ?? []
+})
+
+const { data: reportIssues, pending: isLoadingReports } = useLazyFetch(
+  () => `/api/report-issues/${username.value}`,
+  {
+    key: () => `report-issues:${username.value}`,
+    default: () => [],
+  },
+)
+
+const openReport = computed(() => {
+  return reportIssues.value.find((report) => report.state === 'open')
+})
+
+const closedReports = computed(() => {
+  return reportIssues.value.filter((report) => report.state === 'closed')
 })
 
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
@@ -256,17 +271,66 @@ useSeoAnalysis(identifyAnalysis, {
           v-if="!verifiedAutomation"
           class="mt-4 pt-4 border-t border-ui-border-subtle"
         >
-          <p class="text-ui-muted text-sm">
-            Know something about this account? Help the community.
-          </p>
-          <NuxtLink
-            :to="flagAccountUrl"
-            target="_blank"
-            external
-            class="underline inline text-xs"
-          >
-            Add report
-          </NuxtLink>
+          <template v-if="isLoadingReports">
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <span
+              class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
+              aria-hidden="true"
+            />
+          </template>
+          <template v-else-if="openReport">
+            <p class="text-ui-muted text-sm">
+              This account already has an open report under review. Add what you
+              know there.
+            </p>
+            <NuxtLink
+              :to="openReport.url"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              View open report #{{ openReport.number }}
+            </NuxtLink>
+          </template>
+          <template v-else>
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <NuxtLink
+              :to="flagAccountUrl"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              Add report
+            </NuxtLink>
+          </template>
+
+          <div v-if="closedReports.length" class="mt-3 text-xs text-ui-muted">
+            <p>
+              Previously reported
+              {{
+                closedReports.length === 1
+                  ? 'once'
+                  : `${closedReports.length} times`
+              }}:
+            </p>
+            <ul class="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+              <li v-for="report in closedReports" :key="report.number">
+                <NuxtLink
+                  :to="report.url"
+                  target="_blank"
+                  external
+                  class="underline hover:text-ui-text"
+                >
+                  #{{ report.number }}</NuxtLink
+                >
+                ({{ report.outcome }})
+              </li>
+            </ul>
+          </div>
         </section>
       </template>
     </div>
