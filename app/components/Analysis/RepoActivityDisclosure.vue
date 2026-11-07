@@ -48,7 +48,7 @@ function avatarUrl(owner: string): string {
       :aria-controls="panelId"
       @click="isOpen = !isOpen"
     >
-      <span class="flex shrink-0 items-center" aria-hidden="true">
+      <span class="hidden sm:flex shrink-0 items-center" aria-hidden="true">
         <img
           v-for="owner in previewOwners"
           :key="owner"
