@@ -67,14 +67,13 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
       v-if="isExpanded"
       class="ml-1.5 pl-4 mb-5 border-l border-ui-border/30 space-y-3"
     >
-      <ul
-        class="rounded-lg border border-ui-border/45 divide-y divide-ui-border/25"
-      >
+      <ul class="rounded-lg border border-ui-border/45">
         <AnalysisEventItem
           v-for="(event, i) in visibleItems"
           :key="`${event.created_at}-${i}`"
           :event
           :show-repo="false"
+          class="not-last:border-b border-ui-border/25"
         />
       </ul>
 
