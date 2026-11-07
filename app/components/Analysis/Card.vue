@@ -55,17 +55,13 @@ const classification = computed<ClassificationLabel | undefined>(() => {
   return isPending.value ? undefined : props.analysis?.report.classification
 })
 
-// Insufficient-data accounts already list every analyzed event.
 const repoEvents = computed<RepoEvent[]>(() => {
-  if (!classification.value || classification.value === 'insufficient-data') {
+  if (!classification.value) {
     return []
   }
   const events = props.analysis?.events ?? []
   return fromGitHub({ user: props.user, events }).events
 })
-
-// Opened from the "events" toggle in the card.
-const isEventBreakdownOpen = ref(false)
 
 const rawEventsUrl = computed<string>(() => {
   return `https://api.github.com/users/${username.value}/events?per_page=100`
@@ -195,29 +191,14 @@ useSeoAnalysis(identifyAnalysis, {
               />
             </div>
 
-            <div class="flex items-center gap-3 text-xs">
-              <button
-                class="inline-flex items-center gap-0.5 text-ui-muted hover:text-ui-text underline decoration-dotted underline-offset-4 hover:decoration-solid"
-                :aria-expanded="isEventBreakdownOpen"
-                aria-controls="event-breakdown"
-                @click="isEventBreakdownOpen = !isEventBreakdownOpen"
-              >
-                Event breakdown
-                <span
-                  class="i-lucide:chevron-down text-xs transition-transform"
-                  :class="isEventBreakdownOpen && 'rotate-180'"
-                  aria-hidden="true"
-                />
-              </button>
-              <NuxtLink
-                :to="verifiedAutomation.issueUrl"
-                target="_blank"
-                external
-                class="text-ui-muted underline inline hover:text-ui-text"
-              >
-                View issue
-              </NuxtLink>
-            </div>
+            <NuxtLink
+              :to="verifiedAutomation.issueUrl"
+              target="_blank"
+              external
+              class="text-ui-muted underline inline text-xs hover:text-ui-text"
+            >
+              View issue
+            </NuxtLink>
           </footer>
         </section>
         <template v-else>
@@ -255,60 +236,21 @@ useSeoAnalysis(identifyAnalysis, {
             </div>
           </header>
 
-          <div
-            class="text-sm text-ui-muted flex flex-wrap items-center gap-x-3 gap-y-2"
-          >
-            <p v-if="analysis.eventsCount > 0">
+          <AnalysisRepoActivityDisclosure
+            v-if="hasEventBreakdown"
+            :events="repoEvents"
+            :raw-events-url
+            class="mt-4"
+          />
+
+          <p class="mt-3 text-sm text-ui-muted">
+            <template v-if="analysis.eventsCount > 0">
               Analyzed from the last {{ analysis.eventsCount }} public GitHub
-              <!-- The raw API link moves into the breakdown panel. -->
-              <button
-                v-if="hasEventBreakdown"
-                class="inline-flex items-center gap-0.5 text-ui-text underline decoration-dotted underline-offset-4 hover:decoration-solid"
-                :aria-expanded="isEventBreakdownOpen"
-                aria-controls="event-breakdown"
-                @click="isEventBreakdownOpen = !isEventBreakdownOpen"
-              >
-                events
-                <span
-                  class="i-lucide:chevron-down text-xs transition-transform"
-                  :class="isEventBreakdownOpen && 'rotate-180'"
-                  aria-hidden="true"
-                />
-              </button>
-              <NuxtLink
-                v-else
-                external
-                target="_blank"
-                class="underline"
-                :to="rawEventsUrl"
-              >
-                events
-              </NuxtLink>
-            </p>
-            <p v-else>
-              No recent
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="rawEventsUrl"
-              >
-                events</NuxtLink
-              >
-              from this account
-            </p>
-
-            <DetectionVersion class="hidden md:inline-flex" />
-          </div>
+              events
+            </template>
+            <template v-else>No recent events from this account</template>
+          </p>
         </template>
-
-        <AnalysisRepoActivityPanel
-          v-if="isEventBreakdownOpen && hasEventBreakdown"
-          id="event-breakdown"
-          :events="repoEvents"
-          :raw-events-url
-          class="mt-4 pt-3 border-t border-ui-border-subtle/40"
-        />
 
         <section
           v-if="!verifiedAutomation"
@@ -338,13 +280,6 @@ useSeoAnalysis(identifyAnalysis, {
       :activity-report="activityReport"
       hydrate-on-interaction
     />
-  </div>
-
-  <div
-    v-if="classification === 'insufficient-data' && analysis?.events.length"
-    class="@lg:mx-6"
-  >
-    <LazyAnalysisActivityEvents :events="analysis.events" />
   </div>
 
   <template
