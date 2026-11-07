@@ -46,7 +46,7 @@ const EVENT_TYPE_LABELS: Record<ActivityEventType, string> = {
   issue: 'issues',
   'issue-comment': 'comments',
   push: 'pushes',
-  create: 'branches',
+  create: 'creations',
   delete: 'deletions',
   fork: 'forks',
   star: 'stars',
@@ -70,8 +70,30 @@ export function getEventTypeLabel(type: ActivityEventType): string {
   return EVENT_TYPE_LABELS[type] ?? type.replace(/Event$/, '').toLowerCase()
 }
 
+/**
+ * GitHub reports comments on a pull request's conversation as issue comments,
+ * marking them with `issue.pull_request`.
+ */
+function isPullRequestComment(event: RepoEvent): boolean {
+  const payload = event.source?.payload as
+    { issue?: { pull_request?: unknown } } | undefined
+  return event.type === 'issue-comment' && !!payload?.issue?.pull_request
+}
+
+/** The category an event belongs to, if any. */
+function getEventCategory(event: RepoEvent): EventCategory | undefined {
+  if (isPullRequestComment(event)) {
+    return 'pull-requests'
+  }
+  const categories = Object.keys(EVENT_CATEGORIES) as EventCategory[]
+  return categories.find((category) =>
+    EVENT_CATEGORIES[category].types.includes(event.type),
+  )
+}
+
+/** Whether `event` belongs to `category`. */
 function isInCategory(event: RepoEvent, category: EventCategory): boolean {
-  return EVENT_CATEGORIES[category].types.includes(event.type)
+  return getEventCategory(event) === category
 }
 
 /**
@@ -105,6 +127,7 @@ export function filterByCategory(
   return events.filter((event) => isInCategory(event, category))
 }
 
+/** The event's time in milliseconds; 0 when it can't be parsed. */
 function timestamp(event: RepoEvent): number {
   return Date.parse(event.at) || 0
 }

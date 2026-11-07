@@ -2,6 +2,7 @@ import type { ActivityEvent } from '@unveil/identity'
 import type { GitHubEvent } from '@unveil/identity/providers/github'
 import type { Report } from '@unveil/identity/report'
 
+/** Copies the non-null `keys` of `source`; undefined when none are left. */
 function pick(
   source: unknown,
   keys: string[],
@@ -16,6 +17,17 @@ function pick(
   })
 
   return entries.length ? Object.fromEntries(entries) : undefined
+}
+
+/**
+ * Keeps the issue number, and an empty `pull_request` marker when the issue is
+ * a pull request (how GitHub tells PR conversation comments from issue ones).
+ */
+function slimIssue(issue: unknown): Record<string, unknown> | undefined {
+  const slim = pick(issue, ['number'])
+  const isPullRequest = !!(issue as { pull_request?: unknown } | undefined)
+    ?.pull_request
+  return isPullRequest ? { ...slim, pull_request: {} } : slim
 }
 
 /** Trims a GitHub event to the fields the account page reads (charts and flag evidence). */
@@ -34,7 +46,7 @@ export function slimGitHubEvent(event: GitHubEvent): GitHubEvent {
         ? { size: commits.length }
         : {}),
       pull_request: pick(payload?.pull_request, ['number']),
-      issue: pick(payload?.issue, ['number']),
+      issue: slimIssue(payload?.issue),
       comment: pick(payload?.comment, ['id', 'commit_id']),
       forkee: pick(payload?.forkee, ['full_name']),
       release: pick(payload?.release, ['tag_name']),
@@ -42,6 +54,7 @@ export function slimGitHubEvent(event: GitHubEvent): GitHubEvent {
   } as GitHubEvent
 }
 
+/** Trims the raw GitHub event kept as an activity event's `source`. */
 function slimActivityEvent(event: ActivityEvent): ActivityEvent {
   return {
     ...event,

@@ -12,11 +12,18 @@ import {
   type RepoEvent,
 } from './repo-activity'
 
-function event(type: string, repo: string | undefined, at: string): RepoEvent {
+function event(
+  type: string,
+  repo: string | undefined,
+  at: string,
+  // GitHub sends more payload fields than the provider types (e.g. issue numbers).
+  payload?: Record<string, unknown>,
+): RepoEvent {
   const raw: GitHubEvent = {
     type,
     created_at: at,
     repo: repo ? { name: repo } : undefined,
+    payload: payload as GitHubEvent['payload'],
   }
   return fromGitHubEvent(raw, 'someone')
 }
@@ -79,6 +86,32 @@ describe('filterByCategory', () => {
     const types = filterByCategory(events, 'pull-requests').map((e) => e.type)
 
     expect(types).toEqual(['pull-request', 'pull-request', 'pull-request'])
+  })
+
+  it('counts comments on a pull request as pull requests', () => {
+    const prComment = event(
+      'IssueCommentEvent',
+      'a/one',
+      '2026-10-07T10:00:00Z',
+      {
+        issue: { number: 1, pull_request: {} },
+      },
+    )
+    const issueComment = event(
+      'IssueCommentEvent',
+      'a/one',
+      '2026-10-07T10:00:00Z',
+      {
+        issue: { number: 2 },
+      },
+    )
+
+    expect(
+      filterByCategory([prComment, issueComment], 'pull-requests'),
+    ).toEqual([prComment])
+    expect(filterByCategory([prComment, issueComment], 'issues')).toEqual([
+      issueComment,
+    ])
   })
 
   it('keeps everything without a category', () => {
