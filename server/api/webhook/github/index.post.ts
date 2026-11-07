@@ -25,6 +25,11 @@ import {
 } from './_honeypot'
 import { analyze } from '@unveil/vk'
 
+// Line-anchored so a mention mid-sentence doesn't trigger a scan.
+const SCAN_COMMAND = /^\s*@agentscanapp\s+scan\b/im
+
+const MAINTAINER_ASSOCIATIONS = ['OWNER', 'MEMBER', 'COLLABORATOR']
+
 type OctokitAuthInstall = { token?: string } | undefined
 
 // Under Netlify's 10s function timeout, leaving time to conclude the check run.
@@ -79,15 +84,18 @@ export default defineEventHandler(async (event) => {
 
   const payload = JSON.parse(rawBody)
 
-  // issue_comment events only matter to the honeypot (the author's reply).
+  // issue_comment events are the honeypot reply or the scan command.
   const isCommentEvent =
     payload.action === 'created' && !!payload.comment && !!payload.issue
 
-  if (
-    payload.action !== 'opened' &&
-    payload.action !== 'reopened' &&
-    !isCommentEvent
-  ) {
+  // Reopening never re-scans, so a maintainer can reopen an auto-closed PR
+  // without it closing again. A maintainer re-runs the scan by command instead.
+  const isScanCommand =
+    isCommentEvent &&
+    SCAN_COMMAND.test(payload.comment.body ?? '') &&
+    MAINTAINER_ASSOCIATIONS.includes(payload.comment.author_association)
+
+  if (payload.action !== 'opened' && !isCommentEvent) {
     return { ok: true }
   }
 
@@ -160,7 +168,7 @@ export default defineEventHandler(async (event) => {
     // no config file. use defaults
   }
 
-  if (isCommentEvent) {
+  if (isCommentEvent && !isScanCommand) {
     if (!repoConfig.honeypot) {
       return { ok: true }
     }
@@ -279,11 +287,22 @@ export default defineEventHandler(async (event) => {
   let checkRunId: number | undefined
   if (isPR) {
     try {
+      // issue_comment payloads carry no head SHA.
+      const headSha: string =
+        payload.pull_request?.head.sha ??
+        (
+          await octokit.rest.pulls.get({
+            owner,
+            repo,
+            pull_number: targetNumber,
+          })
+        ).data.head.sha
+
       const { data: checkRun } = await octokit.rest.checks.create({
         owner,
         repo,
         name: 'AgentScan',
-        head_sha: payload.pull_request.head.sha,
+        head_sha: headSha,
         status: 'in_progress',
         started_at: new Date().toISOString(),
         output: {
@@ -358,7 +377,7 @@ export default defineEventHandler(async (event) => {
       completeCheckRun(
         'neutral',
         'Analysis timed out',
-        'AgentScan did not finish analyzing this contributor in time. Re-run this check or reopen the pull request to try again.',
+        'AgentScan did not finish analyzing this contributor in time. Comment `@agentscanapp scan` to try again.',
       )
     }, CHECK_RUN_DEADLINE_MS)
   }
