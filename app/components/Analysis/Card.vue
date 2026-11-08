@@ -137,7 +137,7 @@ const warnings = computed<string[]>(() => {
   if (matchedTally.value) {
     const count = matchedTally.value.counter
     list.push(
-      `Opened ${count} PR${count === 1 ? '' : 's'} in repositories we scan daily, while scoring as automation.`,
+      `Previously classified as automation on ${count} pull request${count === 1 ? '' : 's'} in repositories we scan daily.`,
     )
   }
 
