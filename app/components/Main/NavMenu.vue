@@ -186,6 +186,11 @@ useEventListener('resize', placePanel, { passive: true })
                       ></span>
                       <span class="truncate">{{ item.label }}</span>
                       <span
+                        v-if="item.badge"
+                        class="shrink-0 px-1.5 py-0.5 rounded-full border border-solid border-ui-border text-10px font-medium uppercase tracking-wider text-ui-muted leading-none"
+                        >{{ item.badge }}</span
+                      >
+                      <span
                         v-if="isExternalLink(item.to)"
                         class="i-lucide:arrow-up-right ml-auto shrink-0 text-[0.75em] opacity-70"
                         aria-hidden="true"

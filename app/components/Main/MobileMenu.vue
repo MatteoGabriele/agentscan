@@ -69,6 +69,7 @@ onBeforeUnmount(() => {
                 class="text-xl"
                 to="https://text.agentscan.tools"
                 label="Text scan"
+                badge="Beta"
               />
             </li>
             <li>
