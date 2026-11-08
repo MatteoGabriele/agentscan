@@ -49,16 +49,20 @@ function avatarUrl(owner: string): string {
       @click="isOpen = !isOpen"
     >
       <span class="hidden sm:flex shrink-0 items-center" aria-hidden="true">
-        <img
+        <span
           v-for="owner in previewOwners"
           :key="owner"
-          :src="avatarUrl(owner)"
-          alt=""
-          loading="lazy"
-          width="24"
-          height="24"
-          class="size-6 -mr-1.5 last:mr-0 rounded-full bg-ui-card ring-2 ring-ui-card filter-saturate-0 transition-all group-hover:filter-saturate-100"
-        />
+          class="block size-6 -mr-1.5 last:mr-0 overflow-hidden rounded-full bg-ui-card ring-2 ring-ui-card filter-saturate-0 transition-all group-hover:filter-saturate-100"
+        >
+          <img
+            :src="avatarUrl(owner)"
+            alt=""
+            loading="lazy"
+            width="24"
+            height="24"
+            class="block size-full"
+          />
+        </span>
       </span>
 
       <span class="min-w-0 flex-1">
