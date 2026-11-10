@@ -1176,5 +1176,19 @@
       "trueberryless",
       "danielroe"
     ]
+  },
+  {
+    "username": "20163070",
+    "id": 102943205,
+    "reason": "Self-disclosed AI-generated PRs. Opens a new PR seconds after closing another to work around the repository's open PR limit",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/564",
+    "reportedBy": "xmatthias",
+    "createdAt": "2026-11-07",
+    "approvedBy": [
+      "trueberryless",
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico"
+    ]
   }
 ]
