@@ -206,11 +206,11 @@ importers:
         specifier: ^66.12.0
         version: 66.12.0
       '@unveil/identity':
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 3.1.0
+        version: 3.1.0
       '@unveil/vk':
         specifier: 1.0.0
-        version: 1.0.0(@unveil/identity@3.0.0)
+        version: 1.0.0(@unveil/identity@3.1.0)
       '@vueuse/core':
         specifier: ^14.4.0
         version: 14.4.0(vue@3.5.44(typescript@6.0.3))
@@ -2297,8 +2297,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@unveil/identity@3.0.0':
-    resolution: {integrity: sha512-K12WL5AS7s9FXiY46TCZIMS/Y9RCU0DISs9K2G4ZkOCN3K9E4axG1XrNGYw6G6SrmRtWnZT3kPO+hFnYE055Dw==}
+  '@unveil/identity@3.1.0':
+    resolution: {integrity: sha512-/8Yc3kjUuiy2DpeIjnb93eMyr95+gFRHdwuGvyBDb8WvCTz7nMlGzbgGmqSIHToeKwgg87tExIg6zZ41A5PTUQ==}
 
   '@unveil/vk@1.0.0':
     resolution: {integrity: sha512-/vVWcDJg8ZCun46eZseK8nHUit6Yd1tbgD2ydRXNNEqasGh9cAS00l9QkFdNIL2gy0HF3akbrCTIsftXTNw2Zw==}
@@ -7810,11 +7810,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@unveil/identity@3.0.0': {}
+  '@unveil/identity@3.1.0': {}
 
-  '@unveil/vk@1.0.0(@unveil/identity@3.0.0)':
+  '@unveil/vk@1.0.0(@unveil/identity@3.1.0)':
     dependencies:
-      '@unveil/identity': 3.0.0
+      '@unveil/identity': 3.1.0
 
   '@vercel/nft@1.11.0(rollup@4.67.4)(supports-color@10.2.2)':
     dependencies:
