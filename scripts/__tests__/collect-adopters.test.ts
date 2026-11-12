@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { mergeAdopters } from '../collect-adopters'
+import {
+  diffAdopters,
+  formatAdopterDiff,
+  mergeAdopters,
+} from '../collect-adopters'
 import type {
   AdopterPlatform,
   AdopterRepository,
@@ -59,5 +63,60 @@ describe('mergeAdopters', () => {
 
   it('returns an empty list when nothing was collected', () => {
     expect(mergeAdopters([], [])).toEqual([])
+  })
+})
+
+describe('diffAdopters', () => {
+  it('lists repositories that were added and removed', () => {
+    const diff = diffAdopters(
+      [repository('owner/kept', 5), repository('owner/gone', 3)],
+      [repository('owner/kept', 6), repository('owner/new', 9)],
+    )
+
+    expect(diff.gained.map((item) => item.name)).toEqual(['owner/new'])
+    expect(diff.lost.map((item) => item.name)).toEqual(['owner/gone'])
+  })
+
+  it('treats every repository as gained on the first run', () => {
+    const diff = diffAdopters([], [repository('owner/a', 1)])
+
+    expect(diff.gained).toHaveLength(1)
+    expect(diff.lost).toEqual([])
+  })
+
+  it('ignores a platform switch for the same repository', () => {
+    const diff = diffAdopters(
+      [repository('owner/a', 1, 'avatar', 'action')],
+      [repository('owner/a', 1, 'avatar', 'app')],
+    )
+
+    expect(diff).toEqual({ gained: [], lost: [] })
+  })
+})
+
+describe('formatAdopterDiff', () => {
+  it('reports no change', () => {
+    expect(formatAdopterDiff(2, 2, { gained: [], lost: [] })).toBe(
+      '= No change since the last run (2)',
+    )
+  })
+
+  it('reports the counts and names of gained and lost repositories', () => {
+    const output = formatAdopterDiff(2, 3, {
+      gained: [
+        repository('owner/new', 9, 'avatar', 'app'),
+        repository('owner/other', 1),
+      ],
+      lost: [repository('owner/gone', 3)],
+    })
+
+    expect(output).toBe(
+      [
+        'Δ +2 gained, -1 lost (2 → 3)',
+        '  + owner/new (app, ★ 9)',
+        '  + owner/other (action, ★ 1)',
+        '  - owner/gone (action, ★ 3)',
+      ].join('\n'),
+    )
   })
 })

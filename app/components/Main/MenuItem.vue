@@ -3,6 +3,7 @@ const props = defineProps<{
   label: string
   to: string
   exact?: boolean
+  badge?: string
 }>()
 
 const route = useRoute()
@@ -25,6 +26,11 @@ const isPathActive = computed(() => {
     >
       {{ label }}
     </span>
+    <span
+      v-if="badge"
+      class="shrink-0 px-1.5 py-0.5 rounded-full border border-solid border-ui-border text-10px font-medium uppercase tracking-wider text-ui-muted leading-none"
+      >{{ badge }}</span
+    >
     <span
       v-if="isExternal"
       class="i-lucide:external-link text-[0.7em] opacity-60 shrink-0"
