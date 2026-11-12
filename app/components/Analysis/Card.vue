@@ -47,21 +47,8 @@ const approvedBy = computed<string[]>(() => {
   return verifiedAutomation.value?.approvedBy ?? []
 })
 
-const { data: reportIssues, pending: isLoadingReports } = useLazyFetch(
-  () => `/api/report-issues/${username.value}`,
-  {
-    key: () => `report-issues:${username.value}`,
-    default: () => [],
-  },
-)
-
-const openReport = computed(() => {
-  return reportIssues.value.find((report) => report.state === 'open')
-})
-
-const closedReports = computed(() => {
-  return reportIssues.value.filter((report) => report.state === 'closed')
-})
+const { data: openReport, pending: isLoadingReports } =
+  usePendingReport(username)
 
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
@@ -307,30 +294,6 @@ useSeoAnalysis(identifyAnalysis, {
               Add report
             </NuxtLink>
           </template>
-
-          <div v-if="closedReports.length" class="mt-3 text-xs text-ui-muted">
-            <p>
-              Previously reported
-              {{
-                closedReports.length === 1
-                  ? 'once'
-                  : `${closedReports.length} times`
-              }}:
-            </p>
-            <ul class="mt-1 flex flex-wrap gap-x-3 gap-y-1">
-              <li v-for="report in closedReports" :key="report.number">
-                <NuxtLink
-                  :to="report.url"
-                  target="_blank"
-                  external
-                  class="underline hover:text-ui-text"
-                >
-                  #{{ report.number }}</NuxtLink
-                >
-                ({{ report.outcome }})
-              </li>
-            </ul>
-          </div>
         </section>
       </template>
     </div>
