@@ -263,6 +263,7 @@ const landmarkGroups = computed(() =>
         iconSvg: isGrouped ? SVG_ICON.layers : first.iconSvg,
         series: isGrouped ? undefined : first.series,
         offsetY: isGrouped ? undefined : first.offsetY,
+        labelAbove: isGrouped ? false : first.labelAbove,
       },
     ]
   }),
@@ -383,7 +384,9 @@ function placeLandmark({
                           x: plot.x,
                         })
                       "
-                      :y="svg.drawingArea.bottom - 4"
+                      :y="
+                        svg.drawingArea.bottom - (landmark.labelAbove ? 42 : 4)
+                      "
                       text-anchor="middle"
                       dominant-baseline="middle"
                       paint-order="stroke fill"

@@ -1133,5 +1133,62 @@
       "ematipico",
       "danielroe"
     ]
+  },
+  {
+    "username": "dexhunter",
+    "id": 6930518,
+    "reason": "PR spam with mostly useless micro perf-optimizations. Profile discloses as doing \"AI-generated optimization PRs\" as part of their startup's research.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/552",
+    "reportedBy": "MichaelGrupp",
+    "createdAt": "2026-11-03",
+    "approvedBy": [
+      "graphieros",
+      "ematipico",
+      "danielroe",
+      "OrbisK"
+    ]
+  },
+  {
+    "username": "mvanhorn",
+    "id": 455140,
+    "reason": "Opening AI-generated PRs in multiple repos",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/544",
+    "reportedBy": "gameroman",
+    "createdAt": "2026-10-31",
+    "approvedBy": [
+      "MatteoGabriele",
+      "ematipico",
+      "graphieros",
+      "huang-julien"
+    ]
+  },
+  {
+    "username": "monsterlag",
+    "id": 64719697,
+    "reason": "Self-disclosed as an AI agent, operated continuously for 23 hours",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/556",
+    "reportedBy": "matkoniecz",
+    "createdAt": "2026-11-06",
+    "approvedBy": [
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico",
+      "trueberryless",
+      "danielroe"
+    ]
+  },
+  {
+    "username": "20163070",
+    "id": 102943205,
+    "reason": "Self-disclosed AI-generated PRs. Opens a new PR seconds after closing another to work around the repository's open PR limit",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/564",
+    "reportedBy": "xmatthias",
+    "createdAt": "2026-11-07",
+    "approvedBy": [
+      "trueberryless",
+      "graphieros",
+      "MatteoGabriele",
+      "ematipico"
+    ]
   }
 ]

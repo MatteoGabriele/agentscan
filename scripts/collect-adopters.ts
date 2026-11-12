@@ -187,6 +187,53 @@ export function mergeAdopters(
   })
 }
 
+export type AdopterDiff = {
+  gained: AdopterRepository[]
+  lost: AdopterRepository[]
+}
+
+// Compares two adopter lists by repository name.
+export function diffAdopters(
+  previous: AdopterRepository[],
+  current: AdopterRepository[],
+): AdopterDiff {
+  const previousNames = new Set(previous.map((repository) => repository.name))
+  const currentNames = new Set(current.map((repository) => repository.name))
+
+  return {
+    gained: current.filter((repository) => !previousNames.has(repository.name)),
+    lost: previous.filter((repository) => !currentNames.has(repository.name)),
+  }
+}
+
+export function formatAdopterDiff(
+  previousCount: number,
+  currentCount: number,
+  { gained, lost }: AdopterDiff,
+): string {
+  if (gained.length === 0 && lost.length === 0) {
+    return `= No change since the last run (${currentCount})`
+  }
+
+  const describe = (repository: AdopterRepository) =>
+    `${repository.name} (${repository.platform}, ★ ${repository.stars})`
+
+  return [
+    `Δ +${gained.length} gained, -${lost.length} lost (${previousCount} → ${currentCount})`,
+    ...gained.map((repository) => `  + ${describe(repository)}`),
+    ...lost.map((repository) => `  - ${describe(repository)}`),
+  ].join('\n')
+}
+
+// The committed list; empty when the file doesn't exist yet.
+function readPreviousAdopters(outputPath: string): AdopterRepository[] {
+  if (!fs.existsSync(outputPath)) {
+    return []
+  }
+
+  return JSON.parse(fs.readFileSync(outputPath, 'utf-8')) as AdopterRepository[]
+}
+
 function readEnv(name: string): string {
   const value = process.env[`NUXT_${name}`] || process.env[name]
 
@@ -222,13 +269,22 @@ async function main() {
     process.exit(1)
   }
 
+  const outputPath = path.join(process.cwd(), OUTPUT_PATH)
+  const previous = readPreviousAdopters(outputPath)
+  const diff = formatAdopterDiff(
+    previous.length,
+    adopters.length,
+    diffAdopters(previous, adopters),
+  )
+
   if (dryRun) {
     console.log(JSON.stringify(adopters, null, 2))
+    console.log(diff)
     return
   }
 
-  const outputPath = path.join(process.cwd(), OUTPUT_PATH)
   fs.writeFileSync(outputPath, JSON.stringify(adopters, null, 2) + '\n')
+  console.log(diff)
   console.log(`✓ Wrote ${OUTPUT_PATH}`)
 }
 

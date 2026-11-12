@@ -206,11 +206,11 @@ importers:
         specifier: ^66.12.0
         version: 66.12.0
       '@unveil/identity':
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 3.1.0
+        version: 3.1.0
       '@unveil/vk':
         specifier: 1.0.0
-        version: 1.0.0(@unveil/identity@3.0.0)
+        version: 1.0.0(@unveil/identity@3.1.0)
       '@vueuse/core':
         specifier: ^14.4.0
         version: 14.4.0(vue@3.5.44(typescript@6.0.3))
@@ -236,8 +236,8 @@ importers:
         specifier: ^3.5.28
         version: 3.5.44(typescript@6.0.3)
       vue-data-ui:
-        specifier: 3.28.8
-        version: 3.28.8(vue@3.5.44(typescript@6.0.3))
+        specifier: 3.29.1
+        version: 3.29.1(vue@3.5.44(typescript@6.0.3))
       vue-router:
         specifier: ^4.6.4
         version: 4.6.4(vue@3.5.44(typescript@6.0.3))
@@ -2297,8 +2297,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@unveil/identity@3.0.0':
-    resolution: {integrity: sha512-K12WL5AS7s9FXiY46TCZIMS/Y9RCU0DISs9K2G4ZkOCN3K9E4axG1XrNGYw6G6SrmRtWnZT3kPO+hFnYE055Dw==}
+  '@unveil/identity@3.1.0':
+    resolution: {integrity: sha512-/8Yc3kjUuiy2DpeIjnb93eMyr95+gFRHdwuGvyBDb8WvCTz7nMlGzbgGmqSIHToeKwgg87tExIg6zZ41A5PTUQ==}
 
   '@unveil/vk@1.0.0':
     resolution: {integrity: sha512-/vVWcDJg8ZCun46eZseK8nHUit6Yd1tbgD2ydRXNNEqasGh9cAS00l9QkFdNIL2gy0HF3akbrCTIsftXTNw2Zw==}
@@ -5285,8 +5285,8 @@ packages:
   vue-component-type-helpers@3.3.14:
     resolution: {integrity: sha512-Pq3+OnbCiPCHk0R7KSZrx+j/XXaUn2kSQ1epxq60w8CPbByLjC1EJgV51n4WY851sTXUVzsNMuitywdkdVyKjA==}
 
-  vue-data-ui@3.28.8:
-    resolution: {integrity: sha512-zPHEEa7oBsIfb9EBnSlyoI1k9D6T2v3EQhu7li03Fc4jpSkpF56fHjOG4Mb/AvhvO6THN5Fa90DyeKT3UnESig==}
+  vue-data-ui@3.29.1:
+    resolution: {integrity: sha512-jEYmsZH94Pv6bHWlDf3tgzvJdCAxcNSLuL/4GuwQ5TrXHLmvwXxcID7HYyDbGnQUwXXMIBqrWD96qTZnoc+cbg==}
     peerDependencies:
       jspdf: '>=3.0.1'
       vue: '>=3.3.0'
@@ -7810,11 +7810,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@unveil/identity@3.0.0': {}
+  '@unveil/identity@3.1.0': {}
 
-  '@unveil/vk@1.0.0(@unveil/identity@3.0.0)':
+  '@unveil/vk@1.0.0(@unveil/identity@3.1.0)':
     dependencies:
-      '@unveil/identity': 3.0.0
+      '@unveil/identity': 3.1.0
 
   '@vercel/nft@1.11.0(rollup@4.67.4)(supports-color@10.2.2)':
     dependencies:
@@ -11110,7 +11110,7 @@ snapshots:
 
   vue-component-type-helpers@3.3.14: {}
 
-  vue-data-ui@3.28.8(vue@3.5.44(typescript@6.0.3)):
+  vue-data-ui@3.29.1(vue@3.5.44(typescript@6.0.3)):
     dependencies:
       vue: 3.5.44(typescript@6.0.3)
 

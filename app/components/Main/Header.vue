@@ -26,6 +26,7 @@ const scanItems: MenuDropdownItem[] = [
     label: 'Text',
     description: 'Find signs of AI-written text in open source contributions',
     icon: 'i-agentscan:text',
+    badge: 'Beta',
   },
   {
     to: '/lab',
