@@ -5,7 +5,6 @@ import {
   formatPercentage,
   formatProgressionPoints,
   getTrendArrow,
-  getTrendColor,
 } from '~~/shared/utils/activity-stats'
 import {
   CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
@@ -23,7 +22,7 @@ const isMobile = useIsMobile()
 
 const repo = computed(() => `${route.params.owner}/${route.params.name}`)
 
-const { data: report, status, error } = await useRepoReport(repo)
+const { data: report, status, error, refresh } = await useRepoReport(repo)
 
 useHead({
   title: () => `${report.value?.repo ?? repo.value} activity | AgentScan`,
@@ -175,8 +174,11 @@ function formatDate(date: string) {
     <Skeleton width="w-full" height="h-40" />
   </div>
 
-  <div v-else-if="error" class="text-center py-12 text-ui-muted">
-    <p v-if="error.status === 404" class="text-sm text-pretty">
+  <div
+    v-else-if="error && error.status === 404"
+    class="text-center py-12 text-ui-muted"
+  >
+    <p class="text-sm text-pretty">
       <span class="text-ui-text font-medium">{{ repo }}</span> is not one of the
       <NuxtLink to="/activity/repositories" class="underline"
         >repositories we track</NuxtLink
@@ -186,8 +188,14 @@ function formatDate(date: string) {
       >
       instead.
     </p>
-    <p v-else class="text-sm">{{ error.message }}</p>
   </div>
+  <ErrorCardGeneric
+    v-else-if="error"
+    :error
+    :retry="refresh"
+    title="Could not load this report"
+    description="Something went wrong while loading the repository activity."
+  />
 
   <div v-else-if="report" class="flex flex-col gap-12">
     <div
@@ -222,7 +230,11 @@ function formatDate(date: string) {
       >
         <div v-if="summary" class="flex flex-col gap-1 max-w-sm">
           <div class="flex gap-2 items-center" :class="scoreStyle.text">
-            <span :class="classificationIcon" class="text-base" />
+            <span
+              :class="classificationIcon"
+              class="text-base"
+              aria-hidden="true"
+            />
             <h2 class="text-xl font-mono">{{ summary.label }}</h2>
           </div>
           <p class="text-ui-text text-pretty">{{ summary.text }}</p>
@@ -261,11 +273,7 @@ function formatDate(date: string) {
             vs previous {{ REPO_REPORT_PERIOD_DAYS }} days
           </dt>
           <dd v-if="scoreChange === null">–</dd>
-          <dd
-            v-else
-            class="tabular-nums"
-            :class="getTrendColor({ value: scoreChange })"
-          >
+          <dd v-else class="tabular-nums">
             <span
               :class="getTrendArrow(scoreChange)"
               class="align-middle"
@@ -374,7 +382,7 @@ function formatDate(date: string) {
 
         <button
           v-if="hasHiddenPullRequests"
-          class="self-start text-sm text-ui-muted/70 hover:text-ui-text"
+          class="self-start text-sm text-ui-muted hover:text-ui-text"
           @click="showAllPullRequests = true"
         >
           Show all

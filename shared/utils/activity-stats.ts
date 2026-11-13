@@ -85,19 +85,3 @@ export function getTrendArrow(value: number = 0) {
   }
   return 'i-lucide:trending-up-down'
 }
-
-export function getTrendColor({
-  value = 0,
-  reversed = false,
-}: {
-  value?: number
-  reversed?: boolean
-}) {
-  if (value > 0) {
-    return reversed ? 'text-[--automation]' : 'text-[--organic]'
-  }
-  if (value < 0) {
-    return reversed ? 'text-[--organic]' : 'text-[--automation]'
-  }
-  return 'text-[--text-muted]'
-}

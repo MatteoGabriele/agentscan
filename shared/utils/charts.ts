@@ -1,11 +1,14 @@
 // @unocss-include
+import type { ClassificationLabel } from '@unveil/identity'
+
 export function getCompleteDayRange(days: string[]): string[] {
-  if (!days.length) {
+  const firstDay = days[0]
+  const lastDay = days.at(-1)
+
+  if (!firstDay || !lastDay) {
     return []
   }
 
-  const firstDay = days[0]!
-  const lastDay = days[days.length - 1]!
   const firstDayTime = new Date(firstDay).getTime()
   const lastDayTime = new Date(lastDay).getTime()
   const oneDay = 24 * 60 * 60 * 1000
@@ -62,14 +65,21 @@ export const SVG_ICON = {
 export const EMPTY_HOUR_NOTE =
   'No pull requests recorded. Probably a GitHub outage that stopped the hourly scan.'
 
+/** The one place for the display name of each classification. */
+export const CLASSIFICATION_NAMES: Record<ClassificationLabel, string> = {
+  organic: 'Organic',
+  mixed: 'Mixed',
+  automation: 'Automation',
+  'insufficient-data': 'Not enough data',
+}
+
 export const CLASSIFICATIONS_WITH_NAME_AND_CATEGORY: Array<{
   name: string
   category: ActivityCategory
-}> = [
-  { name: 'Organic', category: 'organic' },
-  { name: 'Mixed', category: 'mixed' },
-  { name: 'Automation', category: 'automation' },
-]
+}> = (['organic', 'mixed', 'automation'] as const).map((category) => ({
+  name: CLASSIFICATION_NAMES[category],
+  category,
+}))
 
 export const PR_VOLUME_DASH_ARRAY = '0.1 4'
 export const PR_VOLUME_STROKE_WIDTH = 2

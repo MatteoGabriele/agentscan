@@ -19,7 +19,7 @@ export function useClassificationIcons(
       return 'i-lucide:blend'
     }
 
-    return 'i-lucide:shield-alert'
+    return 'i-agentscan:automation'
   })
 
   return {

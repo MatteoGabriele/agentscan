@@ -123,11 +123,13 @@ const warnings = computed<string[]>(() => {
     coverageLevel.value === 'low' &&
     classification.value !== 'insufficient-data'
   ) {
-    list.push('Limited activity to analyze. Treat this result as provisional.')
+    list.push('There is little activity to analyze, so this result may change.')
   }
 
   if (nearestClassification.value) {
-    list.push(`Activity close to ${nearestClassification.value} signals.`)
+    list.push(
+      `This result is close to the "${CLASSIFICATION_NAMES[nearestClassification.value]}" group.`,
+    )
   }
 
   if (isBountyHunter.value) {
@@ -197,7 +199,7 @@ useSeoAnalysis(identifyAnalysis, {
               external
               class="text-ui-muted underline inline text-xs hover:text-ui-text"
             >
-              View issue
+              View or dispute the report
             </NuxtLink>
           </footer>
         </section>
@@ -209,7 +211,10 @@ useSeoAnalysis(identifyAnalysis, {
                   v-if="warnings.length"
                   class="flex items-start gap-2 text-sm text-ui-muted mb-2"
                 >
-                  <span class="i-lucide:megaphone text-xs shrink-0"></span>
+                  <span
+                    class="i-lucide:info text-xs shrink-0"
+                    aria-hidden="true"
+                  />
                   <ul class="flex flex-col gap-1">
                     <li
                       v-for="(warning, i) in warnings"
@@ -223,7 +228,11 @@ useSeoAnalysis(identifyAnalysis, {
 
                 <div class="flex flex-wrap gap-2 items-center">
                   <div class="flex gap-2 items-center" :class="scoreStyle.text">
-                    <span :class="classificationIcon" class="text-base" />
+                    <span
+                      :class="classificationIcon"
+                      class="text-base"
+                      aria-hidden="true"
+                    />
                     <h3 class="text-xl font-mono">
                       {{ classificationDetails.label }}
                     </h3>
@@ -298,10 +307,5 @@ useSeoAnalysis(identifyAnalysis, {
     />
   </template>
 
-  <p
-    class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-  >
-    Results are based on pattern analysis and should be interpreted as possible
-    signals, not conclusions. Always verify findings with additional context.
-  </p>
+  <CommonDisclaimer class="mt-8 mx-auto max-w-md text-center" />
 </template>

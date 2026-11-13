@@ -19,7 +19,7 @@ const repo = computed<string>(() => {
   return slug
 })
 
-const { data, status, error } = useAsyncData(
+const { data, status, error, refresh } = useAsyncData(
   () => `scan-${repo.value}`,
   () => {
     return $fetch('/api/scan', {
@@ -73,13 +73,22 @@ async function handleSubmit(value: string) {
     </ul>
   </div>
 
-  <div v-else-if="error" class="text-center py-12 text-ui-muted">
-    <p v-if="error.status === 404" class="text-sm">
+  <div
+    v-else-if="error && error.status === 404"
+    class="text-center py-12 text-ui-muted"
+  >
+    <p class="text-sm">
       Repository <span class="text-ui-text font-medium">{{ repo }}</span> was
       not found. Check the name and try again.
     </p>
-    <p v-else class="text-sm">{{ error.message }}</p>
   </div>
+  <ErrorCardGeneric
+    v-else-if="error"
+    :error
+    :retry="refresh"
+    title="Could not scan this repository"
+    description="Something went wrong while reading its latest pull requests."
+  />
 
   <div v-else-if="data">
     <div class="flex flex-col justify-between mb-2 ml-2 text-sm text-ui-muted">
@@ -118,12 +127,6 @@ async function handleSubmit(value: string) {
       />
     </ul>
 
-    <p
-      class="mt-8 mx-auto max-w-lg text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-    >
-      Results are based on pattern analysis and should be interpreted as
-      possible signals, not conclusions. Always verify findings with additional
-      context.
-    </p>
+    <CommonDisclaimer class="mt-8 mx-auto max-w-lg text-center" />
   </div>
 </template>

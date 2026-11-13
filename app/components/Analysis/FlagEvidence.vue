@@ -24,14 +24,8 @@ const connections = computed(() => {
   })
 })
 
-const {
-  getEventIcon,
-  formatEventTime,
-  groupEvents,
-  sortByTime,
-  getDeltaSeconds,
-  formatSpan,
-} = useGitHubEventDisplay()
+const { getEventIcon, groupEvents, sortByTime, getDeltaSeconds, formatSpan } =
+  useGitHubEventDisplay()
 
 const showAllEvidence = ref(false)
 
@@ -145,33 +139,22 @@ const hiddenCount = computed(() => {
               <span
                 :class="getEventIcon(fastestConnection.conn.from)"
                 class="text-xs text-ui-muted"
+                aria-hidden="true"
               />
               <div class="w-px flex-1 bg-ui-automation/30 my-1" />
             </div>
-            <div class="min-w-0 pb-1">
-              <AnalysisFlagEvidenceLink :event="fastestConnection.conn.from" />
-              <p class="text-xs text-ui-muted">
-                {{ formatEventTime(fastestConnection.conn.from.created_at) }}
-              </p>
-              <AnalysisFlagEvidenceTextLink
-                :event="fastestConnection.conn.from"
-              />
-            </div>
+            <AnalysisFlagEvidenceEvent
+              :event="fastestConnection.conn.from"
+              class="pb-1"
+            />
           </div>
           <div class="flex gap-3">
             <span
               :class="getEventIcon(fastestConnection.conn.to)"
               class="text-xs text-ui-muted shrink-0"
+              aria-hidden="true"
             />
-            <div class="min-w-0">
-              <AnalysisFlagEvidenceLink :event="fastestConnection.conn.to" />
-              <p class="text-xs text-ui-muted">
-                {{ formatEventTime(fastestConnection.conn.to.created_at) }}
-              </p>
-              <AnalysisFlagEvidenceTextLink
-                :event="fastestConnection.conn.to"
-              />
-            </div>
+            <AnalysisFlagEvidenceEvent :event="fastestConnection.conn.to" />
           </div>
         </div>
       </LazyAnalysisFlagEvidenceFast>
@@ -184,39 +167,28 @@ const hiddenCount = computed(() => {
               <span
                 :class="getEventIcon(conn.from)"
                 class="text-xs text-ui-muted"
+                aria-hidden="true"
               />
               <!-- vertical connector line -->
               <div class="w-px flex-1 bg-ui-border-subtle/40 my-1" />
             </div>
-            <div class="min-w-0 pb-2">
-              <AnalysisFlagEvidenceLink :event="conn.from" />
-              <p class="text-xs text-ui-muted">
-                {{ formatEventTime(conn.from.created_at) }} ·
-                {{ conn.from.repo?.name?.split('/')[1] }}
-              </p>
-              <AnalysisFlagEvidenceTextLink :event="conn.from" />
-            </div>
+            <AnalysisFlagEvidenceEvent :event="conn.from" class="pb-2" />
           </div>
 
           <div class="flex gap-3">
             <span
               :class="getEventIcon(conn.to)"
               class="text-xs text-ui-muted shrink-0"
+              aria-hidden="true"
             />
-            <div class="min-w-0">
-              <AnalysisFlagEvidenceLink :event="conn.to" />
-              <p class="text-xs text-ui-muted">
-                {{ formatEventTime(conn.to.created_at) }} ·
-                {{ conn.to.repo?.name?.split('/')[1] }}
-              </p>
-              <AnalysisFlagEvidenceTextLink :event="conn.to" />
-            </div>
+            <AnalysisFlagEvidenceEvent :event="conn.to" />
           </div>
         </div>
       </div>
 
       <button
         v-if="hiddenCount > 0 || showAllEvidence"
+        type="button"
         class="text-ui-muted text-xs hover:text-ui-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
@@ -238,15 +210,9 @@ const hiddenCount = computed(() => {
             <span
               :class="getEventIcon(ev)"
               class="text-xs text-ui-muted shrink-0 mt-0.5"
+              aria-hidden="true"
             />
-            <div class="min-w-0">
-              <AnalysisFlagEvidenceLink :event="ev" />
-              <p class="text-xs text-ui-muted">
-                {{ formatEventTime(ev.created_at) }} ·
-                {{ ev.repo?.name?.split('/')[1] }}
-              </p>
-              <AnalysisFlagEvidenceTextLink :event="ev" />
-            </div>
+            <AnalysisFlagEvidenceEvent :event="ev" />
           </div>
         </div>
       </LazyAnalysisFlagEvidenceFast>
@@ -261,21 +227,16 @@ const hiddenCount = computed(() => {
             <span
               :class="getEventIcon(ev)"
               class="text-xs text-ui-muted shrink-0 mt-0.5"
+              aria-hidden="true"
             />
-            <div class="min-w-0 flex-1">
-              <AnalysisFlagEvidenceLink :event="ev" />
-              <p class="text-xs text-ui-muted">
-                {{ formatEventTime(ev.created_at) }} ·
-                {{ ev.repo?.name?.split('/')[1] }}
-              </p>
-              <AnalysisFlagEvidenceTextLink :event="ev" />
-            </div>
+            <AnalysisFlagEvidenceEvent :event="ev" class="flex-1" />
           </div>
         </div>
       </div>
 
       <button
         v-if="hiddenCount > 0 || showAllEvidence"
+        type="button"
         class="text-ui-muted text-xs hover:text-ui-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >
@@ -298,15 +259,9 @@ const hiddenCount = computed(() => {
             <span
               :class="getEventIcon(ev)"
               class="text-xs text-ui-muted shrink-0 mt-0.5"
+              aria-hidden="true"
             />
-            <div class="flex-1 flex flex-col gap-0.5">
-              <AnalysisFlagEvidenceLink :event="ev" />
-              <div class="flex gap-2 text-ui-muted text-xs">
-                <span>{{ formatEventTime(ev.created_at) }}</span>
-                <span>{{ ev.repo?.name }}</span>
-              </div>
-              <AnalysisFlagEvidenceTextLink :event="ev" />
-            </div>
+            <AnalysisFlagEvidenceEvent :event="ev" class="flex-1" />
           </div>
         </div>
       </LazyAnalysisFlagEvidenceFast>
@@ -319,25 +274,20 @@ const hiddenCount = computed(() => {
         <span
           :class="group.icon"
           class="text-xs text-ui-muted shrink-0 sticky top-4 self-start mt-1"
+          aria-hidden="true"
         />
         <div class="flex-1 space-y-3">
-          <div
+          <AnalysisFlagEvidenceEvent
             v-for="(ev, j) in group.events"
             :key="j"
-            class="flex flex-col gap-0.5"
-          >
-            <AnalysisFlagEvidenceLink :event="ev" />
-            <div class="flex gap-2 text-ui-muted text-xs">
-              <span>{{ formatEventTime(ev.created_at) }}</span>
-              <span>{{ ev.repo?.name }}</span>
-            </div>
-            <AnalysisFlagEvidenceTextLink :event="ev" />
-          </div>
+            :event="ev"
+          />
         </div>
       </div>
 
       <button
         v-if="hiddenCount > 0 || showAllEvidence"
+        type="button"
         class="text-ui-muted text-xs hover:text-ui-text transition-colors"
         @click="showAllEvidence = !showAllEvidence"
       >

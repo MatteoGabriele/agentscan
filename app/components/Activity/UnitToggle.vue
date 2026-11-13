@@ -17,5 +17,5 @@ const options = computed(() => [
 </script>
 
 <template>
-  <Toggle v-model="selected" :options="options" />
+  <Toggle v-model="selected" :options="options" label="Show values as" />
 </template>

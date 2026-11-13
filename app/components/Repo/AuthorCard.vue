@@ -31,21 +31,13 @@ const hasCommunityFlag = computed(() => {
 
 const classificationLabel = computed(() => {
   if (hasCommunityFlag.value) {
-    return 'Flagged'
+    return 'Community reported'
   }
   const value = classification.value
-  return value ? value.charAt(0).toUpperCase() + value.slice(1) : '-'
+  return value ? CLASSIFICATION_NAMES[value] : '-'
 })
 
-const classificationIcon = computed(() => {
-  if (classification.value === 'organic') {
-    return 'i-lucide:heart-handshake'
-  }
-  if (classification.value === 'mixed') {
-    return 'i-lucide:blend'
-  }
-  return 'i-lucide:shield-alert'
-})
+const { classificationIcon } = useClassificationIcons(classification)
 
 const { scoreStyle } = useScoreStyle(
   classification,
@@ -78,7 +70,11 @@ const { scoreStyle } = useScoreStyle(
       </div>
 
       <span class="flex items-center gap-1.5 shrink-0" :class="scoreStyle.text">
-        <span :class="classificationIcon" class="text-base shrink-0" />
+        <span
+          :class="classificationIcon"
+          class="text-base shrink-0"
+          aria-hidden="true"
+        />
         <p class="text-sm font-mono line-height-none">
           {{ classificationLabel }}
         </p>

@@ -32,145 +32,67 @@ onBeforeUnmount(() => {
       'fixed flex flex-col inset-0 h-dvh bg-ui-bg z-40 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]':
         isMenuOpen,
     }"
+    @keydown.esc="isMenuOpen = false"
   >
     <div class="flex justify-end shrink-0">
-      <button class="flex self-end" @click="toggleMenu">
-        <span v-if="isMenuOpen" class="i-lucide:x"></span>
-        <span v-else class="i-lucide:menu"></span>
+      <button
+        type="button"
+        class="flex self-end"
+        :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
+        :aria-expanded="isMenuOpen"
+        :aria-controls="isMenuOpen ? 'mobile-menu' : undefined"
+        @click="toggleMenu"
+      >
+        <span
+          :class="isMenuOpen ? 'i-lucide:x' : 'i-lucide:menu'"
+          aria-hidden="true"
+        />
       </button>
     </div>
 
-    <div
+    <nav
       v-if="isMenuOpen"
+      id="mobile-menu"
+      aria-label="Main"
       class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
     >
       <div
         class="flex items-center flex-col gap-6 justify-center min-h-full py-6"
       >
-        <div class="flex flex-col items-center gap-3">
-          <p
-            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
+        <template v-for="section in NAV_SECTIONS" :key="section.key">
+          <div
+            v-if="'items' in section"
+            class="flex flex-col items-center gap-3"
           >
-            Scan
-          </p>
-          <ul class="flex flex-col items-center gap-3">
-            <li>
-              <LazyMainMenuItem class="text-xl" to="/" label="Account search" />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/scan"
-                label="Repository scan"
-              />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="https://text.agentscan.tools"
-                label="Text scan"
-                badge="Beta"
-              />
-            </li>
-            <li>
-              <LazyMainMenuItem class="text-xl" to="/lab" label="The Lab" />
-            </li>
-          </ul>
-        </div>
+            <p
+              class="text-xs uppercase tracking-wider text-ui-muted font-semibold"
+            >
+              {{ section.label }}
+            </p>
+            <ul class="flex flex-col items-center gap-3">
+              <li v-for="item in section.items" :key="item.to">
+                <LazyMainMenuItem
+                  class="text-xl"
+                  :to="item.to"
+                  :label="item.label"
+                  :badge="item.badge"
+                  :exact="item.exact"
+                />
+              </li>
+            </ul>
+          </div>
+          <LazyMainMenuItem
+            v-else
+            class="text-xl"
+            :to="section.to"
+            :label="section.label"
+          />
 
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
-
-        <div class="flex flex-col items-center gap-3">
-          <p
-            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
-          >
-            Ecosystem Activity
-          </p>
-          <ul class="flex flex-col items-center gap-3">
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/activity"
-                label="Overview"
-                exact
-              />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/activity/repositories"
-                label="Repositories"
-              />
-            </li>
-          </ul>
-        </div>
-
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
-
-        <div class="flex flex-col items-center gap-3">
-          <p
-            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
-          >
-            Community
-          </p>
-          <ul class="flex flex-col items-center gap-3">
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/automations"
-                label="Community reports"
-              />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/adopters"
-                label="Used by"
-              />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/contribute"
-                label="Contribute"
-              />
-            </li>
-          </ul>
-        </div>
-
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
+          <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
+        </template>
 
         <LazyMainMenuItem class="text-xl" to="/bookmarks" label="Bookmarks" />
-
-        <div class="w-1/2 border-b h-px border-ui-border-subtle/30"></div>
-
-        <div class="flex flex-col items-center gap-3">
-          <p
-            class="text-xs uppercase tracking-wider text-ui-muted/70 font-semibold"
-          >
-            Install AgentScan
-          </p>
-          <ul class="flex flex-col items-center gap-3">
-            <li>
-              <LazyMainMenuItem class="text-xl" to="/app" label="GitHub App" />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="https://github.com/marketplace/actions/agentscan"
-                label="GitHub Action"
-              />
-            </li>
-            <li>
-              <LazyMainMenuItem
-                class="text-xl"
-                to="/app#configure"
-                label="Configure"
-              />
-            </li>
-          </ul>
-        </div>
       </div>
-    </div>
+    </nav>
   </div>
 </template>
