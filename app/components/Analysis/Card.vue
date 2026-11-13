@@ -17,12 +17,11 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const { data: accountReports, status: accountReportsStatus } = useFetch(
+const { data: accountReports, status: accountReportsStatus } = useLazyFetch(
   () => `/api/account-reports/${username.value}`,
   {
-    key: computed(() => `account-reports:${username.value}`),
-    query: computed(() => ({ id: props.user.id })),
-    lazy: true,
+    key: () => `account-reports:${username.value}`,
+    query: () => ({ id: props.user.id }),
   },
 )
 
@@ -47,6 +46,9 @@ const activityReport = computed<IntegrationItem | undefined>(() => {
 const approvedBy = computed<string[]>(() => {
   return verifiedAutomation.value?.approvedBy ?? []
 })
+
+const { data: openReport, pending: isLoadingReports } =
+  usePendingReport(username)
 
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
@@ -256,17 +258,42 @@ useSeoAnalysis(identifyAnalysis, {
           v-if="!verifiedAutomation"
           class="mt-4 pt-4 border-t border-ui-border-subtle"
         >
-          <p class="text-ui-muted text-sm">
-            Know something about this account? Help the community.
-          </p>
-          <NuxtLink
-            :to="flagAccountUrl"
-            target="_blank"
-            external
-            class="underline inline text-xs"
-          >
-            Add report
-          </NuxtLink>
+          <template v-if="isLoadingReports">
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <span
+              class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
+              aria-hidden="true"
+            />
+          </template>
+          <template v-else-if="openReport">
+            <p class="text-ui-muted text-sm">
+              This account already has an open report under review. Add what you
+              know there.
+            </p>
+            <NuxtLink
+              :to="openReport.url"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              View open report #{{ openReport.number }}
+            </NuxtLink>
+          </template>
+          <template v-else>
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <NuxtLink
+              :to="flagAccountUrl"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              Add report
+            </NuxtLink>
+          </template>
         </section>
       </template>
     </div>

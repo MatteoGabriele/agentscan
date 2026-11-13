@@ -29,6 +29,12 @@ const hasCommunityFlag = computed(() => {
   })
 })
 
+const { data: report } = usePendingReport(() => props.user.login)
+
+const pendingReport = computed(() =>
+  hasCommunityFlag.value ? null : report.value,
+)
+
 const classificationLabel = computed(() => {
   if (hasCommunityFlag.value) {
     return 'Flagged'
@@ -97,6 +103,17 @@ const { scoreStyle } = useScoreStyle(
           {{ prLabel }}
         </NuxtLink>
       </div>
+
+      <NuxtLink
+        v-if="pendingReport"
+        class="text-xs text-ui-muted underline hover:text-ui-text flex items-center gap-1 ml-auto"
+        target="_blank"
+        external
+        :to="pendingReport.url"
+      >
+        <span class="i-lucide:flag text-xs" />
+        Report #{{ pendingReport.number }} under review
+      </NuxtLink>
 
       <NuxtLink
         class="text-xs text-ui-text/80 hover:text-ui-text flex items-center gap-1"
