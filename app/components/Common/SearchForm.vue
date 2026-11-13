@@ -117,7 +117,7 @@ function clear() {
 
       <button
         type="submit"
-        class="shrink-0 rounded-full px-3 py-1.5 text-sm text-ui-muted transition-colors hover:bg-ui-muted/15 hover:text-ui-text"
+        class="shrink-0 rounded-full bg-ui-muted/15 px-4 py-1.5 text-sm text-ui-text transition-colors hover:bg-ui-muted/25"
       >
         {{ target?.kind === 'repository' ? 'Scan' : 'Analyze' }}
       </button>
