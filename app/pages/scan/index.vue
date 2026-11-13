@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
-
 useHead({
   title: 'Repository scan | AgentScan',
   meta: [
@@ -15,7 +13,6 @@ useHead({
 })
 
 const route = useRoute()
-const router = useRouter()
 
 const repoQuery = computed<string>(() => {
   const q = route.query.repo
@@ -26,16 +23,6 @@ const repoInput = ref(repoQuery.value)
 watch(repoQuery, (val) => {
   repoInput.value = val
 })
-
-async function handleSubmit(value: string) {
-  const slug = parseRepoSlug(value)
-
-  if (!slug) {
-    return
-  }
-
-  await router.push(`/scan/${slug.path}`)
-}
 </script>
 
 <template>
@@ -46,10 +33,10 @@ async function handleSubmit(value: string) {
     </p>
   </header>
 
-  <LazyRepoForm
+  <LazyCommonSearchForm
     v-model="repoInput"
+    placeholder="owner/repo or a GitHub link"
     :hydrate-on-interaction="['click', 'focus']"
-    @submit="handleSubmit"
   />
 
   <LazyRepoSuggestions :query="repoInput" hydrate-on-visible class="mt-8" />

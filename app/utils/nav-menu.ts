@@ -17,7 +17,7 @@ const scanItems: MenuDropdownItem[] = [
     to: '/',
     label: 'Account search',
     description: "Analyze a GitHub account's activity",
-    icon: 'i-lucide:user-search',
+    icon: 'i-lucide:user-round',
   },
   {
     to: '/scan',

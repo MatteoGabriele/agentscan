@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_COUNT } from '~~/shared/scan'
 
 const route = useRoute()
-const router = useRouter()
 
 const repo = computed<string>(() => {
   const { slug } = route.params
@@ -48,20 +46,10 @@ const isTracked = computed(() => {
 const repoUrl = computed(() => `https://github.com/${data.value?.repo}`)
 
 const repoInput = ref(repo.value)
-
-async function handleSubmit(value: string) {
-  const slug = parseRepoSlug(value)
-
-  if (!slug) {
-    return
-  }
-
-  await router.push(`/scan/${slug.path}`)
-}
 </script>
 
 <template>
-  <RepoForm v-model="repoInput" class="mb-8" @submit="handleSubmit" />
+  <CommonSearchForm v-model="repoInput" class="mb-8" />
 
   <div v-if="status === 'pending'">
     <div class="flex items-baseline justify-between mb-2 text-sm">
@@ -91,32 +79,31 @@ async function handleSubmit(value: string) {
   />
 
   <div v-else-if="data">
-    <div class="flex flex-col justify-between mb-2 ml-2 text-sm text-ui-muted">
-      <p>
-        Last {{ data.pullRequests.length }} PRs in
+    <div class="px-1 text-sm text-ui-muted">
+      <p class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <span>
+          Last {{ data.pullRequests.length }} PRs in
+          <NuxtLink
+            :to="repoUrl"
+            external
+            target="_blank"
+            class="underline hover:text-ui-text"
+            >{{ data.repo }}</NuxtLink
+          >
+        </span>
         <NuxtLink
-          :to="repoUrl"
-          external
-          target="_blank"
-          class="underline hover:text-ui-text"
-        >
-          {{ data.repo }}
-        </NuxtLink>
-      </p>
-      <p v-if="isTracked" class="mt-1">
-        <NuxtLink
+          v-if="isTracked"
           :to="`/activity/${data.repo}`"
           class="underline hover:text-ui-text"
-          >See its activity report</NuxtLink
+          >Activity report</NuxtLink
         >
       </p>
-      <p class="text-xs text-ui-muted/80 mt-1">
-        Members, collaborators, and owners are excluded from the scan, as
-        they're trusted by default.
+      <p class="mt-1 text-xs">
+        Members, collaborators, and owners are trusted and not scanned.
       </p>
     </div>
 
-    <ul class="mt-8 flex flex-col gap-4">
+    <ul class="mt-4 flex flex-col gap-4">
       <RepoAuthorCard
         v-for="pullRequest in data.pullRequests"
         :key="pullRequest.prUrl"
