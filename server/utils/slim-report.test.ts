@@ -17,6 +17,23 @@ const pullRequestEvent = {
 } as GitHubEvent
 
 describe('slimGitHubEvent', () => {
+  it('marks comments made on a pull request', () => {
+    const comment = {
+      type: 'IssueCommentEvent',
+      created_at: '2026-10-01T10:00:00Z',
+      payload: {
+        issue: {
+          number: 7,
+          pull_request: { url: 'https://x', merged_at: null },
+        },
+      },
+    } as GitHubEvent
+
+    expect(slimGitHubEvent(comment).payload).toEqual({
+      issue: { number: 7, pull_request: {} },
+    })
+  })
+
   it('keeps the fields the account page reads', () => {
     expect(slimGitHubEvent(pullRequestEvent)).toEqual({
       type: 'PullRequestEvent',

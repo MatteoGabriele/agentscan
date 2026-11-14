@@ -31,7 +31,7 @@ const range = useLocalStorage<ChartRange>('daily-range', 'daily', {
 
 <template>
   <ClientOnly>
-    <Toggle v-model="range" :options="rangeOptions" />
+    <Toggle v-model="range" :options="rangeOptions" label="Chart time range" />
 
     <template #fallback>
       <Skeleton

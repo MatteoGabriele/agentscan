@@ -34,15 +34,11 @@ const tones = {
     halo: 'bg-ui-mixed/10',
     text: 'text-ui-mixed',
   },
+  // Errors stay neutral: classification colors only describe accounts.
   critical: {
-    ring: 'border-ui-automation/40',
-    halo: 'bg-ui-automation/10',
-    text: 'text-ui-automation',
-  },
-  positive: {
-    ring: 'border-ui-organic/40',
-    halo: 'bg-ui-organic/10',
-    text: 'text-ui-organic',
+    ring: 'border-ui-border',
+    halo: 'bg-ui-muted/10',
+    text: 'text-ui-text',
   },
 } as const
 
@@ -100,7 +96,7 @@ async function handleRetry() {
         {{ description }}
       </p>
 
-      <p v-if="hint" class="mt-2 max-w-md text-xs text-ui-muted/70 text-pretty">
+      <p v-if="hint" class="mt-2 max-w-md text-xs text-ui-muted text-pretty">
         {{ hint }}
       </p>
 
@@ -130,7 +126,7 @@ async function handleRetry() {
 
       <p
         v-if="showDetail"
-        class="mt-6 pt-4 w-full border-t-1 border-solid border-ui-border-subtle/40 text-xs font-mono text-ui-muted/60 text-pretty"
+        class="mt-6 pt-4 w-full border-t-1 border-solid border-ui-border-subtle/40 text-xs font-mono text-ui-muted text-pretty"
       >
         <span v-if="statusCode">{{ statusCode }} · </span>
         <span>{{ detail }}</span>

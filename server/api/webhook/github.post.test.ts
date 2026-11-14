@@ -50,6 +50,7 @@ const {
         create: vi.fn(),
         update: vi.fn(),
       },
+      pulls: { get: vi.fn() },
     },
   }
 
@@ -291,7 +292,7 @@ describe('GitHub Webhook Handler', () => {
   })
 
   describe('Early Returns', () => {
-    it('returns { ok: true } for non-opened/reopened actions', async () => {
+    it('returns { ok: true } for non-opened actions', async () => {
       setupEvent({ action: 'closed' })
 
       const result = await handler(MOCK_EVENT)
@@ -330,17 +331,83 @@ describe('GitHub Webhook Handler', () => {
       })
     })
 
-    it('returns { ok: true } for reopened PRs', async () => {
+    it('does not scan reopened PRs', async () => {
       setupEvent({ action: 'reopened' })
-      mockRepoConfig({ 'comment-on-organic': true })
 
       const result = await handler(MOCK_EVENT)
 
-      expect(result).toEqual({
-        ok: true,
-        flagged: false,
-        classification: 'organic',
+      expect(result).toEqual({ ok: true })
+      expect(analyze).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Scan Command', () => {
+    function setupScanComment(body: string, authorAssociation = 'MEMBER') {
+      setupEvent({
+        action: 'created',
+        pull_request: undefined,
+        issue: {
+          number: 123,
+          user: { login: 'test-user' },
+          pull_request: { url: 'https://api.github.com/pulls/123' },
+        },
+        comment: {
+          id: 800,
+          body,
+          user: { login: 'a-maintainer' },
+          author_association: authorAssociation,
+        },
       })
+    }
+
+    beforeEach(() => {
+      mockInstallationOctokit.rest.pulls.get.mockResolvedValue({
+        data: { head: { sha: 'def456' } },
+      })
+    })
+
+    it.each(['OWNER', 'MEMBER', 'COLLABORATOR'])(
+      'scans the author when a %s comments `@agentscanapp scan`',
+      async (association) => {
+        setupScanComment('@agentscanapp scan', association)
+
+        await handler(MOCK_EVENT)
+
+        expect(analyze).toHaveBeenCalledWith('test-user', expect.anything())
+      },
+    )
+
+    it('creates the check run on the PR head fetched from the API', async () => {
+      setupScanComment('@AgentScanApp scan please')
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.pulls.get).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        pull_number: 123,
+      })
+      expect(mockInstallationOctokit.rest.checks.create).toHaveBeenCalledWith(
+        expect.objectContaining({ head_sha: 'def456' }),
+      )
+    })
+
+    it('ignores the command from non-maintainers', async () => {
+      setupScanComment('@agentscanapp scan', 'CONTRIBUTOR')
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(analyze).not.toHaveBeenCalled()
+    })
+
+    it('ignores a mention that is not at the start of a line', async () => {
+      setupScanComment('maybe @agentscanapp scan this?')
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(analyze).not.toHaveBeenCalled()
     })
   })
 

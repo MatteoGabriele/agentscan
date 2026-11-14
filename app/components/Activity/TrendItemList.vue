@@ -77,33 +77,13 @@ const stats = computed<ClassificationStats | null>(() => {
   <ul
     class="text-center flex flex-col md:flex-row gap-2 items-center md:text-left w-full justify-evenly"
   >
-    <li>
+    <li v-for="{ name, category } in NAMED_CATEGORIES" :key="category">
       <ActivityTrend
-        classification="organic"
-        label="Organic"
-        :trend="categoryProgression?.organic.trend"
-        :percentage="stats?.organic.percentage"
-        :count="stats?.organic.count"
-        :unit
-      />
-    </li>
-    <li>
-      <ActivityTrend
-        classification="mixed"
-        label="Mixed"
-        :trend="categoryProgression?.mixed.trend"
-        :percentage="stats?.mixed.percentage"
-        :count="stats?.mixed.count"
-        :unit
-      />
-    </li>
-    <li>
-      <ActivityTrend
-        classification="automation"
-        label="Automation"
-        :trend="categoryProgression?.automation.trend"
-        :percentage="stats?.automation.percentage"
-        :count="stats?.automation.count"
+        :classification="category"
+        :label="name"
+        :trend="categoryProgression?.[category].trend"
+        :percentage="stats?.[category].percentage"
+        :count="stats?.[category].count"
         :unit
       />
     </li>

@@ -41,11 +41,7 @@ type DatapointItem = {
 }
 
 function getTrend({ item, index }: DatapointItem) {
-  const trend = props.rawDataset[item.slotAbsoluteIndex]?.trends[index]
-  return {
-    formattedValue: formatTrend(trend),
-    color: getTrendColor({ value: trend, reversed: item.name !== 'Organic' }),
-  }
+  return formatTrend(props.rawDataset[item.slotAbsoluteIndex]?.trends[index])
 }
 
 function getProgressionVsPrevious({ item, index }: DatapointItem) {
@@ -60,10 +56,7 @@ function getProgressionVsPrevious({ item, index }: DatapointItem) {
     delta = valueCurrent - valuePrevious
   }
 
-  return {
-    color: getTrendColor({ value: delta, reversed: item.name !== 'Organic' }),
-    formattedValue: formatDelta(delta),
-  }
+  return formatDelta(delta)
 }
 
 const prCount = computed(
@@ -125,19 +118,12 @@ const prCountDelta = computed(() => {
         <template v-if="canCompare">
           <td class="px-2 text-right border-l border-solid border-ui-border">
             <template v-if="canCompare">
-              <span
-                :class="[
-                  getProgressionVsPrevious({
-                    item: dp,
-                    index: tooltipSlotProps.timeLabel.absoluteIndex,
-                  }).color,
-                ]"
-              >
+              <span class="text-ui-muted">
                 {{
                   getProgressionVsPrevious({
                     item: dp,
                     index: tooltipSlotProps.timeLabel.absoluteIndex,
-                  }).formattedValue
+                  })
                 }}
               </span>
             </template>
@@ -145,19 +131,12 @@ const prCountDelta = computed(() => {
 
           <td class="px-2 text-left border-l border-solid border-ui-border">
             <template v-if="tooltipSlotProps.timeLabel.absoluteIndex > 0">
-              <span
-                :class="[
-                  getTrend({
-                    item: dp,
-                    index: tooltipSlotProps.timeLabel.absoluteIndex,
-                  }).color,
-                ]"
-              >
+              <span class="text-ui-muted">
                 {{
                   getTrend({
                     item: dp,
                     index: tooltipSlotProps.timeLabel.absoluteIndex,
-                  }).formattedValue
+                  })
                 }}
               </span>
             </template>

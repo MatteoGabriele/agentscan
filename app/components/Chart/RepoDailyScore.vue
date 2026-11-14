@@ -87,6 +87,8 @@ const dataset = computed<VueUiXyDatasetItem[]>(() => [
 ])
 
 const XAXIS_LABELS_MOD_THRESHOLD = 8
+// Room for half a date label, so one on the last day isn't clipped.
+const XAXIS_LABEL_HALF_WIDTH = 24
 const TIME_LABEL_FORMAT = 'MMM dd'
 
 const config = computed<VueUiXyConfig>(() => ({
@@ -118,7 +120,7 @@ const config = computed<VueUiXyConfig>(() => ({
     color: colors.value.textMuted,
     width: CHART_WIDTH,
     height: CHART_HEIGHT,
-    padding: { right: 0 },
+    padding: { right: XAXIS_LABEL_HALF_WIDTH },
     grid: {
       position: 'start',
       stroke: 'transparent',
@@ -140,6 +142,9 @@ const config = computed<VueUiXyConfig>(() => ({
             1,
             Math.round(timeLabels.value.length / XAXIS_LABELS_MOD_THRESHOLD),
           ),
+          // The forced last label lands less than one step after the
+          // previous one and overlaps it, so only the steps are labeled.
+          showFirstAndLast: false,
           autoRotate: { enable: false },
           datetimeFormatter: {
             enable: true,

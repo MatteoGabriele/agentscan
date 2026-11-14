@@ -16,10 +16,8 @@ import type {
   ActivityUnit,
   EventsEvolutionSeries,
 } from '~~/shared/types/activity'
-import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  SVG_ICON,
-} from '~~/shared/utils/charts.ts'
+import { SVG_ICON } from '~~/shared/utils/charts'
+import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
 
 const { unit = 'percentage' } = defineProps<{ unit?: ActivityUnit }>()
 
@@ -72,7 +70,7 @@ onMounted(() => {
 const colors = useColors(rootEl)
 
 const rawDataset = computed<EventsEvolutionSeries[]>(() =>
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+  NAMED_CATEGORIES.map(({ name, category }) => ({
     name,
     category,
     series: (dates.value ?? []).map(
@@ -263,6 +261,7 @@ const landmarkGroups = computed(() =>
         iconSvg: isGrouped ? SVG_ICON.layers : first.iconSvg,
         series: isGrouped ? undefined : first.series,
         offsetY: isGrouped ? undefined : first.offsetY,
+        labelAbove: isGrouped ? false : first.labelAbove,
       },
     ]
   }),
@@ -383,7 +382,9 @@ function placeLandmark({
                           x: plot.x,
                         })
                       "
-                      :y="svg.drawingArea.bottom - 4"
+                      :y="
+                        svg.drawingArea.bottom - (landmark.labelAbove ? 42 : 4)
+                      "
                       text-anchor="middle"
                       dominant-baseline="middle"
                       paint-order="stroke fill"

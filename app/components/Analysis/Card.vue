@@ -2,9 +2,10 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { ClassificationLabel } from '@unveil/identity'
 import type { Report } from '@unveil/identity/report'
-import type { GitHubUser } from '@unveil/identity/providers/github'
+import { fromGitHub, type GitHubUser } from '@unveil/identity/providers/github'
 import type { AnalyzeReturn } from '@unveil/vk'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
+import type { RepoEvent } from '~/utils/repo-activity'
 
 const props = defineProps<{
   user: GitHubUser
@@ -54,6 +55,27 @@ const classification = computed<ClassificationLabel | undefined>(() => {
   return isPending.value ? undefined : props.analysis?.report.classification
 })
 
+const repoEvents = computed<RepoEvent[]>(() => {
+  if (!classification.value) {
+    return []
+  }
+  const events = props.analysis?.events ?? []
+  return fromGitHub({ user: props.user, events }).events
+})
+
+const rawEventsUrl = computed<string>(() => {
+  return `https://api.github.com/users/${username.value}/events?per_page=100`
+})
+const hasEventBreakdown = computed<boolean>(() => {
+  return groupEventsByRepo(repoEvents.value).length > 0
+})
+
+const hasSignals = computed<boolean>(() => {
+  return (
+    (props.analysis?.report.flags.length ?? 0) > 0 || hasActivityReport.value
+  )
+})
+
 const { classificationDetails } = useClassificationDetails(classification)
 const { scoreStyle } = useScoreStyle(
   classification,
@@ -101,11 +123,13 @@ const warnings = computed<string[]>(() => {
     coverageLevel.value === 'low' &&
     classification.value !== 'insufficient-data'
   ) {
-    list.push('Limited activity to analyze. Treat this result as provisional.')
+    list.push('There is little activity to analyze, so this result may change.')
   }
 
   if (nearestClassification.value) {
-    list.push(`Activity close to ${nearestClassification.value} signals.`)
+    list.push(
+      `This result is close to the "${CLASSIFICATION_NAMES[nearestClassification.value]}" group.`,
+    )
   }
 
   if (isBountyHunter.value) {
@@ -115,7 +139,7 @@ const warnings = computed<string[]>(() => {
   if (matchedTally.value) {
     const count = matchedTally.value.counter
     list.push(
-      `Opened ${count} PR${count === 1 ? '' : 's'} in repositories we scan daily, while scoring as automation.`,
+      `Previously classified as automation on ${count} pull request${count === 1 ? '' : 's'} in repositories we scan daily.`,
     )
   }
 
@@ -175,7 +199,7 @@ useSeoAnalysis(identifyAnalysis, {
               external
               class="text-ui-muted underline inline text-xs hover:text-ui-text"
             >
-              View issue
+              View or dispute the report
             </NuxtLink>
           </footer>
         </section>
@@ -187,7 +211,10 @@ useSeoAnalysis(identifyAnalysis, {
                   v-if="warnings.length"
                   class="flex items-start gap-2 text-sm text-ui-muted mb-2"
                 >
-                  <span class="i-lucide:megaphone text-xs shrink-0"></span>
+                  <span
+                    class="i-lucide:info text-xs shrink-0"
+                    aria-hidden="true"
+                  />
                   <ul class="flex flex-col gap-1">
                     <li
                       v-for="(warning, i) in warnings"
@@ -201,7 +228,11 @@ useSeoAnalysis(identifyAnalysis, {
 
                 <div class="flex flex-wrap gap-2 items-center">
                   <div class="flex gap-2 items-center" :class="scoreStyle.text">
-                    <span :class="classificationIcon" class="text-base" />
+                    <span
+                      :class="classificationIcon"
+                      class="text-base"
+                      aria-hidden="true"
+                    />
                     <h3 class="text-xl font-mono">
                       {{ classificationDetails.label }}
                     </h3>
@@ -214,35 +245,20 @@ useSeoAnalysis(identifyAnalysis, {
             </div>
           </header>
 
-          <div
-            class="text-sm text-ui-muted flex flex-wrap items-center gap-x-3 gap-y-2"
-          >
-            <p v-if="analysis.eventsCount > 0">
-              Analyzed from the last {{ analysis.eventsCount }} public GitHub
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
-              >
-                events
-              </NuxtLink>
-            </p>
-            <p v-else>
-              No recent
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
-              >
-                events</NuxtLink
-              >
-              from this account
-            </p>
+          <AnalysisRepoActivityDisclosure
+            v-if="hasEventBreakdown"
+            :events="repoEvents"
+            :raw-events-url
+            class="mt-4"
+          />
 
-            <DetectionVersion class="hidden md:inline-flex" />
-          </div>
+          <p class="mt-3 text-sm text-ui-muted">
+            <template v-if="analysis.eventsCount > 0">
+              Analyzed from the last {{ analysis.eventsCount }} public GitHub
+              events
+            </template>
+            <template v-else>No recent events from this account</template>
+          </p>
         </template>
 
         <section
@@ -265,19 +281,19 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
   </div>
 
-  <div class="@lg:mx-6">
+  <div v-if="isPending || (analysis && hasSignals)" class="@lg:mx-6">
     <AnalysisFlagsSkeleton v-if="isPending" />
     <LazyAnalysisFlags
-      v-else-if="
-        analysis && (analysis.report.flags.length > 0 || hasActivityReport)
-      "
+      v-else-if="analysis"
       :flags="analysis.report.flags"
       :activity-report="activityReport"
       hydrate-on-interaction
     />
   </div>
 
-  <template v-if="classification !== 'insufficient-data' && analysis">
+  <template
+    v-if="classification && classification !== 'insufficient-data' && analysis"
+  >
     <LazyChartAccountEventsTimeline
       :classification="classification"
       :events="analysis.events"
@@ -291,10 +307,5 @@ useSeoAnalysis(identifyAnalysis, {
     />
   </template>
 
-  <p
-    class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-  >
-    Results are based on pattern analysis and should be interpreted as possible
-    signals, not conclusions. Always verify findings with additional context.
-  </p>
+  <CommonDisclaimer class="mt-8 mx-auto max-w-md text-center" />
 </template>

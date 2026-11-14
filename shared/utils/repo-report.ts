@@ -1,19 +1,13 @@
-import type { ActivityCategory, ActivityItem } from '../types/activity'
+import type { ActivityItem } from '../types/activity'
 import type { ActivityRepoScoreDay } from '../types/logs-api'
 import type {
   RepoReport,
   RepoReportDay,
   RepoReportPeriod,
-  RepoReportPullRequest,
 } from '../types/repo-report'
-import { classifyByScore, INSUFFICIENT_DATA_SCORE } from './activity-stats'
-import { getCompleteDayRange } from './charts'
+import { getCompleteDayRange } from './dates'
 
 export const REPO_REPORT_PERIOD_DAYS = 30
-
-export const REPO_REPORT_WINDOW_HOURS = 24
-
-const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
 
 type Totals = { count: number; scoreSum: number }
 
@@ -116,58 +110,17 @@ function getPeriod(
   }
 }
 
-/**
- * Start of the last REPO_REPORT_WINDOW_HOURS scanned clock hours. Anchored to
- * the newest PR across every repo, so a quiet repo doesn't shift its own
- * window back in time.
- */
-function getWindowStart(results: ActivityItem[]): number {
-  const latest = Math.max(
-    ...results.map((item) => new Date(item.created_at).getTime()),
-  )
-  const latestHour =
-    Math.floor(latest / MILLISECONDS_PER_HOUR) * MILLISECONDS_PER_HOUR
-
-  return latestHour - (REPO_REPORT_WINDOW_HOURS - 1) * MILLISECONDS_PER_HOUR
-}
-
-function getWindow(
-  results: ActivityItem[],
-  repo: string,
-): RepoReport['window'] {
-  const windowStart = getWindowStart(results)
-  const pullRequests: RepoReportPullRequest[] = results
-    .filter((item) => isSameRepo(item.repo_name, repo))
-    .filter((item) => new Date(item.created_at).getTime() >= windowStart)
-    .filter((item) => item.score !== INSUFFICIENT_DATA_SCORE)
-    .map((item) => ({
-      pr: item.pr ?? null,
-      createdAt: item.created_at,
-      classification: classifyByScore(item.score) as ActivityCategory,
-    }))
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-
-  const counts: Record<ActivityCategory, number> = {
-    organic: 0,
-    mixed: 0,
-    automation: 0,
-  }
-
-  for (const { classification } of pullRequests) {
-    counts[classification]++
-  }
-
-  return { counts, total: pullRequests.length, pullRequests }
+/** Date of the repo's first scored day, or undefined before it has one. */
+export function getTrackedSince(days: RepoReportDay[]): string | undefined {
+  return days.find((day) => day.count > 0)?.date
 }
 
 export function getRepoReport({
   repo,
   days,
-  results,
 }: {
   repo: string
   days: ActivityRepoScoreDay[]
-  results: ActivityItem[]
 }): RepoReport {
   const dates = getCompleteDayRange(days.map((day) => day.date).sort())
   const currentDates = dates.slice(-REPO_REPORT_PERIOD_DAYS)
@@ -208,6 +161,5 @@ export function getRepoReport({
         ? getPeriod(previousTotals, repo, previousDates)
         : null,
     ecosystemScore: getMean(ecosystem),
-    window: getWindow(results, repo),
   }
 }

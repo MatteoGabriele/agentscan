@@ -32,7 +32,7 @@ const COLORS = {
 const CLASSIFICATION_COLORS: Record<ActivityCategory, string> = {
   organic: '#22c55e',
   mixed: '#e7b416',
-  automation: '#cc3232',
+  automation: '#f0443a',
 }
 
 const accent = computed(() =>

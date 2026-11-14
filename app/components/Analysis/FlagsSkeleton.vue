@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <section class="bg-ui-card rounded-2 px-6 py-5">
+  <section class="bg-ui-card rounded-2 border border-transparent px-6 py-5">
     <header class="flex items-center gap-2 mt-1">
       <Skeleton width="w-36" height="h-5" />
     </header>
