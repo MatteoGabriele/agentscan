@@ -13,7 +13,7 @@ defineProps<{
 <template>
   <ul
     :aria-labelledby="labelledby"
-    class="rounded-lg border border-ui-border/45 bg-ui-card divide-y divide-ui-border/25"
+    class="rounded-lg border border-ui-border/45 bg-ui-card [&>li+li]:border-t [&>li+li]:border-ui-border/25"
   >
     <template v-if="placeholderCount">
       <RepoPullRequestRowSkeleton v-for="n in placeholderCount" :key="n" />

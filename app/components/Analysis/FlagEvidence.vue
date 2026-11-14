@@ -218,7 +218,7 @@ const hiddenCount = computed(() => {
       </LazyAnalysisFlagEvidenceFast>
 
       <div class="rounded-lg border border-ui-border-subtle/30 overflow-hidden">
-        <div class="divide-y divide-ui-border-subtle/15">
+        <div class="[&>*+*]:border-t [&>*+*]:border-ui-border-subtle/15">
           <div
             v-for="(ev, i) in visibleSortedEvents"
             :key="i"
