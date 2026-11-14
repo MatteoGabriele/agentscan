@@ -8,7 +8,7 @@ import {
   type VueUiRidgelineConfig,
   type VueUiRidgelineDatasetItem,
 } from 'vue-data-ui/vue-ui-ridgeline'
-import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
+import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
 
 import 'vue-data-ui/style.css'
 import ClassificationToggle from '../Activity/ClassificationToggle.vue'
@@ -37,7 +37,7 @@ const selectedClassification = ref<ClassificationLabel>('organic')
 const selectedUnit = ref<'percentage' | 'quantity'>('percentage')
 
 const dataset = computed<VueUiRidgelineDatasetItem[]>(() => {
-  const classification = CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.find(
+  const classification = NAMED_CATEGORIES.find(
     ({ category }) => category === selectedClassification.value,
   )
 

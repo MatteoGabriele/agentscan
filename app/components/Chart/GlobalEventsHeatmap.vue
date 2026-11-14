@@ -554,7 +554,11 @@ function getMonthLabelPositions(cells: HeatmapSvgCell[]) {
 
   <div class="flex justify-center mt-6 mb-8 gap-6">
     <UnitToggle v-model="selectedUnit" />
-    <Toggle v-model="selectedScale" :options="scaleOptions" />
+    <Toggle
+      v-model="selectedScale"
+      :options="scaleOptions"
+      label="Color scale"
+    />
   </div>
   <div
     class="flex w-full flex-col items-center gap-6 px-12 md:flex-row md:px-0 transition-opacity"

@@ -1190,5 +1190,19 @@
       "MatteoGabriele",
       "ematipico"
     ]
+  },
+  {
+    "username": "Manavagg2003",
+    "id": 200032840,
+    "reason": "PR labelled \"Generated with Claude Code\"; other PRs translate into many languages across repos, suggesting LLM automation rather than native speakers.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/568",
+    "reportedBy": "delucis",
+    "createdAt": "2026-11-11",
+    "approvedBy": [
+      "graphieros",
+      "ematipico",
+      "OrbisK",
+      "MatteoGabriele"
+    ]
   }
 ]

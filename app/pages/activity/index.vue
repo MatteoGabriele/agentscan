@@ -6,6 +6,7 @@ import {
 import { useUrlSearchParams } from '@vueuse/core'
 import type { ActivityUnit } from '~~/shared/types/activity'
 import { getActivityWeekSnapshot } from '~~/shared/utils/activity-week'
+import { getClassificationDetails } from '@unveil/identity/report'
 
 definePageMeta({
   layout: false,
@@ -111,10 +112,14 @@ const rangeCaption = computed(() =>
             <div class="mt-6 mb-3 flex flex-col items-center gap-1.5 px-4">
               <ClientOnly>
                 <div class="flex flex-wrap items-center justify-center gap-2">
-                  <Toggle v-model="urlParams.view" :options="rangeOptions" />
+                  <Toggle
+                    v-model="urlParams.view"
+                    :options="rangeOptions"
+                    label="Chart time range"
+                  />
                   <ActivityUnitToggle v-model="urlParams.unit" />
                 </div>
-                <p class="text-xs text-ui-muted/70">{{ rangeCaption }}</p>
+                <p class="text-xs text-ui-muted">{{ rangeCaption }}</p>
 
                 <template #fallback>
                   <div class="mb-1 flex gap-2">
@@ -159,9 +164,8 @@ const rangeCaption = computed(() =>
       <div class="mt-4 flex flex-col gap-2 text-ui-text/80 text-pretty">
         <p>
           This page tracks the state of the GitHub community by analyzing public
-          activity. The question we're trying to answer: how many accounts are
-          genuinely contributing to open source, and how many are just flooding
-          it with noise?
+          activity. The question we're trying to answer: how many pull requests
+          come from people, and how many come from automated accounts?
         </p>
         <p>
           This isn't an anti-AI project, though we do have our opinions. We're
@@ -172,7 +176,7 @@ const rangeCaption = computed(() =>
         <p>
           Every hour, we check each of our
           <NuxtLink to="#repositories" class="underline">repositories</NuxtLink>
-          and collect 10 of the most recent pull request opened during the hour
+          and collect the 10 most recent pull requests opened during the hour
           before, or however many there are.
         </p>
         <p>
@@ -189,11 +193,29 @@ const rangeCaption = computed(() =>
           library that powers every AgentScan profile scan.
         </p>
 
+        <h3 class="mt-6 font-semibold text-ui-text">What the groups mean</h3>
+        <dl class="flex flex-col gap-2">
+          <div
+            v-for="{ name, category } in NAMED_CATEGORIES"
+            :key="category"
+            class="flex gap-2"
+          >
+            <dt class="inline font-medium text-ui-text">{{ name }}:</dt>
+            <dd class="inline">
+              {{ getClassificationDetails(category).description }}
+            </dd>
+          </div>
+        </dl>
+        <p>
+          A group describes the account that opened the pull request, not the
+          project.
+        </p>
+
         <h3 class="mt-6 font-semibold text-ui-text">From hours to days</h3>
         <p>
           The hourly view shows the last {{ WINDOW_MAX_HOURS }} hours, one point
-          per scan. Once a day is complete, we compound its hours into a single
-          daily scan result, which is what feeds the daily view and its
+          per scan. Once a day is complete, we combine its hours into one daily
+          result, which is what feeds the daily view and its
           {{ DEFAULT_HISTORY_MONTHS }} months of history.
         </p>
 

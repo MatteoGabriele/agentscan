@@ -6,6 +6,7 @@ import type {
 import { round } from './numbers'
 import { formatPercentage, INSUFFICIENT_DATA_SCORE } from './activity-stats'
 import { calcLinearProgression } from './calc-linear-progression'
+import { CLASSIFICATION_CATEGORIES } from './classifications'
 
 export type ClassificationMetric = {
   count: number
@@ -25,12 +26,6 @@ export type GetClassificationStatsByDateResults = Record<
   string,
   ClassificationStats
 >
-
-export const CLASSIFICATION_CATEGORIES = [
-  'organic',
-  'mixed',
-  'automation',
-] as const
 
 type CategoryPercentageComparison = {
   category: ActivityCategory

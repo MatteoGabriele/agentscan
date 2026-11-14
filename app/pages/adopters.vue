@@ -4,7 +4,7 @@ import { groupAdoptersByOwner } from '~~/shared/utils/group-adopters'
 
 const SKELETON_ROWS = 8
 
-const { data, status, error } = useAdopters()
+const { data, status, error, refresh } = useAdopters()
 
 const search = ref('')
 
@@ -73,11 +73,11 @@ useHead({
       </span>
     </p>
 
-    <input
+    <CommonSearchInput
       v-model="search"
-      type="text"
+      class="mt-12"
+      label="Search repositories using AgentScan"
       placeholder="Search by repository or account..."
-      class="mt-12 w-full px-3 py-2 bg-ui-bg border border-ui-border/60 rounded text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:border-ui-border/80"
     />
   </header>
 
@@ -97,9 +97,14 @@ useHead({
     </ul>
   </div>
 
-  <p v-else-if="error" class="mt-12 text-ui-muted">
-    {{ error.message }}
-  </p>
+  <ErrorCardGeneric
+    v-else-if="error"
+    class="mt-12"
+    :error
+    :retry="refresh"
+    title="Could not load the repositories"
+    description="Something went wrong while loading the list."
+  />
 
   <div v-else class="mt-12">
     <p v-if="groups.length === 0" class="text-ui-muted">

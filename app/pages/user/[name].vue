@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute()
-const router = useRouter()
 
 const username = computed(() => {
   if (!route.params.name) {
@@ -40,20 +39,16 @@ const {
   watch: [username],
 })
 
-async function handleSubmit(name: string) {
-  await router.push({ name: 'user-name', params: { name } })
-}
-
 useSeoUser(user)
 </script>
 
 <template>
   <h1 class="sr-only">{{ username }} analysis page</h1>
 
-  <LazyAnalysisForm
+  <LazyCommonSearchForm
     :hydrate-on-interaction="['click', 'focus']"
     :model-value="username"
-    @submit="handleSubmit"
+    class="mb-12"
   />
 
   <div class="flex flex-col gap-6 @container">

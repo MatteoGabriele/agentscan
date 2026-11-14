@@ -37,7 +37,7 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
   props.previewCount,
 )
 
-// Tracked repositories have their own activity page. The libraries list is
+// Tracked repositories have a 30-day report on their scan page. The libraries list is
 // lowercase, so the match ignores case.
 const { data: libraries } = useLibraries()
 const trackedRepos = computed<Map<string, string>>(() => {
@@ -46,9 +46,9 @@ const trackedRepos = computed<Map<string, string>>(() => {
   )
 })
 
-function getActivityPath(repo: string): string | undefined {
+function getReportPath(repo: string): string | undefined {
   const tracked = trackedRepos.value.get(repo.toLowerCase())
-  return tracked ? `/activity/${tracked}` : undefined
+  return tracked ? `/scan/${tracked}` : undefined
 }
 </script>
 
@@ -66,7 +66,7 @@ function getActivityPath(repo: string): string | undefined {
         v-for="activity in visibleItems"
         :key="activity.repo"
         :activity
-        :activity-path="getActivityPath(activity.repo)"
+        :report-path="getReportPath(activity.repo)"
       />
     </ul>
 
