@@ -28,7 +28,7 @@ export const NAMED_CATEGORIES: NamedCategory[] = CLASSIFICATION_CATEGORIES.map(
   }),
 )
 
-export const SWATCH: Record<ActivityCategory, string> = {
+export const CLASSIFICATION_BG_CLASSES: Record<ActivityCategory, string> = {
   organic: 'bg-ui-organic',
   mixed: 'bg-ui-mixed',
   automation: 'bg-ui-automation',

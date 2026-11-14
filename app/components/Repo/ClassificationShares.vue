@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { ActivityCategory } from '~~/shared/types/activity'
-import { NAMED_CATEGORIES, SWATCH } from '~~/shared/utils/classifications'
+import {
+  NAMED_CATEGORIES,
+  CLASSIFICATION_BG_CLASSES,
+} from '~~/shared/utils/classifications'
 import {
   COMMUNITY_REPORTED_NAME,
   INSUFFICIENT_ACTIVITY_NAME,
@@ -23,7 +26,7 @@ defineProps<{
       class="flex items-center gap-2"
     >
       <span
-        :class="SWATCH[category]"
+        :class="CLASSIFICATION_BG_CLASSES[category]"
         class="size-2 block rounded-full"
         aria-hidden="true"
       />

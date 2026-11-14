@@ -2,7 +2,7 @@
 import type { ClassificationLabel } from '@unveil/identity'
 import type { ActivityUnit } from '~~/shared/types/activity'
 import { formatCompactNumber } from '~~/shared/utils/numbers'
-import { SWATCH } from '~~/shared/utils/classifications'
+import { CLASSIFICATION_BG_CLASSES } from '~~/shared/utils/classifications'
 
 const props = defineProps<{
   label: string
@@ -25,7 +25,7 @@ const displayValue = computed(() =>
 
 const color = computed(() =>
   props.classification && props.classification !== 'insufficient-data'
-    ? SWATCH[props.classification]
+    ? CLASSIFICATION_BG_CLASSES[props.classification]
     : 'bg-ui-muted',
 )
 
