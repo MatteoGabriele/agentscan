@@ -1,7 +1,7 @@
 import type { ClassificationLabel } from '@unveil/identity'
 import type { ActivityCategory, PrStatus } from '../types/activity'
 import { formatPercentage } from './activity-stats'
-import { CLASSIFICATION_CATEGORIES } from './count-classification-by-date'
+import { CLASSIFICATION_CATEGORIES } from './classifications'
 
 export type DailyClassificationCounts = {
   count: number

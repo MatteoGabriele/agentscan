@@ -1,5 +1,5 @@
 // @unocss-include
-export type ErrorTone = 'neutral' | 'notice' | 'critical' | 'positive'
+export type ErrorTone = 'neutral' | 'notice' | 'critical'
 
 export type ErrorDetails = {
   icon: string
@@ -39,7 +39,7 @@ export function useErrorDetails(error: MaybeRefOrGetter<unknown>): {
         ...base,
         icon: 'i-lucide:circle-slash',
         tone: 'notice',
-        title: 'That request looked off',
+        title: 'This account name is not valid',
         description:
           'The account name in the address is not something we can look up on GitHub.',
         hint: 'Check the spelling, or search for the account again.',
@@ -52,9 +52,8 @@ export function useErrorDetails(error: MaybeRefOrGetter<unknown>): {
         ...base,
         icon: 'i-lucide:lock',
         tone: 'critical',
-        title: 'GitHub turned us away',
-        description:
-          'GitHub refused the request, so this account could not be analyzed.',
+        title: 'GitHub refused the request',
+        description: 'This account could not be analyzed right now.',
         hint: 'Nothing is wrong with the account itself.',
         canRetry: true,
       }
@@ -90,7 +89,7 @@ export function useErrorDetails(error: MaybeRefOrGetter<unknown>): {
         ...base,
         icon: 'i-lucide:unplug',
         tone: 'critical',
-        title: 'Analysis stopped short',
+        title: 'The analysis could not finish',
         description:
           "GitHub answered, but we could not finish reading this account's activity.",
         hint: 'This is usually temporary.',
@@ -104,7 +103,7 @@ export function useErrorDetails(error: MaybeRefOrGetter<unknown>): {
       tone: 'critical',
       title: 'Could not load the analysis',
       description:
-        'The request never made it through. This is usually a connection hiccup on the way to GitHub.',
+        'The request never made it through. This is usually a short network problem.',
       hint: 'Check your connection, then try again.',
       canRetry: true,
     }

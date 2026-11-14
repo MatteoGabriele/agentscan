@@ -7,7 +7,7 @@
         >
           <div>
             <h3 class="text-sm font-semibold text-ui-text mb-3">AgentScan</h3>
-            <p class="text-xs text-ui-muted/80 leading-relaxed">
+            <p class="text-xs text-ui-muted leading-relaxed">
               Automation pattern detection for open source maintainers.
             </p>
           </div>
@@ -22,15 +22,8 @@
             >
               Disclaimer
             </h4>
-            <p class="text-xs text-ui-muted/80 leading-relaxed mb-3">
-              Results are based on pattern analysis and should be interpreted as
-              <span class="font-medium">possible signals</span>, not
-              conclusions.
-            </p>
-            <p class="text-xs text-ui-muted/70 mb-3">
-              Always verify findings with additional context.
-            </p>
-            <p class="text-xs text-ui-muted/70">
+            <CommonDisclaimer class="mb-3" />
+            <p class="text-xs text-ui-muted">
               GitHub has no association with this website.
             </p>
           </div>
@@ -51,7 +44,7 @@
                   external
                   target="_blank"
                   to="https://github.com/matteogabriele/agentscan"
-                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                  class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
                 >
                   AgentScan
                 </NuxtLink>
@@ -62,7 +55,7 @@
                   external
                   target="_blank"
                   to="https://github.com/unveil-project"
-                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                  class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
                 >
                   The Unveil Project
                 </NuxtLink>
@@ -73,7 +66,7 @@
                   external
                   target="_blank"
                   to="https://github.com/matteogabriele/agentscan-action"
-                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                  class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
                 >
                   AgentScan Action
                 </NuxtLink>
@@ -84,15 +77,15 @@
                   external
                   target="_blank"
                   to="/feed.xml"
-                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                  class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
                 >
-                  Community flags RSS feed
+                  Community reports RSS feed
                 </NuxtLink>
               </li>
               <li>
                 <NuxtLink
                   to="/adopters"
-                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                  class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
                 >
                   Who's using AgentScan?
                 </NuxtLink>
@@ -100,7 +93,7 @@
               <li>
                 <NuxtLink
                   to="/contribute"
-                  class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+                  class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
                 >
                   Contribute
                 </NuxtLink>
@@ -113,7 +106,7 @@
       <div
         class="border-t border-ui-border/50 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
       >
-        <p class="text-xs text-ui-muted/60">
+        <p class="text-xs text-ui-muted">
           Made with <span class="text-red-400">♥</span> ·
           <NuxtLink
             external
@@ -126,13 +119,13 @@
           </NuxtLink>
           welcome
         </p>
-        <p class="text-xs text-ui-muted/60">
+        <p class="text-xs text-ui-muted">
           Powered by
           <NuxtLink
             external
             target="_blank"
             to="https://www.netlify.com"
-            class="text-ui-muted/80 hover:text-ui-text transition-colors underline"
+            class="text-ui-muted hover:text-ui-text transition-colors underline"
           >
             Netlify
           </NuxtLink>
@@ -146,7 +139,7 @@
 
         <NuxtLink
           to="/privacy-policy"
-          class="text-xs text-ui-muted/80 hover:text-ui-text transition-colors underline"
+          class="text-xs text-ui-muted hover:text-ui-text transition-colors underline"
         >
           Privacy Policy
         </NuxtLink>

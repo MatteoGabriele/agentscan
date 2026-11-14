@@ -61,18 +61,20 @@ export function useSeoAnalysis(
     const descriptions = []
 
     if (toValue(options?.hasCommunityFlag)) {
-      descriptions.push(`Reported by community`)
+      descriptions.push('Community reported')
     } else {
       const details = getClassificationDetails(analysisValue.classification)
       descriptions.push(details.label)
     }
 
     if (flagsCounter > 0) {
-      descriptions.push(`${flagsCounter} flag${flagsCounter === 1 ? '' : 's'}`)
+      descriptions.push(
+        `${flagsCounter} activity signal${flagsCounter === 1 ? '' : 's'}`,
+      )
     }
 
     if (toValue(options?.hasActivityReport)) {
-      descriptions.push('Suspiscious activity reported')
+      descriptions.push('Listed in an external report')
     }
 
     if (descriptions.length === 0) {

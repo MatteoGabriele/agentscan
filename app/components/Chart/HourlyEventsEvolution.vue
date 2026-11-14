@@ -14,11 +14,8 @@ import type {
   ActivityUnit,
   EventsEvolutionSeries,
 } from '~~/shared/types/activity.ts'
-import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  EMPTY_HOUR_NOTE,
-  SVG_ICON,
-} from '~~/shared/utils/charts.ts'
+import { EMPTY_HOUR_NOTE, SVG_ICON } from '~~/shared/utils/charts'
+import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
 
 dayjs.extend(utc)
 
@@ -89,7 +86,7 @@ const skeletonSeries = computed<number[]>(() => {
 })
 
 const rawDataset = computed<EventsEvolutionSeries[]>(() =>
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+  NAMED_CATEGORIES.map(({ name, category }) => ({
     name,
     category,
     series: isLoading.value

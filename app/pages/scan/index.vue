@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
-
 useHead({
   title: 'Repository scan | AgentScan',
   meta: [
@@ -15,7 +13,6 @@ useHead({
 })
 
 const route = useRoute()
-const router = useRouter()
 
 const repoQuery = computed<string>(() => {
   const q = route.query.repo
@@ -26,16 +23,6 @@ const repoInput = ref(repoQuery.value)
 watch(repoQuery, (val) => {
   repoInput.value = val
 })
-
-async function handleSubmit(value: string) {
-  const slug = parseRepoSlug(value)
-
-  if (!slug) {
-    return
-  }
-
-  await router.push(`/scan/${slug.path}`)
-}
 </script>
 
 <template>
@@ -46,18 +33,13 @@ async function handleSubmit(value: string) {
     </p>
   </header>
 
-  <LazyRepoForm
+  <LazyCommonSearchForm
     v-model="repoInput"
+    placeholder="owner/repo or a GitHub link"
     :hydrate-on-interaction="['click', 'focus']"
-    @submit="handleSubmit"
   />
 
-  <LazyRepoSuggestions :query="repoInput" hydrate-on-visible class="mt-8" />
+  <LazyRepoSuggestions :query="repoInput" hydrate-on-visible class="mt-12" />
 
-  <p
-    class="mt-8 mx-auto max-w-lg text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-  >
-    Results are based on pattern analysis and should be interpreted as possible
-    signals, not conclusions. Always verify findings with additional context.
-  </p>
+  <CommonDisclaimer class="mt-8 mx-auto max-w-lg text-center" />
 </template>

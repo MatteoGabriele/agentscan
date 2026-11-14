@@ -1,6 +1,6 @@
 import type { ActivityCategory } from '../types/activity'
 import type { ActivityDailyResponse } from '../types/logs-api'
-import { CLASSIFICATION_CATEGORIES } from './count-classification-by-date'
+import { CLASSIFICATION_CATEGORIES } from './classifications'
 import { round } from './numbers'
 
 export const ACTIVITY_WEEK_DAYS = 7
