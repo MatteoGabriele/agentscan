@@ -25,8 +25,7 @@ const authorPath = computed<string>(() => `/user/${props.author.login}`)
       aria-hidden="true"
     />
 
-    <div class="flex flex-col gap-0.5 min-w-0 sm:row-span-2">
-      <!-- Phones give the title its own lines; wider rows keep it on one. -->
+    <div class="flex flex-col gap-1.5 min-w-0 sm:row-span-2">
       <p class="flex flex-col sm:flex-row sm:items-baseline sm:gap-2 min-w-0">
         <NuxtLink
           :to="url"
@@ -46,8 +45,6 @@ const authorPath = computed<string>(() => `/user/${props.author.login}`)
         >
       </p>
 
-      <!-- Each phrase stays whole so phones wrap between them, not inside,
-           and the separator trails its phrase so no line starts with one. -->
       <p
         class="flex flex-wrap gap-x-1.5 text-xs text-ui-muted [&>span:not(:last-child)]:after:content-['·'] [&>span:not(:last-child)]:after:ml-1.5"
       >
@@ -63,13 +60,13 @@ const authorPath = computed<string>(() => `/user/${props.author.login}`)
         <span class="whitespace-nowrap">
           opened <NuxtTime :datetime="createdAt" relative />
         </span>
-        <!-- "opened … ago" already says an open one is open. -->
+
         <span v-if="state !== 'open'">{{ state }}</span>
       </p>
     </div>
 
     <div
-      class="col-start-2 sm:col-start-auto sm:row-span-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 sm:flex-col sm:items-end"
+      class="col-start-2 sm:col-start-auto sm:row-span-2 flex flex-wrap justify-between mt-2 items-center gap-x-3 gap-y-1 sm:flex-col sm:items-end"
     >
       <RepoClassificationTag :classification :community-reported />
       <NuxtLink
