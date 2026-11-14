@@ -206,7 +206,7 @@ useHead({
         <ul class="mt-3 flex flex-col">
           <li v-for="repo in category.repos" :key="repo">
             <NuxtLink
-              :to="`/activity/${repo}`"
+              :to="`/scan/${repo}`"
               class="group flex truncate py-1 text-sm"
             >
               <span class="text-ui-muted/70">{{ splitRepo(repo).owner }}/</span>

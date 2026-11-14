@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseSearchTarget } from './parse-search-target'
+import { parseScanPath, parseSearchTarget } from './parse-search-target'
 
 describe('parseSearchTarget', () => {
   it.each(['', '   ', '/', '@', 'two words'])('rejects %j', (input) => {
@@ -30,5 +30,29 @@ describe('parseSearchTarget', () => {
       repo: 'nuxt',
       path: 'nuxt/nuxt',
     })
+  })
+})
+
+describe('parseScanPath', () => {
+  it('reads one segment as an account', () => {
+    expect(parseScanPath('vuejs')).toEqual({ kind: 'account', name: 'vuejs' })
+  })
+
+  it.each([
+    'vuejs/core',
+    'https://github.com/vuejs/core',
+    'https:/github.com/vuejs/core',
+    'github.com/vuejs/core/pull/123',
+  ])('reads %j as a repository', (path) => {
+    expect(parseScanPath(path)).toEqual({
+      kind: 'repository',
+      owner: 'vuejs',
+      repo: 'core',
+      path: 'vuejs/core',
+    })
+  })
+
+  it.each(['', 'vuejs/core/pulls', 'a/b/c/d'])('rejects %j', (path) => {
+    expect(parseScanPath(path)).toBeNull()
   })
 })

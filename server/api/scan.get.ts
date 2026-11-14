@@ -2,6 +2,8 @@ import { isGitHubAppAccount } from '@unveil/identity/providers/github'
 import { analyze } from '@unveil/vk'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { MAX_PR_COUNT } from '~~/shared/scan'
+import type { PullRequestState } from '~~/shared/types/scan'
+import { getPullRequestState } from '~~/shared/utils/scan-pull-requests'
 import type { Endpoints } from '@octokit/types'
 
 export type AuthorAssociation =
@@ -18,8 +20,13 @@ const TRUSTED_ASSOCIATIONS: AuthorAssociation[] = [
 
 type PullRequestEntry = {
   login: string
-  prUrl: string
-  state: string
+  pullRequest: {
+    number: number
+    title: string
+    url: string
+    createdAt: string
+    state: PullRequestState
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -82,8 +89,13 @@ export default defineEventHandler(async (event) => {
 
         pullRequests.push({
           login: username,
-          prUrl: pr.html_url,
-          state: pr.state,
+          pullRequest: {
+            number: pr.number,
+            title: pr.title,
+            url: pr.html_url,
+            createdAt: pr.created_at,
+            state: getPullRequestState(pr),
+          },
         })
       }
 
@@ -107,19 +119,16 @@ export default defineEventHandler(async (event) => {
         const { user, report, eventsCount } = await analysis
 
         return {
+          ...entry.pullRequest,
           user,
           analysis: withoutEvidence(report),
-          prUrl: entry.prUrl,
-          prState: entry.state,
           eventsCount,
         }
       }),
     )
 
-    results.sort((a, b) => {
-      return a.analysis.score - b.analysis.score
-    })
-
+    // Kept newest first, as GitHub lists them: sorting by score would rank
+    // the accounts.
     return { pullRequests: results, repo: `${owner}/${repo}` }
   } catch (err: unknown) {
     const error = err as { status?: number; statusCode?: number }

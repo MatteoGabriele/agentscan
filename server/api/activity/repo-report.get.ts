@@ -4,6 +4,7 @@ import type {
 } from '~~/shared/types/logs-api'
 import { parseRepoSlug } from '~~/shared/utils/parse-repo-slug'
 import { findRepoName, getRepoReport } from '~~/shared/utils/repo-report'
+import { getGitHubRepoName } from '~~/server/utils/github-repo-name'
 
 function getRepoQuery(event: Parameters<typeof getQuery>[0]): string {
   const { repo } = getQuery(event)
@@ -31,12 +32,26 @@ export default defineCachedEventHandler(
       $fetch<LibrariesResponse>('/api/libraries'),
     ])
 
-    const name = findRepoName({
-      repo,
-      days,
-      results: window.results,
-      libraries: libraries.repos,
-    })
+    const findTrackedName = (candidate: string) =>
+      findRepoName({
+        repo: candidate,
+        days,
+        results: window.results,
+        libraries: libraries.repos,
+      })
+
+    // Unknown names get one GitHub lookup, so a transferred or renamed repo
+    // (facebook/react is now react/react) still finds its report.
+    async function findRenamedTrackedName(): Promise<string | null> {
+      const current = await getGitHubRepoName(
+        repo,
+        useRuntimeConfig().githubToken,
+      )
+
+      return current ? findTrackedName(current) : null
+    }
+
+    const name = findTrackedName(repo) ?? (await findRenamedTrackedName())
 
     if (!name) {
       throw createError({
@@ -45,13 +60,12 @@ export default defineCachedEventHandler(
       })
     }
 
-    return getRepoReport({
-      repo: name,
-      days,
-      results: window.results,
-    })
+    return getRepoReport({ repo: name, days })
   },
   {
+    // Named so its keys never collide with other cached handlers: without a
+    // repo, the key would match the hourly window's and serve its response.
+    name: 'repo-report',
     maxAge: 60 * 5,
     getKey: (event) =>
       [currentScanWindow('hour'), getRepoQuery(event).toLowerCase()].join(':'),

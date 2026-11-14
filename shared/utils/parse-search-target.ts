@@ -36,3 +36,22 @@ export function parseSearchTarget(input: string): SearchTarget | null {
 
   return name ? { kind: 'account', name } : null
 }
+
+// Routers and proxies can collapse the `//` of a link pasted into a path.
+const GITHUB_LINK_IN_PATH = /^(?:https?:\/+)?(?:www\.)?github\.com\//i
+
+/**
+ * Reads a `/scan/...` path: one segment is an account and `owner/name` is a
+ * repository. A GitHub link keeps working with extra segments, as in search,
+ * but a bare path with more than two (`vuejs/core/pulls`) is not a repository.
+ */
+export function parseScanPath(path: string): SearchTarget | null {
+  const isGitHubLink = GITHUB_LINK_IN_PATH.test(path)
+  const value = path.replace(GITHUB_LINK_IN_PATH, '')
+
+  if (!isGitHubLink && value.split('/').filter(Boolean).length > 2) {
+    return null
+  }
+
+  return parseSearchTarget(value)
+}

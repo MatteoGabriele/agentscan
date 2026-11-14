@@ -5,7 +5,7 @@ import type { RepoActivity } from '~/utils/repo-activity'
 const props = defineProps<{
   activity: RepoActivity
   /** Set when AgentScan tracks this repository. */
-  activityPath?: string
+  reportPath?: string
 }>()
 
 const summary = computed<string>(() => summarizeEvents(props.activity.events))
@@ -46,10 +46,10 @@ const { visibleItems, canToggle, toggleLabel, toggle } = usePreviewList(
         </div>
       </template>
 
-      <template v-if="activityPath" #aside>
+      <template v-if="reportPath" #aside>
         <NuxtLink
-          :to="activityPath"
-          :aria-label="`${activity.repo} is tracked by AgentScan. View repository activity`"
+          :to="reportPath"
+          :aria-label="`${activity.repo} is tracked by AgentScan. View its 30-day report`"
           class="mt-4 shrink-0 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-1 border-solid border-ui-border/50 px-2 py-0.5 text-xs text-ui-muted/80 transition-colors hover:border-ui-border hover:text-ui-text"
         >
           <span class="i-lucide:chart-line shrink-0" aria-hidden="true" />
