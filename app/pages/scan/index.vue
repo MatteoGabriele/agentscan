@@ -39,7 +39,7 @@ watch(repoQuery, (val) => {
     :hydrate-on-interaction="['click', 'focus']"
   />
 
-  <LazyRepoSuggestions :query="repoInput" hydrate-on-visible class="mt-8" />
+  <LazyRepoSuggestions :query="repoInput" hydrate-on-visible class="mt-12" />
 
   <CommonDisclaimer class="mt-8 mx-auto max-w-lg text-center" />
 </template>

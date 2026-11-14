@@ -48,7 +48,7 @@ useSeoUser(user)
   <LazyCommonSearchForm
     :hydrate-on-interaction="['click', 'focus']"
     :model-value="username"
-    class="mb-6"
+    class="mb-12"
   />
 
   <div class="flex flex-col gap-6 @container">

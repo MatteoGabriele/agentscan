@@ -103,7 +103,7 @@ if (report.value) {
 </script>
 
 <template>
-  <CommonSearchForm v-model="repoInput" class="mb-8" />
+  <CommonSearchForm v-model="repoInput" class="mb-12" />
 
   <div v-if="isInvalid || isNotFound" class="text-center py-12 text-ui-muted">
     <template v-if="isInvalid">

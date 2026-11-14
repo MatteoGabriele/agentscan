@@ -119,9 +119,13 @@ watch(
     <p role="status" aria-live="polite" class="sr-only">{{ statusMessage }}</p>
 
     <template v-if="isScanning">
-      <p class="text-sm text-ui-muted">
-        Analyzing each author's recent activity. This can take up to a minute.
-      </p>
+      <!-- Same shape as the loaded summary below, so nothing jumps. -->
+      <div class="flex flex-col gap-2">
+        <p class="text-sm text-ui-muted">
+          Analyzing each author's recent activity. This can take up to a minute.
+        </p>
+        <RepoClassificationSharesSkeleton />
+      </div>
       <RepoPullRequestList
         :rows="[]"
         :labelledby="headingId"
