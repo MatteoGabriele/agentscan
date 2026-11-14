@@ -70,6 +70,13 @@ const hasEventBreakdown = computed<boolean>(() => {
   return groupEventsByRepo(repoEvents.value).length > 0
 })
 
+// The breakdown says nothing useful when there's too little activity to classify.
+const hasActivityBreakdown = computed<boolean>(() => {
+  return (
+    repoEvents.value.length > 0 && classification.value !== 'insufficient-data'
+  )
+})
+
 const hasSignals = computed<boolean>(() => {
   return (
     (props.analysis?.report.flags.length ?? 0) > 0 || hasActivityReport.value
@@ -245,12 +252,20 @@ useSeoAnalysis(identifyAnalysis, {
             </div>
           </header>
 
-          <AnalysisRepoActivityDisclosure
-            v-if="hasEventBreakdown"
-            :events="repoEvents"
-            :raw-events-url
-            class="mt-4"
-          />
+          <div
+            v-if="hasEventBreakdown || hasActivityBreakdown"
+            class="mt-4 flex flex-col gap-2"
+          >
+            <AnalysisRepoActivityDisclosure
+              v-if="hasEventBreakdown"
+              :events="repoEvents"
+              :raw-events-url
+            />
+            <AnalysisActivityBreakdownDisclosure
+              v-if="hasActivityBreakdown"
+              :events="repoEvents"
+            />
+          </div>
 
           <p class="mt-3 text-sm text-ui-muted">
             <template v-if="analysis.eventsCount > 0">
@@ -298,12 +313,6 @@ useSeoAnalysis(identifyAnalysis, {
       :classification="classification"
       :events="analysis.events"
       hydrate-on-visible
-    />
-
-    <LazyChartAccountEventsBreakdown
-      :classification="classification"
-      :events="analysis.events"
-      hydrate-on-interaction
     />
   </template>
 
