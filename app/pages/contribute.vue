@@ -13,9 +13,9 @@ type Contribution = {
 
 const contributionList: Contribution[] = [
   {
-    title: 'Report an automated account',
+    title: 'Report an account that looks automated',
     description:
-      'Found an account you believe is automated? Open an issue with the username, your reasoning and any supporting evidence. Reviewers then vote on it, and once enough of them approve, the account joins the verified list with a link back to the original issue.',
+      'Found an account you believe is automated? Open an issue with the username, your reasoning and any supporting evidence. Reviewers then vote on it, and once enough of them approve, the account is added to the community reports with a link back to the original issue.',
     icon: 'i-lucide:clipboard-pen',
     links: [
       {

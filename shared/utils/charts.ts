@@ -1,35 +1,3 @@
-// @unocss-include
-export function getCompleteDayRange(days: string[]): string[] {
-  if (!days.length) {
-    return []
-  }
-
-  const firstDay = days[0]!
-  const lastDay = days[days.length - 1]!
-  const firstDayTime = new Date(firstDay).getTime()
-  const lastDayTime = new Date(lastDay).getTime()
-  const oneDay = 24 * 60 * 60 * 1000
-  const completeDays: string[] = []
-
-  for (let time = firstDayTime; time <= lastDayTime; time += oneDay) {
-    completeDays.push(new Date(time).toISOString().slice(0, 10))
-  }
-
-  return completeDays
-}
-
-export function getDayKey(date: string | Date) {
-  if (typeof date === 'string') {
-    return date.slice(0, 10)
-  }
-
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0'),
-  ].join('-')
-}
-
 /**
  * SVG markup fragments based on related Lucide icons.
  *
@@ -62,20 +30,5 @@ export const SVG_ICON = {
 export const EMPTY_HOUR_NOTE =
   'No pull requests recorded. Probably a GitHub outage that stopped the hourly scan.'
 
-export const CLASSIFICATIONS_WITH_NAME_AND_CATEGORY: Array<{
-  name: string
-  category: ActivityCategory
-}> = [
-  { name: 'Organic', category: 'organic' },
-  { name: 'Mixed', category: 'mixed' },
-  { name: 'Automation', category: 'automation' },
-]
-
 export const PR_VOLUME_DASH_ARRAY = '0.1 4'
 export const PR_VOLUME_STROKE_WIDTH = 2
-
-export const SWATCH: Record<ActivityCategory, string> = {
-  organic: 'bg-ui-organic',
-  mixed: 'bg-ui-mixed',
-  automation: 'bg-ui-automation',
-}

@@ -6,10 +6,8 @@ import {
   type VueUiStackbarConfig,
   type VueUiStackbarDatasetItem,
 } from 'vue-data-ui/vue-ui-stackbar'
-import {
-  CLASSIFICATION_CATEGORIES,
-  getClassificationByDateChunksByDate,
-} from '~~/shared/utils/count-classification-by-date'
+import { CLASSIFICATION_CATEGORIES } from '~~/shared/utils/classifications'
+import { getClassificationByDateChunksByDate } from '~~/shared/utils/count-classification-by-date'
 import { formatDateRange } from '~~/shared/utils/dates'
 
 import('vue-data-ui/style.css')

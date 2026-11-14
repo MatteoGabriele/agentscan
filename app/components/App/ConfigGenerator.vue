@@ -85,27 +85,27 @@ const classificationInfo: Record<
   { label: string; when: string; dot: string }
 > = {
   automation: {
-    label: 'Automation',
+    label: CLASSIFICATION_NAMES.automation,
     when: 'The account’s activity looks automated.',
     dot: 'bg-ui-automation',
   },
   mixed: {
-    label: 'Mixed',
+    label: CLASSIFICATION_NAMES.mixed,
     when: 'Some activity looks automated, some looks human.',
     dot: 'bg-ui-mixed',
   },
   'community-flagged': {
-    label: 'Community-flagged',
-    when: 'The account is on the community list of verified automated accounts. This replaces the analysis result.',
-    dot: 'bg-ui-destructive',
+    label: 'Community reported',
+    when: 'The account is on the community reports list. This replaces the analysis result.',
+    dot: 'bg-ui-automation',
   },
   organic: {
-    label: 'Organic',
+    label: CLASSIFICATION_NAMES.organic,
     when: 'No signs of automation were found.',
     dot: 'bg-ui-organic',
   },
   'insufficient-data': {
-    label: 'Not enough data',
+    label: CLASSIFICATION_NAMES['insufficient-data'],
     when: 'The account has too little public activity to judge.',
     dot: 'bg-ui-muted',
   },
@@ -559,11 +559,11 @@ const { copy, copied } = useClipboard({ source: output })
                   disabled
                   class="accent-ui-accent"
                 />
-                Community-flagged
+                Community reported
               </label>
             </div>
             <p class="mt-2 text-xs text-ui-muted text-pretty">
-              Community-flagged accounts are always closed while this is on.
+              Community reported accounts are always closed while this is on.
               <template v-if="pickedAutoCloseOptions.length === 0">
                 With nothing else picked, they are the only ones closed.
               </template>

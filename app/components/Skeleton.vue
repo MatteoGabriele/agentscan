@@ -45,4 +45,10 @@ const roundedClasses = {
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer {
+    animation: none;
+  }
+}
 </style>

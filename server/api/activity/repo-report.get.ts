@@ -45,13 +45,12 @@ export default defineCachedEventHandler(
       })
     }
 
-    return getRepoReport({
-      repo: name,
-      days,
-      results: window.results,
-    })
+    return getRepoReport({ repo: name, days })
   },
   {
+    // Named so its keys never collide with other cached handlers: without a
+    // repo, the key would match the hourly window's and serve its response.
+    name: 'repo-report',
     maxAge: 60 * 5,
     getKey: (event) =>
       [currentScanWindow('hour'), getRepoQuery(event).toLowerCase()].join(':'),

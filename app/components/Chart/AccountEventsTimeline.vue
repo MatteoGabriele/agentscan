@@ -5,7 +5,7 @@ import {
   type VueUiXyConfig,
 } from 'vue-data-ui'
 import { useTooltipPosition } from 'vue-data-ui/composables'
-import { getCompleteDayRange } from '~~/shared/utils/charts'
+import { getCompleteDayRange } from '~~/shared/utils/dates'
 import type { GitHubEventType } from '~~/shared/types/identity'
 import { githubEventTypes } from '~~/shared/types/identity'
 import { useColors } from '~/composables/useColors'
@@ -639,11 +639,14 @@ onMounted(pauseChartAnimations)
       </VueUiXy>
       <div v-else class="w-full h-40 flex place-items-center justify-center">
         <div class="flex flex-col items-center gap-4">
-          <span class="i-lucide:circle-dashed text-ui-muted"></span>
+          <span
+            class="i-lucide:circle-dashed text-ui-muted"
+            aria-hidden="true"
+          ></span>
           <div class="flex flex-col items-center">
-            <p class="text-ui-muted text-base">Insufficient activity data</p>
-            <p class="text-ui-muted/50 text-sm">
-              Not enough events to display a timeline
+            <p class="text-ui-muted text-base">No timeline to show</p>
+            <p class="text-ui-muted text-sm">
+              There are too few events to draw a timeline.
             </p>
           </div>
         </div>

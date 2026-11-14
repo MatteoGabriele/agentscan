@@ -95,30 +95,20 @@ const config = computed<VueUiHorizontalBarConfig>(() => ({
     },
   },
 }))
-
-const isExpanded = shallowRef(false)
-function toggleExpanded() {
-  isExpanded.value = !isExpanded.value
-}
 </script>
 
 <template>
   <div v-if="events.length">
-    <button
-      class="mx-auto flex w-fit flex-wrap items-center gap-2 mb-1 text-left text-sm text-ui-muted"
-      @click="toggleExpanded"
+    <CommonDisclosureRow
+      summary-class="mx-auto w-fit items-center gap-2 mb-1 text-sm text-ui-muted"
     >
-      <span>Events breakdown</span>
-      <span
-        class="i-lucide:chevron-down ml-auto mt-0.5 shrink-0 text-sm text-ui-muted transition-transform"
-        :class="isExpanded && 'rotate-180'"
-      />
-    </button>
+      <template #summary>
+        <span>Events breakdown</span>
+      </template>
 
-    <div v-if="isExpanded">
       <ClientOnly>
         <VueUiHorizontalBar :dataset :config />
       </ClientOnly>
-    </div>
+    </CommonDisclosureRow>
   </div>
 </template>

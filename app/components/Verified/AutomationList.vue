@@ -17,7 +17,7 @@ const restItemsCount = computed<number>(() => {
 <template>
   <div>
     <p
-      class="text-xs text-ui-muted/80 tracking-wider font-medium text-center mb-3"
+      class="text-xs text-ui-muted tracking-wider font-medium text-center mb-3"
     >
       Recently reported by the community
     </p>

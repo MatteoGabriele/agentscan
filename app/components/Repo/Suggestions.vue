@@ -48,7 +48,7 @@ watch(search, () => {
 <template>
   <div v-if="status === 'pending' || matches.length">
     <p
-      class="text-xs text-ui-muted/80 tracking-wider font-medium text-center mb-3"
+      class="text-xs text-ui-muted tracking-wider font-medium text-center mb-3"
     >
       <template v-if="search">
         Repositories we already track matching your search

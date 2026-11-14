@@ -4,22 +4,14 @@ import { computed } from 'vue'
 
 const selected = defineModel<ClassificationLabel>()
 
-const options = computed(() => [
-  {
-    value: 'organic',
-    label: 'Organic',
-  },
-  {
-    value: 'mixed',
-    label: 'Mixed',
-  },
-  {
-    value: 'automation',
-    label: 'Automation',
-  },
-])
+const options = computed(() =>
+  NAMED_CATEGORIES.map(({ name, category }) => ({
+    value: category,
+    label: name,
+  })),
+)
 </script>
 
 <template>
-  <Toggle v-model="selected" :options="options" />
+  <Toggle v-model="selected" :options="options" label="Classification" />
 </template>
