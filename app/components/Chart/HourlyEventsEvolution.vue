@@ -16,6 +16,12 @@ import type {
 } from '~~/shared/types/activity.ts'
 import { EMPTY_HOUR_NOTE, SVG_ICON } from '~~/shared/utils/charts'
 import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
+import {
+  findHighShares,
+  formatHighShare,
+  HOURLY_MIN_TOTAL,
+  HOURLY_SHARE_CEILINGS,
+} from '~~/shared/utils/high-share'
 
 dayjs.extend(utc)
 
@@ -43,6 +49,15 @@ const scanTimes = computed(() =>
   hourlyWindow.value?.scanTimes.slice(isMobile.value ? -MOBILE_SLICE_HOURS : 0),
 )
 const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
+
+const highShares = computed(() => {
+  return (scanTimes.value ?? []).map((scanTime) => {
+    const stats = countsByScanTime.value?.[scanTime]
+    return stats
+      ? findHighShares(stats, HOURLY_SHARE_CEILINGS, HOURLY_MIN_TOTAL)
+      : []
+  })
+})
 
 const prCounts = computed(() =>
   (scanTimes.value ?? []).map(
@@ -328,21 +343,20 @@ function handleChartMouseleave() {
                   :color="colors.textMuted"
                   style="cursor: default"
                 >
-                  <title>{{ EMPTY_HOUR_NOTE }}</title>
-                  <circle r="12" :fill="colors.bg" />
-                  <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
-                  <g
-                    transform="translate(-7.68, -7.68) scale(0.64)"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    fill="none"
-                    v-html="SVG_ICON.triangleAlert"
+                  <ChartSvgIcon
+                    :icon="SVG_ICON.triangleAlert"
+                    :title="EMPTY_HOUR_NOTE"
+                    :background="colors.bg"
                   />
-                  <!-- eslint-enable vue/no-v-text-v-html-on-component, vue/no-v-html -->
                 </g>
               </template>
+
+              <ChartHighShareMarkers
+                v-if="!isLoading"
+                :svg
+                :high-shares
+                :colors
+              />
 
               <text
                 v-if="isLoading"
@@ -394,11 +408,26 @@ function handleChartMouseleave() {
                 </ChartEventsEvolutionTooltipTable>
 
                 <div
-                  v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
-                  class="mt-2 flex flex-row gap-2 max-w-[280px] text-xs text-ui-muted"
+                  v-if="
+                    emptyHourIndexes.has(timeLabel.absoluteIndex) ||
+                    highShares[timeLabel.absoluteIndex]?.length
+                  "
+                  class="mt-2 flex flex-col gap-2 text-xs text-ui-muted"
                 >
-                  <span class="w-6 shrink-0 i-lucide:triangle-alert" />
-                  <span>{{ EMPTY_HOUR_NOTE }}</span>
+                  <ChartEventsEvolutionTooltipNote
+                    v-for="highShare in highShares[timeLabel.absoluteIndex] ??
+                    []"
+                    :key="highShare.category"
+                    icon="i-lucide:circle-dot"
+                    :color="colors[highShare.category]"
+                    :text="formatHighShare(highShare)"
+                  />
+
+                  <ChartEventsEvolutionTooltipNote
+                    v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
+                    icon="i-lucide:triangle-alert"
+                    :text="EMPTY_HOUR_NOTE"
+                  />
                 </div>
               </div>
             </template>
