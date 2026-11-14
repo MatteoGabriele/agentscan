@@ -220,12 +220,15 @@ function markAlreadyListed(
 }
 
 function scoreboard(decision: Decision, config: Config): string {
-  const format = (logins: string[]) =>
-    logins.length
-      ? logins
-          .map((login) => `[${login}](https://github.com/${login})`)
-          .join(', ')
-      : '—'
+  const format = (logins: string[]) => {
+    if (logins.length === 0) {
+      return '—'
+    }
+
+    return logins
+      .map((login) => `[${login}](https://github.com/${login})`)
+      .join(', ')
+  }
 
   return [
     `👍 **${decision.approvals}/${config.minApprovals}** — ${format(decision.approvedBy)}`,
