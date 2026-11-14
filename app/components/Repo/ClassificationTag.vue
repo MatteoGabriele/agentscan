@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ClassificationLabel } from '@unveil/identity'
-import { CLASSIFICATION_NAMES } from '~~/shared/utils/charts'
+import { CLASSIFICATION_NAMES } from '~~/shared/utils/classifications'
 import {
   COMMUNITY_REPORTED_NAME,
   INSUFFICIENT_ACTIVITY_NAME,

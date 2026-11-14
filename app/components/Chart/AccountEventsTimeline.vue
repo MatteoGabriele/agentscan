@@ -5,7 +5,7 @@ import {
   type VueUiXyConfig,
 } from 'vue-data-ui'
 import { useTooltipPosition } from 'vue-data-ui/composables'
-import { getCompleteDayRange } from '~~/shared/utils/charts'
+import { getCompleteDayRange } from '~~/shared/utils/dates'
 import type { GitHubEventType } from '~~/shared/types/identity'
 import { githubEventTypes } from '~~/shared/types/identity'
 import { useColors } from '~/composables/useColors'

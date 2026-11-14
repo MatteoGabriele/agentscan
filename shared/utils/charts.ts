@@ -1,38 +1,3 @@
-// @unocss-include
-import type { ClassificationLabel } from '@unveil/identity'
-
-export function getCompleteDayRange(days: string[]): string[] {
-  const firstDay = days[0]
-  const lastDay = days.at(-1)
-
-  if (!firstDay || !lastDay) {
-    return []
-  }
-
-  const firstDayTime = new Date(firstDay).getTime()
-  const lastDayTime = new Date(lastDay).getTime()
-  const oneDay = 24 * 60 * 60 * 1000
-  const completeDays: string[] = []
-
-  for (let time = firstDayTime; time <= lastDayTime; time += oneDay) {
-    completeDays.push(new Date(time).toISOString().slice(0, 10))
-  }
-
-  return completeDays
-}
-
-export function getDayKey(date: string | Date) {
-  if (typeof date === 'string') {
-    return date.slice(0, 10)
-  }
-
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0'),
-  ].join('-')
-}
-
 /**
  * SVG markup fragments based on related Lucide icons.
  *
@@ -65,27 +30,5 @@ export const SVG_ICON = {
 export const EMPTY_HOUR_NOTE =
   'No pull requests recorded. Probably a GitHub outage that stopped the hourly scan.'
 
-/** The one place for the display name of each classification. */
-export const CLASSIFICATION_NAMES: Record<ClassificationLabel, string> = {
-  organic: 'Organic',
-  mixed: 'Mixed',
-  automation: 'Automation',
-  'insufficient-data': 'Not enough data',
-}
-
-export const CLASSIFICATIONS_WITH_NAME_AND_CATEGORY: Array<{
-  name: string
-  category: ActivityCategory
-}> = (['organic', 'mixed', 'automation'] as const).map((category) => ({
-  name: CLASSIFICATION_NAMES[category],
-  category,
-}))
-
 export const PR_VOLUME_DASH_ARRAY = '0.1 4'
 export const PR_VOLUME_STROKE_WIDTH = 2
-
-export const SWATCH: Record<ActivityCategory, string> = {
-  organic: 'bg-ui-organic',
-  mixed: 'bg-ui-mixed',
-  automation: 'bg-ui-automation',
-}

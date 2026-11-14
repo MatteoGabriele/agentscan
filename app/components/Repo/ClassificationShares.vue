@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import type { ActivityCategory } from '~~/shared/types/activity'
-import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  SWATCH,
-} from '~~/shared/utils/charts'
+import { NAMED_CATEGORIES, SWATCH } from '~~/shared/utils/classifications'
 import {
   COMMUNITY_REPORTED_NAME,
   INSUFFICIENT_ACTIVITY_NAME,
@@ -21,7 +18,7 @@ defineProps<{
 <template>
   <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
     <li
-      v-for="{ name, category } in CLASSIFICATIONS_WITH_NAME_AND_CATEGORY"
+      v-for="{ name, category } in NAMED_CATEGORIES"
       :key="category"
       class="flex items-center gap-2"
     >

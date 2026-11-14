@@ -196,7 +196,7 @@ const rangeCaption = computed(() =>
         <h3 class="mt-6 font-semibold text-ui-text">What the groups mean</h3>
         <dl class="flex flex-col gap-2">
           <div
-            v-for="{ name, category } in CLASSIFICATIONS_WITH_NAME_AND_CATEGORY"
+            v-for="{ name, category } in NAMED_CATEGORIES"
             :key="category"
             class="flex gap-2"
           >

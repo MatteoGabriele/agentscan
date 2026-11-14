@@ -5,7 +5,7 @@ import type {
   RepoReportDay,
   RepoReportPeriod,
 } from '../types/repo-report'
-import { getCompleteDayRange } from './charts'
+import { getCompleteDayRange } from './dates'
 
 export const REPO_REPORT_PERIOD_DAYS = 30
 

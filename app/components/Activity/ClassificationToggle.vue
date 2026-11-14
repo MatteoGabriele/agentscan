@@ -5,7 +5,7 @@ import { computed } from 'vue'
 const selected = defineModel<ClassificationLabel>()
 
 const options = computed(() =>
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+  NAMED_CATEGORIES.map(({ name, category }) => ({
     value: category,
     label: name,
   })),

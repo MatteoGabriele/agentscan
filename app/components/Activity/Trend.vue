@@ -2,7 +2,7 @@
 import type { ClassificationLabel } from '@unveil/identity'
 import type { ActivityUnit } from '~~/shared/types/activity'
 import { formatCompactNumber } from '~~/shared/utils/numbers'
-import { SWATCH } from '~~/shared/utils/charts'
+import { SWATCH } from '~~/shared/utils/classifications'
 
 const props = defineProps<{
   label: string

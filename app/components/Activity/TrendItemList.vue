@@ -77,10 +77,7 @@ const stats = computed<ClassificationStats | null>(() => {
   <ul
     class="text-center flex flex-col md:flex-row gap-2 items-center md:text-left w-full justify-evenly"
   >
-    <li
-      v-for="{ name, category } in CLASSIFICATIONS_WITH_NAME_AND_CATEGORY"
-      :key="category"
-    >
+    <li v-for="{ name, category } in NAMED_CATEGORIES" :key="category">
       <ActivityTrend
         :classification="category"
         :label="name"
