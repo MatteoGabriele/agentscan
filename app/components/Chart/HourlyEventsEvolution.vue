@@ -16,12 +16,6 @@ import type {
 } from '~~/shared/types/activity.ts'
 import { EMPTY_HOUR_NOTE, SVG_ICON } from '~~/shared/utils/charts'
 import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
-import {
-  findHighShares,
-  formatHighShare,
-  HOURLY_MIN_TOTAL,
-  HOURLY_SHARE_CEILINGS,
-} from '~~/shared/utils/high-share'
 
 dayjs.extend(utc)
 
@@ -49,15 +43,6 @@ const scanTimes = computed(() =>
   hourlyWindow.value?.scanTimes.slice(isMobile.value ? -MOBILE_SLICE_HOURS : 0),
 )
 const countsByScanTime = computed(() => hourlyWindow.value?.countsByScanTime)
-
-const highShares = computed(() => {
-  return (scanTimes.value ?? []).map((scanTime) => {
-    const stats = countsByScanTime.value?.[scanTime]
-    return stats
-      ? findHighShares(stats, HOURLY_SHARE_CEILINGS, HOURLY_MIN_TOTAL)
-      : []
-  })
-})
 
 const prCounts = computed(() =>
   (scanTimes.value ?? []).map(
@@ -351,13 +336,6 @@ function handleChartMouseleave() {
                 </g>
               </template>
 
-              <ChartHighShareMarkers
-                v-if="!isLoading"
-                :svg
-                :high-shares
-                :colors
-              />
-
               <text
                 v-if="isLoading"
                 :x="svg.drawingArea.left + svg.drawingArea.width / 2"
@@ -407,28 +385,12 @@ function handleChartMouseleave() {
                   </template>
                 </ChartEventsEvolutionTooltipTable>
 
-                <div
-                  v-if="
-                    emptyHourIndexes.has(timeLabel.absoluteIndex) ||
-                    highShares[timeLabel.absoluteIndex]?.length
-                  "
-                  class="mt-2 flex flex-col gap-2 text-xs text-ui-muted"
-                >
-                  <ChartEventsEvolutionTooltipNote
-                    v-for="highShare in highShares[timeLabel.absoluteIndex] ??
-                    []"
-                    :key="highShare.category"
-                    icon="i-lucide:circle-dot"
-                    :color="colors[highShare.category]"
-                    :text="formatHighShare(highShare)"
-                  />
-
-                  <ChartEventsEvolutionTooltipNote
-                    v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
-                    icon="i-lucide:triangle-alert"
-                    :text="EMPTY_HOUR_NOTE"
-                  />
-                </div>
+                <ChartEventsEvolutionTooltipNote
+                  v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
+                  class="mt-2 text-xs text-ui-muted"
+                  icon="i-lucide:triangle-alert"
+                  :text="EMPTY_HOUR_NOTE"
+                />
               </div>
             </template>
 

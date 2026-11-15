@@ -31,10 +31,6 @@ describe('findHighShares', () => {
   it('ignores shares below their ceiling', () => {
     expect(findHighShares(createStats(71, 9, 20), ceilings)).toEqual([])
   })
-
-  it('ignores points below the minimum volume', () => {
-    expect(findHighShares(createStats(1, 1, 2), ceilings, 50)).toEqual([])
-  })
 })
 
 describe('formatHighShare', () => {

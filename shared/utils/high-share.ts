@@ -14,29 +14,19 @@ export type HighShare = {
   ceiling: number
 }
 
-/** Set from the stable dataset (Sep 7 – Nov 13 2026); only the highest day per category reached them. */
+/**
+ * 95th percentile of the daily shares from Sep 7 to Nov 13 2026 (68 days),
+ * rounded up: automation 34.63 → 35, mixed 11.34 → 12.
+ */
 export const DAILY_SHARE_CEILINGS: HighShareCeilings = {
-  automation: 36,
+  automation: 35,
   mixed: 12,
 }
-
-/** Hours are noisier than days, so they need their own, higher ceilings. */
-export const HOURLY_SHARE_CEILINGS: HighShareCeilings = {
-  automation: 45,
-  mixed: 25,
-}
-
-export const HOURLY_MIN_TOTAL = 50
 
 export function findHighShares(
   stats: ClassificationStats,
   ceilings: HighShareCeilings,
-  minTotal = 0,
 ): HighShare[] {
-  if (stats.total.count < minTotal) {
-    return []
-  }
-
   return HIGH_SHARE_CATEGORIES.flatMap((category) => {
     const share = stats[category].percentage
     const ceiling = ceilings[category]
