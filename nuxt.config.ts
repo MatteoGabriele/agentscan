@@ -115,9 +115,10 @@ export default defineNuxtConfig({
       },
     },
 
-    '/api/contributors/**': {
+    // Served from data/contributors.json, updated with `pnpm collect:adopters`.
+    '/api/contributors': {
       cache: {
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60,
       },
     },
 
