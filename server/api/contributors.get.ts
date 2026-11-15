@@ -49,52 +49,57 @@ function getUniqueContributorsFromRepositories(
   )
 }
 
-export default defineEventHandler(async (): Promise<ContributorsResponse> => {
-  const config = useRuntimeConfig()
-  const octokit = createOctokit(config.githubToken)
+export default defineCachedEventHandler(
+  async (): Promise<ContributorsResponse> => {
+    const config = useRuntimeConfig()
+    const octokit = createOctokit(config.githubToken)
 
-  try {
-    const repositories = await Promise.all(
-      projectRepositories.map(async ({ repo, label, owner }) => {
-        const { data } = await octokit.rest.repos.listContributors({
-          owner,
-          repo,
-          per_page: 30,
-        })
+    try {
+      const repositories = await Promise.all(
+        projectRepositories.map(async ({ repo, label, owner }) => {
+          const { data } = await octokit.rest.repos.listContributors({
+            owner,
+            repo,
+            per_page: 30,
+          })
 
-        return {
-          repo,
-          label,
-          url: `https://github.com/${owner}/${repo}`,
-          contributors: data
-            .filter((account): account is CompleteGitHubContributor => {
-              return (
-                isCompleteAccount(account) &&
-                !isGitHubAppAccount(account) &&
-                account.login !== 'actions-user'
-              )
-            })
-            .map((account) => ({
-              id: account.id,
-              name: account.login,
-              avatar: `${account.avatar_url}&s=50`,
-              url: `https://github.com/${account.login}`,
-              contributions: account.contributions,
-            })),
-        }
-      }),
-    )
+          return {
+            repo,
+            label,
+            url: `https://github.com/${owner}/${repo}`,
+            contributors: data
+              .filter((account): account is CompleteGitHubContributor => {
+                return (
+                  isCompleteAccount(account) &&
+                  !isGitHubAppAccount(account) &&
+                  account.login !== 'actions-user'
+                )
+              })
+              .map((account) => ({
+                id: account.id,
+                name: account.login,
+                avatar: `${account.avatar_url}&s=50`,
+                url: `https://github.com/${account.login}`,
+                contributions: account.contributions,
+              })),
+          }
+        }),
+      )
 
-    const contributors = getUniqueContributorsFromRepositories(repositories)
+      const contributors = getUniqueContributorsFromRepositories(repositories)
 
-    return {
-      repositories,
-      contributors,
+      return {
+        repositories,
+        contributors,
+      }
+    } catch {
+      throw createError({
+        status: 500,
+        message: 'Failed to fetch contributors.',
+      })
     }
-  } catch {
-    throw createError({
-      status: 500,
-      message: 'Failed to fetch contributors.',
-    })
-  }
-})
+  },
+  {
+    maxAge: 60 * 60,
+  },
+)
