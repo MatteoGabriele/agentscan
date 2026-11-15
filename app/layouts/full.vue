@@ -22,6 +22,10 @@ useAppHead()
 
     <MainFooter />
   </div>
+
+  <DevOnly>
+    <LazyDevTokenPanel v-if="$config.public.devTokenPanel.enabled" />
+  </DevOnly>
 </template>
 
 <style scoped>

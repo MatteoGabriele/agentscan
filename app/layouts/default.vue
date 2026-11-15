@@ -31,4 +31,8 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
 
     <LazyMainFooter hydrate-on-interaction />
   </div>
+
+  <DevOnly>
+    <LazyDevTokenPanel v-if="$config.public.devTokenPanel.enabled" />
+  </DevOnly>
 </template>
