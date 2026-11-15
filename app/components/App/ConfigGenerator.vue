@@ -401,7 +401,7 @@ const { copy, copied } = useClipboard({ source: output })
             class="flex items-start gap-1.5 pl-6.5 text-xs text-ui-text/80 text-pretty"
           >
             <span
-              class="i-lucide:triangle-alert shrink-0 mt-0.5 text-ui-mixed"
+              class="i-lucide:triangle-alert shrink-0 mt-0.5 text-ui-mixed-text"
               aria-hidden="true"
             />
             <span>

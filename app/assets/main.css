@@ -32,6 +32,7 @@
   --text-muted: #808080;
   --text-faint: rgba(240, 240, 240, 0.25);
   --automation: #f0443a;
+  --mixed-text: var(--mixed);
   --accent: #238636;
   --accent-hover: #2ea043;
   --glint: rgba(255, 255, 255, 0.85);
@@ -57,10 +58,13 @@
   --accent: #1a7f37;
   --accent-hover: #15682d;
 
-  /* Classifications are darker on a light background so text stays readable */
-  --organic: #15803d;
-  --mixed: #b45309;
-  --automation: #d1242f;
+  /* Classifications are darker on a light background so text stays readable.
+     Mixed is split into a bright fill (dots, fills, charts) and a dark text
+     variant so mixed and automation separate clearly by lightness (incl. CVD) */
+  --organic: #0e7c50;
+  --mixed: #e8a317;
+  --mixed-text: #8a5700;
+  --automation: #b01020;
 
   --glint: rgba(34, 34, 34, 0.55);
   --event-organic-pr: #15803d;

@@ -32,7 +32,7 @@ const tones = {
   notice: {
     ring: 'border-ui-mixed/40',
     halo: 'bg-ui-mixed/10',
-    text: 'text-ui-mixed',
+    text: 'text-ui-mixed-text',
   },
   // Errors stay neutral: classification colors only describe accounts.
   critical: {

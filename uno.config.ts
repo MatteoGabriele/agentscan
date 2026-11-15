@@ -53,6 +53,7 @@ export default defineConfig({
         destructive: 'var(--destructive)',
         organic: 'var(--organic)',
         mixed: 'var(--mixed)',
+        'mixed-text': 'var(--mixed-text)',
         automation: 'var(--automation)',
       },
     },
