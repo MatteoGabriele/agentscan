@@ -10,6 +10,8 @@ const isHomePage = computed<boolean>(() => route.name === 'index')
 
   <div class="flex flex-col">
     <div class="min-h-svh flex flex-col relative @container">
+      <MainRateLimitBanner />
+
       <div class="sticky-header">
         <MainHeader class="mx-auto w-full max-w-screen-xl" />
       </div>

@@ -6,6 +6,8 @@ useAppHead()
   <NuxtLoadingIndicator />
 
   <div class="flex flex-col @container">
+    <MainRateLimitBanner />
+
     <div class="sticky-header">
       <MainHeader only-logo />
     </div>
