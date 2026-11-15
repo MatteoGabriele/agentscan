@@ -801,3 +801,46 @@ export function getClassificationByDateChunks({
     rolling,
   })
 }
+
+export function getDaySoFarBuckets(scanTimes: string[]) {
+  const lastHour = [...scanTimes].sort().at(-1)
+
+  if (!lastHour) {
+    return null
+  }
+
+  const date = lastHour.slice(0, 10)
+  const previousDate = new Date(
+    new Date(`${date}T00:00:00.000Z`).getTime() - 24 * MILLISECONDS_PER_HOUR,
+  )
+    .toISOString()
+    .slice(0, 10)
+
+  return {
+    date,
+    previousDate,
+    today: scanTimes.filter((time) => time.startsWith(date)),
+    remaining: scanTimes.filter(
+      (time) =>
+        time.startsWith(previousDate) && time.slice(11) > lastHour.slice(11),
+    ),
+  }
+}
+
+export function estimateDayTotal({
+  soFar,
+  remaining,
+  previousTotal,
+}: {
+  soFar: number
+  remaining: number
+  previousTotal: number
+}): number | null {
+  const previousSoFar = previousTotal - remaining
+
+  if (previousSoFar <= 0) {
+    return null
+  }
+
+  return Math.round((soFar * previousTotal) / previousSoFar)
+}

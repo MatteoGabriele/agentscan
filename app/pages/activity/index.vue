@@ -58,13 +58,15 @@ const rangeOptions: ChartRangeOption[] = [
   { value: 'hourly', label: 'Hourly' },
 ]
 
+const { query } = useRoute()
+
 const urlParams = useUrlSearchParams<{
   view: ChartRange | undefined
   unit: ActivityUnit | undefined
 }>('history', {
   initialValue: {
-    view: 'daily',
-    unit: 'percentage',
+    view: query.view === 'hourly' ? 'hourly' : 'daily',
+    unit: query.unit === 'quantity' ? 'quantity' : 'percentage',
   },
 })
 
@@ -84,7 +86,7 @@ const rangeCaption = computed(() =>
 <template>
   <NuxtLayout name="full">
     <template #hero>
-      <section class="flex flex-col gap-6 h-full pb-8 md:pb-0">
+      <section class="relative flex flex-col gap-6 h-full pb-8">
         <div
           class="h-full flex flex-col items-center justify-center w-full relative"
         >
@@ -154,6 +156,13 @@ const rangeCaption = computed(() =>
             <LazyChartGlobalEventsEvolution v-else :unit />
           </div>
         </div>
+
+        <div
+          v-if="urlParams.view === 'hourly'"
+          class="absolute inset-x-0 bottom-4 px-4 hidden md:flex justify-center"
+        >
+          <ActivityDaySoFar :unit />
+        </div>
       </section>
     </template>
 
@@ -217,6 +226,11 @@ const rangeCaption = computed(() =>
           per scan. Once a day is complete, we combine its hours into one daily
           result, which is what feeds the daily view and its
           {{ DEFAULT_HISTORY_MONTHS }} months of history.
+        </p>
+        <p>
+          Until then, the hourly view compares today so far with yesterday, in
+          UTC. The count view also estimates the full day by scaling today's
+          pull requests by how much of yesterday had arrived by the same hour.
         </p>
 
         <h3 class="mt-6 font-semibold text-ui-text">How to read it</h3>
