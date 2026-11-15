@@ -87,7 +87,6 @@ export default defineNuxtConfig({
       // Floating GitHub token usage widget. Only ever rendered in `nuxt dev`.
       devTokenPanel: {
         enabled: true,
-        position: 'bottom-right',
         refreshInterval: 10_000,
       } satisfies DevTokenPanelConfig,
     },

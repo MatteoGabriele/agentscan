@@ -68,34 +68,27 @@ function resetsIn(reset: number): string {
   const minutes = Math.floor(seconds / 60)
   return minutes ? `${minutes}m ${seconds % 60}s` : `${seconds}s`
 }
-
-const positionClass = {
-  'bottom-right': 'bottom-4 right-4 items-end flex-col-reverse',
-  'bottom-left': 'bottom-4 left-4 items-start flex-col-reverse',
-  'top-right': 'top-4 right-4 items-end flex-col',
-  'top-left': 'top-4 left-4 items-start flex-col',
-}[config.position]
 </script>
 
 <template>
   <div
     v-if="hasTokens || error"
     ref="root"
-    class="fixed z-100 flex gap-2"
-    :class="positionClass"
+    class="fixed bottom-16 right-0 z-100 flex flex-col-reverse items-end gap-2"
   >
     <button
       type="button"
-      class="relative grid size-[50px] place-items-center rounded-full border-1 border-solid border-ui-border bg-ui-card text-ui-text shadow-lg transition-colors hover:bg-ui-muted/15"
+      class="relative flex h-7 items-center rounded-l-full pl-1.5 pr-2 border-1 border-solid border-ui-border bg-ui-card text-ui-muted shadow motion-safe:transition hover:translate-x-0 hover:opacity-100 hover:text-ui-text focus-visible:translate-x-0 focus-visible:opacity-100"
+      :class="{ 'translate-x-1/3 opacity-50': !isOpen }"
       :aria-expanded="isOpen"
       aria-controls="dev-token-panel"
       aria-label="GitHub token usage (dev)"
       title="GitHub token usage (dev)"
       @click="isOpen = !isOpen"
     >
-      <span class="i-lucide:gauge size-5" aria-hidden="true" />
+      <span class="i-lucide:gauge size-3.5" aria-hidden="true" />
       <span
-        class="absolute right-1 top-1 size-2.5 rounded-full border-2 border-solid border-ui-card"
+        class="absolute -top-0.5 left-0.5 size-2 rounded-full border-1 border-solid border-ui-card"
         :class="`dot-${worst}`"
         aria-hidden="true"
       />
@@ -104,7 +97,7 @@ const positionClass = {
     <section
       v-if="isOpen"
       id="dev-token-panel"
-      class="max-h-[70svh] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-lg border-1 border-solid border-ui-border bg-ui-card p-4 text-sm shadow-xl"
+      class="mr-3 max-h-[70svh] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-lg border-1 border-solid border-ui-border bg-ui-card p-4 text-sm shadow-xl"
     >
       <header class="mb-3 flex items-center justify-between gap-2">
         <h2 class="font-semibold">GitHub tokens</h2>

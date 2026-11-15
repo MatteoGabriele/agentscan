@@ -1,9 +1,5 @@
-export type DevTokenPanelPosition =
-  'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
-
 export interface DevTokenPanelConfig {
   enabled: boolean
-  position: DevTokenPanelPosition
   refreshInterval: number
 }
 
