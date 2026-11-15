@@ -42,7 +42,7 @@ const markers = computed(() => {
       :transform="`translate(${marker.x}, ${marker.y})`"
       :color="colors[marker.category]"
       class="hidden md:block"
-      style="cursor: default"
+      style="cursor: default; transition: transform 0.2s"
     >
       <ChartSvgIcon
         :icon="SVG_ICON.circleDot"
