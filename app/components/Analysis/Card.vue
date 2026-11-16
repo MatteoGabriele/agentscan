@@ -265,20 +265,28 @@ useSeoAnalysis(identifyAnalysis, {
               aria-hidden="true"
             />
           </template>
-          <template v-else-if="openReport">
-            <p class="text-ui-muted text-sm">
-              This account already has an open report under review. Add what you
-              know there.
+          <div
+            v-else-if="openReport"
+            class="flex items-center justify-between gap-4 text-sm"
+          >
+            <p class="flex items-center gap-2 text-ui-muted">
+              <span class="relative inline-flex size-2" aria-hidden="true">
+                <span
+                  class="absolute inset-0 rounded-full bg-ui-text/50 opacity-60 animate-ping [animation-duration:2s] motion-reduce:animate-none"
+                />
+                <span class="relative size-2 rounded-full bg-ui-text/50" />
+              </span>
+              Reported by the community · review pending
             </p>
             <NuxtLink
               :to="openReport.url"
               target="_blank"
               external
-              class="underline inline text-xs"
+              class="shrink-0 text-xs text-ui-muted underline hover:text-ui-text"
             >
-              View open report #{{ openReport.number }}
+              View on GitHub<span class="sr-only"> (opens in a new tab)</span>
             </NuxtLink>
-          </template>
+          </div>
           <template v-else>
             <p class="text-ui-muted text-sm">
               Know something about this account? Help the community.
