@@ -14,10 +14,10 @@ const counter = computed<number>(() => {
     <CommonDisclosureRow
       v-model:open="isDisclosureOpen"
       :summary-class="[
-        'flex-1 items-center gap-3 bg-ui-mixed/10 text-ui-mixed rounded-lg border-ui-mixed/40 border px-3 py-2 transition-colors',
+        'flex-1 items-center gap-3 bg-ui-mixed/10 text-ui-mixed-text rounded-lg border-ui-mixed/40 border px-3 py-2 transition-colors',
         isDisclosureOpen
           ? 'border-b-none rounded-b-none'
-          : 'hover:border-ui-mixed',
+          : 'hover:border-ui-mixed-text',
       ]"
       chevron-class="text-base"
       panel-class="bg-ui-mixed/5 border border-t-ui-mixed/30 rounded-b-md border-ui-mixed/40"
@@ -28,7 +28,7 @@ const counter = computed<number>(() => {
           <span>Listed in an external report</span>
         </h3>
         <span
-          class="bg-ui-mixed/20 text-ui-mixed text-xs font-semibold px-2 py-1 rounded"
+          class="bg-ui-mixed/20 text-ui-text text-xs font-semibold px-2 py-1 rounded"
         >
           {{ counter }}
         </span>
