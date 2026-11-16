@@ -45,7 +45,7 @@ function onKeydown(event: KeyboardEvent, index: number) {
   <div
     role="tablist"
     aria-label="Account result"
-    class="grid grid-cols-2 border-b border-solid border-ui-border-subtle/40"
+    class="grid grid-cols-2 border-y border-solid border-ui-border-subtle/40"
   >
     <button
       v-for="(tab, index) in tabs"
