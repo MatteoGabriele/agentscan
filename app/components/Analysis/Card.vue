@@ -30,7 +30,23 @@ const isPending = computed<boolean>(() => {
   return props.status === 'pending' || accountReportsStatus.value === 'pending'
 })
 
-const verifiedAutomation = computed(() => {
+const { data: cachedVerifiedAutomations } = useNuxtData<VerifiedAutomation[]>(
+  VERIFIED_AUTOMATION_CACHE_KEY,
+)
+
+const cachedVerifiedAutomation = computed<VerifiedAutomation | undefined>(
+  () => {
+    return cachedVerifiedAutomations.value?.find((account) => {
+      return account.id === props.user.id
+    })
+  },
+)
+
+const verifiedAutomation = computed<VerifiedAutomation | undefined>(() => {
+  if (accountReportsStatus.value === 'pending') {
+    return cachedVerifiedAutomation.value
+  }
+
   return accountReports.value?.verifiedAutomation ?? undefined
 })
 
@@ -81,10 +97,6 @@ const resultViewTabs: ResultViewTabs[] = [
 ]
 
 const viewTabsId = useId()
-
-const hasViewTabs = computed<boolean>(() => {
-  return accountReportsStatus.value !== 'pending' && hasCommunityFlag.value
-})
 
 const isShowingReport = computed<boolean>(() => {
   return hasCommunityFlag.value && activeView.value === 'report'
@@ -179,7 +191,7 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
 
     <AnalysisViewTabs
-      v-if="hasViewTabs"
+      v-if="hasCommunityFlag"
       v-model="activeView"
       :tabs="resultViewTabs"
       :id-base="viewTabsId"
@@ -192,8 +204,7 @@ useSeoAnalysis(identifyAnalysis, {
     />
 
     <div class="px-6">
-      <LazyAnalysisCardSkeleton v-if="accountReportsStatus === 'pending'" />
-      <template v-else-if="verifiedAutomation">
+      <template v-if="verifiedAutomation">
         <ReportDetails
           v-show="activeView === 'report'"
           :id="`${viewTabsId}-panel-report`"
