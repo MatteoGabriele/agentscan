@@ -3,10 +3,8 @@ import type { ActivityCategory } from '~~/shared/types/activity'
 
 const {
   repo = 'nuxt/nuxt',
-  // No sample defaults: props are encoded in the image URL, where a null
-  // would arrive as the string "null".
-  score,
-  classification,
+  score = undefined,
+  classification = undefined,
   label = 'Organic contributions',
   count = 120,
   days = 30,
