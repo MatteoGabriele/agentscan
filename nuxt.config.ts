@@ -1,4 +1,8 @@
 import { resolve } from 'path'
+import type {
+  DevTokenPanelConfig,
+  DevTokenPanelToken,
+} from './shared/types/dev-token-panel'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -72,6 +76,20 @@ export default defineNuxtConfig({
     githubAppPrivateKey: '',
     githubWebhookSecret: '',
     discordPublicKey: '',
+    // Env vars the dev token panel reports on. Server only, so the names
+    // never reach the client payload.
+    devTokenPanelTokens: [
+      { env: 'NUXT_GITHUB_TOKEN', label: 'API dev token' },
+      { env: 'NUXT_GITHUB_PROD_TOKEN', label: 'API prod token' },
+      { env: 'NUXT_GITHUB_TOKEN_ANASTELLINE', label: 'Daily scan token' },
+    ] satisfies DevTokenPanelToken[],
+    public: {
+      // Floating GitHub token usage widget. Only ever rendered in `nuxt dev`.
+      devTokenPanel: {
+        enabled: true,
+        refreshInterval: 10_000,
+      } satisfies DevTokenPanelConfig,
+    },
   },
 
   css: ['~/assets/main.css'],
@@ -115,9 +133,10 @@ export default defineNuxtConfig({
       },
     },
 
-    '/api/contributors/**': {
+    // Served from data/contributors.json, updated with `pnpm collect:adopters`.
+    '/api/contributors': {
       cache: {
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60,
       },
     },
 

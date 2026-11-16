@@ -25,13 +25,27 @@ const { data: accountReports, status: accountReportsStatus } = useLazyFetch(
   },
 )
 
-// Held until community reports settle too, so a reported account never
-// flashes its regular classification before switching.
 const isPending = computed<boolean>(() => {
   return props.status === 'pending' || accountReportsStatus.value === 'pending'
 })
 
-const verifiedAutomation = computed(() => {
+const { data: cachedVerifiedAutomations } = useNuxtData<VerifiedAutomation[]>(
+  VERIFIED_AUTOMATION_CACHE_KEY,
+)
+
+const cachedVerifiedAutomation = computed<VerifiedAutomation | undefined>(
+  () => {
+    return cachedVerifiedAutomations.value?.find((account) => {
+      return account.id === props.user.id
+    })
+  },
+)
+
+const verifiedAutomation = computed<VerifiedAutomation | undefined>(() => {
+  if (accountReportsStatus.value === 'pending') {
+    return cachedVerifiedAutomation.value
+  }
+
   return accountReports.value?.verifiedAutomation ?? undefined
 })
 
@@ -41,10 +55,6 @@ const matchedTally = computed(() => {
 
 const activityReport = computed<IntegrationItem | undefined>(() => {
   return accountReports.value?.integration ?? undefined
-})
-
-const approvedBy = computed<string[]>(() => {
-  return verifiedAutomation.value?.approvedBy ?? []
 })
 
 const { data: openReport, pending: isLoadingReports } =
@@ -68,8 +78,30 @@ const repoEvents = computed<RepoEvent[]>(() => {
 const rawEventsUrl = computed<string>(() => {
   return `https://api.github.com/users/${username.value}/events?per_page=100`
 })
-const hasEventBreakdown = computed<boolean>(() => {
-  return groupEventsByRepo(repoEvents.value).length > 0
+
+type ResultView = 'report' | 'analysis'
+
+// The community report is the stronger evidence, so it opens first.
+const activeView = ref<ResultView>('report')
+watch(username, () => {
+  activeView.value = 'report'
+})
+
+type ResultViewTabs = {
+  value: ResultView
+  label: string
+  icon?: string
+}
+
+const resultViewTabs: ResultViewTabs[] = [
+  { value: 'report', label: 'Community report', icon: 'i-lucide:circle-alert' },
+  { value: 'analysis', label: 'Analysis' },
+]
+
+const viewTabsId = useId()
+
+const isShowingReport = computed<boolean>(() => {
+  return hasCommunityFlag.value && activeView.value === 'report'
 })
 
 const hasSignals = computed<boolean>(() => {
@@ -78,16 +110,13 @@ const hasSignals = computed<boolean>(() => {
   )
 })
 
-const { classificationDetails } = useClassificationDetails(classification)
 const { scoreStyle } = useScoreStyle(
   classification,
   computed(() => ({
-    hasCommunityFlag: hasCommunityFlag.value,
+    hasCommunityFlag: isShowingReport.value,
     hasActivityReport: hasActivityReport.value,
   })),
 )
-
-const { classificationIcon } = useClassificationIcons(classification)
 
 const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
@@ -125,11 +154,13 @@ const warnings = computed<string[]>(() => {
     coverageLevel.value === 'low' &&
     classification.value !== 'insufficient-data'
   ) {
-    list.push('Limited activity to analyze. Treat this result as provisional.')
+    list.push('There is little activity to analyze, so this result may change.')
   }
 
   if (nearestClassification.value) {
-    list.push(`Activity close to ${nearestClassification.value} signals.`)
+    list.push(
+      `This result is close to the "${CLASSIFICATION_NAMES[nearestClassification.value]}" group.`,
+    )
   }
 
   if (isBountyHunter.value) {
@@ -154,110 +185,77 @@ useSeoAnalysis(identifyAnalysis, {
 
 <template>
   <div
-    class="flex flex-col gap-6 bg-ui-card py-4 @md:py-6 rounded-2 border-2 border-solid"
+    class="flex flex-col gap-6 bg-ui-card py-4 @md:py-6 rounded-2 border-2 border-solid transition-colors duration-300 motion-reduce:transition-none"
     :class="scoreStyle.border"
   >
     <div class="px-6">
       <UserDetails :user />
     </div>
 
+    <AnalysisViewTabs
+      v-if="hasCommunityFlag"
+      v-model="activeView"
+      :tabs="resultViewTabs"
+      :id-base="viewTabsId"
+    />
     <div
+      v-else
       class="fade-divider mx-6 h-px opacity-35"
       :class="scoreStyle.background"
       aria-hidden="true"
     />
 
     <div class="px-6">
-      <LazyAnalysisCardSkeleton v-if="isPending" />
+      <template v-if="verifiedAutomation">
+        <ReportDetails
+          v-show="activeView === 'report'"
+          :id="`${viewTabsId}-panel-report`"
+          role="tabpanel"
+          :aria-labelledby="`${viewTabsId}-tab-report`"
+          tabindex="0"
+          :report="verifiedAutomation"
+        />
+
+        <div
+          v-show="activeView === 'analysis'"
+          :id="`${viewTabsId}-panel-analysis`"
+          role="tabpanel"
+          :aria-labelledby="`${viewTabsId}-tab-analysis`"
+          :aria-busy="isPending"
+          tabindex="0"
+        >
+          <LazyAnalysisCardSkeleton v-if="isPending" :footer="false" />
+          <LazyErrorCardGeneric
+            v-else-if="error"
+            :error
+            :retry="() => retry()"
+          />
+          <AnalysisSummary
+            v-else-if="analysis"
+            compact
+            :classification
+            :events="repoEvents"
+            :events-count="analysis.eventsCount"
+            :raw-events-url
+            :warnings
+            :has-activity-report
+          />
+        </div>
+      </template>
+
+      <LazyAnalysisCardSkeleton v-else-if="isPending" />
       <LazyErrorCardGeneric v-else-if="error" :error :retry="() => retry()" />
       <template v-else-if="analysis">
-        <section v-if="verifiedAutomation">
-          <header class="mb-2 flex gap-2 items-center text-ui-automation">
-            <span class="i-lucide:circle-alert text-base" aria-hidden="true" />
-            <h3 class="text-xl font-mono">Community reported</h3>
-          </header>
+        <AnalysisSummary
+          :classification
+          :events="repoEvents"
+          :events-count="analysis.eventsCount"
+          :raw-events-url
+          :warnings
+          :has-activity-report
+        />
 
-          <p class="mt-1 text-ui-text">
-            {{ verifiedAutomation.reason }}
-          </p>
-
-          <footer
-            class="mt-4 pt-4 border-t border-ui-border-subtle/40 flex flex-wrap items-start justify-between gap-x-4 gap-y-2"
-          >
-            <div class="flex flex-col gap-2">
-              <ReportMeta :report="verifiedAutomation" />
-
-              <ReportApprovals
-                v-if="approvedBy.length"
-                :approved-by="approvedBy"
-              />
-            </div>
-
-            <NuxtLink
-              :to="verifiedAutomation.issueUrl"
-              target="_blank"
-              external
-              class="text-ui-muted underline inline text-xs hover:text-ui-text"
-            >
-              View issue
-            </NuxtLink>
-          </footer>
-        </section>
-        <template v-else>
-          <header class="flex items-center justify-between mb-2">
-            <div class="w-full">
-              <div class="mb-2 flex flex-col">
-                <div
-                  v-if="warnings.length"
-                  class="flex items-start gap-2 text-sm text-ui-muted mb-2"
-                >
-                  <span class="i-lucide:megaphone text-xs shrink-0"></span>
-                  <ul class="flex flex-col gap-1">
-                    <li
-                      v-for="(warning, i) in warnings"
-                      :key="i"
-                      class="text-pretty line-height-none"
-                    >
-                      {{ warning }}
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="flex flex-wrap gap-2 items-center">
-                  <div class="flex gap-2 items-center" :class="scoreStyle.text">
-                    <span :class="classificationIcon" class="text-base" />
-                    <h3 class="text-xl font-mono">
-                      {{ classificationDetails.label }}
-                    </h3>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-1 text-ui-text">
-                {{ classificationDetails.description }}
-              </p>
-            </div>
-          </header>
-
-          <AnalysisRepoActivityDisclosure
-            v-if="hasEventBreakdown"
-            :events="repoEvents"
-            :raw-events-url
-            class="mt-4"
-          />
-
-          <p class="mt-3 text-sm text-ui-muted">
-            <template v-if="analysis.eventsCount > 0">
-              Analyzed from the last {{ analysis.eventsCount }} public GitHub
-              events
-            </template>
-            <template v-else>No recent events from this account</template>
-          </p>
-        </template>
-
-        <section
-          v-if="!verifiedAutomation"
-          class="mt-4 pt-4 border-t border-ui-border-subtle"
-        >
+        <section class="mt-4 pt-4 border-t border-ui-border-subtle">
           <template v-if="isLoadingReports">
             <p class="text-ui-muted text-sm">
               Know something about this account? Help the community.
@@ -317,18 +315,7 @@ useSeoAnalysis(identifyAnalysis, {
       :events="analysis.events"
       hydrate-on-visible
     />
-
-    <LazyChartAccountEventsBreakdown
-      :classification="classification"
-      :events="analysis.events"
-      hydrate-on-interaction
-    />
   </template>
 
-  <p
-    class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-  >
-    Results are based on pattern analysis and should be interpreted as possible
-    signals, not conclusions. Always verify findings with additional context.
-  </p>
+  <CommonDisclaimer class="mt-8 mx-auto max-w-md text-center" />
 </template>

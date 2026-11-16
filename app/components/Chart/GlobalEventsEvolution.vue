@@ -16,10 +16,13 @@ import type {
   ActivityUnit,
   EventsEvolutionSeries,
 } from '~~/shared/types/activity'
+import { SVG_ICON } from '~~/shared/utils/charts'
+import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
 import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  SVG_ICON,
-} from '~~/shared/utils/charts.ts'
+  DAILY_SHARE_CEILINGS,
+  findHighShares,
+  formatHighShare,
+} from '~~/shared/utils/high-share'
 
 const { unit = 'percentage' } = defineProps<{ unit?: ActivityUnit }>()
 
@@ -45,6 +48,13 @@ const scanTimes = computed(() =>
 )
 
 const countsByDate = computed(() => activity.value?.countsByDate)
+
+const highShares = computed(() =>
+  (dates.value ?? []).map((date) => {
+    const stats = countsByDate.value?.[date]
+    return stats ? findHighShares(stats, DAILY_SHARE_CEILINGS) : []
+  }),
+)
 
 const prCounts = computed(() =>
   (dates.value ?? []).map(
@@ -72,7 +82,7 @@ onMounted(() => {
 const colors = useColors(rootEl)
 
 const rawDataset = computed<EventsEvolutionSeries[]>(() =>
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+  NAMED_CATEGORIES.map(({ name, category }) => ({
     name,
     category,
     series: (dates.value ?? []).map(
@@ -408,19 +418,11 @@ function placeLandmark({
                       style="pointer-events: all; cursor: default"
                       opacity="1"
                     >
-                      <title>{{ landmark.title }}</title>
-                      <circle r="12" :fill="colors.bg" />
-                      <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
-                      <g
-                        transform="translate(-7.68, -7.68) scale(0.64)"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        fill="none"
-                        v-html="landmark.iconSvg"
+                      <ChartSvgIcon
+                        :icon="landmark.iconSvg"
+                        :title="landmark.title"
+                        :background="colors.bg"
                       />
-                      <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
                       <!-- Number of landmarks sharing the same day -->
                       <text
                         v-if="landmark.count > 1"
@@ -441,6 +443,8 @@ function placeLandmark({
                   </g>
                 </template>
               </g>
+
+              <ChartHighShareMarkers :svg :high-shares :colors />
             </template>
 
             <template #area-gradient="{ series, id }">
@@ -474,25 +478,30 @@ function placeLandmark({
                   </template>
                 </ChartEventsEvolutionTooltipTable>
 
-                <!-- LANDMARK INFO -->
                 <div
-                  v-if="visibleLandmarksByIndex.has(timeLabel.absoluteIndex)"
+                  v-if="
+                    highShares[timeLabel.absoluteIndex]?.length ||
+                    visibleLandmarksByIndex.has(timeLabel.absoluteIndex)
+                  "
                   class="mt-2 flex flex-col gap-2 text-xs text-ui-muted"
                 >
-                  <div
+                  <ChartEventsEvolutionTooltipNote
+                    v-for="highShare in highShares[timeLabel.absoluteIndex] ??
+                    []"
+                    :key="highShare.category"
+                    icon="i-lucide:circle-dot"
+                    :color="colors[highShare.category]"
+                    :text="formatHighShare(highShare)"
+                  />
+
+                  <ChartEventsEvolutionTooltipNote
                     v-for="landmark in visibleLandmarksByIndex.get(
                       timeLabel.absoluteIndex,
                     ) ?? []"
                     :key="`${landmark.date}-${landmark.name}-${landmark.series ?? 'global'}`"
-                    class="flex flex-row gap-2 max-w-[280px]"
-                  >
-                    <span class="w-6 shrink-0" :class="landmark.icon" />
-
-                    <span>
-                      {{ landmark.name }}:
-                      {{ landmark.description }}
-                    </span>
-                  </div>
+                    :icon="landmark.icon"
+                    :text="`${landmark.name}: ${landmark.description}`"
+                  />
                 </div>
               </div>
             </template>

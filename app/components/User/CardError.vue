@@ -23,11 +23,11 @@ const githubUrl = computed<string>(() => {
 <template>
   <ErrorCard
     v-if="isNotFound && isFlaggedAccount"
-    icon="i-lucide:gift"
-    tone="positive"
-    title="Good news"
-    description="This account was reported as an automation, and GitHub no longer serves it. It looks like it is gone for good."
-    hint="Reports stay listed so the pattern remains searchable."
+    icon="i-lucide:user-x"
+    tone="neutral"
+    title="Account no longer available"
+    description="This account was reported by the community, and GitHub no longer shows it."
+    hint="The report stays listed for reference."
   >
     <p
       v-if="username"

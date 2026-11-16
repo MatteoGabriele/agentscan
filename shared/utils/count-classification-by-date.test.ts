@@ -12,6 +12,8 @@ import {
   getClassificationForPreviousDays,
   getClassificationStatsByScanTime,
   getWeeklyClassification,
+  getDaySoFarBuckets,
+  estimateDayTotal,
 } from './count-classification-by-date'
 import type { ActivityItem } from '../types/activity'
 
@@ -987,6 +989,74 @@ describe('getActivityStatsByBuckets', () => {
     expect(getActivityStatsByBuckets({})).toBeNull()
     expect(
       getActivityStatsByBuckets(countsByHour, ['2026-08-08T09:00:00.000Z']),
+    ).toBeNull()
+  })
+})
+
+describe('getDaySoFarBuckets', () => {
+  const hour = (date: string, h: number) =>
+    `${date}T${String(h).padStart(2, '0')}:00:00.000Z`
+
+  it('splits the window into today and the hours yesterday still has ahead', () => {
+    const scanTimes = [
+      ...Array.from({ length: 11 }, (_, h) => hour('2026-11-14', h + 13)),
+      ...Array.from({ length: 14 }, (_, h) => hour('2026-11-15', h)),
+    ]
+
+    const result = getDaySoFarBuckets(scanTimes)
+
+    expect(result?.date).toBe('2026-11-15')
+    expect(result?.previousDate).toBe('2026-11-14')
+    expect(result?.today).toHaveLength(14)
+    expect(result?.remaining).toEqual(
+      Array.from({ length: 10 }, (_, h) => hour('2026-11-14', h + 14)),
+    )
+  })
+
+  it('keeps every later hour of yesterday at the first hour of a day', () => {
+    const scanTimes = Array.from({ length: 25 }, (_, h) =>
+      new Date(Date.UTC(2026, 10, 14, h)).toISOString(),
+    )
+
+    const result = getDaySoFarBuckets(scanTimes)
+
+    expect(result?.date).toBe('2026-11-15')
+    expect(result?.today).toEqual([hour('2026-11-15', 0)])
+    expect(result?.remaining).toEqual(
+      Array.from({ length: 23 }, (_, h) => hour('2026-11-14', h + 1)),
+    )
+  })
+
+  it('crosses month boundaries', () => {
+    expect(getDaySoFarBuckets([hour('2026-12-01', 3)])?.previousDate).toBe(
+      '2026-11-30',
+    )
+  })
+
+  it('returns null without scan times', () => {
+    expect(getDaySoFarBuckets([])).toBeNull()
+  })
+})
+
+describe('estimateDayTotal', () => {
+  it('scales today by the share of yesterday done by the same hour', () => {
+    expect(
+      estimateDayTotal({ soFar: 300, remaining: 600, previousTotal: 1000 }),
+    ).toBe(750)
+  })
+
+  it('follows an even day linearly', () => {
+    expect(
+      estimateDayTotal({ soFar: 120, remaining: 120, previousTotal: 240 }),
+    ).toBe(240)
+  })
+
+  it('returns null when yesterday had nothing by this hour', () => {
+    expect(
+      estimateDayTotal({ soFar: 10, remaining: 50, previousTotal: 50 }),
+    ).toBeNull()
+    expect(
+      estimateDayTotal({ soFar: 10, remaining: 0, previousTotal: 0 }),
     ).toBeNull()
   })
 })

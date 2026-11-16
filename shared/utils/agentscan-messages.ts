@@ -5,9 +5,8 @@ import { getClassificationDetails } from '@unveil/identity/report'
  * community-flagged list.
  */
 export const COMMUNITY_FLAGGED_DETAILS = {
-  label: 'Flagged by community',
-  description:
-    'This account has been flagged as potentially automated by the community.',
+  label: 'Community reported',
+  description: 'The community reported this account as possibly automated.',
 }
 
 /**

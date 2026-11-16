@@ -14,11 +14,8 @@ import type {
   ActivityUnit,
   EventsEvolutionSeries,
 } from '~~/shared/types/activity.ts'
-import {
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY,
-  EMPTY_HOUR_NOTE,
-  SVG_ICON,
-} from '~~/shared/utils/charts.ts'
+import { EMPTY_HOUR_NOTE, SVG_ICON } from '~~/shared/utils/charts'
+import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
 
 dayjs.extend(utc)
 
@@ -89,7 +86,7 @@ const skeletonSeries = computed<number[]>(() => {
 })
 
 const rawDataset = computed<EventsEvolutionSeries[]>(() =>
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+  NAMED_CATEGORIES.map(({ name, category }) => ({
     name,
     category,
     series: isLoading.value
@@ -331,19 +328,11 @@ function handleChartMouseleave() {
                   :color="colors.textMuted"
                   style="cursor: default"
                 >
-                  <title>{{ EMPTY_HOUR_NOTE }}</title>
-                  <circle r="12" :fill="colors.bg" />
-                  <!-- eslint-disable vue/no-v-text-v-html-on-component, vue/no-v-html -->
-                  <g
-                    transform="translate(-7.68, -7.68) scale(0.64)"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    fill="none"
-                    v-html="SVG_ICON.triangleAlert"
+                  <ChartSvgIcon
+                    :icon="SVG_ICON.triangleAlert"
+                    :title="EMPTY_HOUR_NOTE"
+                    :background="colors.bg"
                   />
-                  <!-- eslint-enable vue/no-v-text-v-html-on-component, vue/no-v-html -->
                 </g>
               </template>
 
@@ -396,13 +385,12 @@ function handleChartMouseleave() {
                   </template>
                 </ChartEventsEvolutionTooltipTable>
 
-                <div
+                <ChartEventsEvolutionTooltipNote
                   v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
-                  class="mt-2 flex flex-row gap-2 max-w-[280px] text-xs text-ui-muted"
-                >
-                  <span class="w-6 shrink-0 i-lucide:triangle-alert" />
-                  <span>{{ EMPTY_HOUR_NOTE }}</span>
-                </div>
+                  class="mt-2 text-xs text-ui-muted"
+                  icon="i-lucide:triangle-alert"
+                  :text="EMPTY_HOUR_NOTE"
+                />
               </div>
             </template>
 

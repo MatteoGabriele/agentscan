@@ -7,52 +7,36 @@ const props = defineProps<{
 
 const { parseDataPoint, groupDataPoints } = useFlagDataPoints()
 
-const isExpanded = ref(false)
-
 const isExpandable = computed<boolean>(() => props.flag.data.length > 0)
-
-function toggleExpanded() {
-  if (isExpandable.value) {
-    isExpanded.value = !isExpanded.value
-  }
-}
 </script>
 
 <template>
   <li class="not-last:border-b border-ui-border-subtle/15">
-    <button
-      class="group w-full flex items-start gap-3 text-left py-4"
-      :aria-expanded="isExpandable ? isExpanded : undefined"
-      @click="toggleExpanded"
+    <CommonDisclosureRow
+      :expandable="isExpandable"
+      summary-class="w-full items-start gap-3 py-4"
+      panel-class="pl-4 mb-5 border-l border-ui-border-subtle/20 space-y-3"
     >
-      <div class="min-w-0 flex-1">
-        <span
-          class="font-mono text-sm text-ui-text/90 underline decoration-transparent underline-offset-4 transition-colors"
-          :class="
-            isExpandable &&
-            'group-hover:text-ui-text group-hover:decoration-ui-border-subtle'
-          "
-        >
-          {{ flag.label }}
-        </span>
-        <p
-          class="text-ui-muted text-sm text-pretty mt-1 transition-colors"
-          :class="isExpandable && 'group-hover:text-ui-text/75'"
-        >
-          {{ flag.detail }}
-        </p>
-      </div>
-      <span
-        v-if="isExpandable"
-        class="i-lucide:chevron-down text-sm text-ui-muted group-hover:text-ui-text transition-all mt-0.5 shrink-0"
-        :class="isExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'"
-      />
-    </button>
+      <template #summary>
+        <div class="min-w-0 flex-1">
+          <span
+            class="font-mono text-sm text-ui-text/90 underline decoration-transparent underline-offset-4 transition-colors"
+            :class="
+              isExpandable &&
+              'group-hover:text-ui-text group-hover:decoration-ui-border-subtle'
+            "
+          >
+            {{ flag.label }}
+          </span>
+          <p
+            class="text-ui-muted text-sm text-pretty mt-1 transition-colors"
+            :class="isExpandable && 'group-hover:text-ui-text/75'"
+          >
+            {{ flag.detail }}
+          </p>
+        </div>
+      </template>
 
-    <div
-      v-if="isExpandable && isExpanded"
-      class="pl-4 mb-5 border-l border-ui-border-subtle/20 space-y-3"
-    >
       <div
         v-for="(group, i) in groupDataPoints(flag.data)"
         :key="`${group.icon}-${i}`"
@@ -95,6 +79,6 @@ function toggleExpanded() {
       </div>
 
       <LazyAnalysisFlagEvidence v-if="flag.events.length" :flag />
-    </div>
+    </CommonDisclosureRow>
   </li>
 </template>

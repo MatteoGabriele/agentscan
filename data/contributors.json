@@ -1,0 +1,230 @@
+{
+  "repositories": [
+    {
+      "repo": "agentscan",
+      "label": "agentscan",
+      "url": "https://github.com/MatteoGabriele/agentscan",
+      "contributors": [
+        {
+          "id": 5337152,
+          "name": "MatteoGabriele",
+          "avatar": "https://avatars.githubusercontent.com/u/5337152?v=4&s=50",
+          "url": "https://github.com/MatteoGabriele",
+          "contributions": 889
+        },
+        {
+          "id": 55991794,
+          "name": "graphieros",
+          "avatar": "https://avatars.githubusercontent.com/u/55991794?v=4&s=50",
+          "url": "https://github.com/graphieros",
+          "contributions": 126
+        },
+        {
+          "id": 2119212,
+          "name": "jsoref",
+          "avatar": "https://avatars.githubusercontent.com/u/2119212?v=4&s=50",
+          "url": "https://github.com/jsoref",
+          "contributions": 3
+        },
+        {
+          "id": 63512348,
+          "name": "huang-julien",
+          "avatar": "https://avatars.githubusercontent.com/u/63512348?v=4&s=50",
+          "url": "https://github.com/huang-julien",
+          "contributions": 2
+        },
+        {
+          "id": 25065347,
+          "name": "CorentinTh",
+          "avatar": "https://avatars.githubusercontent.com/u/25065347?v=4&s=50",
+          "url": "https://github.com/CorentinTh",
+          "contributions": 1
+        },
+        {
+          "id": 99918022,
+          "name": "trueberryless",
+          "avatar": "https://avatars.githubusercontent.com/u/99918022?v=4&s=50",
+          "url": "https://github.com/trueberryless",
+          "contributions": 1
+        },
+        {
+          "id": 112722215,
+          "name": "cernymatej",
+          "avatar": "https://avatars.githubusercontent.com/u/112722215?v=4&s=50",
+          "url": "https://github.com/cernymatej",
+          "contributions": 1
+        },
+        {
+          "id": 9141017,
+          "name": "rijkvanzanten",
+          "avatar": "https://avatars.githubusercontent.com/u/9141017?v=4&s=50",
+          "url": "https://github.com/rijkvanzanten",
+          "contributions": 1
+        },
+        {
+          "id": 37191683,
+          "name": "OrbisK",
+          "avatar": "https://avatars.githubusercontent.com/u/37191683?v=4&s=50",
+          "url": "https://github.com/OrbisK",
+          "contributions": 1
+        }
+      ]
+    },
+    {
+      "repo": "agentscan-action",
+      "label": "agentscan-action",
+      "url": "https://github.com/MatteoGabriele/agentscan-action",
+      "contributors": [
+        {
+          "id": 5337152,
+          "name": "MatteoGabriele",
+          "avatar": "https://avatars.githubusercontent.com/u/5337152?v=4&s=50",
+          "url": "https://github.com/MatteoGabriele",
+          "contributions": 62
+        },
+        {
+          "id": 99918022,
+          "name": "trueberryless",
+          "avatar": "https://avatars.githubusercontent.com/u/99918022?v=4&s=50",
+          "url": "https://github.com/trueberryless",
+          "contributions": 2
+        },
+        {
+          "id": 63512348,
+          "name": "huang-julien",
+          "avatar": "https://avatars.githubusercontent.com/u/63512348?v=4&s=50",
+          "url": "https://github.com/huang-julien",
+          "contributions": 2
+        },
+        {
+          "id": 52195,
+          "name": "mcollina",
+          "avatar": "https://avatars.githubusercontent.com/u/52195?v=4&s=50",
+          "url": "https://github.com/mcollina",
+          "contributions": 2
+        },
+        {
+          "id": 34116392,
+          "name": "bluwy",
+          "avatar": "https://avatars.githubusercontent.com/u/34116392?v=4&s=50",
+          "url": "https://github.com/bluwy",
+          "contributions": 1
+        },
+        {
+          "id": 121314722,
+          "name": "gameroman",
+          "avatar": "https://avatars.githubusercontent.com/u/121314722?v=4&s=50",
+          "url": "https://github.com/gameroman",
+          "contributions": 1
+        }
+      ]
+    },
+    {
+      "repo": "identity",
+      "label": "unveil/identity",
+      "url": "https://github.com/unveil-project/identity",
+      "contributors": [
+        {
+          "id": 5337152,
+          "name": "MatteoGabriele",
+          "avatar": "https://avatars.githubusercontent.com/u/5337152?v=4&s=50",
+          "url": "https://github.com/MatteoGabriele",
+          "contributions": 98
+        },
+        {
+          "id": 63512348,
+          "name": "huang-julien",
+          "avatar": "https://avatars.githubusercontent.com/u/63512348?v=4&s=50",
+          "url": "https://github.com/huang-julien",
+          "contributions": 12
+        }
+      ]
+    }
+  ],
+  "contributors": [
+    {
+      "id": 5337152,
+      "name": "MatteoGabriele",
+      "avatar": "https://avatars.githubusercontent.com/u/5337152?v=4&s=50",
+      "url": "https://github.com/MatteoGabriele",
+      "contributions": 1049
+    },
+    {
+      "id": 55991794,
+      "name": "graphieros",
+      "avatar": "https://avatars.githubusercontent.com/u/55991794?v=4&s=50",
+      "url": "https://github.com/graphieros",
+      "contributions": 126
+    },
+    {
+      "id": 63512348,
+      "name": "huang-julien",
+      "avatar": "https://avatars.githubusercontent.com/u/63512348?v=4&s=50",
+      "url": "https://github.com/huang-julien",
+      "contributions": 16
+    },
+    {
+      "id": 2119212,
+      "name": "jsoref",
+      "avatar": "https://avatars.githubusercontent.com/u/2119212?v=4&s=50",
+      "url": "https://github.com/jsoref",
+      "contributions": 3
+    },
+    {
+      "id": 99918022,
+      "name": "trueberryless",
+      "avatar": "https://avatars.githubusercontent.com/u/99918022?v=4&s=50",
+      "url": "https://github.com/trueberryless",
+      "contributions": 3
+    },
+    {
+      "id": 52195,
+      "name": "mcollina",
+      "avatar": "https://avatars.githubusercontent.com/u/52195?v=4&s=50",
+      "url": "https://github.com/mcollina",
+      "contributions": 2
+    },
+    {
+      "id": 34116392,
+      "name": "bluwy",
+      "avatar": "https://avatars.githubusercontent.com/u/34116392?v=4&s=50",
+      "url": "https://github.com/bluwy",
+      "contributions": 1
+    },
+    {
+      "id": 112722215,
+      "name": "cernymatej",
+      "avatar": "https://avatars.githubusercontent.com/u/112722215?v=4&s=50",
+      "url": "https://github.com/cernymatej",
+      "contributions": 1
+    },
+    {
+      "id": 25065347,
+      "name": "CorentinTh",
+      "avatar": "https://avatars.githubusercontent.com/u/25065347?v=4&s=50",
+      "url": "https://github.com/CorentinTh",
+      "contributions": 1
+    },
+    {
+      "id": 121314722,
+      "name": "gameroman",
+      "avatar": "https://avatars.githubusercontent.com/u/121314722?v=4&s=50",
+      "url": "https://github.com/gameroman",
+      "contributions": 1
+    },
+    {
+      "id": 37191683,
+      "name": "OrbisK",
+      "avatar": "https://avatars.githubusercontent.com/u/37191683?v=4&s=50",
+      "url": "https://github.com/OrbisK",
+      "contributions": 1
+    },
+    {
+      "id": 9141017,
+      "name": "rijkvanzanten",
+      "avatar": "https://avatars.githubusercontent.com/u/9141017?v=4&s=50",
+      "url": "https://github.com/rijkvanzanten",
+      "contributions": 1
+    }
+  ]
+}

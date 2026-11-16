@@ -1,38 +1,5 @@
 <script setup lang="ts">
-const colorScheme = useColorScheme()
-
-useHead({
-  title: 'AgentScan - GitHub Automation Detector',
-  meta: [
-    {
-      property: 'og:title',
-      content: 'AgentScan - GitHub Automation Detector',
-    },
-    {
-      property: 'og:description',
-      content: 'Automation pattern detection for open source maintainers',
-    },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:image', content: 'https://agentscan.tools/agentscan.png' },
-    { property: 'og:image:width', content: '1200' },
-    { property: 'og:image:height', content: '630' },
-    { name: 'color-scheme', content: colorScheme },
-  ],
-  link: [
-    {
-      rel: 'icon',
-      href: '/favicon.ico',
-      type: 'image/x-icon',
-      media: '(prefers-color-scheme: dark)',
-    },
-    {
-      rel: 'icon',
-      href: '/favicon-dark.ico',
-      type: 'image/x-icon',
-      media: '(prefers-color-scheme: light)',
-    },
-  ],
-})
+useAppHead()
 </script>
 
 <template>
@@ -40,6 +7,8 @@ useHead({
 
   <div class="flex flex-col">
     <div class="min-h-svh flex flex-col @container">
+      <MainRateLimitBanner />
+
       <div class="sticky-header">
         <MainHeader class="mx-auto w-full max-w-screen-xl" />
       </div>
@@ -53,6 +22,10 @@ useHead({
 
     <MainFooter />
   </div>
+
+  <DevOnly>
+    <LazyDevTokenPanel v-if="$config.public.devTokenPanel.enabled" />
+  </DevOnly>
 </template>
 
 <style scoped>

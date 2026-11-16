@@ -37,8 +37,10 @@ const EVENT_CATEGORIES: Record<
   },
 }
 
-/** Plural, lowercase names used in summaries ("3 events · pull requests"). */
-const EVENT_TYPE_LABELS: Record<ActivityEventType, string> = {
+export type EventLabel = Lowercase<string>
+
+/** Plural names used in summaries ("3 events · pull requests"). */
+const EVENT_TYPE_LABELS: Record<ActivityEventType, EventLabel> = {
   'pull-request': 'pull requests',
   review: 'reviews',
   'review-comment': 'review comments',
@@ -46,14 +48,14 @@ const EVENT_TYPE_LABELS: Record<ActivityEventType, string> = {
   issue: 'issues',
   'issue-comment': 'comments',
   push: 'pushes',
-  create: 'creations',
-  delete: 'deletions',
+  create: 'branches and tags',
+  delete: 'deleted branches',
   fork: 'forks',
   star: 'stars',
   release: 'releases',
   'commit-comment': 'commit comments',
   member: 'members',
-  public: 'made public',
+  public: 'repositories made public',
   wiki: 'wiki edits',
   discussion: 'discussions',
   sponsorship: 'sponsorships',
@@ -66,8 +68,11 @@ const SUMMARY_TYPE_LIMIT = 3
  * Types the provider doesn't know are passed through raw ("FooEvent"), so the
  * fallback strips the GitHub suffix.
  */
-export function getEventTypeLabel(type: ActivityEventType): string {
-  return EVENT_TYPE_LABELS[type] ?? type.replace(/Event$/, '').toLowerCase()
+export function getEventTypeLabel(type: ActivityEventType): EventLabel {
+  return (
+    EVENT_TYPE_LABELS[type] ??
+    (type.replace(/Event$/, '').toLowerCase() as EventLabel)
+  )
 }
 
 /**
@@ -179,4 +184,173 @@ export function summarizeEvents(events: RepoEvent[]): string {
   const noun = events.length === 1 ? 'event' : 'events'
 
   return `${events.length} ${noun} · ${named}${more}`
+}
+
+export type EventTypeSummary = {
+  /** The event type, or for pull requests the type plus what was done ("pull-request:merged"). */
+  key: string
+  type: ActivityEventType
+  /** Plural ("pushes", "merged pull requests"); rows capitalize it for display. */
+  label: EventLabel
+  count: number
+  /** Fraction of all events, from 0 to 1. */
+  share: number
+  /** Distinct repositories the type appears in. */
+  repoCount: number
+  /** Time of the newest event of this type. */
+  newestAt: string
+}
+
+/** Below this many events, percentages say more than the data does. */
+export const MIN_EVENTS_FOR_SHARE = 5
+
+/** A second type is named in the breakdown only when it holds at least this share. */
+const SECOND_TYPE_MIN_SHARE = 0.15
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+type PullRequestAction = 'opened' | 'merged' | 'closed'
+
+const PULL_REQUEST_ACTION_LABELS: Record<PullRequestAction, EventLabel> = {
+  opened: 'opened pull requests',
+  merged: 'merged pull requests',
+  closed: 'closed pull requests',
+}
+
+/**
+ * What this account did to a pull request. GitHub now sends `merged` as its own
+ * action; older events said `closed` with `pull_request.merged`. Labeling,
+ * reopening and other edits return undefined.
+ */
+function getPullRequestAction(event: RepoEvent): PullRequestAction | undefined {
+  const payload = event.source?.payload as
+    { action?: string; pull_request?: { merged?: boolean | null } } | undefined
+  const action = payload?.action
+  if (action === 'merged') {
+    return 'merged'
+  }
+  if (action === 'closed') {
+    return payload?.pull_request?.merged === true ? 'merged' : 'closed'
+  }
+  return action === 'opened' ? 'opened' : undefined
+}
+
+/** The row an event is counted in; pull requests split by action. */
+function getEventKind(event: RepoEvent): { key: string; label: EventLabel } {
+  if (event.type !== 'pull-request') {
+    return { key: event.type, label: getEventTypeLabel(event.type) }
+  }
+  const action = getPullRequestAction(event)
+  return action
+    ? {
+        key: `pull-request:${action}`,
+        label: PULL_REQUEST_ACTION_LABELS[action],
+      }
+    : { key: 'pull-request', label: 'other pull request updates' }
+}
+
+/**
+ * Counts events by type, splitting pull requests into opened, merged, closed and
+ * other updates. The most frequent types come first; ties go to the
+ * most recently seen.
+ */
+export function summarizeEventTypes(events: RepoEvent[]): EventTypeSummary[] {
+  const byKind = new Map<
+    string,
+    { label: EventLabel; count: number; repos: Set<string>; newest: RepoEvent }
+  >()
+
+  for (const event of events) {
+    const { key, label } = getEventKind(event)
+    const entry = byKind.get(key)
+    if (!entry) {
+      byKind.set(key, {
+        label,
+        count: 1,
+        repos: new Set(event.repo ? [event.repo] : []),
+        newest: event,
+      })
+      continue
+    }
+
+    entry.count += 1
+    if (event.repo) {
+      entry.repos.add(event.repo)
+    }
+    if (timestamp(event) > timestamp(entry.newest)) {
+      entry.newest = event
+    }
+  }
+
+  return [...byKind]
+    .map(([key, { label, count, repos, newest }]) => ({
+      key,
+      type: newest.type,
+      label,
+      count,
+      share: count / events.length,
+      repoCount: repos.size,
+      newestAt: newest.at,
+    }))
+    .sort((a, b) => {
+      const byCount = b.count - a.count
+      return byCount || Date.parse(b.newestAt) - Date.parse(a.newestAt) || 0
+    })
+}
+
+/** Days between the oldest and newest event; 0 with fewer than two. */
+export function getEventSpanDays(events: RepoEvent[]): number {
+  const times = events.map(timestamp).filter((time) => time > 0)
+  if (times.length < 2) {
+    return 0
+  }
+  return (Math.max(...times) - Math.min(...times)) / DAY_MS
+}
+
+/** A share as a whole percentage, "<1%" when it would round to zero. */
+export function formatEventShare(share: number): string {
+  const percent = Math.round(share * 100)
+  return share > 0 && percent < 1 ? '<1%' : `${percent}%`
+}
+
+function describeSpan(spanDays: number): string {
+  if (spanDays < 1) {
+    return 'within a day'
+  }
+  const days = Math.round(spanDays)
+  return `over ${days} ${days === 1 ? 'day' : 'days'}`
+}
+
+/**
+ * One sentence on what kind of activity the events are, from the output of
+ * `summarizeEventTypes`: "Mostly pull requests (46%) and comments, over 23 days".
+ */
+export function describeActivityBreakdown(
+  types: EventTypeSummary[],
+  spanDays: number,
+): string {
+  const [top, second] = types
+  if (!top) {
+    return ''
+  }
+
+  const total = types.reduce((sum, { count }) => sum + count, 0)
+
+  if (total === 1) {
+    return `A single event: ${top.label}`
+  }
+
+  const span = describeSpan(spanDays)
+
+  if (!second) {
+    const all = total === 2 ? 'Both events are' : `All ${total} events are`
+    return `${all} ${top.label}, ${span}`
+  }
+
+  const showShare = total >= MIN_EVENTS_FOR_SHARE
+  const topShare = showShare ? ` (${formatEventShare(top.share)})` : ''
+  const secondPart =
+    second.share >= SECOND_TYPE_MIN_SHARE ? ` and ${second.label}` : ''
+
+  return `Mostly ${top.label}${topShare}${secondPart}, ${span}`
 }

@@ -1,7 +1,8 @@
 /// <reference types="node" />
 /**
- * Collects the repositories using AgentScan into data/adopters.json.
- * Run with `pnpm collect:adopters` and commit the file.
+ * Collects the repositories using AgentScan into data/adopters.json, and the
+ * people building it into data/contributors.json.
+ * Run with `pnpm collect:adopters` and commit both files.
  *
  * Credentials from .env:
  *   NUXT_GITHUB_TOKEN            code search across public repos
@@ -16,6 +17,8 @@ import fs from 'fs'
 import path from 'path'
 import { App, Octokit } from 'octokit'
 import type { AdopterRepository } from '../shared/types/adopter-repository'
+import type { ContributorsResponse } from '../shared/types/contributor'
+import { collectContributors, formatContributorDiff } from './lib/contributors'
 
 const SEARCH_PAGE_SIZE = 100
 const MAX_SEARCH_PAGES = 5
@@ -26,6 +29,7 @@ const ACTION_SEARCH_QUERY =
   '"MatteoGabriele/agentscan-action" path:.github/workflows -is:fork'
 
 const OUTPUT_PATH = 'data/adopters.json'
+const CONTRIBUTORS_OUTPUT_PATH = 'data/contributors.json'
 
 const repositoryQuery = `
   query ($ids: [ID!]!) {
@@ -234,6 +238,17 @@ function readPreviousAdopters(outputPath: string): AdopterRepository[] {
   return JSON.parse(fs.readFileSync(outputPath, 'utf-8')) as AdopterRepository[]
 }
 
+// The committed contributors; empty when the file doesn't exist yet.
+function readPreviousContributors(outputPath: string): ContributorsResponse {
+  if (!fs.existsSync(outputPath)) {
+    return { repositories: [], contributors: [] }
+  }
+
+  return JSON.parse(
+    fs.readFileSync(outputPath, 'utf-8'),
+  ) as ContributorsResponse
+}
+
 function readEnv(name: string): string {
   const value = process.env[`NUXT_${name}`] || process.env[name]
 
@@ -252,10 +267,14 @@ async function main() {
   const appId = readEnv('GITHUB_APP_ID')
   const privateKey = readEnv('GITHUB_APP_PRIVATE_KEY')
 
-  const [actionRepositories, appRepositories] = await Promise.all([
-    collectActionRepositories(token),
-    collectAppRepositories(appId, privateKey),
-  ])
+  // Any failed lookup rejects here, so neither file is written half-updated.
+  const [actionRepositories, appRepositories, contributors] = await Promise.all(
+    [
+      collectActionRepositories(token),
+      collectAppRepositories(appId, privateKey),
+      collectContributors(token),
+    ],
+  )
 
   const adopters = mergeAdopters(actionRepositories, appRepositories)
 
@@ -269,6 +288,15 @@ async function main() {
     process.exit(1)
   }
 
+  console.log(`👥 ${contributors.contributors.length} contributor(s)`)
+
+  if (contributors.contributors.length === 0) {
+    console.error(
+      '✗ No contributors found — leaving the existing files untouched',
+    )
+    process.exit(1)
+  }
+
   const outputPath = path.join(process.cwd(), OUTPUT_PATH)
   const previous = readPreviousAdopters(outputPath)
   const diff = formatAdopterDiff(
@@ -277,15 +305,33 @@ async function main() {
     diffAdopters(previous, adopters),
   )
 
+  const contributorsOutputPath = path.join(
+    process.cwd(),
+    CONTRIBUTORS_OUTPUT_PATH,
+  )
+  const contributorDiff = formatContributorDiff(
+    readPreviousContributors(contributorsOutputPath).contributors,
+    contributors.contributors,
+  )
+
   if (dryRun) {
     console.log(JSON.stringify(adopters, null, 2))
+    console.log(JSON.stringify(contributors, null, 2))
     console.log(diff)
+    console.log(contributorDiff)
     return
   }
 
   fs.writeFileSync(outputPath, JSON.stringify(adopters, null, 2) + '\n')
   console.log(diff)
   console.log(`✓ Wrote ${OUTPUT_PATH}`)
+
+  fs.writeFileSync(
+    contributorsOutputPath,
+    JSON.stringify(contributors, null, 2) + '\n',
+  )
+  console.log(contributorDiff)
+  console.log(`✓ Wrote ${CONTRIBUTORS_OUTPUT_PATH}`)
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
