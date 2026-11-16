@@ -13,22 +13,17 @@ export function readList(): AutomationEntry[] {
 }
 
 export function writeList(entries: AutomationEntry[]): void {
-  // The trailing newline only keeps `git diff` quiet before the commit; the
-  // pre-commit prettier run is what actually settles the formatting.
+  // Trailing newline matches prettier's output.
   fs.writeFileSync(listPath(), JSON.stringify(entries, null, 2) + '\n')
 }
 
-/**
- * GitHub logins are case-insensitive, so the list is deduped that way too — a
- * report for `SomeBot` must not add a second entry next to `somebot`.
- */
+/** Case-insensitive key, matching how GitHub treats logins. */
 const key = (entry: AutomationEntry | string): string =>
   (typeof entry === 'string' ? entry : entry.username).toLowerCase()
 
 /**
- * Splits `incoming` against the list as it stands. The set grows as it goes, so
- * two reports for the same account add one entry and the second is reported as
- * already listed.
+ * Splits `incoming` into new and already listed entries. Repeats within
+ * `incoming` count as already listed.
  */
 export function split(
   list: AutomationEntry[],

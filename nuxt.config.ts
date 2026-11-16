@@ -1,4 +1,8 @@
 import { resolve } from 'path'
+import type {
+  DevTokenPanelConfig,
+  DevTokenPanelToken,
+} from './shared/types/dev-token-panel'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -8,9 +12,18 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
     '@nuxt/fonts',
+    'nuxt-og-image',
   ],
 
-  plugins: ['~/plugins/analytics.client'],
+  site: {
+    url: 'https://agentscan.tools',
+    name: 'AgentScan',
+  },
+
+  ogImage: {
+    // Matches the static og:image size declared in the layouts.
+    defaults: { height: 630 },
+  },
 
   vite: {
     optimizeDeps: {
@@ -55,14 +68,28 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Where the hourly scan publishes its results. Overridable with
-    // NUXT_LOGS_API_BASE; the activity and automation-tally routes proxy it.
+    // agentscan-logs base URL (NUXT_LOGS_API_BASE), proxied by the activity and
+    // automation-tally routes.
     logsApiBase: 'https://logs.agentscan.tools',
     githubToken: '',
     githubAppId: '',
     githubAppPrivateKey: '',
     githubWebhookSecret: '',
     discordPublicKey: '',
+    // Env vars the dev token panel reports on. Server only, so the names
+    // never reach the client payload.
+    devTokenPanelTokens: [
+      { env: 'NUXT_GITHUB_TOKEN', label: 'API dev token' },
+      { env: 'NUXT_GITHUB_PROD_TOKEN', label: 'API prod token' },
+      { env: 'NUXT_GITHUB_TOKEN_ANASTELLINE', label: 'Daily scan token' },
+    ] satisfies DevTokenPanelToken[],
+    public: {
+      // Floating GitHub token usage widget. Only ever rendered in `nuxt dev`.
+      devTokenPanel: {
+        enabled: true,
+        refreshInterval: 10_000,
+      } satisfies DevTokenPanelConfig,
+    },
   },
 
   css: ['~/assets/main.css'],
@@ -83,8 +110,7 @@ export default defineNuxtConfig({
       },
     },
 
-    // the routes moved with the agentscan-logs rename; keep the old paths
-    // working for anything still pointing at them.
+    // Redirects from the paths used before the agentscan-logs rename.
     '/api/health': {
       redirect: {
         to: '/api/activity',
@@ -107,13 +133,14 @@ export default defineNuxtConfig({
       },
     },
 
-    '/api/contributors/**': {
+    // Served from data/contributors.json, updated with `pnpm collect:adopters`.
+    '/api/contributors': {
       cache: {
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60,
       },
     },
 
-    // served from data/adopters.json, refreshed weekly by the workflow.
+    // Served from data/adopters.json, updated with `pnpm collect:adopters`.
     '/api/adopters': {
       cache: {
         maxAge: 60 * 60,
@@ -122,10 +149,10 @@ export default defineNuxtConfig({
 
     '/api/identify-replicant/**': {
       isr: {
-        expiration: 60 * 10,
+        expiration: 60 * 60,
         passQuery: true,
       },
-      cache: { maxAge: 600 },
+      cache: { maxAge: 60 * 60 },
     },
     '/api/verified-automations/**': {
       cache: {
@@ -144,10 +171,10 @@ export default defineNuxtConfig({
     },
     '/api/scan/**': {
       isr: {
-        expiration: 60 * 10,
+        expiration: 60 * 60,
         passQuery: true,
       },
-      cache: { maxAge: 600 },
+      cache: { maxAge: 60 * 60 },
     },
     '/feed.xml': {
       cache: {

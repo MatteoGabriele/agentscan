@@ -26,6 +26,12 @@ const projects = computed<AvatarStackItem[]>(() => {
   }))
 })
 
+const showContributors = computed<boolean>(() => {
+  return (
+    contributorsStatus.value === 'pending' || allContributors.value.length > 0
+  )
+})
+
 const showProjects = computed<boolean>(() => {
   return adoptersStatus.value === 'pending' || projects.value.length > 0
 })
@@ -34,6 +40,7 @@ const showProjects = computed<boolean>(() => {
 <template>
   <div class="flex flex-col md:flex-row items-center justify-center gap-6">
     <CommunityAvatarStack
+      v-if="showContributors"
       label="Built by"
       :items="allContributors"
       :pending="contributorsStatus === 'pending'"
@@ -43,6 +50,7 @@ const showProjects = computed<boolean>(() => {
 
     <template v-if="showProjects">
       <span
+        v-if="showContributors"
         class="hidden md:block md:relative md:top-2 self-stretch w-px bg-ui-border/40"
         aria-hidden="true"
       />

@@ -14,7 +14,8 @@ import type {
   ActivityUnit,
   EventsEvolutionSeries,
 } from '~~/shared/types/activity.ts'
-import { CLASSIFICATIONS_WITH_NAME_AND_CATEGORY } from '~~/shared/utils/charts.ts'
+import { EMPTY_HOUR_NOTE, SVG_ICON } from '~~/shared/utils/charts'
+import { NAMED_CATEGORIES } from '~~/shared/utils/classifications'
 
 dayjs.extend(utc)
 
@@ -49,6 +50,18 @@ const prCounts = computed(() =>
   ),
 )
 
+const emptyHourIndexes = computed(() => {
+  if (isLoading.value) {
+    return new Set([])
+  }
+
+  return new Set(
+    prCounts.value.flatMap((count, index) => {
+      return count ? [] : [index]
+    }),
+  )
+})
+
 const scanTimesOffset = computed(() => {
   if (!isMobile.value) {
     return 0
@@ -73,7 +86,7 @@ const skeletonSeries = computed<number[]>(() => {
 })
 
 const rawDataset = computed<EventsEvolutionSeries[]>(() =>
-  CLASSIFICATIONS_WITH_NAME_AND_CATEGORY.map(({ name, category }) => ({
+  NAMED_CATEGORIES.map(({ name, category }) => ({
     name,
     category,
     series: isLoading.value
@@ -304,6 +317,25 @@ function handleChartMouseleave() {
                 :hovered-index="hoveredIndex"
               />
 
+              <!-- EMPTY HOURS -->
+              <template
+                v-for="(plot, i) in svg?.data?.[0]?.plots"
+                :key="`empty_${i}`"
+              >
+                <g
+                  v-if="emptyHourIndexes.has(i + svg.slicer.start)"
+                  :transform="`translate(${plot.x}, ${svg.drawingArea.bottom - 22})`"
+                  :color="colors.textMuted"
+                  style="cursor: default"
+                >
+                  <ChartSvgIcon
+                    :icon="SVG_ICON.triangleAlert"
+                    :title="EMPTY_HOUR_NOTE"
+                    :background="colors.bg"
+                  />
+                </g>
+              </template>
+
               <text
                 v-if="isLoading"
                 :x="svg.drawingArea.left + svg.drawingArea.width / 2"
@@ -352,6 +384,13 @@ function handleChartMouseleave() {
                     <th class="px-2 text-left">Trend</th>
                   </template>
                 </ChartEventsEvolutionTooltipTable>
+
+                <ChartEventsEvolutionTooltipNote
+                  v-if="emptyHourIndexes.has(timeLabel.absoluteIndex)"
+                  class="mt-2 text-xs text-ui-muted"
+                  icon="i-lucide:triangle-alert"
+                  :text="EMPTY_HOUR_NOTE"
+                />
               </div>
             </template>
 

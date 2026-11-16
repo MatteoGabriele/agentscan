@@ -13,7 +13,6 @@
   /* Classifications */
   --organic: #22c55e;
   --mixed: #e7b416;
-  --automation: #cc3232;
 
   /* PR graph colors */
   --event-automation-pr: var(--event-mixed-pr);
@@ -32,6 +31,8 @@
   --text: #f0f0f0;
   --text-muted: #808080;
   --text-faint: rgba(240, 240, 240, 0.25);
+  --automation: #f0443a;
+  --mixed-text: var(--mixed);
   --accent: #238636;
   --accent-hover: #2ea043;
   --glint: rgba(255, 255, 255, 0.85);
@@ -57,8 +58,13 @@
   --accent: #1a7f37;
   --accent-hover: #15682d;
 
-  /* mixed for a light background needs to be darker or is hard to see */
-  --mixed: #f59e0b;
+  /* Classifications are darker on a light background so text stays readable.
+     Mixed is split into a bright fill (dots, fills, charts) and a dark text
+     variant so mixed and automation separate clearly by lightness (incl. CVD) */
+  --organic: #0e7c50;
+  --mixed: #e8a317;
+  --mixed-text: #8a5700;
+  --automation: #b01020;
 
   --glint: rgba(34, 34, 34, 0.55);
   --event-organic-pr: #15803d;
@@ -75,6 +81,17 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+}
+
+/* One visible focus ring for every control; keyboard only. */
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* The search field shows focus on its whole pill instead. */
+[role='search'] input:focus-visible {
+  outline: none;
 }
 
 @property --glint-angle {

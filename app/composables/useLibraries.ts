@@ -7,7 +7,11 @@ export function useLibraries() {
       return $fetch<LibrariesResponse>('/api/libraries')
     },
     {
-      default: (): LibrariesResponse => ({ total: 0, repos: [] }),
+      default: (): LibrariesResponse => ({
+        total: 0,
+        repos: [],
+        categories: [],
+      }),
       getCachedData: payloadCachedData,
     },
   )

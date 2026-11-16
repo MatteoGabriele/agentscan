@@ -24,8 +24,7 @@ const {
   const mockWebhooks = { verify: vi.fn() }
 
   const mockInstallationOctokit = {
-    // Mirrors octokit's paginate: calls the endpoint and unwraps `data`, so the
-    // per-test `listComments.mockResolvedValue({ data })` setups still apply.
+    // Mirrors octokit's paginate: calls the endpoint and unwraps `data`.
     paginate: vi.fn(
       async (
         endpoint: (params: unknown) => Promise<{ data: unknown[] }>,
@@ -35,8 +34,7 @@ const {
         return data
       },
     ),
-    // The handler authenticates as the installation and hands the token to
-    // `analyze`, which does the GitHub reads itself.
+    // The installation token is passed to `analyze`, which does the GitHub reads.
     auth: vi.fn(),
     rest: {
       repos: { getContent: vi.fn() },
@@ -52,6 +50,7 @@ const {
         create: vi.fn(),
         update: vi.fn(),
       },
+      pulls: { get: vi.fn() },
     },
   }
 
@@ -105,8 +104,7 @@ vi.mock('@octokit/webhooks', () => ({
     return mockWebhooks
   }),
 }))
-// Only the classification copy is stubbed: `describeFlag` stays real so the
-// flag text in the comment comes from the same code that runs in production.
+// Only the classification copy is stubbed; `describeFlag` stays real.
 vi.mock('@unveil/identity/report', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@unveil/identity/report')>()),
   getClassificationDetails: vi.fn(),
@@ -170,7 +168,8 @@ const MOCK_USER: GitHubUser = {
   public_repos: 0,
 }
 
-const MOCK_EVENT = {} satisfies H3Event<EventHandlerRequest>
+// The handler only reads the request through the stubbed h3 helpers.
+const MOCK_EVENT = {} as Parameters<typeof handler>[0]
 
 // --- Helpers ---
 
@@ -293,7 +292,7 @@ describe('GitHub Webhook Handler', () => {
   })
 
   describe('Early Returns', () => {
-    it('returns { ok: true } for non-opened/reopened actions', async () => {
+    it('returns { ok: true } for non-opened actions', async () => {
       setupEvent({ action: 'closed' })
 
       const result = await handler(MOCK_EVENT)
@@ -332,17 +331,83 @@ describe('GitHub Webhook Handler', () => {
       })
     })
 
-    it('returns { ok: true } for reopened PRs', async () => {
+    it('does not scan reopened PRs', async () => {
       setupEvent({ action: 'reopened' })
-      mockRepoConfig({ 'comment-on-organic': true })
 
       const result = await handler(MOCK_EVENT)
 
-      expect(result).toEqual({
-        ok: true,
-        flagged: false,
-        classification: 'organic',
+      expect(result).toEqual({ ok: true })
+      expect(analyze).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Scan Command', () => {
+    function setupScanComment(body: string, authorAssociation = 'MEMBER') {
+      setupEvent({
+        action: 'created',
+        pull_request: undefined,
+        issue: {
+          number: 123,
+          user: { login: 'test-user' },
+          pull_request: { url: 'https://api.github.com/pulls/123' },
+        },
+        comment: {
+          id: 800,
+          body,
+          user: { login: 'a-maintainer' },
+          author_association: authorAssociation,
+        },
       })
+    }
+
+    beforeEach(() => {
+      mockInstallationOctokit.rest.pulls.get.mockResolvedValue({
+        data: { head: { sha: 'def456' } },
+      })
+    })
+
+    it.each(['OWNER', 'MEMBER', 'COLLABORATOR'])(
+      'scans the author when a %s comments `@agentscanapp scan`',
+      async (association) => {
+        setupScanComment('@agentscanapp scan', association)
+
+        await handler(MOCK_EVENT)
+
+        expect(analyze).toHaveBeenCalledWith('test-user', expect.anything())
+      },
+    )
+
+    it('creates the check run on the PR head fetched from the API', async () => {
+      setupScanComment('@AgentScanApp scan please')
+
+      await handler(MOCK_EVENT)
+
+      expect(mockInstallationOctokit.rest.pulls.get).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        pull_number: 123,
+      })
+      expect(mockInstallationOctokit.rest.checks.create).toHaveBeenCalledWith(
+        expect.objectContaining({ head_sha: 'def456' }),
+      )
+    })
+
+    it('ignores the command from non-maintainers', async () => {
+      setupScanComment('@agentscanapp scan', 'CONTRIBUTOR')
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(analyze).not.toHaveBeenCalled()
+    })
+
+    it('ignores a mention that is not at the start of a line', async () => {
+      setupScanComment('maybe @agentscanapp scan this?')
+
+      const result = await handler(MOCK_EVENT)
+
+      expect(result).toEqual({ ok: true })
+      expect(analyze).not.toHaveBeenCalled()
     })
   })
 
@@ -431,8 +496,7 @@ describe('GitHub Webhook Handler', () => {
 
       await handler(MOCK_EVENT)
 
-      // Raw brackets make `details_url` an invalid URL, GitHub rejects the
-      // update, and the check run stays stuck in progress.
+      // Raw brackets make `details_url` invalid and GitHub rejects the update.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledWith(
         expect.objectContaining({
           details_url: 'https://agentscan.tools/user/dependabot%5Bbot%5D',
@@ -964,7 +1028,7 @@ describe('GitHub Webhook Handler', () => {
         await handler(MOCK_EVENT)
 
         const body =
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body
         expect(body).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
         expect(body).toContain('<!-- message_for_llms')
@@ -991,8 +1055,10 @@ describe('GitHub Webhook Handler', () => {
 
         const [first, second] =
           mockInstallationOctokit.rest.issues.createComment.mock.calls.map(
-            (call: [{ body: string }]) =>
-              call[0].body.match(/<!-- agentscanapp-ref:([0-9a-f]{12}) -->/)[1],
+            (call) =>
+              call[0].body.match(
+                /<!-- agentscanapp-ref:([0-9a-f]{12}) -->/,
+              )?.[1],
           )
         expect(first).not.toBe(second)
       })
@@ -1003,9 +1069,11 @@ describe('GitHub Webhook Handler', () => {
         await handler(MOCK_EVENT)
 
         const body =
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body
-        const token = body.match(/<!-- agentscanapp-ref:([0-9a-f]{12}) -->/)[1]
+        const token = body.match(
+          /<!-- agentscanapp-ref:([0-9a-f]{12}) -->/,
+        )?.[1]
         const rendered = body.replace(/<!--[\s\S]*?-->/g, '')
         expect(rendered).not.toContain(token)
       })
@@ -1032,7 +1100,7 @@ describe('GitHub Webhook Handler', () => {
         await handler(MOCK_EVENT)
 
         expect(
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body,
         ).toMatch(/<!-- agentscanapp-ref:[0-9a-f]{12} -->/)
       })
@@ -1052,7 +1120,7 @@ describe('GitHub Webhook Handler', () => {
 
         const bodies =
           mockInstallationOctokit.rest.issues.createComment.mock.calls.map(
-            (call: [{ body: string }]) => call[0].body,
+            (call) => call[0].body,
           )
         expect(bodies.join('')).not.toContain('message_for_llms')
       })
@@ -1066,7 +1134,7 @@ describe('GitHub Webhook Handler', () => {
         await handler(MOCK_EVENT)
 
         const body =
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body
         expect(body).toContain('## Hello!\n\nWelcome aboard.')
         expect(body).not.toContain('Thanks for opening this pull request!')
@@ -1083,7 +1151,7 @@ describe('GitHub Webhook Handler', () => {
         await handler(MOCK_EVENT)
 
         expect(
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body,
         ).toContain('Hi @test-user, nice pull request!')
       })
@@ -1094,7 +1162,7 @@ describe('GitHub Webhook Handler', () => {
         await handler(MOCK_EVENT)
 
         expect(
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body,
         ).toContain('Thanks for opening this pull request!')
       })
@@ -1117,7 +1185,7 @@ describe('GitHub Webhook Handler', () => {
 
         function baitBody() {
           return mockInstallationOctokit.rest.issues.createComment.mock
-            .calls[0][0].body
+            .calls[0]?.[0].body
         }
 
         it.each(['FIRST_TIME_CONTRIBUTOR', 'FIRST_TIMER'])(
@@ -1202,8 +1270,7 @@ describe('GitHub Webhook Handler', () => {
         })
       })
 
-      // The bait is the whole mechanism, so mode does not gate it — otherwise
-      // honeypot: true would silently do nothing.
+      // The bait applies regardless of mode.
       it.each(['silent', 'labels'])(
         'still posts the honeypot comment in %s mode',
         async (mode) => {
@@ -1212,7 +1279,7 @@ describe('GitHub Webhook Handler', () => {
           await handler(MOCK_EVENT)
 
           expect(
-            mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+            mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
               .body,
           ).toContain('<!-- message_for_llms')
         },
@@ -1242,7 +1309,7 @@ describe('GitHub Webhook Handler', () => {
 
         expect(result).toEqual({ ok: true, honeypot: 'triggered' })
         expect(
-          mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+          mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
             .body,
         ).toContain('Automated contributor detected')
         expect(
@@ -1470,7 +1537,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).toContain(
         'This PR was opened by a bot. Please review carefully.',
       )
@@ -1487,7 +1554,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).toContain('Flagged by our community watchlist.')
     })
   })
@@ -1502,7 +1569,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).toContain('[Report this account →]')
       expect(commentCall.body).toContain(
         'https://github.com/matteogabriele/agentscan/issues/new',
@@ -1519,7 +1586,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).not.toContain('Report this account')
     })
 
@@ -1529,7 +1596,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).not.toContain('Report this account')
     })
 
@@ -1543,7 +1610,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).not.toContain('Report this account')
     })
   })
@@ -1558,7 +1625,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).toContain('<details>')
       expect(commentCall.body).toContain('<summary>Evidence</summary>')
       expect(commentCall.body).toContain(
@@ -1576,7 +1643,7 @@ describe('GitHub Webhook Handler', () => {
       await handler(MOCK_EVENT)
 
       const commentCall =
-        mockInstallationOctokit.rest.issues.createComment.mock.calls[0][0]
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
       expect(commentCall.body).not.toContain('<details>')
     })
   })
@@ -1777,9 +1844,8 @@ describe('GitHub Webhook Handler', () => {
       onTestFinished(() => consoleError.mockRestore())
 
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
-      // Each conclusion is attempted twice — full payload, then stripped — and
-      // the run must not be left at `in_progress`: once the real conclusion is
-      // exhausted the guard concludes it as neutral instead.
+      // Each conclusion is tried with the full payload, then stripped; if both fail,
+      // the run is concluded as neutral.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
         4,
       )
@@ -1806,14 +1872,13 @@ describe('GitHub Webhook Handler', () => {
 
       await expect(handler(MOCK_EVENT)).resolves.toMatchObject({ ok: true })
 
-      // The stripped retry lands the real conclusion, so the safety net in
-      // `finally` sees a settled run and does not overwrite it with neutral.
+      // The stripped retry succeeds, so `finally` leaves the conclusion alone.
       expect(mockInstallationOctokit.rest.checks.update).toHaveBeenCalledTimes(
         2,
       )
 
       const stripped =
-        mockInstallationOctokit.rest.checks.update.mock.calls[1]![0]
+        mockInstallationOctokit.rest.checks.update.mock.calls[1]?.[0]
 
       expect(stripped).toMatchObject({
         status: 'completed',
@@ -1826,8 +1891,7 @@ describe('GitHub Webhook Handler', () => {
     it('concludes the check run as neutral when the analysis outruns the deadline', async () => {
       vi.useFakeTimers()
 
-      // Stays pending past the deadline: stands in for a scan slow enough to be
-      // killed by the function timeout before it can conclude the run itself.
+      // Never resolves, simulating a scan that outlives the function timeout.
       let resolveAnalysis: (value: AnalyzeReturn) => void = () => {}
       vi.mocked(analyze).mockReturnValue(
         new Promise((resolve) => {
@@ -1849,8 +1913,7 @@ describe('GitHub Webhook Handler', () => {
         }),
       )
 
-      // Let the handler run its cleanup before handing the clock back, so no
-      // in-flight work leaks into the next test.
+      // Lets the handler clean up before restoring real timers.
       resolveAnalysis({
         report: MOCK_ANALYSIS,
         events: [],

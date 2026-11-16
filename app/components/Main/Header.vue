@@ -1,59 +1,10 @@
 <script setup lang="ts">
-import type { MenuDropdownItem } from '~~/shared/types/menu'
-
 defineProps<{
   onlyLogo?: boolean
 }>()
 
-const { trackEvent } = useSaEvent()
-
-const scanItems: MenuDropdownItem[] = [
-  {
-    to: '/',
-    label: 'Account search',
-    description: "Analyze a GitHub account's activity",
-    icon: 'i-lucide:user-search',
-  },
-  {
-    to: '/scan',
-    label: 'Repository scan',
-    description: 'Recent PR authors of any public repository',
-    icon: 'i-lucide:book-search',
-  },
-  {
-    to: 'https://text.agentscan.tools',
-    label: 'Text',
-    description: 'Find signs of AI-written text in open source contributions',
-    icon: 'i-agentscan:text',
-  },
-  {
-    to: '/lab',
-    label: 'The Lab',
-    description: 'Experimental account scan mapping',
-    icon: 'i-lucide:flask-conical',
-  },
-]
-
-const communityItems: MenuDropdownItem[] = [
-  {
-    to: '/contribute',
-    label: 'Contribute',
-    description: 'Ways to help the AgentScan ecosystem',
-    icon: 'i-lucide:book-heart',
-  },
-  {
-    to: '/automations',
-    label: 'Community reports',
-    description: 'Automations flagged by the community',
-    icon: 'i-lucide:clipboard-pen',
-  },
-  {
-    to: '/adopters',
-    label: 'Used by',
-    description: 'Public repositories running AgentScan on their CI',
-    icon: 'i-lucide:heart-handshake',
-  },
-]
+const route = useRoute()
+const isBookmarksPage = computed<boolean>(() => route.path === '/bookmarks')
 </script>
 
 <template>
@@ -68,27 +19,26 @@ const communityItems: MenuDropdownItem[] = [
       </NuxtLink>
     </div>
     <div v-if="!onlyLogo" class="hidden @4xl:block">
-      <ul class="flex items-center gap-5">
-        <li>
-          <LazyMainMenuDropdown label="Scan" :items="scanItems" />
-        </li>
-        <li><LazyMainMenuItem to="/activity" label="Ecosystem Activity" /></li>
-        <li>
-          <LazyMainMenuDropdown label="Community" :items="communityItems" />
-        </li>
-        <li><LazyMainMenuItem to="/bookmarks" label="Bookmarks" /></li>
-        <li>
-          <LazyMainMenuItem
-            to="/app"
-            label="Install AgentScan"
-            @click="trackEvent('get_agentscan_clicked')"
-          />
-        </li>
-      </ul>
+      <MainNavMenu :sections="NAV_SECTIONS" />
     </div>
 
     <div v-if="!onlyLogo" class="flex-1 flex items-center gap-3 justify-end">
-      <LazyMainSourceLink hydrate-on-visible class="hidden @4xl:inline-flex" />
+      <div class="flex items-center gap-1">
+        <!-- The mobile menu already lists Bookmarks. -->
+        <NuxtLink
+          to="/bookmarks"
+          aria-label="Bookmarks"
+          title="Bookmarks"
+          class="hidden @4xl:grid size-8 place-items-center rounded-full transition-colors hover:bg-ui-muted/10 hover:text-ui-text"
+          :class="
+            isBookmarksPage ? 'bg-ui-muted/10 text-ui-text' : 'text-ui-muted'
+          "
+        >
+          <span class="i-lucide:bookmark" aria-hidden="true"></span>
+        </NuxtLink>
+
+        <MainThemeToggle />
+      </div>
 
       <LazyMainMobileMenu hydrate-on-visible class="@4xl:hidden" />
     </div>

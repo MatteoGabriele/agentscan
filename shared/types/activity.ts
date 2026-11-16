@@ -18,12 +18,6 @@ export type ActivityItem = {
   events_count: number
   repo_name: string
   is_bounty: boolean
-  additions: number
-  deletions: number
-  text_verdict?: 'ai' | 'human'
-  text_confidence?: number
-  text_probability?: number
-  text_template_found?: boolean
   pr?: number
 }
 

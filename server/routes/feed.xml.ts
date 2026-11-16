@@ -2,20 +2,17 @@ import type { VerifiedAutomation } from '~~/shared/types/automation'
 
 export default defineEventHandler(async (event) => {
   try {
-    // Fetch the verified automations list
     const automations: VerifiedAutomation[] = await $fetch(
       '/api/verified-automations',
     )
 
-    // Sort by createdAt in descending order (newest first)
+    // Newest first
     const sortedAutomations = [...automations].sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
 
-    // Generate RSS feed
     const rss = generateRSSFeed(sortedAutomations)
 
-    // Set proper content-type header
     setHeader(event, 'Content-Type', 'application/rss+xml')
     setHeader(event, 'Cache-Control', 'public, max-age=3600')
 

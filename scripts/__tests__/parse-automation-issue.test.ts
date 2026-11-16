@@ -391,7 +391,6 @@ describe('parseApprovedBy', () => {
     expect(parseApprovedBy('@alice,alice, ,bob')).toEqual(['alice', 'bob'])
   })
 
-  // These logins end up on the public list, so they keep the casing GitHub gave.
   it('leaves casing alone', () => {
     expect(parseApprovedBy('MatteoGabriele')).toEqual(['MatteoGabriele'])
   })
@@ -419,8 +418,6 @@ describe('generateEntry approvedBy', () => {
     expect(entry.approvedBy).toEqual(['alice', 'bob'])
   })
 
-  // Older entries have no votes at all, so an entry added without them has to
-  // read the same way rather than carrying an empty array.
   it('omits the key entirely when there are no approvals', () => {
     const entry = generateEntry(
       parsedData,

@@ -6,6 +6,7 @@ import type {
 import { round } from './numbers'
 import { formatPercentage, INSUFFICIENT_DATA_SCORE } from './activity-stats'
 import { calcLinearProgression } from './calc-linear-progression'
+import { CLASSIFICATION_CATEGORIES } from './classifications'
 
 export type ClassificationMetric = {
   count: number
@@ -25,12 +26,6 @@ export type GetClassificationStatsByDateResults = Record<
   string,
   ClassificationStats
 >
-
-export const CLASSIFICATION_CATEGORIES = [
-  'organic',
-  'mixed',
-  'automation',
-] as const
 
 type CategoryPercentageComparison = {
   category: ActivityCategory
@@ -175,8 +170,7 @@ export function getActivityStatsByBuckets(
   }
 }
 
-// Entries written by the same scan run share a `created_at`, so a run is
-// already its own bucket — the hourly scan gives one bucket per hour.
+// Groups by `created_at`, which entries from the same scan run share.
 export function getClassificationStatsByScanTime(
   data: ActivityItem[] = [],
 ): GetClassificationStatsByDateResults {
@@ -218,8 +212,7 @@ export function applyCumulativeTrends(
 
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
 
-// The clock hour a timestamp belongs to, so a scan time and the placeholder
-// standing in for it can never end up under two different keys.
+// Truncates a timestamp to its clock hour.
 function getHourTime(time: number): number {
   return Math.floor(time / MILLISECONDS_PER_HOUR) * MILLISECONDS_PER_HOUR
 }
@@ -276,9 +269,7 @@ export function fillEmptyHourlyBuckets({
         )
       : firstHourTime
 
-  // Scan times that don't sit exactly on the hourly grid still belong to the
-  // window, so they collapse onto their clock hour rather than being dropped
-  // next to the placeholder for that same hour.
+  // Scan times off the hourly grid are bucketed under their clock hour.
   const recorded: GetClassificationStatsByDateResults = {}
 
   hours.forEach((hour) => {
@@ -809,4 +800,47 @@ export function getClassificationByDateChunks({
     days,
     rolling,
   })
+}
+
+export function getDaySoFarBuckets(scanTimes: string[]) {
+  const lastHour = [...scanTimes].sort().at(-1)
+
+  if (!lastHour) {
+    return null
+  }
+
+  const date = lastHour.slice(0, 10)
+  const previousDate = new Date(
+    new Date(`${date}T00:00:00.000Z`).getTime() - 24 * MILLISECONDS_PER_HOUR,
+  )
+    .toISOString()
+    .slice(0, 10)
+
+  return {
+    date,
+    previousDate,
+    today: scanTimes.filter((time) => time.startsWith(date)),
+    remaining: scanTimes.filter(
+      (time) =>
+        time.startsWith(previousDate) && time.slice(11) > lastHour.slice(11),
+    ),
+  }
+}
+
+export function estimateDayTotal({
+  soFar,
+  remaining,
+  previousTotal,
+}: {
+  soFar: number
+  remaining: number
+  previousTotal: number
+}): number | null {
+  const previousSoFar = previousTotal - remaining
+
+  if (previousSoFar <= 0) {
+    return null
+  }
+
+  return Math.round((soFar * previousTotal) / previousSoFar)
 }

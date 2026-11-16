@@ -1,5 +1,12 @@
 export function useVerifiedAutomations() {
-  return useAsyncData('verified-list', async () => {
-    return $fetch('/api/verified-automations')
-  })
+  // Reused across navigations; the list only changes on deploy.
+  return useAsyncData(
+    'verified-list',
+    async () => {
+      return $fetch('/api/verified-automations')
+    },
+    {
+      getCachedData: payloadCachedData,
+    },
+  )
 }

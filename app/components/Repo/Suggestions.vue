@@ -43,14 +43,12 @@ const hiddenItemsCount = computed<number>(() => {
 watch(search, () => {
   showAllItems.value = false
 })
-
-const { trackEvent } = useSaEvent()
 </script>
 
 <template>
   <div v-if="status === 'pending' || matches.length">
     <p
-      class="text-xs text-ui-muted/80 tracking-wider font-medium text-center mb-3"
+      class="text-xs text-ui-muted tracking-wider font-medium text-center mb-3"
     >
       <template v-if="search">
         Repositories we already track matching your search
@@ -80,7 +78,6 @@ const { trackEvent } = useSaEvent()
           :key="name"
           :to="`/scan/${name}`"
           class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border border-ui-border/40 hover:bg-ui-muted/15 hover:border-ui-border/60 transition-all"
-          @click="trackEvent('scan_suggested_repository_clicked')"
         >
           {{ name }}
         </NuxtLink>

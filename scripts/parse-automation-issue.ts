@@ -1,11 +1,10 @@
 /// <reference types="node" />
 /**
- * Parse automation report issues and generate JSON entries
+ * Parses automation report issues into list entries.
  * Usage: npx tsx scripts/parse-automation-issue.ts <issue-number> [--approved-by=a,b]
  *        npx tsx scripts/parse-automation-issue.ts <issue-body> [issue-url] (legacy mode)
  *
- * --approved-by is passed by the review workflow: the reviewers whose 👍 carried the
- * report, recorded on the entry so the list says who stood behind it.
+ * --approved-by records the reviewers whose 👍 approved the report.
  */
 
 import fs from 'fs'
@@ -21,24 +20,18 @@ interface AutomationEntry {
   issueUrl: string
   createdAt: string
   reportedBy: string
-  /** Omitted entirely when the entry was added without a recorded vote. */
+  /** Omitted when no vote was recorded. */
   approvedBy?: string[]
 }
 
 export type { AutomationEntry }
 
-/**
- * The reason is shown as plain prose on the public list, so it has to stay one
- * sentence-shaped string. Links belong in Supporting Evidence / Additional Context,
- * where reviewers read them; reporters still paste them here, so they are stripped
- * rather than trusted.
- */
+/** Max length of the reason shown on the public list. */
 export const MAX_REASON_LENGTH = 280
 
 /**
- * Strips everything that is not sentence text: markdown images and links, bare and
- * autolinked URLs, HTML tags, code ticks and list bullets. Link text is kept, since
- * "self-describes as [an AI agent](url)" still reads as a reason without the URL.
+ * Reduces the reason to plain sentence text: removes images, links, URLs, HTML
+ * tags, code ticks and list bullets. Link text is kept.
  */
 export function sanitizeReason(raw: string | undefined): string | undefined {
   if (!raw) {
@@ -48,19 +41,18 @@ export function sanitizeReason(raw: string | undefined): string | undefined {
   let reason = raw.split(/\n\s*\n/)[0]
 
   reason = reason
-    // ![alt](url) - an image says nothing once the URL is gone
+    // ![alt](url)
     .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
     // [text](url) -> text
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    // a whole parenthetical built around a link ("(see https://...)") goes with it
+    // parentheticals containing a link
     .replace(/\([^)]*(?:https?:\/\/|www\.|\.[a-z]{2,}\/)[^)]*\)?/gi, ' ')
     // <https://...> and any HTML tag
     .replace(/<[^>\s]+>/g, ' ')
     // bare URLs, with or without a scheme
     .replace(/\b(?:https?:\/\/|www\.)\S+/gi, ' ')
     .replace(/\b[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}\/\S*/gi, ' ')
-    // markdown leftovers: code ticks, and line-leading bullets/quotes/headings.
-    // Emphasis markers are left alone mid-word so `some_bot_name` survives intact.
+    // code ticks and line-leading bullets, quotes and headings (mid-word `_` is kept)
     .replace(/`/g, '')
     .replace(/^[\s>#*-]+/gm, ' ')
     // empty brackets or parens left behind by a stripped URL
@@ -71,10 +63,7 @@ export function sanitizeReason(raw: string | undefined): string | undefined {
   return truncateReason(trimDanglingTail(reason))
 }
 
-/**
- * A stripped URL usually leaves the words that introduced it ("spam PRs, see",
- * "flagged in:"). Drop that tail so the reason still ends like a sentence.
- */
+/** Drops words left dangling by a removed URL ("see", "flagged in:"). */
 function trimDanglingTail(reason: string): string {
   return reason
     .replace(/[\s,;:–—(-]+$/, '')
@@ -86,7 +75,7 @@ function trimDanglingTail(reason: string): string {
     .trim()
 }
 
-/** Cuts at a word boundary so a long report reads as a sentence, not a fragment. */
+/** Truncates at a word boundary. */
 function truncateReason(reason: string): string {
   if (reason.length <= MAX_REASON_LENGTH) {
     return reason
@@ -124,10 +113,7 @@ export function parseIssueBody(body: string): Partial<AutomationEntry> {
   }
 }
 
-/**
- * Reads the `--approved-by` list. Casing is left alone: these are GitHub logins as
- * the reactions reported them, and they end up on the public list.
- */
+/** Parses the `--approved-by` list, keeping the logins' casing. */
 export function parseApprovedBy(raw: string | undefined): string[] {
   return [
     ...new Set(
@@ -154,8 +140,7 @@ export function validateEntry(
     console.error('✗ Missing or invalid reason')
     return false
   }
-  // Belt and braces: sanitizeReason already strips these, so a link reaching here
-  // means a reason was built by some other path and must not go on the public list.
+  // Rejects any reason that still contains a link.
   if (/https?:\/\/|www\.|\]\(/i.test(entry.reason)) {
     console.error(
       '✗ Reason must be plain text - move links to Supporting Evidence',
@@ -201,8 +186,7 @@ export function generateEntry(
     issueUrl,
     reportedBy,
     createdAt: createdAt || new Date().toISOString().split('T')[0],
-    // Left off rather than written as [], so an entry added by hand reads the same
-    // as the ones that predate the vote being recorded.
+    // Omitted rather than [] to match entries without recorded votes.
     ...(approvedBy?.length ? { approvedBy } : {}),
   }
 }
@@ -239,8 +223,7 @@ async function fetchIssueFromGitHub(issueNumber: number): Promise<{
   createdAt: string
   reportedBy: string
 }> {
-  // Authenticated when running in CI, so the review workflow does not burn
-  // through the 60/hour unauthenticated budget.
+  // Authenticated to avoid the 60/hour unauthenticated rate limit.
   const octokit = new Octokit({ auth: readGithubToken() })
 
   try {
@@ -272,11 +255,7 @@ function isIssueNumber(arg: string): boolean {
   return /^\d+$/.test(arg)
 }
 
-/**
- * `--name=value` only. Legacy mode takes the issue body as a positional argument,
- * so a bare `--` prefix is not enough to tell a flag from a report that happens to
- * open with a dash.
- */
+/** Reads a `--name=value` flag. A bare `--` prefix could be a legacy-mode issue body. */
 function flag(name: string): string | undefined {
   const match = process.argv
     .slice(2)

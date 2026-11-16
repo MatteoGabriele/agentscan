@@ -5,8 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
-// The name is a contract. This is used in multiple places to get automation list.
-// Make sure to address every single implementation before changing this file name.
+// Other code reads this path; update every usage before renaming the file.
 describe('data/verified-automations-list.json', () => {
   it('exists at the path the GitHub Actions flow writes to', () => {
     expect(

@@ -5,6 +5,7 @@ import {
   type VueUiWaffleDatasetItem,
 } from 'vue-data-ui/vue-ui-waffle'
 import dayjs from 'dayjs'
+import { EMPTY_HOUR_NOTE } from '~~/shared/utils/charts.ts'
 
 import('vue-data-ui/style.css')
 
@@ -281,10 +282,14 @@ function getCountLabel(count: number) {
           :key="i"
           class="flex flex-col gap-1"
         >
-          <div
-            v-if="!waffle.totalCount"
-            class="aspect-square rounded-1 border-1 border-dashed border-ui-border/60"
-          />
+          <Tooltip v-if="!waffle.totalCount" :label="EMPTY_HOUR_NOTE" wide>
+            <div
+              tabindex="0"
+              class="aspect-square w-full flex items-center justify-center rounded-1 border-1 border-dashed border-ui-border/60 text-ui-muted"
+            >
+              <span class="i-lucide:triangle-alert" aria-hidden="true" />
+            </div>
+          </Tooltip>
 
           <VueUiWaffle v-else :dataset="waffle.dataset" :config="waffle.config">
             <template #tooltip="{ datapoint, config }">

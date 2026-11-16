@@ -1,24 +1,14 @@
 /// <reference types="node" />
 /**
- * Drop the entries whose GitHub account is gone from data/verified-automations-list.json.
+ * Removes entries from data/verified-automations-list.json whose GitHub account
+ * no longer exists. Run with `pnpm prune:automations` and commit the file.
  *
- * Accounts on the list get deleted, renamed, or suspended after they are
- * reported, and a stale entry either points at nothing or — once the login is
- * taken by somebody else — at the wrong person. Run it by hand every now and
- * then with `pnpm prune:automations` and commit the file.
+ * Each entry is looked up by login and by id:
+ *   - id gone (deleted or suspended): removed, even if someone else now holds
+ *     the login
+ *   - id alive under another login: a rename, reported to fix by hand
  *
- * Both halves of an entry are checked, because either one alone lies:
- *   - the login alone: a deleted login is free for anyone to claim, so the name
- *     can resolve to an account that was never reported
- *   - the id alone: it survives a rename, so the entry keeps pointing at a live
- *     account under a name the list no longer spells right
- *
- * Only entries whose id is gone are removed. A rename is reported and left
- * alone: the account is still there, so the entry is a name to fix by hand, not
- * a report to drop. GitHub answers 404 for suspended accounts too, so an account
- * it has taken down counts as gone.
- *
- * Credentials come from .env:
+ * Credentials from .env:
  *   NUXT_GITHUB_TOKEN   any token that may read public users
  */
 
@@ -46,10 +36,8 @@ type ById = { login: string } | null
 const sameLogin = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
 
 /**
- * `byLogin` is the answer for the entry's username, `byId` the answer for its
- * id — both null when GitHub returned 404. `byId` may be left undefined when
- * the login lookup already confirmed the entry, which is the common case and
- * saves the second request.
+ * `byLogin` and `byId` are the lookups for the entry's username and id (null on
+ * 404). `byId` is undefined when the login lookup already confirmed the entry.
  */
 export function classify(
   entry: AutomationEntry,
@@ -66,15 +54,14 @@ export function classify(
       : { state: 'renamed', login: byId.login }
   }
 
-  // The id is gone. Whoever answers to the login now is not the account that
-  // was reported, so the entry has to go either way.
+  // The id is gone, so the entry is removed whoever holds the login now.
   return byLogin ? { state: 'reclaimed', id: byLogin.id } : { state: 'gone' }
 }
 
 export const isGone = ({ status }: Check): boolean =>
   status.state === 'gone' || status.state === 'reclaimed'
 
-/** A 404 is an answer; anything else is a broken run and must not prune. */
+/** Returns null on 404 and rethrows any other error, so a failed run never prunes. */
 async function lookup<T>(request: () => Promise<T>): Promise<T | null> {
   try {
     return await request()
@@ -140,8 +127,7 @@ async function main() {
 
   const checks: Check[] = []
 
-  // One at a time: the list is small, and a burst of lookups is the one way a
-  // read-only token runs into a secondary rate limit.
+  // Sequential lookups avoid GitHub's secondary rate limit.
   for (const entry of list) {
     checks.push({ entry, status: await check(octokit, entry) })
   }
@@ -162,8 +148,7 @@ async function main() {
     return
   }
 
-  // Every account gone at once is a broken lookup, not a mass deletion, so the
-  // committed file is left alone.
+  // Every account gone at once means the lookups failed; leave the file alone.
   if (removed.length === list.length && list.length > 1) {
     console.error(
       '✗ Every entry looked gone — that is a broken run, leaving the file untouched',
@@ -181,7 +166,7 @@ async function main() {
   console.log('Commit it on a branch and open a pull request to publish.')
 }
 
-// Guarded so importing a helper from here — the tests do — does not prune.
+// Runs only when executed directly, not when imported.
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((err) => {
     console.error('Error:', err.message)

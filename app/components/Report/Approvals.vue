@@ -19,6 +19,12 @@ const restReviewersCount = computed<number>(() => {
   return props.approvedBy.length - visibleReviewers.value.length
 })
 
+// Built here rather than in the template: Volar rewrites `//` in component
+// props as a comment, which breaks type checking for the rest of the template.
+function profileUrl(reviewer: string): string {
+  return `https://github.com/${reviewer}`
+}
+
 function avatarUrl(reviewer: string): string {
   return `https://avatars.githubusercontent.com/${encodeURIComponent(reviewer)}?size=48`
 }
@@ -43,7 +49,7 @@ function showRest() {
       >
         <Tooltip :label="reviewer">
           <NuxtLink
-            :to="`https://github.com/${reviewer}`"
+            :to="profileUrl(reviewer)"
             target="_blank"
             external
             class="block size-6 overflow-hidden rounded-full bg-ui-card ring-2 ring-ui-card filter-saturate-0 hover:filter-saturate-100 hover:scale-115 transition-all"

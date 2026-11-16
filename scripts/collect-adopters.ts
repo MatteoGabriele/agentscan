@@ -1,25 +1,24 @@
 /// <reference types="node" />
 /**
- * Collect the repositories using AgentScan into data/adopters.json.
+ * Collects the repositories using AgentScan into data/adopters.json, and the
+ * people building it into data/contributors.json.
+ * Run with `pnpm collect:adopters` and commit both files.
  *
- * This used to run per request in server/api/adopters.get.ts, but code search
- * is rate limited to 10 requests a minute and listing the app installations
- * costs a token per install. Run it by hand every now and then with
- * `pnpm collect:adopters` and commit the file; the site serves that.
- *
- * Credentials come from .env, the same ones the server uses:
- *   NUXT_GITHUB_TOKEN            a token that may search code across public repos
- *   NUXT_GITHUB_APP_ID           the AgentScan app, to list its installations
+ * Credentials from .env:
+ *   NUXT_GITHUB_TOKEN            code search across public repos
+ *   NUXT_GITHUB_APP_ID           lists the app installations
  *   NUXT_GITHUB_APP_PRIVATE_KEY  base64-encoded PEM
  *
- * Without the app credentials only the action adopters are collected, which
- * would drop every app-only repository from the file, so the run fails instead.
+ * Fails without the app credentials, since the result would miss app-only
+ * adopters.
  */
 
 import fs from 'fs'
 import path from 'path'
 import { App, Octokit } from 'octokit'
 import type { AdopterRepository } from '../shared/types/adopter-repository'
+import type { ContributorsResponse } from '../shared/types/contributor'
+import { collectContributors, formatContributorDiff } from './lib/contributors'
 
 const SEARCH_PAGE_SIZE = 100
 const MAX_SEARCH_PAGES = 5
@@ -30,6 +29,7 @@ const ACTION_SEARCH_QUERY =
   '"MatteoGabriele/agentscan-action" path:.github/workflows -is:fork'
 
 const OUTPUT_PATH = 'data/adopters.json'
+const CONTRIBUTORS_OUTPUT_PATH = 'data/contributors.json'
 
 const repositoryQuery = `
   query ($ids: [ID!]!) {
@@ -101,8 +101,7 @@ async function fetchRepositories(octokit: Octokit, ids: string[]) {
     .filter((node) => node !== null)
 }
 
-// The action leaves a workflow file behind, so adopters are found by searching
-// for it.
+// Finds action adopters by searching for the workflow file.
 export async function collectActionRepositories(
   token: string,
 ): Promise<AdopterRepository[]> {
@@ -124,8 +123,7 @@ export async function collectActionRepositories(
   }))
 }
 
-// The app leaves nothing in the repository, so we ask GitHub, as the app, which
-// installations exist.
+// Lists app adopters from the app's installations.
 export async function collectAppRepositories(
   appId: string,
   encodedPrivateKey: string,
@@ -143,8 +141,7 @@ export async function collectAppRepositories(
       continue
     }
 
-    // Skipping a failed installation would return a short list that still looks
-    // healthy and overwrite the committed file, so the whole run fails instead.
+    // A failed installation fails the run, so a partial list never overwrites the file.
     let installed
     try {
       installed = await octokit.paginate(
@@ -177,9 +174,8 @@ export async function collectAppRepositories(
 }
 
 /**
- * A repository running both the action and the app is one adopter, and the
- * list passed last wins, so it is recorded with that platform. Ties are
- * broken by name so a week without star changes produces no diff at all.
+ * Merges adopter lists into one entry per repository; later lists win.
+ * Sorted by stars, then name, for stable diffs.
  */
 export function mergeAdopters(
   ...lists: AdopterRepository[][]
@@ -193,6 +189,64 @@ export function mergeAdopters(
   return [...adopters.values()].sort((a, b) => {
     return b.stars - a.stars || a.name.localeCompare(b.name)
   })
+}
+
+export type AdopterDiff = {
+  gained: AdopterRepository[]
+  lost: AdopterRepository[]
+}
+
+// Compares two adopter lists by repository name.
+export function diffAdopters(
+  previous: AdopterRepository[],
+  current: AdopterRepository[],
+): AdopterDiff {
+  const previousNames = new Set(previous.map((repository) => repository.name))
+  const currentNames = new Set(current.map((repository) => repository.name))
+
+  return {
+    gained: current.filter((repository) => !previousNames.has(repository.name)),
+    lost: previous.filter((repository) => !currentNames.has(repository.name)),
+  }
+}
+
+export function formatAdopterDiff(
+  previousCount: number,
+  currentCount: number,
+  { gained, lost }: AdopterDiff,
+): string {
+  if (gained.length === 0 && lost.length === 0) {
+    return `= No change since the last run (${currentCount})`
+  }
+
+  const describe = (repository: AdopterRepository) =>
+    `${repository.name} (${repository.platform}, ★ ${repository.stars})`
+
+  return [
+    `Δ +${gained.length} gained, -${lost.length} lost (${previousCount} → ${currentCount})`,
+    ...gained.map((repository) => `  + ${describe(repository)}`),
+    ...lost.map((repository) => `  - ${describe(repository)}`),
+  ].join('\n')
+}
+
+// The committed list; empty when the file doesn't exist yet.
+function readPreviousAdopters(outputPath: string): AdopterRepository[] {
+  if (!fs.existsSync(outputPath)) {
+    return []
+  }
+
+  return JSON.parse(fs.readFileSync(outputPath, 'utf-8')) as AdopterRepository[]
+}
+
+// The committed contributors; empty when the file doesn't exist yet.
+function readPreviousContributors(outputPath: string): ContributorsResponse {
+  if (!fs.existsSync(outputPath)) {
+    return { repositories: [], contributors: [] }
+  }
+
+  return JSON.parse(
+    fs.readFileSync(outputPath, 'utf-8'),
+  ) as ContributorsResponse
 }
 
 function readEnv(name: string): string {
@@ -213,10 +267,14 @@ async function main() {
   const appId = readEnv('GITHUB_APP_ID')
   const privateKey = readEnv('GITHUB_APP_PRIVATE_KEY')
 
-  const [actionRepositories, appRepositories] = await Promise.all([
-    collectActionRepositories(token),
-    collectAppRepositories(appId, privateKey),
-  ])
+  // Any failed lookup rejects here, so neither file is written half-updated.
+  const [actionRepositories, appRepositories, contributors] = await Promise.all(
+    [
+      collectActionRepositories(token),
+      collectAppRepositories(appId, privateKey),
+      collectContributors(token),
+    ],
+  )
 
   const adopters = mergeAdopters(actionRepositories, appRepositories)
 
@@ -224,21 +282,56 @@ async function main() {
     `📋 ${adopters.length} adopter(s): ${actionRepositories.length} from the action, ${appRepositories.length} from the app`,
   )
 
-  // An empty result means the search or the app listing broke, not that every
-  // adopter left, so keep whatever is already committed.
+  // An empty result means a lookup failed; keep the committed file.
   if (adopters.length === 0) {
     console.error('✗ No adopters found — leaving the existing file untouched')
     process.exit(1)
   }
 
-  if (dryRun) {
-    console.log(JSON.stringify(adopters, null, 2))
-    return
+  console.log(`👥 ${contributors.contributors.length} contributor(s)`)
+
+  if (contributors.contributors.length === 0) {
+    console.error(
+      '✗ No contributors found — leaving the existing files untouched',
+    )
+    process.exit(1)
   }
 
   const outputPath = path.join(process.cwd(), OUTPUT_PATH)
+  const previous = readPreviousAdopters(outputPath)
+  const diff = formatAdopterDiff(
+    previous.length,
+    adopters.length,
+    diffAdopters(previous, adopters),
+  )
+
+  const contributorsOutputPath = path.join(
+    process.cwd(),
+    CONTRIBUTORS_OUTPUT_PATH,
+  )
+  const contributorDiff = formatContributorDiff(
+    readPreviousContributors(contributorsOutputPath).contributors,
+    contributors.contributors,
+  )
+
+  if (dryRun) {
+    console.log(JSON.stringify(adopters, null, 2))
+    console.log(JSON.stringify(contributors, null, 2))
+    console.log(diff)
+    console.log(contributorDiff)
+    return
+  }
+
   fs.writeFileSync(outputPath, JSON.stringify(adopters, null, 2) + '\n')
+  console.log(diff)
   console.log(`✓ Wrote ${OUTPUT_PATH}`)
+
+  fs.writeFileSync(
+    contributorsOutputPath,
+    JSON.stringify(contributors, null, 2) + '\n',
+  )
+  console.log(contributorDiff)
+  console.log(`✓ Wrote ${CONTRIBUTORS_OUTPUT_PATH}`)
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

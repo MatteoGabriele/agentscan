@@ -12,14 +12,12 @@ const recentItems = computed<VerifiedAutomation[]>(() => {
 const restItemsCount = computed<number>(() => {
   return items.value.slice(MAX_VISIBLE_ITEMS).length
 })
-
-const { trackEvent } = useSaEvent()
 </script>
 
 <template>
   <div>
     <p
-      class="text-xs text-ui-muted/80 tracking-wider font-medium text-center mb-3"
+      class="text-xs text-ui-muted tracking-wider font-medium text-center mb-3"
     >
       Recently reported by the community
     </p>
@@ -40,7 +38,6 @@ const { trackEvent } = useSaEvent()
           :key="account.username"
           :to="{ name: 'user-name', params: { name: account.username } }"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border border-ui-border/40 bg-white/2 hover:bg-white/4 hover:border-ui-border/60 transition-all"
-          @click="trackEvent('automation_list_account_link_clicked')"
         >
           <span class="text-ui-text">@{{ account.username }}</span>
         </NuxtLink>

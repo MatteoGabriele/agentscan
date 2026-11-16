@@ -12,6 +12,8 @@ import {
   getClassificationForPreviousDays,
   getClassificationStatsByScanTime,
   getWeeklyClassification,
+  getDaySoFarBuckets,
+  estimateDayTotal,
 } from './count-classification-by-date'
 import type { ActivityItem } from '../types/activity'
 
@@ -32,9 +34,13 @@ function expectClassificationMetric(
 }
 
 function expectClassificationCounts(
-  received: ClassificationStats,
-  expected: ClassificationStats,
+  received: ClassificationStats | undefined,
+  expected: Omit<ClassificationStats, 'createdAt'>,
 ): void {
+  if (!received) {
+    throw new Error('Expected classification stats, received undefined')
+  }
+
   expectClassificationMetric(received.organic, expected.organic)
   expectClassificationMetric(received.mixed, expected.mixed)
   expectClassificationMetric(received.automation, expected.automation)
@@ -63,11 +69,11 @@ describe('getClassificationStatsByDate', () => {
     ])
 
     expect(Object.keys(result)).toEqual(['2026-06-10'])
-    expect(result['2026-06-10']!.total.count).toBe(2)
-    expect(result['2026-06-10']!.organic.count).toBe(1)
-    expect(result['2026-06-10']!.organic.percentage).toBe(50)
-    expect(result['2026-06-10']!.automation.count).toBe(1)
-    expect(result['2026-06-10']!.automation.percentage).toBe(50)
+    expect(result['2026-06-10']?.total.count).toBe(2)
+    expect(result['2026-06-10']?.organic.count).toBe(1)
+    expect(result['2026-06-10']?.organic.percentage).toBe(50)
+    expect(result['2026-06-10']?.automation.count).toBe(1)
+    expect(result['2026-06-10']?.automation.percentage).toBe(50)
   })
 
   it('returns counts, percentages, and default trends for each date', () => {
@@ -422,10 +428,10 @@ describe('getClassificationByDateChunks', () => {
 
     expect(result).toHaveLength(3)
 
-    expect(result[0].startDate).toBe('2026-06-01')
-    expect(result[0].endDate).toBe('2026-06-03')
-    expect(result[0].days).toBe(3)
-    expectClassificationCounts(result[0].classification, {
+    expect(result[0]?.startDate).toBe('2026-06-01')
+    expect(result[0]?.endDate).toBe('2026-06-03')
+    expect(result[0]?.days).toBe(3)
+    expectClassificationCounts(result[0]?.classification, {
       organic: {
         count: 1,
         trend: 100,
@@ -448,10 +454,10 @@ describe('getClassificationByDateChunks', () => {
       },
     })
 
-    expect(result[1].startDate).toBe('2026-06-04')
-    expect(result[1].endDate).toBe('2026-06-06')
-    expect(result[1].days).toBe(3)
-    expectClassificationCounts(result[1].classification, {
+    expect(result[1]?.startDate).toBe('2026-06-04')
+    expect(result[1]?.endDate).toBe('2026-06-06')
+    expect(result[1]?.days).toBe(3)
+    expectClassificationCounts(result[1]?.classification, {
       organic: {
         count: 2,
         trend: 50,
@@ -474,10 +480,10 @@ describe('getClassificationByDateChunks', () => {
       },
     })
 
-    expect(result[2].startDate).toBe('2026-06-07')
-    expect(result[2].endDate).toBe('2026-06-08')
-    expect(result[2].days).toBe(2)
-    expectClassificationCounts(result[2].classification, {
+    expect(result[2]?.startDate).toBe('2026-06-07')
+    expect(result[2]?.endDate).toBe('2026-06-08')
+    expect(result[2]?.days).toBe(2)
+    expectClassificationCounts(result[2]?.classification, {
       organic: {
         count: 0,
         trend: 0,
@@ -570,10 +576,10 @@ describe('getClassificationByDateChunks', () => {
       },
     ])
 
-    expect(result[1].classification.organic.count).toBe(1)
-    expect(result[1].classification.mixed.count).toBe(0)
-    expect(result[1].classification.automation.count).toBe(1)
-    expect(result[1].classification.total.count).toBe(2)
+    expect(result[1]?.classification.organic.count).toBe(1)
+    expect(result[1]?.classification.mixed.count).toBe(0)
+    expect(result[1]?.classification.automation.count).toBe(1)
+    expect(result[1]?.classification.total.count).toBe(2)
   })
 
   it('returns an empty array when dates are empty', () => {
@@ -620,10 +626,10 @@ describe('getClassificationByDateChunks', () => {
     })
 
     expect(result).toHaveLength(1)
-    expect(result[0].startDate).toBe('2026-06-08')
-    expect(result[0].endDate).toBe('2026-06-14')
-    expect(result[0].days).toBe(7)
-    expect(result[0].classification.total.count).toBe(6)
+    expect(result[0]?.startDate).toBe('2026-06-08')
+    expect(result[0]?.endDate).toBe('2026-06-14')
+    expect(result[0]?.days).toBe(7)
+    expect(result[0]?.classification.total.count).toBe(6)
   })
 
   it('returns only complete Monday to Sunday calendar week chunks when rolling is false', () => {
@@ -664,10 +670,10 @@ describe('getClassificationByDateChunks', () => {
 
     expect(result).toHaveLength(2)
 
-    expect(result[0].startDate).toBe('2026-06-08')
-    expect(result[0].endDate).toBe('2026-06-14')
-    expect(result[0].days).toBe(7)
-    expectClassificationCounts(result[0].classification, {
+    expect(result[0]?.startDate).toBe('2026-06-08')
+    expect(result[0]?.endDate).toBe('2026-06-14')
+    expect(result[0]?.days).toBe(7)
+    expectClassificationCounts(result[0]?.classification, {
       organic: {
         count: 1,
         trend: 100,
@@ -690,10 +696,10 @@ describe('getClassificationByDateChunks', () => {
       },
     })
 
-    expect(result[1].startDate).toBe('2026-06-15')
-    expect(result[1].endDate).toBe('2026-06-21')
-    expect(result[1].days).toBe(7)
-    expectClassificationCounts(result[1].classification, {
+    expect(result[1]?.startDate).toBe('2026-06-15')
+    expect(result[1]?.endDate).toBe('2026-06-21')
+    expect(result[1]?.days).toBe(7)
+    expectClassificationCounts(result[1]?.classification, {
       organic: {
         count: 2,
         trend: 20,
@@ -859,7 +865,7 @@ describe('fillEmptyHourlyBuckets', () => {
     ])
 
     // Zeroed because there was nothing to classify, not because of a score.
-    expectClassificationCounts(result['2026-08-08T06:00:00.000Z']!, {
+    expectClassificationCounts(result['2026-08-08T06:00:00.000Z'], {
       organic: { count: 0, trend: 0, percentage: 0 },
       mixed: { count: 0, trend: 0, percentage: 0 },
       automation: { count: 0, trend: 0, percentage: 0 },
@@ -875,7 +881,7 @@ describe('fillEmptyHourlyBuckets', () => {
 
     const result = fillEmptyHourlyBuckets({ countsByHour })
 
-    expectClassificationCounts(result['2026-08-08T07:00:00.000Z']!, {
+    expectClassificationCounts(result['2026-08-08T07:00:00.000Z'], {
       organic: { count: 0, trend: 0, percentage: 0 },
       mixed: { count: 0, trend: 0, percentage: 0 },
       automation: { count: 1, trend: 0, percentage: 100 },
@@ -917,19 +923,19 @@ describe('fillEmptyHourlyBuckets', () => {
 
     // Both 06:xx scans belong to the same clock hour, so their counts add up
     // instead of splitting into two buckets.
-    expectClassificationCounts(result['2026-08-08T06:00:00.000Z']!, {
+    expectClassificationCounts(result['2026-08-08T06:00:00.000Z'], {
       organic: { count: 0, trend: 0, percentage: 0 },
       mixed: { count: 0, trend: 0, percentage: 0 },
       automation: { count: 2, trend: 0, percentage: 100 },
       total: { count: 2, trend: 0, percentage: 100 },
     })
 
-    expect(result['2026-08-08T06:00:00.000Z']!.createdAt).toBe(
+    expect(result['2026-08-08T06:00:00.000Z']?.createdAt).toBe(
       '2026-08-08T06:14:47.000Z',
     )
 
     // The hour with no scan at all is still an empty placeholder.
-    expectClassificationCounts(result['2026-08-08T07:00:00.000Z']!, {
+    expectClassificationCounts(result['2026-08-08T07:00:00.000Z'], {
       organic: { count: 0, trend: 0, percentage: 0 },
       mixed: { count: 0, trend: 0, percentage: 0 },
       automation: { count: 0, trend: 0, percentage: 0 },
@@ -983,6 +989,74 @@ describe('getActivityStatsByBuckets', () => {
     expect(getActivityStatsByBuckets({})).toBeNull()
     expect(
       getActivityStatsByBuckets(countsByHour, ['2026-08-08T09:00:00.000Z']),
+    ).toBeNull()
+  })
+})
+
+describe('getDaySoFarBuckets', () => {
+  const hour = (date: string, h: number) =>
+    `${date}T${String(h).padStart(2, '0')}:00:00.000Z`
+
+  it('splits the window into today and the hours yesterday still has ahead', () => {
+    const scanTimes = [
+      ...Array.from({ length: 11 }, (_, h) => hour('2026-11-14', h + 13)),
+      ...Array.from({ length: 14 }, (_, h) => hour('2026-11-15', h)),
+    ]
+
+    const result = getDaySoFarBuckets(scanTimes)
+
+    expect(result?.date).toBe('2026-11-15')
+    expect(result?.previousDate).toBe('2026-11-14')
+    expect(result?.today).toHaveLength(14)
+    expect(result?.remaining).toEqual(
+      Array.from({ length: 10 }, (_, h) => hour('2026-11-14', h + 14)),
+    )
+  })
+
+  it('keeps every later hour of yesterday at the first hour of a day', () => {
+    const scanTimes = Array.from({ length: 25 }, (_, h) =>
+      new Date(Date.UTC(2026, 10, 14, h)).toISOString(),
+    )
+
+    const result = getDaySoFarBuckets(scanTimes)
+
+    expect(result?.date).toBe('2026-11-15')
+    expect(result?.today).toEqual([hour('2026-11-15', 0)])
+    expect(result?.remaining).toEqual(
+      Array.from({ length: 23 }, (_, h) => hour('2026-11-14', h + 1)),
+    )
+  })
+
+  it('crosses month boundaries', () => {
+    expect(getDaySoFarBuckets([hour('2026-12-01', 3)])?.previousDate).toBe(
+      '2026-11-30',
+    )
+  })
+
+  it('returns null without scan times', () => {
+    expect(getDaySoFarBuckets([])).toBeNull()
+  })
+})
+
+describe('estimateDayTotal', () => {
+  it('scales today by the share of yesterday done by the same hour', () => {
+    expect(
+      estimateDayTotal({ soFar: 300, remaining: 600, previousTotal: 1000 }),
+    ).toBe(750)
+  })
+
+  it('follows an even day linearly', () => {
+    expect(
+      estimateDayTotal({ soFar: 120, remaining: 120, previousTotal: 240 }),
+    ).toBe(240)
+  })
+
+  it('returns null when yesterday had nothing by this hour', () => {
+    expect(
+      estimateDayTotal({ soFar: 10, remaining: 50, previousTotal: 50 }),
+    ).toBeNull()
+    expect(
+      estimateDayTotal({ soFar: 10, remaining: 0, previousTotal: 0 }),
     ).toBeNull()
   })
 })

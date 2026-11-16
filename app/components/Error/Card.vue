@@ -32,17 +32,13 @@ const tones = {
   notice: {
     ring: 'border-ui-mixed/40',
     halo: 'bg-ui-mixed/10',
-    text: 'text-ui-mixed',
+    text: 'text-ui-mixed-text',
   },
+  // Errors stay neutral: classification colors only describe accounts.
   critical: {
-    ring: 'border-ui-automation/40',
-    halo: 'bg-ui-automation/10',
-    text: 'text-ui-automation',
-  },
-  positive: {
-    ring: 'border-ui-organic/40',
-    halo: 'bg-ui-organic/10',
-    text: 'text-ui-organic',
+    ring: 'border-ui-border',
+    halo: 'bg-ui-muted/10',
+    text: 'text-ui-text',
   },
 } as const
 
@@ -57,16 +53,11 @@ const showDetail = computed<boolean>(() => {
 })
 
 const isRetrying = ref(false)
-const { trackEvent } = useSaEvent()
 
 async function handleRetry() {
   if (!props.retry || isRetrying.value) {
     return
   }
-
-  trackEvent('error_card_retry_clicked', {
-    statusCode: props.statusCode ?? 0,
-  })
 
   isRetrying.value = true
 
@@ -105,7 +96,7 @@ async function handleRetry() {
         {{ description }}
       </p>
 
-      <p v-if="hint" class="mt-2 max-w-md text-xs text-ui-muted/70 text-pretty">
+      <p v-if="hint" class="mt-2 max-w-md text-xs text-ui-muted text-pretty">
         {{ hint }}
       </p>
 
@@ -135,7 +126,7 @@ async function handleRetry() {
 
       <p
         v-if="showDetail"
-        class="mt-6 pt-4 w-full border-t-1 border-solid border-ui-border-subtle/40 text-xs font-mono text-ui-muted/60 text-pretty"
+        class="mt-6 pt-4 w-full border-t-1 border-solid border-ui-border-subtle/40 text-xs font-mono text-ui-muted text-pretty"
       >
         <span v-if="statusCode">{{ statusCode }} · </span>
         <span>{{ detail }}</span>

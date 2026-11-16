@@ -21,17 +21,13 @@ const REPO = 'agentscan'
 
 const APPROVED_LABEL = 'automation:approved'
 
-/**
- * The approved reports still waiting on a list entry. The review workflow
- * leaves them open on purpose; they are closed by the commit this run's
- * `closes` lines go into.
- */
+/** Open approved reports that still need a list entry. */
 async function approvedReports(octokit: Octokit): Promise<Report[]> {
   const issues = await octokit.paginate(octokit.rest.issues.listForRepo, {
     owner: OWNER,
     repo: REPO,
     state: 'open',
-    // Both labels, so a pull request or an unrelated open issue cannot match.
+    // Both labels, to exclude pull requests and unrelated issues.
     labels: `automation,${APPROVED_LABEL}`,
     per_page: 100,
   })
@@ -39,7 +35,7 @@ async function approvedReports(octokit: Octokit): Promise<Report[]> {
   return issues.filter((issue) => !issue.pull_request).map(toReport)
 }
 
-/** Ascending, so the lines read in the order the reports were filed. */
+/** `closes #n` lines in ascending issue order. */
 export function closesLines(issues: number[]): string {
   return issues
     .slice()
@@ -88,8 +84,7 @@ async function main() {
   const reports = await approvedReports(octokit)
   const list = readList()
 
-  // Deduped before the reactions are read, so an account that is already listed
-  // costs nothing beyond the listing itself.
+  // Already listed accounts are filtered out before reading reactions.
   const entries = new Map<AutomationEntry, Report>()
 
   for (const report of reports) {
@@ -120,8 +115,7 @@ async function main() {
       continue
     }
 
-    // Counted now rather than trusted from the closing comment, so the entry
-    // records who had actually approved it.
+    // Approvals are recounted from the reactions.
     const { approvedBy } = await tally(octokit, report.number, reviewers)
 
     if (approvedBy.length) {
@@ -147,13 +141,12 @@ async function main() {
   writeList([...list, ...publishable])
   console.log(`\nAdded ${publishable.length} entr(y/ies) to ${LIST_PATH}`)
   console.log('Commit it on a branch and open a pull request to publish.')
-  // Pasted into the commit message, so merging the list update closes every
-  // report it covers.
+  // A commit with these lines closes the reports when merged.
   console.log('\nPaste into the commit message to close the reports:\n')
   console.log(closesLines(published))
 }
 
-// Guarded so importing a helper from here — the tests do — does not publish.
+// Runs only when executed directly, not when imported.
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((err) => {
     console.error('Error:', err.message)

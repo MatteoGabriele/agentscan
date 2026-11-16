@@ -1,49 +1,47 @@
 <script setup lang="ts">
+import type { AsyncDataRequestStatus } from '#app'
 import type { ClassificationLabel } from '@unveil/identity'
 import type { Report } from '@unveil/identity/report'
-import type { GitHubUser } from '@unveil/identity/providers/github'
+import { fromGitHub, type GitHubUser } from '@unveil/identity/providers/github'
+import type { AnalyzeReturn } from '@unveil/vk'
 import { buildReportIssueUrl } from '~~/shared/utils/report-issue'
+import type { RepoEvent } from '~/utils/repo-activity'
 
 const props = defineProps<{
   user: GitHubUser
+  analysis?: AnalyzeReturn | null
+  status: AsyncDataRequestStatus
+  error?: unknown
+  retry: () => unknown
 }>()
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const analysisKey = computed<string>(() => `analysis:${username.value}`)
-const { data, status, error, refresh } = useFetch(
-  () => `/api/identify-replicant/${username.value}`,
+const { data: accountReports, status: accountReportsStatus } = useFetch(
+  () => `/api/account-reports/${username.value}`,
   {
-    query: {
-      show_events: true,
-    },
-    key: analysisKey,
-    watch: [username],
+    key: computed(() => `account-reports:${username.value}`),
+    query: computed(() => ({ id: props.user.id })),
     lazy: true,
   },
 )
 
-const { data: verifiedAutomations } = await useVerifiedAutomations()
+// Held until community reports settle too, so a reported account never
+// flashes its regular classification before switching.
+const isPending = computed<boolean>(() => {
+  return props.status === 'pending' || accountReportsStatus.value === 'pending'
+})
 
 const verifiedAutomation = computed(() => {
-  return verifiedAutomations.value?.find((account) => {
-    return (
-      account.username.toLowerCase() === username.value?.toLowerCase() ||
-      account.id === props.user.id
-    )
-  })
+  return accountReports.value?.verifiedAutomation ?? undefined
 })
 
-const { data: automationTally } = await useAutomationTally()
 const matchedTally = computed(() => {
-  return automationTally.value?.find((tally) => tally.id === props.user.id)
+  return accountReports.value?.automationTally ?? undefined
 })
 
-const { data: integrations } = await useIntegrations()
 const activityReport = computed<IntegrationItem | undefined>(() => {
-  return integrations.value?.find((item) => {
-    return item.username.toLowerCase() === username.value?.toLowerCase()
-  })
+  return accountReports.value?.integration ?? undefined
 })
 
 const approvedBy = computed<string[]>(() => {
@@ -54,7 +52,35 @@ const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
 
 const classification = computed<ClassificationLabel | undefined>(() => {
-  return data.value?.report.classification
+  return isPending.value ? undefined : props.analysis?.report.classification
+})
+
+const repoEvents = computed<RepoEvent[]>(() => {
+  if (!classification.value) {
+    return []
+  }
+  const events = props.analysis?.events ?? []
+  return fromGitHub({ user: props.user, events }).events
+})
+
+const rawEventsUrl = computed<string>(() => {
+  return `https://api.github.com/users/${username.value}/events?per_page=100`
+})
+const hasEventBreakdown = computed<boolean>(() => {
+  return groupEventsByRepo(repoEvents.value).length > 0
+})
+
+// The breakdown says nothing useful when there's too little activity to classify.
+const hasActivityBreakdown = computed<boolean>(() => {
+  return (
+    repoEvents.value.length > 0 && classification.value !== 'insufficient-data'
+  )
+})
+
+const hasSignals = computed<boolean>(() => {
+  return (
+    (props.analysis?.report.flags.length ?? 0) > 0 || hasActivityReport.value
+  )
 })
 
 const { classificationDetails } = useClassificationDetails(classification)
@@ -72,27 +98,27 @@ const flagAccountUrl = computed<string>(() => {
   return buildReportIssueUrl({
     username: username.value || '',
     userId: props.user.id,
-    flags: data.value?.report.flags ?? [],
+    flags: props.analysis?.report.flags ?? [],
     sourceUrl: `https://agentscan.tools/user/${username.value}`,
   })
 })
 
 const identifyAnalysis = computed<Report | undefined>(() => {
-  return data.value?.report
+  return props.analysis?.report
 })
 
 const score = computed<number | undefined>(() => {
-  return data.value?.report.score
+  return props.analysis?.report.score
 })
 
 const isBountyHunter = computed<boolean>(() => {
-  return !!data.value?.report.isBountyHunter
+  return !!props.analysis?.report.isBountyHunter
 })
 
 const { nearestClassification } = useNearestClassification(score)
 
 const confidence = computed<number | undefined>(() => {
-  return data.value?.report.confidence
+  return props.analysis?.report.confidence
 })
 
 const { coverageLevel } = useDataCoverage(confidence)
@@ -104,11 +130,13 @@ const warnings = computed<string[]>(() => {
     coverageLevel.value === 'low' &&
     classification.value !== 'insufficient-data'
   ) {
-    list.push('Limited activity to analyze. Treat this result as provisional.')
+    list.push('There is little activity to analyze, so this result may change.')
   }
 
   if (nearestClassification.value) {
-    list.push(`Activity close to ${nearestClassification.value} signals.`)
+    list.push(
+      `This result is close to the "${CLASSIFICATION_NAMES[nearestClassification.value]}" group.`,
+    )
   }
 
   if (isBountyHunter.value) {
@@ -118,7 +146,7 @@ const warnings = computed<string[]>(() => {
   if (matchedTally.value) {
     const count = matchedTally.value.counter
     list.push(
-      `Opened ${count} PR${count === 1 ? '' : 's'} in repositories we scan daily, while scoring as automation.`,
+      `Previously classified as automation on ${count} pull request${count === 1 ? '' : 's'} in repositories we scan daily.`,
     )
   }
 
@@ -147,9 +175,9 @@ useSeoAnalysis(identifyAnalysis, {
     />
 
     <div class="px-6">
-      <LazyAnalysisCardSkeleton v-if="status === 'pending'" />
-      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => refresh()" />
-      <template v-else-if="data">
+      <LazyAnalysisCardSkeleton v-if="isPending" />
+      <LazyErrorCardGeneric v-else-if="error" :error :retry="() => retry()" />
+      <template v-else-if="analysis">
         <section v-if="verifiedAutomation">
           <header class="mb-2 flex gap-2 items-center text-ui-automation">
             <span class="i-lucide:circle-alert text-base" aria-hidden="true" />
@@ -178,7 +206,7 @@ useSeoAnalysis(identifyAnalysis, {
               external
               class="text-ui-muted underline inline text-xs hover:text-ui-text"
             >
-              View issue
+              View or dispute the report
             </NuxtLink>
           </footer>
         </section>
@@ -190,7 +218,10 @@ useSeoAnalysis(identifyAnalysis, {
                   v-if="warnings.length"
                   class="flex items-start gap-2 text-sm text-ui-muted mb-2"
                 >
-                  <span class="i-lucide:megaphone text-xs shrink-0"></span>
+                  <span
+                    class="i-lucide:info text-xs shrink-0"
+                    aria-hidden="true"
+                  />
                   <ul class="flex flex-col gap-1">
                     <li
                       v-for="(warning, i) in warnings"
@@ -204,7 +235,11 @@ useSeoAnalysis(identifyAnalysis, {
 
                 <div class="flex flex-wrap gap-2 items-center">
                   <div class="flex gap-2 items-center" :class="scoreStyle.text">
-                    <span :class="classificationIcon" class="text-base" />
+                    <span
+                      :class="classificationIcon"
+                      class="text-base"
+                      aria-hidden="true"
+                    />
                     <h3 class="text-xl font-mono">
                       {{ classificationDetails.label }}
                     </h3>
@@ -218,34 +253,27 @@ useSeoAnalysis(identifyAnalysis, {
           </header>
 
           <div
-            class="text-sm text-ui-muted flex flex-wrap items-center gap-x-3 gap-y-2"
+            v-if="hasEventBreakdown || hasActivityBreakdown"
+            class="mt-4 flex flex-col gap-2"
           >
-            <p v-if="data.eventsCount > 0">
-              Analyzed from the last {{ data.eventsCount }} public GitHub
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
-              >
-                events
-              </NuxtLink>
-            </p>
-            <p v-else>
-              No recent
-              <NuxtLink
-                external
-                target="_blank"
-                class="underline"
-                :to="`https://api.github.com/users/${username}/events?per_page=100`"
-              >
-                events</NuxtLink
-              >
-              from this account
-            </p>
-
-            <DetectionVersion class="hidden md:inline-flex" />
+            <AnalysisRepoActivityDisclosure
+              v-if="hasEventBreakdown"
+              :events="repoEvents"
+              :raw-events-url
+            />
+            <AnalysisActivityBreakdownDisclosure
+              v-if="hasActivityBreakdown"
+              :events="repoEvents"
+            />
           </div>
+
+          <p class="mt-3 text-sm text-ui-muted">
+            <template v-if="analysis.eventsCount > 0">
+              Analyzed from the last {{ analysis.eventsCount }} public GitHub
+              events
+            </template>
+            <template v-else>No recent events from this account</template>
+          </p>
         </template>
 
         <section
@@ -268,34 +296,25 @@ useSeoAnalysis(identifyAnalysis, {
     </div>
   </div>
 
-  <div class="@lg:mx-6">
-    <AnalysisFlagsSkeleton v-if="status === 'pending'" />
+  <div v-if="isPending || (analysis && hasSignals)" class="@lg:mx-6">
+    <AnalysisFlagsSkeleton v-if="isPending" />
     <LazyAnalysisFlags
-      v-else-if="data && (data.report.flags.length > 0 || hasActivityReport)"
-      :flags="data.report.flags"
+      v-else-if="analysis"
+      :flags="analysis.report.flags"
       :activity-report="activityReport"
       hydrate-on-interaction
     />
   </div>
 
-  <template v-if="classification !== 'insufficient-data' && data">
+  <template
+    v-if="classification && classification !== 'insufficient-data' && analysis"
+  >
     <LazyChartAccountEventsTimeline
       :classification="classification"
-      :events="data.events"
+      :events="analysis.events"
       hydrate-on-visible
-    />
-
-    <LazyChartAccountEventsBreakdown
-      :classification="classification"
-      :events="data.events"
-      hydrate-on-interaction
     />
   </template>
 
-  <p
-    class="mt-8 mx-auto max-w-md text-xs text-ui-muted/60 leading-relaxed text-pretty text-center"
-  >
-    Results are based on pattern analysis and should be interpreted as possible
-    signals, not conclusions. Always verify findings with additional context.
-  </p>
+  <CommonDisclaimer class="mt-8 mx-auto max-w-md text-center" />
 </template>

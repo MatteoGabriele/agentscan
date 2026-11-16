@@ -5,7 +5,7 @@ import {
   type VueUiXyConfig,
 } from 'vue-data-ui'
 import { useTooltipPosition } from 'vue-data-ui/composables'
-import { getCompleteDayRange } from '~~/shared/utils/charts'
+import { getCompleteDayRange } from '~~/shared/utils/dates'
 import type { GitHubEventType } from '~~/shared/types/identity'
 import { githubEventTypes } from '~~/shared/types/identity'
 import { useColors } from '~/composables/useColors'
@@ -121,12 +121,7 @@ function isActiveGitHubEventType(
   return activeGitHubEventTypes.includes(type as ActiveGitHubEventType)
 }
 
-/**
- * A PullRequestEvent is emitted for the whole pull request lifecycle (opened, closed,
- * reopened, ...), so counting all of them would tally the same pull request several
- * times. Only "opened" marks a new pull request, which is also what the identity
- * thresholds this chart plots against are computed on.
- */
+/** Counts PullRequestEvents only when opened, so each pull request is counted once. */
 function isTimelineEvent(event: GitHubEvent): boolean {
   if (
     !event.created_at ||
@@ -306,10 +301,7 @@ const isEmpty = computed(
       .reduce((a, b) => (a ?? 0) + (b ?? 0), 0) === 0,
 )
 
-/**
- * Both branches below are computed from props alone, so the server already knows
- * which one the client will mount and can hold the matching space for it.
- */
+/** Computed from props only, so the server can reserve space for the branch the client mounts. */
 const hasChart = computed<boolean>(() => {
   return hasEnoughDataPoints.value && !isEmpty.value
 })
@@ -647,22 +639,21 @@ onMounted(pauseChartAnimations)
       </VueUiXy>
       <div v-else class="w-full h-40 flex place-items-center justify-center">
         <div class="flex flex-col items-center gap-4">
-          <span class="i-lucide:circle-dashed text-ui-muted"></span>
+          <span
+            class="i-lucide:circle-dashed text-ui-muted"
+            aria-hidden="true"
+          ></span>
           <div class="flex flex-col items-center">
-            <p class="text-ui-muted text-base">Insufficient activity data</p>
-            <p class="text-ui-muted/50 text-sm">
-              Not enough events to display a timeline
+            <p class="text-ui-muted text-base">No timeline to show</p>
+            <p class="text-ui-muted text-sm">
+              There are too few events to draw a timeline.
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!--
-      The chart only exists client-side, so without this the server renders an
-      empty box and everything below jumps down once it mounts. The svg is
-      width: 100% over a 1000x600 viewBox, followed by the legend row.
-    -->
+    <!-- Placeholder sized like the client-only chart (1000x600 viewBox + legend) to avoid layout shift -->
     <template #fallback>
       <div v-if="hasChart" aria-hidden="true">
         <div class="w-full aspect-5/3" />

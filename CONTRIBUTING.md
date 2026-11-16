@@ -10,7 +10,8 @@ Please read our [AI Policy](./AI_POLICY.md) before submitting code generated wit
 
 ### Prerequisites
 
-- Node.js 24+
+- Node.js 26.13.0+
+- [pnpm](https://pnpm.io/installation) 12
 
 ### Setup
 

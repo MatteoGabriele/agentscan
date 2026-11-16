@@ -21,8 +21,7 @@ const props = withDefaults(
   },
 )
 
-// This is an arbitrary ratio to keep the line within a certain height
-// Pretty much visual tweaking
+// Share of the chart height the line's peak reaches.
 const PEAK_HEIGHT_RATIO = 0.85
 
 const plotCoordinates = computed(() => {

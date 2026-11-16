@@ -17,7 +17,7 @@ type UseScoreStyleOptions = {
 }
 
 const mixed = {
-  text: 'text-ui-mixed',
+  text: 'text-ui-mixed-text',
   border: 'border-ui-mixed',
   background: 'bg-ui-mixed',
 }
