@@ -1,4 +1,11 @@
 <script setup lang="ts">
+withDefaults(
+  defineProps<{
+    footer?: boolean
+  }>(),
+  { footer: true },
+)
+
 const disclosureRows = [
   { title: 'w-1/2', subtitle: 'w-2/3' },
   { title: 'w-1/3', subtitle: 'w-3/5' },
@@ -49,7 +56,7 @@ const disclosureRows = [
       <Skeleton width="w-2/5" height="h-3.5" />
     </div>
 
-    <div class="mt-4 pt-4 border-t border-ui-border-subtle">
+    <div v-if="footer" class="mt-4 pt-4 border-t border-ui-border-subtle">
       <div class="flex h-5 items-center">
         <Skeleton width="w-1/2" height="h-3.5" />
       </div>
