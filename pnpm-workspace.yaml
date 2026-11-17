@@ -6,3 +6,6 @@ minimumReleaseAgeExclude:
   - '@unveil/identity'
   - 'vue-data-ui'
   - '@unveil/vk'
+permissions:
+  nuxt-og-image:
+    skills: false
