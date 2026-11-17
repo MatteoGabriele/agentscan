@@ -1,3 +1,5 @@
+import { parseIssue } from '@github/issue-parser'
+
 export type PendingReport = {
   username: string
   number: number
@@ -7,15 +9,21 @@ export type PendingReport = {
 type IssueLike = {
   number: number
   html_url: string
-  title: string
+  body?: string | null
   pull_request?: unknown
 }
 
-const USERNAME_RE = /^\s*\[AUTOMATION\]\s*@?([\w-]+)\s*$/i
+const USERNAME_RE = /^@?([\w-]+)$/
 
-/** Reads the username from a report title like `[AUTOMATION] username`. */
-export function readReportedUsername(title: string): string | undefined {
-  const match = title.match(USERNAME_RE)
+export function readReportedUsername(
+  body: string | null | undefined,
+): string | undefined {
+  if (!body) {
+    return undefined
+  }
+
+  const value = parseIssue(body)['GitHub Username']?.toString().trim()
+  const match = value?.match(USERNAME_RE)
 
   return match?.[1]?.toLowerCase()
 }
@@ -24,7 +32,7 @@ export function toPendingReports(issues: IssueLike[]): PendingReport[] {
   return issues
     .filter((issue) => !issue.pull_request)
     .flatMap((issue) => {
-      const username = readReportedUsername(issue.title)
+      const username = readReportedUsername(issue.body)
 
       return username
         ? [{ username, number: issue.number, url: issue.html_url }]

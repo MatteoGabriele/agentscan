@@ -5,7 +5,8 @@ function issue(number: number, username: string, overrides = {}) {
   return {
     number,
     html_url: `https://github.com/o/r/issues/${number}`,
-    title: `[AUTOMATION] ${username}`,
+    title: '[AUTOMATION] ',
+    body: `### GitHub Username\n\n${username}\n\n### GitHub User ID\n\n1\n`,
     ...overrides,
   }
 }
@@ -28,13 +29,22 @@ describe('toPendingReports', () => {
     ])
   })
 
+  it('reads the body even when the title names someone else', () => {
+    expect(
+      toPendingReports([issue(7, 'bot', { title: '[AUTOMATION] other' })]),
+    ).toEqual([
+      { username: 'bot', number: 7, url: 'https://github.com/o/r/issues/7' },
+    ])
+  })
+
   it('skips pull requests and issues without a username', () => {
     expect(
       toPendingReports([
         issue(1, 'bot', { pull_request: {} }),
         issue(2, ''),
-        issue(3, '', { title: 'Some other issue' }),
-        issue(4, '', { title: '[AUTOMATION] two words' }),
+        issue(3, '', { body: 'Some other issue' }),
+        issue(4, 'two words'),
+        issue(5, '', { body: null }),
       ]),
     ).toEqual([])
   })
