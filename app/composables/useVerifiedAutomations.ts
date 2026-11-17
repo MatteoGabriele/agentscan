@@ -1,7 +1,8 @@
+export const VERIFIED_AUTOMATION_CACHE_KEY = 'verified-list'
+
 export function useVerifiedAutomations() {
-  // Reused across navigations; the list only changes on deploy.
   return useAsyncData(
-    'verified-list',
+    VERIFIED_AUTOMATION_CACHE_KEY,
     async () => {
       return $fetch('/api/verified-automations')
     },
