@@ -17,12 +17,11 @@ const props = defineProps<{
 
 const username = computed<string | undefined | null>(() => props.user.login)
 
-const { data: accountReports, status: accountReportsStatus } = useFetch(
+const { data: accountReports, status: accountReportsStatus } = useLazyFetch(
   () => `/api/account-reports/${username.value}`,
   {
-    key: computed(() => `account-reports:${username.value}`),
-    query: computed(() => ({ id: props.user.id })),
-    lazy: true,
+    key: () => `account-reports:${username.value}`,
+    query: () => ({ id: props.user.id }),
   },
 )
 
@@ -57,6 +56,9 @@ const matchedTally = computed(() => {
 const activityReport = computed<IntegrationItem | undefined>(() => {
   return accountReports.value?.integration ?? undefined
 })
+
+const { data: openReport, pending: isLoadingReports } =
+  usePendingReport(username)
 
 const hasActivityReport = computed<boolean>(() => !!activityReport.value)
 const hasCommunityFlag = computed<boolean>(() => !!verifiedAutomation.value)
@@ -254,17 +256,50 @@ useSeoAnalysis(identifyAnalysis, {
         />
 
         <section class="mt-4 pt-4 border-t border-ui-border-subtle">
-          <p class="text-ui-muted text-sm">
-            Know something about this account? Help the community.
-          </p>
-          <NuxtLink
-            :to="flagAccountUrl"
-            target="_blank"
-            external
-            class="underline inline text-xs"
+          <template v-if="isLoadingReports">
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <span
+              class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
+              aria-hidden="true"
+            />
+          </template>
+          <div
+            v-else-if="openReport"
+            class="flex items-center justify-between gap-4 text-sm"
           >
-            Add report
-          </NuxtLink>
+            <p class="flex items-center gap-2 text-ui-muted">
+              <span class="relative inline-flex size-2" aria-hidden="true">
+                <span
+                  class="absolute inset-0 rounded-full bg-ui-text/50 opacity-60 animate-ping [animation-duration:2s] motion-reduce:animate-none"
+                />
+                <span class="relative size-2 rounded-full bg-ui-text/50" />
+              </span>
+              Reported by the community · review pending
+            </p>
+            <NuxtLink
+              :to="openReport.url"
+              target="_blank"
+              external
+              class="shrink-0 text-xs text-ui-muted underline hover:text-ui-text"
+            >
+              View on GitHub<span class="sr-only"> (opens in a new tab)</span>
+            </NuxtLink>
+          </div>
+          <template v-else>
+            <p class="text-ui-muted text-sm">
+              Know something about this account? Help the community.
+            </p>
+            <NuxtLink
+              :to="flagAccountUrl"
+              target="_blank"
+              external
+              class="underline inline text-xs"
+            >
+              Add report
+            </NuxtLink>
+          </template>
         </section>
       </template>
     </div>
