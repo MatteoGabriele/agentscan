@@ -24,6 +24,17 @@ import {
   isOwnComment,
 } from './_honeypot'
 import { analyze } from '@unveil/vk'
+import { getPendingReports } from '~~/server/utils/pending-reports'
+import { findPendingReport } from '~~/shared/utils/pending-reports'
+
+async function hasPendingReport(username: string): Promise<boolean> {
+  try {
+    return !!findPendingReport(await getPendingReports(), username)
+  } catch {
+    // If the lookup fails, show the link rather than hide it.
+    return false
+  }
+}
 
 // Line-anchored so a mention mid-sentence doesn't trigger a scan.
 const SCAN_COMMAND = /^\s*@agentscanapp\s+scan\b/im
@@ -572,15 +583,21 @@ export default defineEventHandler(async (event) => {
       payload.issue?.html_url ??
       `https://github.com/${owner}/${repo}/${isPR ? 'pull' : 'issues'}/${targetNumber}`
 
-    const reportUrl =
-      analysis.classification === 'automation' && !hasCommunityFlag
-        ? buildReportIssueUrl({
-            username,
-            userId,
-            flags: analysis.flags,
-            sourceUrl,
-          })
-        : null
+    // Reports are only taken for organic results: mixed and automation
+    // already show their evidence. Skip the link when a report is already open.
+    const canReport =
+      analysis.classification === 'organic' &&
+      !hasCommunityFlag &&
+      !(await hasPendingReport(username))
+
+    const reportUrl = canReport
+      ? buildReportIssueUrl({
+          username,
+          userId,
+          flags: analysis.flags,
+          sourceUrl,
+        })
+      : null
 
     // Evidence rendered inline in the comment.
     const evidenceLines =

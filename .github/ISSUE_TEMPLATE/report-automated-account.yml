@@ -13,6 +13,10 @@ body:
         > 2. Search for the account
         > 3. Click **Add report** on its page
         >
+        > Reports are only taken for accounts AgentScan classifies as **Organic**.
+        > Mixed and automation results already show their evidence on the page,
+        > so they don't need a report and **Add report** doesn't appear on them.
+        >
         > That fills in the username, the user ID and the evidence for you, so
         > reviewers see the same data every time. All you have to add is a clear,
         > factual reason and any extra details that show the account is automated.
@@ -20,7 +24,7 @@ body:
         > The link left by the GitHub Action or GitHub App on a pull request works
         > too. Reports started any other way are closed without review.
 
-        Thank you for helping identify automated accounts on GitHub. Please fill in the details below.
+        Thank you for flagging an account the analysis missed. Please fill in the details below.
 
         ### How your report is reviewed
 
@@ -69,7 +73,7 @@ body:
         **Good examples:**
         - "Self-disclosed as an AI agent"
         - "Account publicly describes itself as an AI agent in Bluesky message"
-        - "Heavy automation usage creating spam PRs within short timeframe"
+        - "Opened near-identical PRs across 30 repos in one day"
 
         **Not recommended:**
         - Links, screenshots or bullet lists (use the fields below)

@@ -13,14 +13,13 @@ type Contribution = {
 
 const contributionList: Contribution[] = [
   {
-    title: 'Report an account that looks automated',
-    description:
-      'Found an account you believe is automated? Open an issue with the username, your reasoning and any supporting evidence. Reviewers then vote on it, and once enough of them approve, the account is added to the community reports with a link back to the original issue.',
+    title: 'Report an account the analysis missed',
+    description: `If an account is classified as "Organic" but you know it's automated, open a report from its AgentScan page. Reviewers vote on it, and once enough approve, the account joins the community reports with a link back to the issue. Mixed and automation results already show their evidence, so reports are only taken for accounts classified as "Organic".`,
     icon: 'i-lucide:clipboard-pen',
     links: [
       {
-        label: 'Open a report',
-        url: 'https://github.com/MatteoGabriele/agentscan/issues/new?template=report-automated-account.yml',
+        label: 'Find an account',
+        url: '/',
       },
       {
         label: 'Community reports',

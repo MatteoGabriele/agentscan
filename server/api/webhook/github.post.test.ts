@@ -9,6 +9,7 @@ import type { AnalyzeReturn, GitHubUser } from '@unveil/vk'
 import { analyze } from '@unveil/vk'
 import { parse as parseYaml } from 'yaml'
 import handler from './github/index.post.ts'
+import { getPendingReports } from '~~/server/utils/pending-reports'
 
 // vi.hoisted runs before all module imports — used to stub Nuxt auto-imports
 // and to create shared mock objects referenced in vi.mock() factories below.
@@ -111,6 +112,9 @@ vi.mock('@unveil/identity/report', async (importOriginal) => ({
 }))
 vi.mock('@unveil/vk', () => ({ analyze: vi.fn() }))
 vi.mock('yaml', () => ({ parse: vi.fn() }))
+vi.mock('~~/server/utils/pending-reports', () => ({
+  getPendingReports: vi.fn().mockResolvedValue([]),
+}))
 
 // --- Shared fixtures ---
 
@@ -1560,11 +1564,12 @@ describe('GitHub Webhook Handler', () => {
   })
 
   describe('Report Link', () => {
-    it('includes a pre-filled report-issue link for automation classifications', async () => {
-      mockAnalysis({
-        ...MOCK_ANALYSIS,
-        classification: 'automation',
-      })
+    beforeEach(() => {
+      vi.mocked(getPendingReports).mockResolvedValue([])
+    })
+
+    it('includes a pre-filled report-issue link for organic classifications', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
 
       await handler(MOCK_EVENT)
 
@@ -1575,6 +1580,19 @@ describe('GitHub Webhook Handler', () => {
         'https://github.com/matteogabriele/agentscan/issues/new',
       )
       expect(commentCall.body).toContain('username=test-user')
+    })
+
+    it('omits the report link for automation classifications', async () => {
+      mockAnalysis({
+        ...MOCK_ANALYSIS,
+        classification: 'automation',
+      })
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
+      expect(commentCall.body).not.toContain('Report this account')
     })
 
     it('omits the report link for mixed classifications', async () => {
@@ -1590,8 +1608,15 @@ describe('GitHub Webhook Handler', () => {
       expect(commentCall.body).not.toContain('Report this account')
     })
 
-    it('omits the report link for organic classifications', async () => {
+    it('omits the report link for organic accounts with a report already open', async () => {
       mockRepoConfig({ 'comment-on-organic': true })
+      vi.mocked(getPendingReports).mockResolvedValue([
+        {
+          username: 'test-user',
+          number: 1,
+          url: 'https://github.com/MatteoGabriele/agentscan/issues/1',
+        },
+      ])
 
       await handler(MOCK_EVENT)
 
@@ -1600,11 +1625,19 @@ describe('GitHub Webhook Handler', () => {
       expect(commentCall.body).not.toContain('Report this account')
     })
 
-    it('omits the report link for community-flagged accounts even when classification is automation', async () => {
-      mockAnalysis({
-        ...MOCK_ANALYSIS,
-        classification: 'automation',
-      })
+    it('keeps the report link when the open-report lookup fails', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
+      vi.mocked(getPendingReports).mockRejectedValue(new Error('rate limited'))
+
+      await handler(MOCK_EVENT)
+
+      const commentCall =
+        mockInstallationOctokit.rest.issues.createComment.mock.calls[0]?.[0]
+      expect(commentCall.body).toContain('[Report this account →]')
+    })
+
+    it('omits the report link for community-flagged accounts', async () => {
+      mockRepoConfig({ 'comment-on-organic': true })
       mockVerifiedList(['test-user'])
 
       await handler(MOCK_EVENT)
