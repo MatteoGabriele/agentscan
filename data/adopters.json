@@ -2,133 +2,133 @@
   {
     "name": "nodejs/node",
     "url": "https://github.com/nodejs/node",
-    "stars": 123729,
+    "stars": 123775,
     "avatar": "https://avatars.githubusercontent.com/u/9950313?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "storybookjs/storybook",
     "url": "https://github.com/storybookjs/storybook",
-    "stars": 91576,
+    "stars": 91632,
     "avatar": "https://avatars.githubusercontent.com/u/22632046?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "vitejs/vite",
     "url": "https://github.com/vitejs/vite",
-    "stars": 83914,
+    "stars": 83983,
     "avatar": "https://avatars.githubusercontent.com/u/65625612?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "nuxt/nuxt",
     "url": "https://github.com/nuxt/nuxt",
-    "stars": 61077,
+    "stars": 61076,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "prettier/prettier",
     "url": "https://github.com/prettier/prettier",
-    "stars": 52415,
+    "stars": 52418,
     "avatar": "https://avatars.githubusercontent.com/u/25822731?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "moeru-ai/airi",
     "url": "https://github.com/moeru-ai/airi",
-    "stars": 51451,
+    "stars": 51547,
     "avatar": "https://avatars.githubusercontent.com/u/165476306?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "DIYgod/RSSHub",
     "url": "https://github.com/DIYgod/RSSHub",
-    "stars": 47023,
+    "stars": 47104,
     "avatar": "https://avatars.githubusercontent.com/u/8266075?s=50&u=9de49c9b3eaf4db02e685458cb64b64c172034bf&v=4",
     "platform": "action"
   },
   {
     "name": "babel/babel",
     "url": "https://github.com/babel/babel",
-    "stars": 44062,
+    "stars": 44067,
     "avatar": "https://avatars.githubusercontent.com/u/9637642?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "biomejs/biome",
     "url": "https://github.com/biomejs/biome",
-    "stars": 26106,
+    "stars": 26132,
     "avatar": "https://avatars.githubusercontent.com/u/140182603?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "matplotlib/matplotlib",
     "url": "https://github.com/matplotlib/matplotlib",
-    "stars": 23459,
+    "stars": 23497,
     "avatar": "https://avatars.githubusercontent.com/u/215947?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "mochajs/mocha",
     "url": "https://github.com/mochajs/mocha",
-    "stars": 22912,
+    "stars": 22910,
     "avatar": "https://avatars.githubusercontent.com/u/8770005?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "vueuse/vueuse",
     "url": "https://github.com/vueuse/vueuse",
-    "stars": 22394,
+    "stars": 22397,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "vitest-dev/vitest",
     "url": "https://github.com/vitest-dev/vitest",
-    "stars": 17377,
+    "stars": 17395,
     "avatar": "https://avatars.githubusercontent.com/u/95747107?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "aio-libs/aiohttp",
     "url": "https://github.com/aio-libs/aiohttp",
-    "stars": 16608,
+    "stars": 16609,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "typescript-eslint/typescript-eslint",
     "url": "https://github.com/typescript-eslint/typescript-eslint",
-    "stars": 16468,
+    "stars": 16470,
     "avatar": "https://avatars.githubusercontent.com/u/46634674?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "jasmine/jasmine",
     "url": "https://github.com/jasmine/jasmine",
-    "stars": 15808,
+    "stars": 15812,
     "avatar": "https://avatars.githubusercontent.com/u/4624349?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "rerun-io/rerun",
     "url": "https://github.com/rerun-io/rerun",
-    "stars": 11802,
+    "stars": 11833,
     "avatar": "https://avatars.githubusercontent.com/u/99407368?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "sqlfluff/sqlfluff",
     "url": "https://github.com/sqlfluff/sqlfluff",
-    "stars": 10026,
+    "stars": 10030,
     "avatar": "https://avatars.githubusercontent.com/u/71874918?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "usekaneo/kaneo",
     "url": "https://github.com/usekaneo/kaneo",
-    "stars": 9805,
+    "stars": 9833,
     "avatar": "https://avatars.githubusercontent.com/u/192649426?s=50&v=4",
     "platform": "action"
   },
@@ -142,35 +142,56 @@
   {
     "name": "dubzzz/fast-check",
     "url": "https://github.com/dubzzz/fast-check",
-    "stars": 5258,
+    "stars": 5285,
     "avatar": "https://avatars.githubusercontent.com/u/5300235?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ros-navigation/navigation2",
+    "url": "https://github.com/ros-navigation/navigation2",
+    "stars": 5078,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "MichaelGrupp/evo",
     "url": "https://github.com/MichaelGrupp/evo",
-    "stars": 4367,
+    "stars": 4368,
     "avatar": "https://avatars.githubusercontent.com/u/8985495?s=50&u=5771d7a2fadc7fc6a0c85040a18f6a8ecd59db3c&v=4",
+    "platform": "action"
+  },
+  {
+    "name": "danielroe/magic-regexp",
+    "url": "https://github.com/danielroe/magic-regexp",
+    "stars": 4337,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "openstreetmap/iD",
+    "url": "https://github.com/openstreetmap/iD",
+    "stars": 3929,
+    "avatar": "https://avatars.githubusercontent.com/u/261431?s=50&v=4",
     "platform": "action"
   },
   {
     "name": "npmx-dev/npmx.dev",
     "url": "https://github.com/npmx-dev/npmx.dev",
-    "stars": 3669,
+    "stars": 3676,
     "avatar": "https://avatars.githubusercontent.com/u/257109910?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "vueuse/vue-demi",
     "url": "https://github.com/vueuse/vue-demi",
-    "stars": 3125,
+    "stars": 3124,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "vueuse/motion",
     "url": "https://github.com/vueuse/motion",
-    "stars": 2767,
+    "stars": 2766,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
     "platform": "app"
   },
@@ -196,6 +217,13 @@
     "platform": "action"
   },
   {
+    "name": "danielroe/fontaine",
+    "url": "https://github.com/danielroe/fontaine",
+    "stars": 2004,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "cherrypy/cherrypy",
     "url": "https://github.com/cherrypy/cherrypy",
     "stars": 1950,
@@ -205,8 +233,15 @@
   {
     "name": "aio-libs/aiomysql",
     "url": "https://github.com/aio-libs/aiomysql",
-    "stars": 1899,
+    "stars": 1900,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "prettytable/prettytable",
+    "url": "https://github.com/prettytable/prettytable",
+    "stars": 1803,
+    "avatar": "https://avatars.githubusercontent.com/u/186069930?v=4&s=50",
     "platform": "app"
   },
   {
@@ -266,18 +301,18 @@
     "platform": "action"
   },
   {
+    "name": "pypa/gh-action-pypi-publish",
+    "url": "https://github.com/pypa/gh-action-pypi-publish",
+    "stars": 1191,
+    "avatar": "https://avatars.githubusercontent.com/u/647025?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "PyCalendar/icalendar",
     "url": "https://github.com/PyCalendar/icalendar",
     "stars": 1190,
     "avatar": "https://avatars.githubusercontent.com/u/267741567?s=50&v=4",
     "platform": "action"
-  },
-  {
-    "name": "pypa/gh-action-pypi-publish",
-    "url": "https://github.com/pypa/gh-action-pypi-publish",
-    "stars": 1190,
-    "avatar": "https://avatars.githubusercontent.com/u/647025?v=4&s=50",
-    "platform": "app"
   },
   {
     "name": "ansible/ansible-runner",
@@ -289,7 +324,7 @@
   {
     "name": "SnapXL/SnapX",
     "url": "https://github.com/SnapXL/SnapX",
-    "stars": 1075,
+    "stars": 1073,
     "avatar": "https://avatars.githubusercontent.com/u/225452456?v=4&s=50",
     "platform": "app"
   },
@@ -350,6 +385,13 @@
     "platform": "app"
   },
   {
+    "name": "python-humanize/humanize",
+    "url": "https://github.com/python-humanize/humanize",
+    "stars": 769,
+    "avatar": "https://avatars.githubusercontent.com/u/62149795?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "aio-libs/aiohttp-demos",
     "url": "https://github.com/aio-libs/aiohttp-demos",
     "stars": 749,
@@ -380,7 +422,7 @@
   {
     "name": "danielroe/beasties",
     "url": "https://github.com/danielroe/beasties",
-    "stars": 713,
+    "stars": 714,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -485,7 +527,7 @@
   {
     "name": "nuxt-modules/ionic",
     "url": "https://github.com/nuxt-modules/ionic",
-    "stars": 455,
+    "stars": 456,
     "avatar": "https://avatars.githubusercontent.com/u/111748132?s=50&v=4",
     "platform": "action"
   },
@@ -527,14 +569,14 @@
   {
     "name": "vueuse/skills",
     "url": "https://github.com/vueuse/skills",
-    "stars": 408,
+    "stars": 409,
     "avatar": "https://avatars.githubusercontent.com/u/77578415?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "nuxt/cli",
     "url": "https://github.com/nuxt/cli",
-    "stars": 402,
+    "stars": 403,
     "avatar": "https://avatars.githubusercontent.com/u/23360933?s=50&v=4",
     "platform": "action"
   },
@@ -562,7 +604,7 @@
   {
     "name": "node-modules/detect-port",
     "url": "https://github.com/node-modules/detect-port",
-    "stars": 394,
+    "stars": 395,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
     "platform": "app"
   },
@@ -581,9 +623,16 @@
     "platform": "app"
   },
   {
+    "name": "ros-navigation/navigation2_tutorials",
+    "url": "https://github.com/ros-navigation/navigation2_tutorials",
+    "stars": 375,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/nuxt-vitest",
     "url": "https://github.com/danielroe/nuxt-vitest",
-    "stars": 362,
+    "stars": 363,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -616,6 +665,13 @@
     "platform": "app"
   },
   {
+    "name": "open-navigation/opennav_coverage",
+    "url": "https://github.com/open-navigation/opennav_coverage",
+    "stars": 321,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "aio-libs/create-aio-app",
     "url": "https://github.com/aio-libs/create-aio-app",
     "stars": 311,
@@ -626,6 +682,13 @@
     "name": "danielroe/provenance-action",
     "url": "https://github.com/danielroe/provenance-action",
     "stars": 309,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "danielroe/unifont",
+    "url": "https://github.com/danielroe/unifont",
+    "stars": 305,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -800,7 +863,7 @@
   {
     "name": "aio-libs/aioftp",
     "url": "https://github.com/aio-libs/aioftp",
-    "stars": 212,
+    "stars": 213,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
@@ -826,10 +889,24 @@
     "platform": "action"
   },
   {
+    "name": "danielroe/forges",
+    "url": "https://github.com/danielroe/forges",
+    "stars": 202,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "aio-libs/aiohttp-debugtoolbar",
     "url": "https://github.com/aio-libs/aiohttp-debugtoolbar",
     "stars": 201,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "danielroe/unrouting",
+    "url": "https://github.com/danielroe/unrouting",
+    "stars": 201,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
   {
@@ -840,10 +917,10 @@
     "platform": "app"
   },
   {
-    "name": "danielroe/forges",
-    "url": "https://github.com/danielroe/forges",
-    "stars": 198,
-    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "name": "ros-navigation/docs.nav2.org",
+    "url": "https://github.com/ros-navigation/docs.nav2.org",
+    "stars": 193,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
     "platform": "app"
   },
   {
@@ -896,6 +973,13 @@
     "platform": "app"
   },
   {
+    "name": "open-navigation/opennav_docking",
+    "url": "https://github.com/open-navigation/opennav_docking",
+    "stars": 183,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "tsperf/tracer",
     "url": "https://github.com/tsperf/tracer",
     "stars": 182,
@@ -910,17 +994,17 @@
     "platform": "app"
   },
   {
+    "name": "re-actors/alls-green",
+    "url": "https://github.com/re-actors/alls-green",
+    "stars": 180,
+    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/zero-vue",
     "url": "https://github.com/danielroe/zero-vue",
     "stars": 179,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
-    "platform": "app"
-  },
-  {
-    "name": "re-actors/alls-green",
-    "url": "https://github.com/re-actors/alls-green",
-    "stars": 179,
-    "avatar": "https://avatars.githubusercontent.com/u/46427759?v=4&s=50",
     "platform": "app"
   },
   {
@@ -940,14 +1024,14 @@
   {
     "name": "aio-libs/aiosignal",
     "url": "https://github.com/aio-libs/aiosignal",
-    "stars": 171,
+    "stars": 172,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
     "platform": "app"
   },
   {
     "name": "danielroe/airspace",
     "url": "https://github.com/danielroe/airspace",
-    "stars": 170,
+    "stars": 171,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -955,6 +1039,13 @@
     "name": "danielroe/vue-bind-once",
     "url": "https://github.com/danielroe/vue-bind-once",
     "stars": 168,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "danielroe/my-bad",
+    "url": "https://github.com/danielroe/my-bad",
+    "stars": 165,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -973,13 +1064,6 @@
     "platform": "app"
   },
   {
-    "name": "danielroe/my-bad",
-    "url": "https://github.com/danielroe/my-bad",
-    "stars": 158,
-    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
-    "platform": "app"
-  },
-  {
     "name": "node-modules/cfork",
     "url": "https://github.com/node-modules/cfork",
     "stars": 158,
@@ -994,18 +1078,18 @@
     "platform": "app"
   },
   {
+    "name": "roostorg/coop",
+    "url": "https://github.com/roostorg/coop",
+    "stars": 147,
+    "avatar": "https://avatars.githubusercontent.com/u/189051351?s=50&v=4",
+    "platform": "action"
+  },
+  {
     "name": "danielroe/siroc",
     "url": "https://github.com/danielroe/siroc",
     "stars": 146,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
-  },
-  {
-    "name": "roostorg/coop",
-    "url": "https://github.com/roostorg/coop",
-    "stars": 145,
-    "avatar": "https://avatars.githubusercontent.com/u/189051351?s=50&v=4",
-    "platform": "action"
   },
   {
     "name": "node-modules/formstream",
@@ -1043,6 +1127,13 @@
     "platform": "app"
   },
   {
+    "name": "danielroe/fetchdts",
+    "url": "https://github.com/danielroe/fetchdts",
+    "stars": 129,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "MatteoGabriele/agentscan",
     "url": "https://github.com/MatteoGabriele/agentscan",
     "stars": 129,
@@ -1064,13 +1155,6 @@
     "platform": "app"
   },
   {
-    "name": "danielroe/firstcommit.is",
-    "url": "https://github.com/danielroe/firstcommit.is",
-    "stars": 124,
-    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
-    "platform": "app"
-  },
-  {
     "name": "node-modules/is-type-of",
     "url": "https://github.com/node-modules/is-type-of",
     "stars": 124,
@@ -1082,6 +1166,13 @@
     "url": "https://github.com/node-modules/webcamera",
     "stars": 124,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "danielroe/firstcommit.is",
+    "url": "https://github.com/danielroe/firstcommit.is",
+    "stars": 123,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1148,6 +1239,13 @@
     "platform": "app"
   },
   {
+    "name": "open-navigation/opennav_amd_demonstrations",
+    "url": "https://github.com/open-navigation/opennav_amd_demonstrations",
+    "stars": 96,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "nuxt-modules/kinde",
     "url": "https://github.com/nuxt-modules/kinde",
     "stars": 92,
@@ -1158,6 +1256,13 @@
     "name": "danielroe/n3rdle",
     "url": "https://github.com/danielroe/n3rdle",
     "stars": 90,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "danielroe/impound",
+    "url": "https://github.com/danielroe/impound",
+    "stars": 89,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -1225,6 +1330,13 @@
     "platform": "app"
   },
   {
+    "name": "ros-navigation/navigation2_dynamic",
+    "url": "https://github.com/ros-navigation/navigation2_dynamic",
+    "stars": 80,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "npmx-dev/vscode-npmx",
     "url": "https://github.com/npmx-dev/vscode-npmx",
     "stars": 79,
@@ -1255,7 +1367,7 @@
   {
     "name": "danielroe/empathy",
     "url": "https://github.com/danielroe/empathy",
-    "stars": 71,
+    "stars": 72,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
@@ -1337,6 +1449,13 @@
     "platform": "app"
   },
   {
+    "name": "e18e/framework-performance",
+    "url": "https://github.com/e18e/framework-performance",
+    "stars": 59,
+    "avatar": "https://avatars.githubusercontent.com/u/166689785?s=50&v=4",
+    "platform": "action"
+  },
+  {
     "name": "danielroe/nuxt-web-bundle",
     "url": "https://github.com/danielroe/nuxt-web-bundle",
     "stars": 58,
@@ -1377,13 +1496,6 @@
     "stars": 53,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
-  },
-  {
-    "name": "e18e/framework-performance",
-    "url": "https://github.com/e18e/framework-performance",
-    "stars": 53,
-    "avatar": "https://avatars.githubusercontent.com/u/166689785?s=50&v=4",
-    "platform": "action"
   },
   {
     "name": "node-modules/thunkify-wrap",
@@ -1505,6 +1617,13 @@
     "platform": "app"
   },
   {
+    "name": "danielroe/diglot",
+    "url": "https://github.com/danielroe/diglot",
+    "stars": 38,
+    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "danielroe/spooon",
     "url": "https://github.com/danielroe/spooon",
     "stars": 38,
@@ -1530,13 +1649,6 @@
     "url": "https://github.com/aio-libs/aiofastnet",
     "stars": 36,
     "avatar": "https://avatars.githubusercontent.com/u/7049303?v=4&s=50",
-    "platform": "app"
-  },
-  {
-    "name": "danielroe/diglot",
-    "url": "https://github.com/danielroe/diglot",
-    "stars": 36,
-    "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1631,10 +1743,24 @@
     "platform": "app"
   },
   {
+    "name": "open-navigation/opennav_robotics_workload_benchmark",
+    "url": "https://github.com/open-navigation/opennav_robotics_workload_benchmark",
+    "stars": 32,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "huang-julien/nitro-opentelemetry",
     "url": "https://github.com/huang-julien/nitro-opentelemetry",
     "stars": 31,
     "avatar": "https://avatars.githubusercontent.com/u/63512348?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-navigation/opennav_visual_navigation",
+    "url": "https://github.com/open-navigation/opennav_visual_navigation",
+    "stars": 31,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1649,6 +1775,13 @@
     "url": "https://github.com/danielroe/trellis-valet-driver",
     "stars": 29,
     "avatar": "https://avatars.githubusercontent.com/u/28706372?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ros-navigation/nav2_minimal_turtlebot_simulation",
+    "url": "https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation",
+    "stars": 29,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
     "platform": "app"
   },
   {
@@ -1848,6 +1981,13 @@
     "platform": "app"
   },
   {
+    "name": "ros-navigation/nav2_docker",
+    "url": "https://github.com/ros-navigation/nav2_docker",
+    "stars": 21,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "aio-libs/aioppspp",
     "url": "https://github.com/aio-libs/aioppspp",
     "stars": 20,
@@ -1995,6 +2135,13 @@
     "platform": "action"
   },
   {
+    "name": "open-navigation/opennav_amd_semantic_navigation",
+    "url": "https://github.com/open-navigation/opennav_amd_semantic_navigation",
+    "stars": 16,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "vueuse/vueuse-vue3-example",
     "url": "https://github.com/vueuse/vueuse-vue3-example",
     "stars": 16,
@@ -2023,6 +2170,20 @@
     "platform": "app"
   },
   {
+    "name": "ros-navigation/navigation2.ai",
+    "url": "https://github.com/ros-navigation/navigation2.ai",
+    "stars": 15,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "sanitizers/patchback-github-app",
+    "url": "https://github.com/sanitizers/patchback-github-app",
+    "stars": 15,
+    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "ansible-community/sphinx_ansible_theme",
     "url": "https://github.com/ansible-community/sphinx_ansible_theme",
     "stars": 14,
@@ -2048,13 +2209,6 @@
     "url": "https://github.com/node-modules/cluster-reload",
     "stars": 14,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
-    "platform": "app"
-  },
-  {
-    "name": "sanitizers/patchback-github-app",
-    "url": "https://github.com/sanitizers/patchback-github-app",
-    "stars": 14,
-    "avatar": "https://avatars.githubusercontent.com/u/40318227?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2223,6 +2377,13 @@
     "url": "https://github.com/node-modules/zookeeper-watcher",
     "stars": 10,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-navigation/opennav_epic_shelter",
+    "url": "https://github.com/open-navigation/opennav_epic_shelter",
+    "stars": 10,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2548,6 +2709,13 @@
     "platform": "app"
   },
   {
+    "name": "ros-navigation/navigation2_auxiliary",
+    "url": "https://github.com/ros-navigation/navigation2_auxiliary",
+    "stars": 6,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "tox-dev/workflow",
     "url": "https://github.com/tox-dev/workflow",
     "stars": 6,
@@ -2615,6 +2783,13 @@
     "url": "https://github.com/node-modules/urlmock",
     "stars": 5,
     "avatar": "https://avatars.githubusercontent.com/u/7125868?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-navigation/opennav_teach_and_repeat",
+    "url": "https://github.com/open-navigation/opennav_teach_and_repeat",
+    "stars": 5,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
     "platform": "app"
   },
   {
@@ -2776,6 +2951,13 @@
     "url": "https://github.com/recaptime-dev/verify",
     "stars": 4,
     "avatar": "https://avatars.githubusercontent.com/u/55875459?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ros-navigation/nav2.org",
+    "url": "https://github.com/ros-navigation/nav2.org",
+    "stars": 4,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
     "platform": "app"
   },
   {
@@ -3367,6 +3549,20 @@
     "platform": "app"
   },
   {
+    "name": "open-navigation/gz2-toy-demos",
+    "url": "https://github.com/open-navigation/gz2-toy-demos",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-navigation/opennav_docking-release",
+    "url": "https://github.com/open-navigation/opennav_docking-release",
+    "stars": 2,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "re-actors/python-dist-meta",
     "url": "https://github.com/re-actors/python-dist-meta",
     "stars": 2,
@@ -3892,6 +4088,13 @@
     "platform": "app"
   },
   {
+    "name": "open-navigation/opennav_coverage-release",
+    "url": "https://github.com/open-navigation/opennav_coverage-release",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
     "name": "OSS-NORUS/Apache-License-2-norus",
     "url": "https://github.com/OSS-NORUS/Apache-License-2-norus",
     "stars": 1,
@@ -4071,6 +4274,13 @@
     "url": "https://github.com/redspah/PvPokeGMPatchTool",
     "stars": 1,
     "avatar": "https://avatars.githubusercontent.com/u/11236384?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ros-navigation/api.nav2.org",
+    "url": "https://github.com/ros-navigation/api.nav2.org",
+    "stars": 1,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
     "platform": "app"
   },
   {
@@ -6510,10 +6720,24 @@
     "platform": "app"
   },
   {
-    "name": "outslept/chatlyzer",
-    "url": "https://github.com/outslept/chatlyzer",
+    "name": "open-navigation/opennav_rclcpp_issue_reproduction",
+    "url": "https://github.com/open-navigation/opennav_rclcpp_issue_reproduction",
     "stars": 0,
-    "avatar": "https://avatars.githubusercontent.com/u/135520429?s=50&u=33245e27e00e3026179b3b709f00fdc94c0345f2&v=4",
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "open-navigation/opennav.org",
+    "url": "https://github.com/open-navigation/opennav.org",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/62168404?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "outslept/tgex",
+    "url": "https://github.com/outslept/tgex",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/135520429?s=50&u=f27c656784dce9c9f8d1b3eae290863f2c185389&v=4",
     "platform": "action"
   },
   {
@@ -6731,6 +6955,20 @@
     "url": "https://github.com/redspah/redspah.github.io",
     "stars": 0,
     "avatar": "https://avatars.githubusercontent.com/u/11236384?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ros-navigation/mkdocs.nav2.org",
+    "url": "https://github.com/ros-navigation/mkdocs.nav2.org",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
+    "platform": "app"
+  },
+  {
+    "name": "ros-navigation/nav2_minimal_turtlebot_simulation-release",
+    "url": "https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation-release",
+    "stars": 0,
+    "avatar": "https://avatars.githubusercontent.com/u/150733807?v=4&s=50",
     "platform": "app"
   },
   {
