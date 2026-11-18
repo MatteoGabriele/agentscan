@@ -31,6 +31,12 @@ describe('findHighShares', () => {
   it('ignores shares below their ceiling', () => {
     expect(findHighShares(createStats(71, 9, 20), ceilings)).toEqual([])
   })
+
+  it('never flags a category without a ceiling', () => {
+    expect(
+      findHighShares(createStats(60, 10, 30), { ...ceilings, mixed: null }),
+    ).toEqual([{ category: 'automation', share: 30, ceiling: 30 }])
+  })
 })
 
 describe('formatHighShare', () => {
