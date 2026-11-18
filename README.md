@@ -32,17 +32,17 @@ The same analysis that powers the website can run directly against your reposito
 - **[GitHub App](https://github.com/apps/agentscanapp)** — zero config. Install it and it starts working immediately, no workflow files required. Both share almost the same configuration options, but the app is updated centrally, so you get fixes and new features as soon as they ship, no action needed on your end.
 - **[GitHub Action](https://github.com/MatteoGabriele/agentscan-action)** — needs to be added to a workflow, and new releases have to be published and then manually picked up by pinning a newer version in your repository.
 
-## Reporting an automated account
+## Reporting an account the analysis missed
 
-If you've found a GitHub account you believe is automated, you can submit it for review.
+Reports are only taken for accounts AgentScan classifies as **Organic**. An account classified as Organic that is actually automated is exactly what the analysis misses, while mixed and automation results already show their evidence on the page.
 
-1. [Open an issue](https://github.com/MatteoGabriele/agentscan/issues/new?template=report-automated-account.yml) using the report template
-2. Include the GitHub username, your reasoning, and any supporting evidence
-3. A maintainer will review the account manually
-4. If confirmed, the account will be added to the verified list via a pull request
+1. Search for the account on [agentscan.tools](https://agentscan.tools) and click **Add report** on its page. This opens a pre-filled issue with the username, user ID and evidence
+2. Add a short, factual reason and any supporting evidence
+3. Reviewers vote by reacting to the issue: 4 👍 flags the account, 2 👎 rejects it
+4. Once approved, the account is added to the community reports
 5. The entry will appear in AgentScan with a link back to the original issue
 
-Please only submit accounts you have reasonable evidence for. Submissions without supporting context will be closed.
+Please only submit accounts you have reasonable evidence for. Reports started any other way than from AgentScan are closed without review.
 
 ## Disputing or removing a claim
 

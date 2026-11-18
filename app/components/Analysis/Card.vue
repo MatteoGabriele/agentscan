@@ -127,6 +127,22 @@ const flagAccountUrl = computed<string>(() => {
   })
 })
 
+type ReportState = 'loading' | 'open' | 'organic' | undefined
+
+// Reports are only taken for organic results, so other results show no report
+// section unless a report is already open.
+const reportState = computed<ReportState>(() => {
+  const isOrganic = classification.value === 'organic'
+
+  if (isLoadingReports.value) {
+    return isOrganic ? 'loading' : undefined
+  }
+  if (openReport.value) {
+    return 'open'
+  }
+  return isOrganic ? 'organic' : undefined
+})
+
 const identifyAnalysis = computed<Report | undefined>(() => {
   return props.analysis?.report
 })
@@ -255,18 +271,17 @@ useSeoAnalysis(identifyAnalysis, {
           :has-activity-report
         />
 
-        <section class="mt-4 pt-4 border-t border-ui-border-subtle">
-          <template v-if="isLoadingReports">
-            <p class="text-ui-muted text-sm">
-              Know something about this account? Help the community.
-            </p>
-            <span
-              class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
-              aria-hidden="true"
-            />
-          </template>
+        <section
+          v-if="reportState"
+          class="mt-4 pt-4 border-t border-ui-border-subtle"
+        >
+          <span
+            v-if="reportState === 'loading'"
+            class="h-2.5 bg-ui-border rounded w-20 inline-block animate-pulse"
+            aria-hidden="true"
+          />
           <div
-            v-else-if="openReport"
+            v-else-if="reportState === 'open' && openReport"
             class="flex items-center justify-between gap-4 text-sm"
           >
             <p class="flex items-center gap-2 text-ui-muted">
@@ -287,9 +302,10 @@ useSeoAnalysis(identifyAnalysis, {
               View on GitHub<span class="sr-only"> (opens in a new tab)</span>
             </NuxtLink>
           </div>
-          <template v-else>
+          <template v-else-if="reportState === 'organic'">
             <p class="text-ui-muted text-sm">
-              Know something about this account? Help the community.
+              Know this account is automated? A report helps catch what the
+              analysis misses.
             </p>
             <NuxtLink
               :to="flagAccountUrl"
@@ -297,7 +313,7 @@ useSeoAnalysis(identifyAnalysis, {
               external
               class="underline inline text-xs"
             >
-              Add report
+              Add report<span class="sr-only"> (opens in a new tab)</span>
             </NuxtLink>
           </template>
         </section>
