@@ -1204,5 +1204,19 @@
       "OrbisK",
       "MatteoGabriele"
     ]
+  },
+  {
+    "username": "tony1233200",
+    "id": 127579663,
+    "reason": "Opened a new PR against a different issue in a short timeframe just after another PR was closed to a missing PR template.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/574",
+    "reportedBy": "vytas7",
+    "createdAt": "2026-11-15",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "trueberryless",
+      "ematipico"
+    ]
   }
 ]
