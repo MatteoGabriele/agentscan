@@ -51,7 +51,7 @@
     "@unveil/identity": "3.3.0",
     "@unveil/vk": "1.0.0",
     "@vueuse/core": "^14.4.0",
-    "dayjs": "^1.11.19",
+    "dayjs": "^1.11.23",
     "nuxt": "^4.6.4",
     "nuxt-og-image": "^7.0.7",
     "octokit": "^5.0.5",
