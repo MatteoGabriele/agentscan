@@ -203,8 +203,8 @@ importers:
         specifier: ^3.31.3
         version: 3.31.3(@floating-ui/dom@1.7.6)(@tiptap/core@3.31.3(@tiptap/pm@3.31.3))(@tiptap/pm@3.31.3)(vue@3.5.44(typescript@6.0.3))
       '@unocss/preset-icons':
-        specifier: ^66.12.0
-        version: 66.12.0
+        specifier: ^66.13.0
+        version: 66.13.0
       '@unveil/identity':
         specifier: 3.3.0
         version: 3.3.0
@@ -2108,6 +2108,9 @@ packages:
   '@unocss/core@66.12.0':
     resolution: {integrity: sha512-kWPbF6ilPyrKm5+XNKsHtCZYY5BSHGeCPKb19bEQnvFknPyi57xfBpI/3GSj5zs8i0EMbQkJbT22BcgeJ4DAZw==}
 
+  '@unocss/core@66.13.0':
+    resolution: {integrity: sha512-RacGWqjZj8kEN5mtFFbEcaqtpvSkSBMrzqAIaIx0BAtkAA7GHUlw25fSXbx6jxuknnZk2Pe/s+B/dbBAgmD+Gg==}
+
   '@unocss/extractor-arbitrary-variants@66.12.0':
     resolution: {integrity: sha512-2T1lMbsH1MEKXOhINez98OOdT0ndHvooPnNCgAP1yiIzGhO13L0Pls+Yok0hGwg4EEoiByrxoYCPudzxSRMIDw==}
 
@@ -2122,6 +2125,9 @@ packages:
 
   '@unocss/preset-icons@66.12.0':
     resolution: {integrity: sha512-4QHRRGAZRgh3TPWOX1uN6/ZfQnfRDyhI+MJZl+5HxW12kOUKT6Hin3v/sOA7Dyfy2pN0CKRE2EbXutb/PhJDUw==}
+
+  '@unocss/preset-icons@66.13.0':
+    resolution: {integrity: sha512-R6IYuNkBvStHyoSGHw/srAW44evovrm4sKnN5awlZDEfY50wSR72L8ECA5nKHwYrBqsjqz3kvDAA+BRvSQgq4w==}
 
   '@unocss/preset-mini@66.12.0':
     resolution: {integrity: sha512-aGXu7E1DQW/W1IVUBFilC+Z0h6LbGTaM2j6VpBnpAjzpnd5LGGqIk5BG2kVRVaem/9MfmuYUdkyCJn1Y1dP5XA==}
@@ -7559,6 +7565,11 @@ snapshots:
 
   '@unocss/core@66.12.0': {}
 
+  '@unocss/core@66.13.0':
+    dependencies:
+      magic-string: 1.4.5
+      unconfig: 7.5.0
+
   '@unocss/extractor-arbitrary-variants@66.12.0':
     dependencies:
       '@unocss/core': 66.12.0
@@ -7630,6 +7641,13 @@ snapshots:
     dependencies:
       '@iconify/utils': 3.1.7
       '@unocss/core': 66.12.0
+      ofetch: 1.5.1
+
+  '@unocss/preset-icons@66.13.0':
+    dependencies:
+      '@iconify/types': 2.0.0
+      '@iconify/utils': 3.1.7
+      '@unocss/core': 66.13.0
       ofetch: 1.5.1
 
   '@unocss/preset-mini@66.12.0':
