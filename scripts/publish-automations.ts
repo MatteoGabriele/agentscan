@@ -1,5 +1,6 @@
 /// <reference types="node" />
 
+import { execFileSync } from 'node:child_process'
 import { Octokit } from 'octokit'
 import {
   generateEntry,
@@ -42,6 +43,14 @@ export function closesLines(issues: number[]): string {
     .sort((a, b) => a - b)
     .map((issue) => `closes #${issue}`)
     .join('\n')
+}
+
+/** Commit message for the published entries, closing their reports. */
+export function commitMessage(issues: number[]): string {
+  const subject =
+    issues.length === 1 ? 'feat: add automation' : 'feat: add automations'
+
+  return `${subject}\n\n${closesLines(issues)}`
 }
 
 async function stillOnGitHub(
@@ -140,10 +149,14 @@ async function main() {
 
   writeList([...list, ...publishable])
   console.log(`\nAdded ${publishable.length} entr(y/ies) to ${LIST_PATH}`)
-  console.log('Commit it on a branch and open a pull request to publish.')
-  // A commit with these lines closes the reports when merged.
-  console.log('\nPaste into the commit message to close the reports:\n')
-  console.log(closesLines(published))
+
+  // Only the list is committed, whatever else is staged. Nothing is pushed.
+  const message = commitMessage(published)
+  execFileSync('git', ['commit', '-m', message, '--', LIST_PATH], {
+    stdio: 'inherit',
+  })
+  console.log('\nCommitted (not pushed):\n')
+  console.log(message)
 }
 
 // Runs only when executed directly, not when imported.
