@@ -1218,5 +1218,19 @@
       "trueberryless",
       "ematipico"
     ]
+  },
+  {
+    "username": "machenh001-pixel",
+    "id": 267278142,
+    "reason": "PR description starts with \"Thanks for the nudge.\" even though this is the user's first interaction with this repo.",
+    "issueUrl": "https://github.com/MatteoGabriele/agentscan/issues/579",
+    "reportedBy": "FloEdelmann",
+    "createdAt": "2026-11-17",
+    "approvedBy": [
+      "MatteoGabriele",
+      "graphieros",
+      "ematipico",
+      "danielroe"
+    ]
   }
 ]
