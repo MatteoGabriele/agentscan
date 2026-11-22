@@ -97,4 +97,12 @@ export const landmarks: Landmark[] = [
     icon: 'i-lucide:newspaper',
     iconSvg: SVG_ICON.newspaper,
   },
+  {
+    date: '2026-11-15',
+    name: 'Detection update',
+    description:
+      'The detection library now detects AI-generated pull requests and comments, along with further fine-tuning of the classification.',
+    icon: 'i-lucide:info',
+    iconSvg: SVG_ICON.info,
+  },
 ]
