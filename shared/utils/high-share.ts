@@ -18,13 +18,15 @@ export type HighShare = {
  * automation: 95th percentile of the daily shares from Sep 7 to Nov 13 2026
  * (68 days), rounded up: 34.63 → 35.
  *
- * mixed: paused. @unveil/identity 3.2/3.3 (live from Nov 15 2026) caps AI agent
- * accounts at "mixed", which moved the daily share from ~10% to ~22%.
- * Re-measure as the 95th percentile once ~4 weeks exist (mid-Dec 2026).
+ * mixed: provisional. 95th percentile of the daily shares from Nov 15 to
+ * Nov 27 2026 (12 full days), rounded up: 23.74 → 24 (mean + 2SD: 24.4).
+ * Only days from Nov 15 count: @unveil/identity 3.2/3.3 caps AI agent accounts
+ * at "mixed", which moved the daily share from ~10% to ~22%.
+ * Re-measure once ~4 weeks exist (mid-Dec 2026).
  */
 export const DAILY_SHARE_CEILINGS: HighShareCeilings = {
   automation: 35,
-  mixed: null,
+  mixed: 24,
 }
 
 export function findHighShares(
